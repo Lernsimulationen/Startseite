@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hiob: Klage, Streit und Hoffnung</title>
+    
+    <!-- 
+      SICHERHEIT (CSP - GEHÄRTET): 
+      - script-src: Nur Skripte mit dem korrekten Nonce erlaubt (Kein 'unsafe-inline' mehr für JS).
+      - style-src: 'unsafe-inline' erlaubt (notwendig für Single-File CSS).
+      - base-uri / form-action: 'none' verhindert URL-Manipulation und Formular-Hijacking.
+      - frame-ancestors: Wird in <meta> ignoriert, daher hier nicht gesetzt (regelt Server/Embedder).
+    -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'none'; 
+        script-src 'nonce-hiobSicherheit123'; 
+        style-src 'unsafe-inline'; 
+        img-src 'self' data:; 
+        font-src 'none'; 
+        connect-src 'none'; 
+        object-src 'none'; 
+        base-uri 'none'; 
+        form-action 'none';
+    ">
+
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #d35400;
+            --bg: #f4f6f7;
+            --card-bg: #ffffff;
+            --text: #2c3e50;
+            --border: #bdc3c7;
+            --error: #c0392b;
+            --success: #27ae60;
+        }
+
+        /* Base Typography */
+        * { box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 15px;
+        }
+
+        h1 { margin: 0; font-size: 1.5rem; }
+
+        /* Status Bar */
+        #status-bar {
+            font-size: 0.8rem;
+            margin-left: 10px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .status-saved { color: var(--success); }
+        .status-error { color: var(--error); }
+
+        /* Navigation */
+        .nav-steps {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .nav-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 10px 15px;
+            cursor: pointer;
+            white-space: nowrap;
+            border-radius: 4px;
+            color: #7f8c8d;
+            font-weight: 600;
+        }
+
+        .nav-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Content Sections */
+        .phase-content {
+            display: none;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .phase-content.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Form Elements */
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        textarea, input[type="text"], select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-family: inherit;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        textarea { min-height: 120px; resize: vertical; }
+
+        /* Character Counter Style */
+        .char-count {
+            font-size: 0.75rem;
+            text-align: right;
+            color: #95a5a6;
+            margin-top: -12px;
+            margin-bottom: 15px;
+        }
+
+        /* Buttons */
+        .btn {
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: opacity 0.2s;
+        }
+        .btn:hover { opacity: 0.9; }
+        
+        .btn-primary { background-color: var(--accent); color: white; }
+        .btn-secondary { background-color: #95a5a6; color: white; font-size: 0.9rem; }
+        .btn-small { padding: 5px 10px; font-size: 0.8rem; }
+
+        /* Mood Selector */
+        .mood-selector {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .mood-btn {
+            font-size: 2rem;
+            background: transparent;
+            border: 2px solid transparent;
+            cursor: pointer;
+            border-radius: 12px;
+            padding: 10px;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .mood-btn span { display: block; font-size: 0.8rem; margin-top: 5px; color: var(--text); }
+        .mood-btn:hover { background: #f0f0f0; }
+        .mood-btn.selected {
+            background: #fff3e0;
+            border-color: var(--accent);
+            transform: scale(1.05);
+        }
+
+        /* Matrix & Layouts */
+        .text-workspace {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .biblical-text {
+            background: #f9f9f9;
+            padding: 20px;
+            border-left: 4px solid var(--primary);
+            font-family: "Georgia", serif;
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+
+        .matrix-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            background: #fff;
+            border-left: 5px solid var(--accent);
+        }
+        .matrix-row {
+            display: flex;
+            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+        }
+        .matrix-row:last-child { border-bottom: none; }
+        .matrix-label { font-weight: bold; width: 140px; color: var(--primary); flex-shrink: 0; }
+
+        /* Helper Classes */
+        .hidden { display: none !important; }
+        .warning-box { 
+            background-color: #fceceb; 
+            color: #c0392b; 
+            padding: 10px; 
+            border-radius: 4px; 
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .text-workspace { grid-template-columns: 1fr; }
+            .nav-steps { padding-bottom: 15px; }
+            .matrix-row { flex-direction: column; }
+            .matrix-label { margin-bottom: 5px; color: #7f8c8d; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div style="display:flex; align-items:center;">
+            <h1>Hiob Interaktiv</h1>
+            <span id="status-bar"></span>
+        </div>
+        <button id="btn-reset" class="btn btn-secondary" title="Löscht alle Eingaben">Reset / Neu 🗑️</button>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav-steps" id="main-nav">
+        <button class="nav-btn active" data-target="phaseA">1. Einstieg</button>
+        <button class="nav-btn" data-target="phaseB">2. Textarbeit</button>
+        <button class="nav-btn" data-target="phaseC">3. Struktur</button>
+        <button class="nav-btn" data-target="phaseD">4. Deutung</button>
+        <button class="nav-btn" data-target="phaseE">5. Transfer</button>
+        <button class="nav-btn" data-target="phaseF">6. Abschluss</button>
+    </nav>
+
+    <!-- PHASE A: EINSTIEG -->
+    <section id="phaseA" class="phase-content active">
+        <h2>Impuls</h2>
+        <div style="text-align: center; padding: 20px; background: #fafafa; border-radius:8px; margin-bottom:20px;">
+            <blockquote style="font-size: 1.4rem; font-style: italic; color: var(--primary); margin:0;">
+                „Lass mich wissen, warum du mich befehdest.“
+            </blockquote>
+            <p style="margin-top:10px; font-weight:bold;">(Hiob 10,2)</p>
+        </div>
+
+        <label>Welche Gefühle stecken in diesem Satz? (Wähle eines aus)</label>
+        <div class="mood-selector" id="mood-container">
+            <button class="mood-btn" data-mood="wut">😠<span>Wut</span></button>
+            <button class="mood-btn" data-mood="angst">😨<span>Angst</span></button>
+            <button class="mood-btn" data-mood="trauer">😢<span>Trauer</span></button>
+            <button class="mood-btn" data-mood="unverstaendnis">🤔<span>Frage</span></button>
+            <button class="mood-btn" data-mood="trotz">😤<span>Trotz</span></button>
+        </div>
+
+        <label for="inputPhaseA">Deine erste Assoziation (Stichwort):</label>
+        <input type="text" id="inputPhaseA" data-key="phaseA_assoc" maxlength="100" placeholder="z.B. Ungerechtigkeit...">
+        
+        <div class="warning-box">
+            <span>🛡️</span> 
+            Datenschutz-Hinweis: Deine Eingaben werden nur temporär im Browser gespeichert (Session). Beim Schließen des Tabs sind sie weg. Bitte gib keine echten Namen ein.
+        </div>
+    </section>
+
+    <!-- PHASE B: TEXTARBEIT -->
+    <section id="phaseB" class="phase-content">
+        <h2>Textstationen</h2>
+        <label for="textSelect">Wähle deinen Textabschnitt:</label>
+        <select id="textSelect">
+            <option value="hi3">Hiob 3,20–26 (Lebensmüdigkeit)</option>
+            <option value="hi9">Hiob 9,11–18 (Gott ungreifbar)</option>
+            <option value="hi16">Hiob 16,9–14 (Gott als Feind)</option>
+            <option value="hi19">Hiob 19,6–12 (Eingeschlossen)</option>
+        </select>
+
+        <div class="text-workspace">
+            <div>
+                <h3>Bibeltext</h3>
+                <div id="biblicalTextDisplay" class="biblical-text"></div>
+            </div>
+            <div>
+                <h3>Analyse</h3>
+                <label for="inpContent">Inhalt (Kurzfassung):</label>
+                <textarea id="inpContent" data-key="phaseB_content" maxlength="500" placeholder="Worum geht es hier im Kern?"></textarea>
+                <div class="char-count">max. 500 Zeichen</div>
+
+                <label for="inpKeywords">3 Schlüsselwörter:</label>
+                <input type="text" id="inpKeywords" data-key="phaseB_keywords" maxlength="100" placeholder="Wort 1, Wort 2, Wort 3">
+
+                <label for="inpMetaphor">Zentrales Bild / Metapher:</label>
+                <input type="text" id="inpMetaphor" data-key="phaseB_metaphor" maxlength="150" placeholder="z.B. ein wildes Tier, ein Netz...">
+                
+                <label for="inpDemand">Forderung an Gott:</label>
+                <input type="text" id="inpDemand" data-key="phaseB_demand" maxlength="150" placeholder="Was will Hiob?">
+            </div>
+        </div>
+    </section>
+
+    <!-- PHASE C: STRUKTUR -->
+    <section id="phaseC" class="phase-content">
+        <h2>Struktur: Die Klage-Matrix</h2>
+        <p>Automatische Zusammenfassung deiner Ergebnisse.</p>
+
+        <div class="matrix-card">
+            <h3 style="margin-top:0;">Klage-Karte</h3>
+            <div class="matrix-row">
+                <div class="matrix-label">Textstelle</div>
+                <div class="matrix-value" id="outTextstelle">-</div>
+            </div>
+            <div class="matrix-row">
+                <div class="matrix-label">Anlass</div>
+                <div class="matrix-value" id="outContent">-</div>
+            </div>
+             <div class="matrix-row">
+                <div class="matrix-label">Bildsprache</div>
+                <div class="matrix-value" id="outMetaphor" style="color: var(--accent); font-weight:bold;">-</div>
+            </div>
+            <div class="matrix-row">
+                <div class="matrix-label">Forderung</div>
+                <div class="matrix-value" id="outDemand">-</div>
+            </div>
+        </div>
+        <br>
+        <button id="btn-print" class="btn btn-secondary">🖨️ Drucken / PDF speichern</button>
+    </section>
+
+    <!-- PHASE D: DEUTUNG -->
+    <section id="phaseD" class="phase-content">
+        <h2>Deutungsangebote</h2>
+        <p>Wähle eine "Linse", um den Text zu betrachten:</p>
+
+        <div id="lens-nav" style="display:flex; gap:10px; margin-bottom:15px;">
+            <button class="btn btn-small btn-secondary" data-lens="theology">Theologisch</button>
+            <button class="btn btn-small btn-secondary" data-lens="psychology">Psychologisch</button>
+            <button class="btn btn-small btn-secondary" data-lens="ethics">Ethisch</button>
+        </div>
+
+        <div id="lens-content-area" style="background:#f9f9f9; padding:15px; border-radius:4px; border:1px solid #eee; margin-bottom:20px;">
+            <!-- Dynamischer Inhalt -->
+            <p>Bitte wähle oben eine Perspektive.</p>
+        </div>
+        
+        <label for="inpDeutung">Deine Meinung dazu:</label>
+        <textarea id="inpDeutung" data-key="phaseD_deutung" maxlength="800" placeholder="Welche Deutung findest du passend? Warum?"></textarea>
+    </section>
+
+    <!-- PHASE E: TRANSFER -->
+    <section id="phaseE" class="phase-content">
+        <h2>Schreibwerkstatt</h2>
+        
+        <label for="levelSelect">Wähle dein Level:</label>
+        <select id="levelSelect">
+            <option value="A">Level A (Basis): Eigene Klage</option>
+            <option value="B">Level B (Mittel): Die Antwort</option>
+            <option value="C">Level C (Vertiefung): Regeln für Begleitung</option>
+        </select>
+
+        <div id="taskDisplay" class="warning-box" style="background-color: #e8f6f3; color: #0e6251; margin-bottom:15px;">
+            <!-- JS füllt dies -->
+        </div>
+
+        <textarea id="inpTransfer" data-key="phaseE_transfer" maxlength="2000" placeholder="Schreibe hier deinen Text..."></textarea>
+        
+        <div id="helpBox" class="hidden" style="background: #fff8e1; padding: 10px; margin-bottom: 15px; border-radius: 4px; border: 1px solid #f1c40f;">
+            <strong>Satzanfänge zur Hilfe:</strong><br>
+            • "Ich klage an, dass..."<br>
+            • "Warum muss ich..."<br>
+            • "Es fühlt sich an wie..."
+        </div>
+        <button id="btn-toggle-help" class="btn btn-small btn-secondary">💡 Hilfe an/aus</button>
+    </section>
+
+    <!-- PHASE F: ABSCHLUSS -->
+    <section id="phaseF" class="phase-content">
+        <h2>Exit-Ticket & Export</h2>
+        
+        <label for="exitSatz">Ein Satz, der mir bleibt:</label>
+        <input type="text" id="exitSatz" data-key="phaseF_satz" maxlength="200">
+
+        <label for="exitFrage">Eine offene Frage:</label>
+        <input type="text" id="exitFrage" data-key="phaseF_frage" maxlength="200">
+
+        <label for="exitNoGo">No-Go Satz bei Krisen:</label>
+        <input type="text" id="exitNoGo" data-key="phaseF_nogo" maxlength="200">
+
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid var(--border);">
+            <h3>Sichern</h3>
+            <button id="btn-download" class="btn btn-primary">💾 Als Textdatei speichern</button>
+        </div>
+    </section>
+
+</div>
+
+<!-- 
+  SCRIPT BLOCK 
+  Nonce Attribut ist Pflicht aufgrund der CSP-Regel.
+-->
+<script nonce="hiobSicherheit123">
+    /**
+     * KONFIGURATION & DATENSCHUTZ
+     * 'session' = Daten werden gelöscht, wenn Browser geschlossen wird (Empfohlen für Schulen)
+     * 'local' = Daten bleiben dauerhaft (Nur für private Geräte)
+     */
+    const CONFIG = {
+        STORAGE_MODE: 'session', 
+        STORAGE_KEY: 'hiob_app_data_v1',
+        DEBOUNCE_MS: 500
+    };
+
+    // --- STATIC DATA ---
+    const TEXTS = {
+        hi3: `(20) Warum gibt er dem Mühseligen Licht und Leben den verbitterten Herzen,\n(21) die auf den Tod warten, und er kommt nicht...\n(23) Dem Mann, dessen Weg verborgen ist und den Gott ringsum eingeschlossen hat?`,
+        hi9: `(11) Siehe, er geht an mir vorüber, und ich sehe ihn nicht...\n(17) Er, der mich im Sturm zermalmt und meine Wunden ohne Grund mehrt.`,
+        hi16: `(9) Sein Zorn hat mich zerrissen und befeindet...\n(12) Ich hatte Ruhe, da hat er mich zerrüttet; er hat mich beim Nacken ergriffen und mich zerschmettert.`,
+        hi19: `(6) So erkennt doch, dass Gott mir Unrecht getan und sein Netz über mir zusammengezogen hat!\n(8) Meinen Weg hat er vermauert...`
+    };
+
+    const LENSES = {
+        theology: { title: "Theologisch", text: "Klage ist hier legitimes Gebet. Hiob klagt Gott bei Gott an und hält so an der Beziehung fest." },
+        psychology: { title: "Psychologisch", text: "Sprache schafft Distanz zum Trauma. Das Benennen des Grauens (Coping) verhindert das Verstummen." },
+        ethics: { title: "Ethisch", text: "Solidarität bedeutet, das Leid auszuhalten, statt es vorschnell zu erklären (wie die Freunde Hiobs)." }
+    };
+
+    const TASKS = {
+        A: "Aufgabe: Schreibe eine 'Klage in 6 Zeilen' (Adressat, Klage, Bild, Forderung). Keine privaten Details!",
+        B: "Aufgabe: Formuliere eine Antwort eines Freundes. Was ist hilfreich, was übergriffig?",
+        C: "Aufgabe: Entwickle 3 Regeln für 'gute Begleitung' bei Leid."
+    };
+
+    // --- APP STATE ---
+    let appState = {
+        mood: '',
+        textSelection: 'hi3',
+        inputs: {} 
+    };
+
+    // --- CORE FUNCTIONS ---
+
+    // 1. Storage Abstraction (Robustness)
+    const StorageService = {
+        getProvider() {
+            try {
+                return CONFIG.STORAGE_MODE === 'session' ? sessionStorage : localStorage;
+            } catch(e) {
+                console.warn("Storage access denied/failed", e);
+                return null; // Fallback für extrem restriktive Browser-Settings
+            }
+        },
+        save(data) {
+            const provider = this.getProvider();
+            if(!provider) return;
+
+            try {
+                provider.setItem(CONFIG.STORAGE_KEY, JSON.stringify(data));
+                ui.showStatus('Gespeichert', 'success');
+            } catch (e) {
+                console.error("Storage Error:", e);
+                if (e.name === 'QuotaExceededError') {
+                    ui.showStatus('Speicher voll!', 'error');
+                } else {
+                    ui.showStatus('Fehler beim Speichern', 'error');
+                }
+            }
+        },
+        load() {
+            const provider = this.getProvider();
+            if(!provider) return null;
+
+            try {
+                const raw = provider.getItem(CONFIG.STORAGE_KEY);
+                if (!raw) return null;
+
+                const parsed = JSON.parse(raw);
+                
+                // Defensive Prüfung: Ist das Geladene wirklich ein Objekt?
+                if (parsed && typeof parsed === 'object') {
+                    // Sicherstellen, dass 'inputs' existiert
+                    if (!parsed.inputs || typeof parsed.inputs !== 'object') {
+                        parsed.inputs = {};
+                    }
+                    return parsed;
+                }
+                return null; // Daten korrupt oder falsches Format -> Neu starten
+            } catch (e) {
+                console.error("Corrupt Data ignored", e);
+                return null;
+            }
+        },
+        clear() {
+            const provider = this.getProvider();
+            if(provider) provider.removeItem(CONFIG.STORAGE_KEY);
+        }
+    };
+
+    // 2. Debounce
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            const context = this;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), wait);
+        };
+    }
+
+    // 3. UI Helper
+    const ui = {
+        showStatus(msg, type) {
+            const el = document.getElementById('status-bar');
+            el.textContent = msg;
+            el.className = type === 'success' ? 'status-saved' : 'status-error';
+            el.style.opacity = '1';
+            setTimeout(() => { el.style.opacity = '0'; }, 2000);
+        },
+        switchPhase(targetId) {
+            document.querySelectorAll('.phase-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            
+            const targetEl = document.getElementById(targetId);
+            if(targetEl) targetEl.classList.add('active');
+            
+            const btn = document.querySelector(`.nav-btn[data-target="${targetId}"]`);
+            if(btn) btn.classList.add('active');
+
+            if(targetId === 'phaseC') updateMatrix();
+        }
+    };
+
+    // --- LOGIC ---
+
+    function init() {
+        const saved = StorageService.load();
+        if (saved) {
+            appState = saved;
+            restoreInputs();
+        }
+        
+        loadTextContent();
+        updateTaskDisplay();
+        attachEventListeners();
+    }
+
+    function attachEventListeners() {
+        // Navigation
+        document.getElementById('main-nav').addEventListener('click', (e) => {
+            if (e.target.classList.contains('nav-btn')) {
+                ui.switchPhase(e.target.dataset.target);
+            }
+        });
+
+        // Mood Selector
+        document.getElementById('mood-container').addEventListener('click', (e) => {
+            const btn = e.target.closest('.mood-btn');
+            if (btn) {
+                document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                appState.mood = btn.dataset.mood;
+                debouncedSave();
+            }
+        });
+
+        // Text Select
+        document.getElementById('textSelect').addEventListener('change', (e) => {
+            appState.textSelection = e.target.value;
+            loadTextContent();
+            debouncedSave();
+        });
+
+        // Level Select
+        document.getElementById('levelSelect').addEventListener('change', updateTaskDisplay);
+
+        // Lens Buttons (REFACTORED for Safety: No innerHTML)
+        document.getElementById('lens-nav').addEventListener('click', (e) => {
+            if(e.target.dataset.lens) {
+                const lens = LENSES[e.target.dataset.lens];
+                const display = document.getElementById('lens-content-area');
+                
+                // Clear content safely
+                display.textContent = ''; 
+                
+                // Create DOM Elements safely
+                const h3 = document.createElement('h3');
+                h3.textContent = lens.title;
+                
+                const p = document.createElement('p');
+                p.textContent = lens.text;
+                
+                display.appendChild(h3);
+                display.appendChild(p);
+            }
+        });
+
+        // Inputs
+        const inputs = document.querySelectorAll('input[data-key], textarea[data-key]');
+        inputs.forEach(input => {
+            input.addEventListener('input', (e) => {
+                appState.inputs[e.target.dataset.key] = e.target.value;
+                debouncedSave();
+            });
+        });
+
+        // Buttons
+        document.getElementById('btn-reset').addEventListener('click', () => {
+            if(confirm('Wirklich alles löschen?')) {
+                StorageService.clear();
+                location.reload();
+            }
+        });
+        
+        document.getElementById('btn-toggle-help').addEventListener('click', () => {
+            document.getElementById('helpBox').classList.toggle('hidden');
+        });
+
+        document.getElementById('btn-print').addEventListener('click', () => window.print());
+        document.getElementById('btn-download').addEventListener('click', downloadData);
+    }
+
+    // --- BUSINESS LOGIC ---
+
+    const debouncedSave = debounce(() => {
+        StorageService.save(appState);
+    }, CONFIG.DEBOUNCE_MS);
+
+    function loadTextContent() {
+        const textKey = appState.textSelection || 'hi3';
+        document.getElementById('textSelect').value = textKey;
+        document.getElementById('biblicalTextDisplay').textContent = TEXTS[textKey] || '';
+    }
+
+    function updateTaskDisplay() {
+        const val = document.getElementById('levelSelect').value;
+        document.getElementById('taskDisplay').textContent = TASKS[val];
+    }
+
+    function updateMatrix() {
+        const selText = document.getElementById('textSelect');
+        const textName = selText.options[selText.selectedIndex].text;
+        
+        setTextSafe('outTextstelle', textName);
+        setTextSafe('outContent', appState.inputs['phaseB_content'] || '...');
+        setTextSafe('outMetaphor', appState.inputs['phaseB_metaphor'] || '...');
+        setTextSafe('outDemand', appState.inputs['phaseB_demand'] || '...');
+    }
+
+    function setTextSafe(id, text) {
+        document.getElementById(id).textContent = text;
+    }
+
+    function restoreInputs() {
+        if (appState.mood) {
+            const btn = document.querySelector(`.mood-btn[data-mood="${appState.mood}"]`);
+            if (btn) btn.classList.add('selected');
+        }
+        for (const [key, val] of Object.entries(appState.inputs)) {
+            const el = document.querySelector(`[data-key="${key}"]`);
+            if (el) el.value = val;
+        }
+    }
+
+    function downloadData() {
+        const date = new Date().toLocaleDateString('de-DE');
+        let txt = `HIOB ARBEITSBLATT - ${date}\n============================\n\n`;
+        
+        const getVal = (k) => appState.inputs[k] || '-';
+
+        txt += `1. EINSTIEG\nStimmung: ${appState.mood}\nAssoziation: ${getVal('phaseA_assoc')}\n\n`;
+        txt += `2. TEXTARBEIT (${appState.textSelection})\nInhalt: ${getVal('phaseB_content')}\n`;
+        txt += `Begriffe: ${getVal('phaseB_keywords')}\nBild: ${getVal('phaseB_metaphor')}\nForderung: ${getVal('phaseB_demand')}\n\n`;
+        txt += `4. DEUTUNG\nMeinung: ${getVal('phaseD_deutung')}\n\n`;
+        txt += `5. TRANSFER\n${getVal('phaseE_transfer')}\n\n`;
+        txt += `6. ABSCHLUSS\nSatz: ${getVal('phaseF_satz')}\nFrage: ${getVal('phaseF_frage')}\nNo-Go: ${getVal('phaseF_nogo')}\n`;
+
+        // UTF-8 BOM hinzufügen (\uFEFF) damit Windows/Excel Umlaute erkennt
+        const blob = new Blob(['\uFEFF' + txt], { type: 'text/plain;charset=utf-8' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Hiob_Mappe.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    }
+
+    // Start App
+    document.addEventListener('DOMContentLoaded', init);
+
+</script>
+</body>
+</html>
