@@ -1,88 +1,932 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Lernsimulationen – Q1</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steuerstaat im Alltag – Umverteilung entscheiden</title>
+    
+    <!-- 
+        SECURITY & DATENSCHUTZ (DSGVO/Security by Design):
+        1. Content-Security-Policy (CSP): 
+           - Strikte Regeln für Skripte und Styles.
+           - frame-ancestors: Erlaubt Einbettung in Schul-Plattformen (z.B. Google Sites).
+           - form-action 'self': Verhindert Datenabfluss via Formular-Submit.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self' https://sites.google.com;">
+    
+    <!-- SYSTEM FONTS & CSS (Keine externen Requests) -->
+    <style>
+        :root {
+            --color-primary: #2563eb;
+            --color-primary-hover: #1d4ed8;
+            --color-bg: #f3f4f6;
+            --color-white: #ffffff;
+            --color-text: #1f2937;
+            --color-text-light: #6b7280;
+            --color-border: #e5e7eb;
+            --color-success: #16a34a;
+            --color-warning: #ca8a04;
+            --color-danger: #dc2626;
+            --radius: 0.5rem;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            margin: 0;
+            line-height: 1.5;
+        }
 
-  <style>
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-                   Roboto, Helvetica, Arial, sans-serif;
-      margin: 0;
-      padding: 2rem;
-      background-color: #f5f7fa;
-      color: #1f2937;
-      line-height: 1.6;
-    }
+        /* Layout & Container */
+        .container { max-width: 64rem; margin: 0 auto; padding: 1rem; }
+        .card { background: var(--color-white); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow); margin-bottom: 1.5rem; }
+        .header { background: var(--color-white); border-bottom: 1px solid var(--color-border); position: sticky; top: 0; z-index: 10; padding: 1rem 0; }
+        
+        /* Flex & Grid Utilities */
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .flex-wrap { flex-wrap: wrap; }
+        .justify-between { justify-content: space-between; }
+        .justify-end { justify-content: flex-end; }
+        .justify-center { justify-content: center; }
+        .items-center { align-items: center; }
+        .items-start { align-items: flex-start; }
+        .gap-1 { gap: 0.25rem; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-4 { gap: 1rem; }
+        
+        .grid { display: grid; gap: 1rem; }
+        .grid-2 { grid-template-columns: 1fr; }
+        .grid-3 { grid-template-columns: 1fr; }
+        
+        @media(min-width: 768px) { 
+            .grid-2 { grid-template-columns: 1fr 1fr; } 
+            .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+        }
 
-    h1 {
-      margin-top: 0;
-      font-size: 2rem;
-      border-bottom: 3px solid #2563eb;
-      padding-bottom: 0.5rem;
-    }
+        /* UI Elements */
+        button {
+            cursor: pointer; padding: 0.75rem 1.5rem; border-radius: var(--radius); border: 1px solid transparent; font-weight: 600; font-size: 1rem; transition: all 0.2s;
+            background-color: var(--color-border); color: var(--color-text);
+        }
+        button:hover:not(:disabled) { filter: brightness(0.95); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .btn-primary { background-color: var(--color-primary); color: white; }
+        .btn-primary:hover:not(:disabled) { background-color: var(--color-primary-hover); }
+        
+        .btn-success { background-color: var(--color-success); color: white; }
+        
+        .btn-ghost { background-color: transparent; border: 1px solid var(--color-border); }
+        .btn-ghost:hover { background-color: #f9fafb; }
 
-    ul {
-      list-style: none;
-      padding-left: 0;
-      max-width: 400px;
-    }
+        input[type="range"] { width: 100%; cursor: pointer; }
+        
+        textarea { 
+            width: 100%; border: 1px solid var(--color-border); border-radius: var(--radius); padding: 0.75rem; 
+            font-family: inherit; resize: vertical; box-sizing: border-box; 
+        }
+        textarea:focus { outline: 2px solid var(--color-primary); border-color: transparent; }
 
-    li {
-      margin-top: 1.5rem;
-    }
+        /* Custom Specific Styles */
+        .min-h-60 { min-height: 60px; }
+        
+        .role-card { cursor: pointer; border: 1px solid var(--color-border); border-radius: var(--radius); padding: 1rem; transition: background 0.2s; }
+        .role-card:hover { background-color: #eff6ff; border-color: var(--color-primary); }
+        
+        .highlight-span { padding: 2px 4px; border-radius: 4px; cursor: pointer; margin-right: 4px; transition: background 0.2s; display: inline-block; }
+        .highlight-span:hover { background-color: #fef9c3; }
+        .highlight-span.active { background-color: #86efac; border-bottom: 2px solid #15803d; }
+        
+        .target-box { border: 1px solid var(--color-border); border-radius: var(--radius); padding: 1rem; text-align: center; cursor: pointer; transition: background 0.2s; min-height: 120px; }
+        .target-box:hover { background-color: #f9fafb; }
+        
+        .tax-chip { font-size: 0.75rem; padding: 0.5rem 0.75rem; border-radius: 4px; border: 1px solid var(--color-border); background: white; cursor: pointer; }
+        .tax-chip.selected { background-color: var(--color-primary); color: white; border-color: var(--color-primary); }
+        .tax-chip-assigned { background-color: #dcfce7; color: #166534; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; border: 1px solid #bbf7d0; margin-bottom: 4px; }
 
-    a {
-      display: block;
-      padding: 1rem 1.25rem;
-      background-color: #ffffff;
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      text-decoration: none;
-      color: #1f2937;
-      font-weight: 600;
-      font-size: 1.1rem;
-      transition: background-color 0.2s, border-color 0.2s;
-    }
+        .progress-bar { height: 10px; background: var(--color-border); border-radius: 99px; overflow: hidden; margin-top: 1rem; }
+        .progress-fill { height: 100%; background: var(--color-primary); transition: width 0.5s ease; width: 0%; }
+        
+        /* Toast Notification */
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 100; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: #333; color: white; padding: 12px 24px; border-radius: var(--radius); animation: slideIn 0.3s; max-width: 300px; font-size: 0.875rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .toast.error { background: var(--color-danger); }
+        .toast.success { background: var(--color-success); }
+        @keyframes slideIn { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-    a:hover {
-      background-color: #eff6ff;
-      border-color: #2563eb;
-    }
-
-    footer {
-      margin-top: 3rem;
-      font-size: 0.85rem;
-      color: #6b7280;
-      border-top: 1px solid #d1d5db;
-      padding-top: 1rem;
-      max-width: 500px;
-    }
-  </style>
+        /* Animation */
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Utility Helpers */
+        .text-sm { font-size: 0.875rem; }
+        .text-xs { font-size: 0.75rem; }
+        .font-bold { font-weight: 700; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .text-blue { color: var(--color-primary); }
+        .text-green { color: var(--color-success); }
+        .text-red { color: var(--color-danger); }
+        .text-gray { color: var(--color-text-light); }
+        .bg-gray { background-color: #f9fafb; }
+        .bg-blue-light { background-color: #eff6ff; }
+        .border-blue { border-color: var(--color-primary); }
+        .hidden { display: none !important; }
+        .w-full { width: 100%; }
+    </style>
 </head>
-
 <body>
 
-  <h1>Lernsimulationen</h1>
+    <!-- Header Section -->
+    <header class="header">
+        <div class="container">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="font-bold" style="font-size: 1.125rem;">Finanzausschuss Simulation</h1>
+                    <div id="role-display" class="text-xs text-blue hidden flex items-center gap-2">
+                        <!-- Icon & Role via JS -->
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="text-sm font-bold bg-gray p-2 rounded flex items-center gap-2" style="background: #f3f4f6;">
+                        <span style="height:8px; width:8px; background:var(--color-danger); border-radius:50%; display:inline-block;"></span>
+                        <span id="timer">00:00</span>
+                    </div>
+                    <div class="text-sm font-bold">Akt <span id="act-display">0</span> / 5</div>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
+        </div>
+    </header>
 
-  <p>
-    Bitte wähle deinen Kurs:
-  </p>
+    <!-- Main Content Area -->
+    <main id="app" class="container fade-in">
+        <!-- Inhalte werden hier per JS injiziert (DOM API, kein innerHTML Template) -->
+    </main>
 
-  <ul>
-    <li>
-      <a href="lernsimulationen/kurse/q1/">Q1</a>
-    </li>
-  </ul>
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
 
-  <footer>
-    <p>
-      Diese Seite speichert keine personenbezogenen Daten.
-      Alle Inhalte laufen ausschließlich im Browser.
-    </p>
-  </footer>
+    <script>
+        /**
+         * SICHERHEITSKRITISCHE HELPER (DOM-Erzeugung)
+         * Diese Funktionen ersetzen innerHTML-Templates, um XSS zu verhindern.
+         */
+        
+        // Erzeugt ein DOM-Element mit Klasse und Text
+        function el(tag, className, text) {
+            const e = document.createElement(tag);
+            if (className) e.className = className;
+            if (text !== undefined && text !== null) e.textContent = text;
+            return e;
+        }
 
+        // Erzeugt ein SVG-Icon sicher aus der Trusted Source (ICONS Konstante)
+        function createIcon(iconName, extraClass) {
+            const span = document.createElement('span');
+            span.className = 'icon-wrapper ' + (extraClass || '');
+            if (ICONS[iconName]) {
+                // innerHTML ist hier akzeptabel, da die Quelle (ICONS) statisch und vertrauenswürdig ist.
+                // Es werden KEINE externen Daten injiziert.
+                span.innerHTML = ICONS[iconName];
+            }
+            return span;
+        }
+
+        // Leert einen Container sicher
+        function clearElement(element) {
+            while (element.firstChild) {
+                element.removeChild(element.firstChild);
+            }
+        }
+
+        /**
+         * STATE MANAGEMENT
+         */
+        const state = {
+            act: 0,
+            elapsedTime: 0,
+            timerInterval: null,
+            role: null,
+            evidence: [],
+            assignments: { bund: [], land: [], gemeinde: [], gemeinschaft: [] },
+            taxes: [], 
+            decision: null,
+            rationale: "",
+            quizCorrect: false
+        };
+
+        // --- KONSTANTEN & DATEN ---
+
+        const ROLES = [
+            { id: 'bmf', title: 'Referent/in im BMF', focus: 'Achte auf stabile Einnahmen und Systematik.', icon: 'briefcase' },
+            { id: 'social', title: 'Sozialverband', focus: 'Achte auf Mindestsicherung und Umverteilung.', icon: 'users' },
+            { id: 'business', title: 'Unternehmensverband', focus: 'Achte auf Leistungsanreize und Wettbewerb.', icon: 'building' },
+            { id: 'local', title: 'Kommunalverwaltung', focus: 'Achte auf Gemeindefinanzen (Gewerbesteuer).', icon: 'scale' }
+        ];
+
+        const M16_TEXT = [
+            { id: 1, text: "Der Sozialstaat ist im Grundgesetz (Art. 20 Abs. 1 GG) verankert und verpflichtet den Staat, für soziale Gerechtigkeit zu sorgen." },
+            { id: 2, text: "Eine zentrale Aufgabe ist die Korrektur der Marktergebnisse durch Umverteilung, um extreme Ungleichheiten abzufedern." },
+            { id: 3, text: "Dabei müssen jedoch Zielkonflikte beachtet werden: Zu hohe Steuern können Leistungsanreize für Bürger und Unternehmen schwächen (Effizienz vs. Gerechtigkeit)." },
+            { id: 4, text: "Die Besteuerung muss sich am Leistungsfähigkeitsprinzip orientieren: Starke Schultern tragen mehr als schwache." },
+            { id: 5, text: "Gleichzeitig muss ein Existenzminimum (Mindestsicherung) steuerfrei bleiben, um die Teilhabe aller zu sichern." },
+            { id: 6, text: "Kritiker mahnen, dass Umverteilung bürokratisch teuer ist und Abhängigkeiten vom Staat schaffen kann." },
+            { id: 7, text: "Befürworter argumentieren, dass sozialer Frieden und Stabilität ohne Ausgleich gefährdet sind." }
+        ];
+
+        const M17_TAXES_DATA = [
+            { id: 't1', name: 'Lohn-/Einkommensteuer', correctOwner: 'gemeinschaft', hint: 'Wird geteilt zwischen Bund, Ländern und Gemeinden.' },
+            { id: 't2', name: 'Umsatzsteuer (MwSt)', correctOwner: 'gemeinschaft', hint: 'Die größte Einnahmequelle, wird geteilt.' },
+            { id: 't3', name: 'Gewerbesteuer', correctOwner: 'gemeinde', hint: 'Wichtigste Einnahmequelle der Kommunen.' },
+            { id: 't4', name: 'Energiesteuer', correctOwner: 'bund', hint: 'Geht an den Bund (früher Mineralölsteuer).' },
+            { id: 't5', name: 'Grundsteuer', correctOwner: 'gemeinde', hint: 'Wird auf Grundbesitz erhoben, für die Stadtkasse.' },
+            { id: 't6', name: 'Körperschaftsteuer', correctOwner: 'gemeinschaft', hint: 'Die Einkommensteuer für Unternehmen.' }
+        ];
+
+        // Trusted SVG Strings
+        const ICONS = {
+            briefcase: '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>',
+            users: '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+            building: '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M16 10h.01"/><path d="M8 14h.01"/><path d="M16 14h.01"/></svg>',
+            scale: '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>',
+            check: '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>',
+            alert: '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>',
+            info: '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>'
+        };
+
+        // --- HELPER LOGIC ---
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = el('div', `toast ${type}`, message);
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        function handleError() {
+            showToast("Fehler: Sitzung ungültig. Neustart...", "error");
+            state.act = 0;
+            state.role = null;
+            render();
+        }
+
+        function updateHeader() {
+            document.getElementById('act-display').textContent = state.act;
+            const progress = (state.act / 5) * 100;
+            document.getElementById('progress-fill').style.width = `${progress}%`;
+            
+            const roleDisplay = document.getElementById('role-display');
+            clearElement(roleDisplay);
+            
+            if (state.role) {
+                roleDisplay.classList.remove('hidden');
+                roleDisplay.appendChild(createIcon(state.role.icon));
+                const span = el('span', '', state.role.title);
+                roleDisplay.appendChild(span);
+            } else {
+                roleDisplay.classList.add('hidden');
+            }
+        }
+
+        // --- CORE RENDER LOGIC ---
+
+        function render() {
+            const app = document.getElementById('app');
+            clearElement(app); // Sicher leeren
+            updateHeader();
+
+            // Guard: Acts > 0 require a role
+            if (state.act > 0 && !state.role) {
+                return handleError();
+            }
+
+            switch (state.act) {
+                case 0: renderAct0(app); break;
+                case 1: renderAct1(app); break;
+                case 2: renderAct2(app); break;
+                case 3: renderAct3(app); break;
+                case 4: renderAct4(app); break;
+                case 5: renderAct5(app); break;
+                default: app.textContent = 'Fehler: Unbekannter Akt.';
+            }
+        }
+
+        // --- ACT 0: INTRO ---
+        function renderAct0(container) {
+            const card = el('div', 'card text-center');
+            card.style.maxWidth = '800px';
+            card.style.margin = '2rem auto';
+
+            const h1 = el('h1', '', 'Steuerstaat im Alltag');
+            h1.style.fontSize = '2rem';
+            h1.style.fontWeight = '800';
+            h1.style.marginBottom = '1rem';
+
+            const p = el('p', 'text-gray', 'Willkommen im Finanzausschuss 2025. Wir entscheiden heute über die Zukunft der Umverteilung. Bitte wähle deine Perspektive für diese Sitzung:');
+            p.style.marginBottom = '2rem';
+
+            const grid = el('div', 'grid grid-2 text-left');
+            grid.style.marginBottom = '2rem';
+
+            ROLES.forEach((role, idx) => {
+                const roleCard = el('div', 'role-card flex gap-4 items-start');
+                
+                const iconDiv = el('div', 'text-blue');
+                iconDiv.appendChild(createIcon(role.icon));
+                
+                const contentDiv = el('div');
+                const title = el('div', 'font-bold', role.title);
+                const desc = el('div', 'text-xs text-gray', role.focus);
+                
+                contentDiv.appendChild(title);
+                contentDiv.appendChild(desc);
+                roleCard.appendChild(iconDiv);
+                roleCard.appendChild(contentDiv);
+
+                roleCard.onclick = () => selectRole(idx);
+                grid.appendChild(roleCard);
+            });
+
+            card.append(h1, p, grid);
+            container.appendChild(card);
+        }
+
+        function selectRole(index) {
+            state.role = ROLES[index];
+            state.act = 1;
+            state.taxes = [...M17_TAXES_DATA]; 
+            render();
+        }
+
+        // --- ACT 1: TEXT ARBEIT ---
+        function renderAct1(container) {
+            const wrapper = el('div', 'flex flex-col gap-4');
+
+            // Info Box
+            const infoBox = el('div', 'card bg-blue-light border border-blue');
+            const header = el('div', 'flex items-center gap-2 font-bold text-blue');
+            header.style.marginBottom = '0.5rem';
+            header.appendChild(createIcon('info'));
+            header.appendChild(document.createTextNode('Dossier M16: Begründungsmuster'));
+            
+            const p = el('p', 'text-sm');
+            const strong = el('strong', '', `0 / 3`);
+            strong.id = 'evidence-count'; // ID für Updates
+            
+            p.appendChild(document.createTextNode('Lies den Text. Markiere '));
+            p.appendChild(strong);
+            p.appendChild(document.createTextNode(` Textstellen, die für deine Rolle (${state.role.title}) wichtig sind.`));
+            
+            infoBox.append(header, p);
+
+            // Text Box
+            const textBox = el('div', 'card');
+            M16_TEXT.forEach(item => {
+                const span = el('span', 'highlight-span', item.text);
+                if (state.evidence.includes(item.id)) {
+                    span.classList.add('active');
+                }
+                span.onclick = () => toggleEvidence(item.id, span);
+                textBox.appendChild(span);
+            });
+
+            // Next Button
+            const btnDiv = el('div', 'text-center');
+            const btn = el('button', 'btn-primary', 'Weiter zu Akt 2');
+            btn.id = 'btn-act1-next';
+            btn.disabled = state.evidence.length === 0;
+            btn.onclick = () => nextAct();
+            btnDiv.appendChild(btn);
+
+            wrapper.append(infoBox, textBox, btnDiv);
+            container.appendChild(wrapper);
+            updateEvidenceCount();
+        }
+
+        function toggleEvidence(id, element) {
+            if (state.evidence.includes(id)) {
+                state.evidence = state.evidence.filter(e => e !== id);
+                element.classList.remove('active');
+            } else {
+                if (state.evidence.length >= 3) {
+                    showToast('Maximal 3 Textstellen erlaubt!', 'error');
+                    return;
+                }
+                state.evidence.push(id);
+                element.classList.add('active');
+            }
+            updateEvidenceCount();
+        }
+
+        function updateEvidenceCount() {
+            const elCount = document.getElementById('evidence-count');
+            const btn = document.getElementById('btn-act1-next');
+            if(elCount) elCount.textContent = `${state.evidence.length} / 3`;
+            if(btn) btn.disabled = state.evidence.length === 0;
+        }
+
+        // --- ACT 2: STEUERN ZUORDNEN ---
+        let selectedTaxId = null;
+
+        function renderAct2(container) {
+            const card = el('div', 'card');
+            
+            const h2 = el('h2', 'font-bold', 'M17: Wer bekommt das Geld?');
+            h2.style.marginBottom = '1rem';
+            const p = el('p', 'text-sm text-gray', 'Wähle eine Steuer oben aus und klicke dann unten auf den richtigen Empfänger.');
+            p.style.marginBottom = '1rem';
+
+            // Pool
+            const poolDiv = el('div', 'flex gap-2 flex-wrap mb-8 p-4 bg-gray border border-dashed rounded min-h-60');
+            poolDiv.id = 'tax-pool';
+            
+            // Targets Grid
+            const grid = el('div', 'grid grid-3');
+            
+            // Targets
+            const targets = [
+                {id: 'bund', title: 'Bund', desc: 'Bundesweite Aufgaben'},
+                {id: 'gemeinschaft', title: 'Gemeinschaft', desc: 'Geteilt (Bund/Länder/Gem.)'},
+                {id: 'gemeinde', title: 'Gemeinden', desc: 'Lokale Aufgaben'}
+            ];
+
+            targets.forEach(t => {
+                const targetBox = el('div', 'target-box');
+                targetBox.onclick = () => assignTax(t.id);
+                
+                const title = el('div', 'font-bold', t.title);
+                const desc = el('div', 'text-xs text-gray', t.desc);
+                desc.style.marginBottom = '0.5rem';
+                
+                const listDiv = el('div', 'flex flex-col gap-1');
+                listDiv.id = `target-${t.id}`;
+                
+                targetBox.append(title, desc, listDiv);
+                grid.appendChild(targetBox);
+            });
+
+            card.append(h2, p, poolDiv, grid);
+
+            // Next Button Container
+            const btnDiv = el('div', 'text-center hidden');
+            btnDiv.id = 'btn-act2-next-wrapper';
+            const btn = el('button', 'btn-primary', 'Weiter zu Akt 3');
+            btn.onclick = () => nextAct();
+            btnDiv.appendChild(btn);
+
+            container.append(card, btnDiv);
+
+            renderTaxPool();
+            renderAssignments();
+        }
+
+        function renderTaxPool() {
+            const pool = document.getElementById('tax-pool');
+            const btnWrapper = document.getElementById('btn-act2-next-wrapper');
+            if(!pool) return;
+            
+            clearElement(pool);
+
+            if (state.taxes.length === 0) {
+                const msg = el('span', 'text-sm text-gray italic w-full text-center', 'Alle Steuern verteilt!');
+                pool.appendChild(msg);
+                if(btnWrapper) btnWrapper.classList.remove('hidden');
+            } else {
+                state.taxes.forEach(t => {
+                    const btn = el('button', 'tax-chip', t.name);
+                    if (selectedTaxId === t.id) {
+                        btn.classList.add('selected');
+                    }
+                    btn.onclick = () => {
+                        selectedTaxId = t.id;
+                        renderTaxPool();
+                    };
+                    pool.appendChild(btn);
+                });
+            }
+        }
+
+        function renderAssignments() {
+            for (const [key, list] of Object.entries(state.assignments)) {
+                const container = document.getElementById(`target-${key}`);
+                if (container) {
+                    clearElement(container);
+                    list.forEach(t => {
+                        container.appendChild(el('div', 'tax-chip-assigned', t.name));
+                    });
+                }
+            }
+        }
+
+        function assignTax(targetId) {
+            if (!selectedTaxId) {
+                showToast('Bitte erst eine Steuer oben auswählen.', 'error');
+                return;
+            }
+            const tax = state.taxes.find(t => t.id === selectedTaxId);
+            
+            if (tax.correctOwner !== targetId) {
+                showToast(`Falsch! Tipp: ${tax.hint}`, 'error');
+                return;
+            }
+
+            // Move Tax
+            state.assignments[targetId].push(tax);
+            state.taxes = state.taxes.filter(t => t.id !== selectedTaxId);
+            selectedTaxId = null;
+            
+            showToast('Richtig zugeordnet!', 'success');
+            renderTaxPool();
+            renderAssignments();
+        }
+
+        // --- ACT 3: PROGRESSION ---
+        let income = 30000;
+
+        function renderAct3(container) {
+            const card = el('div', 'card');
+            card.append(
+                el('h2', 'font-bold mb-4', 'M18: Der progressive Tarif'),
+                el('p', 'text-sm mb-6 text-gray', 'Untersuche den Unterschied zwischen Grenz- und Durchschnittssteuersatz.')
+            );
+
+            // Input Section
+            const inputDiv = el('div', 'mb-6');
+            const label = el('label', 'block font-bold mb-2');
+            label.textContent = 'Jahreseinkommen: ';
+            const valSpan = el('span', '', '30.000');
+            valSpan.id = 'income-val';
+            label.append(valSpan, document.createTextNode(' €'));
+
+            const range = el('input');
+            range.type = 'range';
+            range.min = 0; range.max = 100000; range.step = 1000;
+            range.value = income;
+            range.oninput = (e) => updateGraph(e.target.value);
+
+            inputDiv.append(label, range);
+
+            // Stats Grid
+            const statsGrid = el('div', 'grid grid-2 text-center mb-6');
+            
+            const box1 = el('div', 'p-4 bg-gray rounded border border-red');
+            box1.style.backgroundColor = '#fef2f2';
+            box1.append(
+                el('div', 'text-xs text-gray', 'Grenzsteuersatz (auf den nächsten €)'),
+                el('div', 'text-3xl font-bold text-red', '0%') // ID comes via variable logic
+            );
+            box1.lastChild.id = 'marginal-val';
+
+            const box2 = el('div', 'p-4 bg-gray rounded border border-blue');
+            box2.style.backgroundColor = '#eff6ff';
+            box2.append(
+                el('div', 'text-xs text-gray', 'Durchschnittssteuersatz (Gesamtlast)'),
+                el('div', 'text-3xl font-bold text-blue', '0%')
+            );
+            box2.lastChild.id = 'average-val';
+
+            statsGrid.append(box1, box2);
+            card.append(inputDiv, statsGrid);
+
+            // Quiz Section
+            const quizCard = el('div', 'card');
+            quizCard.id = 'quiz-box';
+            quizCard.style.backgroundColor = '#fefce8';
+            quizCard.style.borderColor = '#fef08a';
+            quizCard.style.borderWidth = '1px';
+            quizCard.style.borderStyle = 'solid';
+
+            const quizHeader = el('h3', 'font-bold mb-2 flex items-center gap-2');
+            quizHeader.appendChild(createIcon('alert'));
+            quizHeader.appendChild(document.createTextNode('Verständnis-Check'));
+
+            const quizP = el('p', 'text-sm mb-4', 'Ein Bürger rutscht durch eine Gehaltserhöhung in einen höheren Steuersatz. Was passiert?');
+
+            const formDiv = el('div', 'flex flex-col gap-2');
+            
+            const createOption = (val, text) => {
+                const label = el('label', 'flex gap-2 items-start cursor-pointer');
+                const radio = el('input');
+                radio.type = 'radio';
+                radio.name = 'quiz';
+                radio.value = val;
+                const span = el('span', 'text-sm', text);
+                label.append(radio, span);
+                return label;
+            };
+
+            formDiv.append(
+                createOption('wrong', 'Das gesamte Einkommen wird höher besteuert -> weniger Netto.'),
+                createOption('correct', 'Nur der Teil über der Grenze wird höher besteuert -> immer mehr Netto.')
+            );
+
+            const checkBtn = el('button', 'btn-primary', 'Prüfen');
+            checkBtn.style.marginTop = '1rem';
+            checkBtn.onclick = checkQuiz;
+
+            quizCard.append(quizHeader, quizP, formDiv, checkBtn);
+
+            container.append(card, quizCard);
+            updateGraph(income);
+        }
+
+        function updateGraph(val) {
+            income = parseInt(val);
+            const elVal = document.getElementById('income-val');
+            if(elVal) elVal.textContent = income.toLocaleString('de-DE');
+            
+            const basicAllowance = 11604;
+            let tax = 0;
+            let marginal = 0;
+
+            if (income > basicAllowance) {
+                if (income <= 66760) {
+                    const progress = (income - basicAllowance) / (66760 - basicAllowance);
+                    marginal = 14 + (progress * (42 - 14));
+                    tax = (income - basicAllowance) * ((14 + marginal) / 2 / 100);
+                } else {
+                    const taxBase = (66760 - basicAllowance) * ((14 + 42) / 2 / 100);
+                    tax = taxBase + ((income - 66760) * 0.42);
+                    marginal = 42;
+                    if (income > 277825) marginal = 45;
+                }
+            }
+
+            const average = income > 0 ? (tax / income) * 100 : 0;
+            const elMarg = document.getElementById('marginal-val');
+            const elAvg = document.getElementById('average-val');
+            
+            if(elMarg) elMarg.textContent = marginal.toFixed(1) + '%';
+            if(elAvg) elAvg.textContent = average.toFixed(1) + '%';
+        }
+
+        function checkQuiz() {
+            const selected = document.querySelector('input[name="quiz"]:checked');
+            if (!selected) return showToast('Bitte wähle eine Antwort.', 'error');
+            
+            const quizBox = document.getElementById('quiz-box');
+            clearElement(quizBox);
+
+            if (selected.value === 'correct') {
+                const successDiv = el('div', 'text-green font-bold flex gap-2 items-center');
+                successDiv.appendChild(createIcon('check'));
+                successDiv.appendChild(document.createTextNode('Korrekt! Das Leistungsprinzip bleibt gewahrt.'));
+                
+                const btnDiv = el('div', 'text-center');
+                btnDiv.style.marginTop = '1rem';
+                const nextBtn = el('button', 'btn-primary', 'Weiter zu Akt 4');
+                nextBtn.onclick = nextAct;
+                
+                btnDiv.appendChild(nextBtn);
+                quizBox.append(successDiv, btnDiv);
+            } else {
+                showToast('Falsch. Denk an den Unterschied zwischen Grenz- und Durchschnittssatz!', 'error');
+                // Re-render Quiz box content ideally, but here just warning
+                state.act = 3; 
+                render(); // Reset quiz view
+            }
+        }
+
+        // --- ACT 4: ENTSCHEIDUNG ---
+        let selectedOptionId = null;
+        let selectedEvidenceForRationale = [];
+        const MIN_CHARS = 30;
+        const MAX_CHARS = 800;
+
+        function renderAct4(container) {
+            const card = el('div', 'card');
+            card.appendChild(el('h2', 'font-bold mb-4', 'M19: Deine Reform-Entscheidung'));
+
+            // Options
+            const grid = el('div', 'grid grid-3 mb-6');
+            const OPTIONS = [
+                { id: 'A', title: 'Stärkere Progression', desc: 'Spitzensteuersatz erhöhen (z.B. 48%).', effect: 'Mehr Umverteilung.' },
+                { id: 'B', title: 'Flacherer Tarif', desc: 'Mittelstandsbauch abflachen.', effect: 'Mehr Leistungsanreize.' },
+                { id: 'C', title: 'Status Quo + Transfers', desc: 'Keine Tarifänderung, gezielte Hilfen.', effect: 'Zielgenau.' }
+            ];
+
+            OPTIONS.forEach(o => {
+                const box = el('div', 'border rounded p-4 cursor-pointer');
+                box.id = `opt-${o.id}`;
+                box.onclick = () => selectOption(o.id);
+                
+                box.append(
+                    el('div', 'font-bold text-sm', o.title),
+                    el('div', 'text-xs text-gray', o.desc)
+                );
+                grid.appendChild(box);
+            });
+
+            // Evidence Selector
+            const evDiv = el('div', 'mb-4');
+            evDiv.appendChild(el('h3', 'font-bold text-sm mb-2', '1. Belege auswählen (aus M16)'));
+            
+            const evList = el('div', 'flex flex-wrap gap-2 mb-4');
+            state.evidence.forEach(eid => {
+                const textObj = M16_TEXT.find(t => t.id === eid);
+                if (!textObj) return;
+                
+                const btn = el('button', 'text-xs border p-2 bg-white', textObj.text.substring(0, 40) + '...');
+                btn.id = `evidence-btn-${eid}`;
+                btn.onclick = () => toggleRationaleEvidence(eid, btn);
+                evList.appendChild(btn);
+            });
+            evDiv.appendChild(evList);
+
+            // Rationale Input
+            const textDiv = el('div', 'mb-4');
+            textDiv.appendChild(el('h3', 'font-bold text-sm mb-2', '2. Begründung schreiben'));
+            
+            const textarea = el('textarea');
+            textarea.id = 'rationale-input';
+            textarea.rows = 4;
+            textarea.maxLength = MAX_CHARS;
+            textarea.oninput = (e) => updateCharCount(e.target);
+
+            const metaDiv = el('div', 'flex justify-between text-xs mt-1');
+            const charCount = el('span', 'text-red', `0 / ${MIN_CHARS} (Min)`);
+            charCount.id = 'char-count';
+            const maxSpan = el('span', '', `Max ${MAX_CHARS} Zeichen`);
+            
+            metaDiv.append(charCount, maxSpan);
+            textDiv.append(textarea, metaDiv);
+
+            // Submit
+            const submitDiv = el('div', 'text-right');
+            const subBtn = el('button', 'btn-success', 'Abstimmung einreichen');
+            subBtn.onclick = submitDecision;
+            submitDiv.appendChild(subBtn);
+
+            card.append(grid, evDiv, textDiv, submitDiv);
+            container.appendChild(card);
+        }
+
+        function selectOption(id) {
+            selectedOptionId = id;
+            ['A','B','C'].forEach(oid => {
+                const el = document.getElementById(`opt-${oid}`);
+                if (!el) return;
+                if(oid === id) {
+                    el.style.borderColor = 'var(--color-primary)';
+                    el.style.backgroundColor = '#eff6ff';
+                } else {
+                    el.style.borderColor = 'var(--color-border)';
+                    el.style.backgroundColor = 'white';
+                }
+            });
+        }
+
+        function toggleRationaleEvidence(id, btn) {
+            if (selectedEvidenceForRationale.includes(id)) {
+                selectedEvidenceForRationale = selectedEvidenceForRationale.filter(e => e !== id);
+                btn.style.borderColor = 'var(--color-border)';
+                btn.classList.remove('text-blue');
+            } else {
+                selectedEvidenceForRationale.push(id);
+                btn.style.borderColor = 'var(--color-primary)';
+                btn.classList.add('text-blue');
+            }
+        }
+
+        function updateCharCount(el) {
+            const len = el.value.length;
+            const counter = document.getElementById('char-count');
+            if (counter) {
+                counter.textContent = `${len} / ${MIN_CHARS} (Min)`;
+                if (len >= MIN_CHARS) {
+                    counter.className = 'text-green font-bold';
+                } else {
+                    counter.className = 'text-red';
+                }
+            }
+        }
+
+        function submitDecision() {
+            const area = document.getElementById('rationale-input');
+            const text = area ? area.value : '';
+
+            // Defensive Guards
+            if (!state.role) return handleError();
+            if (!selectedOptionId) return showToast('Wähle eine Option (A, B oder C).', 'error');
+            if (selectedEvidenceForRationale.length === 0) return showToast('Nutze mindestens einen Beleg.', 'error');
+            if (text.length < MIN_CHARS) return showToast('Begründung ist zu kurz.', 'error');
+
+            const OPTIONS = { 'A': 'Stärkere Progression', 'B': 'Flacherer Tarif', 'C': 'Status Quo' };
+            state.decision = OPTIONS[selectedOptionId];
+            
+            const evidenceTxt = selectedEvidenceForRationale
+                .map(id => {
+                    const t = M16_TEXT.find(x => x.id === id);
+                    return t ? `"${t.text}"` : '';
+                })
+                .join(' ');
+
+            state.rationale = `${text} (Gestützt auf: ${evidenceTxt})`;
+            nextAct();
+        }
+
+        // --- ACT 5: ZUSAMMENFASSUNG ---
+        function renderAct5(container) {
+            // Stop Timer
+            clearInterval(state.timerInterval);
+
+            // Guard
+            if (!state.decision || !state.role) return handleError();
+
+            const card = el('div', 'card bg-white border-t-4 border-green-600');
+            card.style.borderTopColor = 'var(--color-success)';
+
+            // Header
+            const header = el('div', 'text-center mb-6');
+            const iconWrap = el('div', 'text-green inline-block p-4 bg-gray rounded-full mb-2');
+            iconWrap.style.backgroundColor = '#dcfce7';
+            iconWrap.appendChild(createIcon('check'));
+            
+            const h2 = el('h2', 'text-2xl font-bold', 'Sitzung beendet');
+            const p = el('p', 'text-gray', 'Gut gemacht! Hier ist dein Ergebnis.');
+            
+            header.append(iconWrap, h2, p);
+
+            // Report logic string building
+            const reportText = [
+                "PROTOKOLL FINANZAUSSCHUSS",
+                "-------------------------",
+                `Zeit: ${formatTime(state.elapsedTime)}`,
+                `Rolle: ${state.role.title}`,
+                `Entscheidung: ${state.decision}`,
+                "",
+                "Begründung:",
+                state.rationale,
+                "",
+                "Kompetenzprofil:",
+                "- Systematik verstanden: Ja (Grenzsteuersatz)",
+                `- Belege genutzt: ${state.evidence.length}`
+            ].join('\n');
+
+            const area = el('textarea');
+            area.id = 'final-report';
+            area.readOnly = true;
+            area.style.height = '300px';
+            area.style.fontFamily = 'monospace';
+            area.style.fontSize = '0.9rem';
+            area.style.backgroundColor = '#f9fafb';
+            area.value = reportText; // Safe: .value prevents HTML injection
+
+            const btnDiv = el('div', 'text-center mt-4');
+            const copyBtn = el('button', 'btn-primary', 'Protokoll kopieren');
+            copyBtn.onclick = copyReport;
+            
+            btnDiv.appendChild(copyBtn);
+            card.append(header, area, btnDiv);
+            container.appendChild(card);
+        }
+
+        async function copyReport() {
+            const area = document.getElementById('final-report');
+            if (!area) return;
+            try {
+                await navigator.clipboard.writeText(area.value);
+                showToast('In die Zwischenablage kopiert!', 'success');
+            } catch (err) {
+                area.select();
+                showToast('Konnte nicht automatisch kopieren. Bitte STRG+C drücken.', 'info');
+            }
+        }
+
+        // --- INIT ---
+
+        window.nextAct = () => {
+            if (state.act < 5) {
+                state.act++;
+                render();
+            }
+        };
+
+        // Start Timer
+        state.timerInterval = setInterval(() => {
+            state.elapsedTime++;
+            const timerEl = document.getElementById('timer');
+            if (timerEl) timerEl.textContent = formatTime(state.elapsedTime);
+        }, 1000);
+
+        // Initial Render
+        render();
+
+    </script>
 </body>
 </html>
