@@ -1,1 +1,786 @@
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { BookOpen, Users, Vote, Scale, Info, CheckCircle, AlertTriangle, RotateCcw, User, Search, FileText, Download, XCircle, PenTool, MousePointer2, ShieldAlert, Lightbulb, FastForward } from 'lucide-react';
 
+// --- KONSTANTEN & GRENZWERTE ---
+const MAX_INPUT_LENGTH = 1200; // Zeichenlimit für Freitextfelder
+const MAX_WRONG_ATTEMPTS = 40; // Anti-Spam Limit
+const TOAST_DURATION = 4000;   // Anzeigedauer für Hinweise in ms
+
+// --- Daten & Inhalte (Unverändert) ---
+
+const sourceData = [
+  { text: "Ich kann nur wünschen, dass er seinen Schutz solchen religiösen Gebilden angedeihen lässt, die ihm auch ihrerseits wieder ", type: "neutral" },
+  { text: "nützlich zu werden vermögen.", type: "demand", hint: "Funktionalisierung: Religion hat für den Staat vor allem dann einen Wert, wenn sie ihm nützt.", color: "amber" },
+  { text: " Gleichzeitig hat sich auch innerhalb der evangelischen Bekenntnisse im Kirchenvolk, in den ", type: "neutral" },
+  { text: "Deutschen Christen,", type: "appeal", hint: "Parteinahme: Der Staat hebt explizit die ihm treue Fraktion hervor.", color: "blue" },
+  { text: " eine Bewegung erhoben, die von dem Willen erfüllt, den großen Aufgaben der Zeit gerecht zu werden, eine Einigung der evangelischen Landeskirchen und Bekenntnisse anstrebt. Wenn diese Frage nun wirklich in Fluss geraten ist, dann wird vor der Geschichte nicht durch unwahre Einwendungen bestritten werden können, dass dies das ", type: "neutral" },
+  { text: "Verdienst der völkisch-politischen Umwelt", type: "appeal", hint: "Vereinnahmung: Kirchliche Entwicklungen werden als Erfolg der NS-Politik umgedeutet.", color: "blue" },
+  { text: " in Deutschland war. Und jede Bewegung innerhalb der evangelischen Bekenntnisse, die sich eindeutig und klar zu dieser nationalen und völkischen Bewegung bekannte, zu einer Zeit, da leider genauso wie in der katholischen Kirche zahlreiche ", type: "neutral" },
+  { text: "Pastoren und Superintendenten... auf fanatische Weise gegen diese nationale Erhebung... Stellung genommen haben.", type: "threat", hint: "Diffamierung: Kritiker werden pauschal als 'grundlose Fanatiker' abgewertet und ausgegrenzt.", color: "rose" },
+  { text: " Im Interesse des Wiederaufstiegs der deutschen Nation, wenn ich mich untrennbar mit der nationalsozialistischen Bewegung verbunden ansehe, wünsche ich daher verständlicherweise, dass die neuen Kirchenwahlen mit ihrem Ergebnis ", type: "neutral" },
+  { text: "unsere neue Volks- und Staatspolitik unterstützen werden.", type: "demand", hint: "Wahlbeeinflussung: Eine klare Forderung, die Kirche politisch gleichzuschalten.", color: "amber" },
+  { text: " Denn indem der Staat die ", type: "neutral" },
+  { text: "innere Freiheit des religiösen Lebens zu garantieren bereit ist,", type: "promise", hint: "Schein-Garantie: Freiheit wird versprochen, ist aber an politische Wohlverhaltensbedingungen geknüpft.", color: "emerald" },
+  { text: " hat er das Recht zu hoffen, dass in den Bekenntnissen diejenigen Kräfte gehören werden möchten, die entschlossen und gewillt sind, ", type: "neutral" },
+  { text: "auf ihrer Seite für die Freiheit der Nation sich einzusetzen.", type: "demand", hint: "Bedingung: Religiöse Freiheit gibt es nur im Tausch gegen totalen politischen Einsatz.", color: "amber" },
+  { text: " Dies wird aber nicht gewährleistet durch ", type: "neutral" },
+  { text: "weltabgewandte... Kräfte", type: "threat", hint: "Abwertung: Theologische Unabhängigkeit wird als 'Weltfremdheit' diskreditiert.", color: "rose" },
+  { text: " einer kirchlichen Verstärkung, sondern durch die Kräfte einer ", type: "neutral" },
+  { text: "lebendigen Bejahung.", type: "appeal", hint: "Propaganda-Begriff: Zustimmung zum NS-Staat wird als 'Lebendigkeit' und 'Kraft' verkauft.", color: "blue" },
+  { text: " Diese Kräfte, die in jenem Teil des evangelischen Kirchenvolkes in erster Linie versammelt, die als ", type: "neutral" },
+  { text: "Deutsche Christen bewusst auf dem Boden des nationalsozialistischen Staates stehen,", type: "appeal", hint: "Gleichschaltung: Identifikation von Kirche und Staat als Idealbild.", color: "blue" },
+  { text: " nicht in erzwungener Duldung, sondern in lebendiger Bejahung. Die ", type: "neutral" },
+  { text: "inneren religiösen Fragen der eigenen Bekenntnisse werden davon überhaupt nicht berührt.", type: "promise", hint: "Die große Lüge: Behauptung einer Trennung von Politik und Glaube, die der Text selbst widerlegt.", color: "emerald" },
+  { text: " Es ist nicht meine Aufgabe, dazu Stellung zu nehmen.", type: "neutral" }
+];
+
+const roles = [
+  {
+    id: 'A',
+    title: 'Deutsche Christen',
+    icon: <CheckCircle className="w-6 h-6 text-blue-600" />,
+    short: 'Pro-NS & National',
+    description: 'Sie sehen im Nationalsozialismus eine „nationale Erhebung“ und wollen eine kraftvolle Volkskirche.',
+    arguments: [
+      'Gott offenbart sich in der deutschen Geschichte.',
+      'Wir brauchen eine Kirche, die „Ja“ zum Volk sagt.',
+      'Wer gegen den Staat ist, ist gegen die Ordnung Gottes.'
+    ],
+    strategy: 'Nutzt Begriffe wie „Volksgemeinschaft“ und „Lebendigkeit“. Werft den Kritikern vor, veraltet zu sein.'
+  },
+  {
+    id: 'B',
+    title: 'Kritische Pfarrerschaft',
+    icon: <AlertTriangle className="w-6 h-6 text-red-600" />,
+    short: 'Theologische Distanz',
+    description: 'Sie warnen vor der Vermischung von Politik und Glaube. Christus ist der einzige Herr der Kirche.',
+    arguments: [
+      'Die Kirche dient dem Evangelium, keiner Partei.',
+      'Politische „Freiheit“ ist wertlos, wenn die Lehre verfälscht wird.',
+      'Glaube darf nicht instrumentalisiert werden.'
+    ],
+    strategy: 'Betont die Unabhängigkeit der Theologie. Warnt vor Götzendienst am Staat.'
+  },
+  {
+    id: 'C',
+    title: 'Unentschlossene Gemeinde',
+    icon: <Users className="w-6 h-6 text-gray-600" />,
+    short: 'Ängstlich & Hoffend',
+    description: 'Sie wollen Ruhe, Ordnung und keine Konflikte. Das Versprechen der „religiösen Freiheit“ klingt gut.',
+    arguments: [
+      'Der Staat verspricht doch Schutz.',
+      'Warum sollen wir uns streiten? Einigkeit ist wichtig.',
+      'Vielleicht wird alles nicht so schlimm.'
+    ],
+    strategy: 'Schwankt zwischen Angst vor Ausgrenzung und Hoffnung auf Normalität.'
+  }
+];
+
+// --- Helfer & Sanitization ---
+
+const prepareTextData = () => {
+  let fullText = "";
+  const truthRanges = [];
+  
+  sourceData.forEach(segment => {
+    const start = fullText.length;
+    fullText += segment.text;
+    const end = fullText.length;
+    if (segment.type !== 'neutral') {
+      truthRanges.push({ start, end, type: segment.type, hint: segment.hint, color: segment.color });
+    }
+  });
+  return { fullText, truthRanges };
+};
+
+const { fullText, truthRanges } = prepareTextData();
+
+// Entfernt unerwünschte Steuerzeichen und begrenzt Länge für sicheren Export (Robust & DSGVO-konform)
+const normalizeForExport = (str, maxLen = MAX_INPUT_LENGTH) => {
+  if (typeof str !== 'string') return '';
+  const s = String(str);
+  // Entfernt Steuerzeichen (0-31) außer \n (10) und \t (9), sowie DEL (127)
+  let clean = s.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+  // Normalisiert Zeilenumbrüche
+  clean = clean.replace(/\r\n|\r/g, '\n');
+  // Hartes Limit
+  return clean.slice(0, maxLen);
+};
+
+// Berechnet sichere Menü-Position innerhalb des Containers
+const clampMenuPosition = (top, left, width, height, containerRect) => {
+  const padding = 8;
+  
+  // Left Clamping
+  let safeLeft = Math.max(padding, left);
+  if (safeLeft + width > containerRect.width - padding) {
+    safeLeft = containerRect.width - width - padding;
+  }
+  // Falls Container kleiner als Menü
+  if (safeLeft < padding) safeLeft = padding;
+
+  // Top Clamping
+  let safeTop = Math.max(padding, top);
+  if (safeTop + height > containerRect.height - padding) {
+      safeTop = containerRect.height - height - padding;
+  }
+  
+  return { top: safeTop, left: safeLeft };
+};
+
+// --- Komponenten ---
+
+export default function SimulationApp() {
+  const [phase, setPhase] = useState(1);
+  const [userMarks, setUserMarks] = useState([]); 
+  const [selectionMenu, setSelectionMenu] = useState(null); 
+  const [wrongAttempts, setWrongAttempts] = useState(0);
+  const [userVote, setUserVote] = useState(null); 
+  const [simulatedResults, setSimulatedResults] = useState(null);
+  const [reflectionAnswers, setReflectionAnswers] = useState({ motivation: '', ethics: '', transfer: '' });
+  
+  // Hilfs-Status
+  const [activeHint, setActiveHint] = useState(null);
+  const [hintsUsedCount, setHintsUsedCount] = useState(0);
+  const [solutionRevealed, setSolutionRevealed] = useState(false);
+  
+  // Interne Modal-Steuerung (Ersatz für window.confirm)
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  // UI-Feedback System statt alert()
+  const [toast, setToast] = useState({ msg: '', type: 'info', visible: false });
+  // Timer Ref für Toast Cleanup (Memory Leak Prevention)
+  const toastTimerRef = useRef(null);
+
+  const textContainerRef = useRef(null); // Das innere Text-Div
+  const textFrameRef = useRef(null);     // Der relative Wrapper (Container für Menu Position)
+
+  // --- Toast Helper (Robust) ---
+  useEffect(() => {
+    // Cleanup bei Unmount
+    return () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    };
+  }, []);
+
+  const showToast = useCallback((msg, type = 'error') => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    
+    setToast({ msg, type, visible: true });
+    
+    toastTimerRef.current = setTimeout(() => {
+      setToast(prev => ({ ...prev, visible: false }));
+      toastTimerRef.current = null;
+    }, TOAST_DURATION);
+  }, []);
+
+  // --- Analyse-Logik & Hilfe ---
+
+  const foundCount = userMarks.length;
+  const totalCount = truthRanges.length;
+  // Progress Berechnung sicher gegen Division durch Null
+  const progress = totalCount > 0 ? Math.round((foundCount / totalCount) * 100) : 0;
+
+  // Generiert einen didaktischen Hinweis basierend auf fehlenden Elementen
+  const generateHint = () => {
+    const foundStartPoints = userMarks.map(m => m.start);
+    // Finde das erste Element, das noch nicht gefunden wurde
+    const missing = truthRanges.find(t => !foundStartPoints.includes(t.start));
+
+    if (!missing) {
+      showToast("Du hast bereits alles gefunden!", "success");
+      return;
+    }
+
+    setHintsUsedCount(prev => prev + 1);
+    
+    let hintText = "";
+    switch(missing.type) {
+      case 'appeal': 
+        hintText = "Lernhilfe: Suche nach Begriffen, die 'Wir-Gefühl', 'Volk' oder 'nationale Bewegung' positiv hervorheben (Appell)."; 
+        break;
+      case 'demand': 
+        hintText = "Lernhilfe: Wo fordert der Redner ganz konkret eine Gegenleistung oder Unterstützung von der Kirche? (Forderung)"; 
+        break;
+      case 'promise': 
+        hintText = "Lernhilfe: Der Staat verspricht Schutz oder Freiheit. Klingt das glaubwürdig oder ist es an Bedingungen geknüpft? (Versprechen)"; 
+        break;
+      case 'threat': 
+        hintText = "Lernhilfe: Achte auf aggressive Wörter. Wie werden Kritiker, Gegner oder Andersdenkende bezeichnet? (Drohung)"; 
+        break;
+      default: 
+        hintText = "Suche weiter im Text nach rhetorischen Mitteln.";
+    }
+    
+    setActiveHint(hintText);
+    showToast("Hinweis aktiviert (siehe unten)", "info");
+  };
+
+  const handleRevealRequest = () => {
+    setShowConfirmModal(true);
+  };
+
+  const executeRevealSolution = () => {
+    setShowConfirmModal(false);
+    setSolutionRevealed(true);
+    // Kopiere alle Wahrheit-Bereiche in die User-Markierungen
+    const solutionMarks = truthRanges.map(t => ({
+      start: t.start,
+      end: t.end,
+      type: t.type,
+      color: t.color,
+      hint: t.hint
+    }));
+    setUserMarks(solutionMarks);
+    setActiveHint("Lösung wurde vollständig angezeigt.");
+  };
+
+  // Selektions-Handler
+  const handleTextSelection = (e) => {
+    if (wrongAttempts >= MAX_WRONG_ATTEMPTS || solutionRevealed) {
+        if (selectionMenu) setSelectionMenu(null);
+        return;
+    }
+
+    const selection = window.getSelection();
+    if (!selection.rangeCount || selection.isCollapsed) {
+      setSelectionMenu(null);
+      return;
+    }
+
+    const range = selection.getRangeAt(0);
+    const textNodeContainer = textContainerRef.current; // Das Element mit dem Text
+    const wrapperFrame = textFrameRef.current;          // Der relative Wrapper
+    
+    // Sicherheitscheck: Selektion muss innerhalb unseres Containers sein
+    if (!textNodeContainer || !textNodeContainer.contains(range.commonAncestorContainer) || !wrapperFrame) {
+        setSelectionMenu(null);
+        return;
+    }
+
+    // Offset-Berechnung
+    const getAbsoluteOffset = (node, offset) => {
+      let length = 0;
+      const treeWalker = document.createTreeWalker(textNodeContainer, NodeFilter.SHOW_TEXT, null, false);
+      let currentNode = treeWalker.nextNode();
+      while (currentNode) {
+        if (currentNode === node) {
+          return length + offset;
+        }
+        length += currentNode.textContent.length;
+        currentNode = treeWalker.nextNode();
+      }
+      return -1;
+    };
+
+    const start = getAbsoluteOffset(range.startContainer, range.startOffset);
+    const end = getAbsoluteOffset(range.endContainer, range.endOffset);
+
+    if (start === -1 || end === -1 || start >= end) {
+      setSelectionMenu(null);
+      return;
+    }
+
+    const rect = range.getBoundingClientRect();
+    const containerRect = wrapperFrame.getBoundingClientRect(); // Wir positionieren relativ zum Frame
+    
+    const MENU_WIDTH = 280;
+    const MENU_HEIGHT = 80; // Geschätzt für Clamping
+
+    // Berechnung relativ zum Wrapper
+    const rawTop = rect.top - containerRect.top - 60; // Standardmäßig drüber
+    const rawLeft = rect.left - containerRect.left + (rect.width / 2) - (MENU_WIDTH / 2); // Zentriert
+    
+    const clamped = clampMenuPosition(rawTop, rawLeft, MENU_WIDTH, MENU_HEIGHT, containerRect);
+    
+    setSelectionMenu({ top: clamped.top, left: clamped.left, start, end });
+  };
+
+  const handleMarking = (selectedType) => {
+    if (!selectionMenu) return;
+    const { start, end } = selectionMenu;
+    const selectionLength = end - start;
+    
+    let bestMatch = null;
+    let maxOverlap = 0;
+
+    truthRanges.forEach(truth => {
+      if (truth.type !== selectedType) return;
+      if (userMarks.some(m => m.start === truth.start)) return; 
+
+      const overlapStart = Math.max(start, truth.start);
+      const overlapEnd = Math.min(end, truth.end);
+      const overlapLength = Math.max(0, overlapEnd - overlapStart);
+
+      if (overlapLength > 0) {
+        const coverageTruth = overlapLength / (truth.end - truth.start);
+        const coverageSelection = overlapLength / selectionLength;
+
+        if (coverageTruth > 0.4 || coverageSelection > 0.6) {
+          if (overlapLength > maxOverlap) {
+            maxOverlap = overlapLength;
+            bestMatch = truth;
+          }
+        }
+      }
+    });
+
+    if (bestMatch) {
+      setUserMarks(prev => [...prev, { 
+        start: bestMatch.start, end: bestMatch.end, type: bestMatch.type, color: bestMatch.color, hint: bestMatch.hint 
+      }]);
+      showToast("Gut erkannt!", "success");
+      // Wenn ein Hinweis aktiv war und dieser Typ gefunden wurde, Hinweis ausblenden
+      if (activeHint && activeHint.includes("Lernhilfe")) {
+         setActiveHint(null); 
+      }
+    } else {
+      setWrongAttempts(w => {
+          const newVal = w + 1;
+          if (newVal < MAX_WRONG_ATTEMPTS) {
+             showToast("Das passt nicht ganz oder ist zu ungenau.", "error");
+          }
+          return newVal;
+      });
+    }
+
+    setSelectionMenu(null);
+    window.getSelection().removeAllRanges();
+  };
+
+  const renderText = () => {
+    const sortedMarks = [...userMarks].sort((a, b) => a.start - b.start);
+    const elements = [];
+    let currentPos = 0;
+
+    sortedMarks.forEach((mark, i) => {
+      if (mark.start < currentPos) return; 
+      if (mark.start > currentPos) {
+        elements.push(<span key={`text-${i}`}>{fullText.slice(currentPos, mark.start)}</span>);
+      }
+      
+      let colorClass = "";
+      switch(mark.color) {
+        case 'blue': colorClass = 'bg-blue-200 text-blue-900 border-b-2 border-blue-500'; break;
+        case 'emerald': colorClass = 'bg-emerald-200 text-emerald-900 border-b-2 border-emerald-500'; break;
+        case 'amber': colorClass = 'bg-amber-200 text-amber-900 border-b-2 border-amber-500'; break;
+        case 'rose': colorClass = 'bg-rose-200 text-rose-900 border-b-2 border-rose-500'; break;
+        default: colorClass = 'bg-gray-200';
+      }
+
+      elements.push(
+        // select-none wurde entfernt, um Textselektion über Markierungen zu erlauben
+        <span key={`mark-${i}`} className={`${colorClass} px-1 rounded relative group cursor-help`}>
+          {fullText.slice(mark.start, mark.end)}
+          <span className="hidden md:group-hover:block absolute bottom-full left-1/2 -translate-x-1/2 w-64 bg-stone-800 text-white text-xs sans-serif p-3 rounded mb-2 z-20 shadow-xl pointer-events-none text-center">
+             {mark.hint}
+             <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-stone-800"></span>
+          </span>
+        </span>
+      );
+      currentPos = mark.end;
+    });
+
+    if (currentPos < fullText.length) {
+      elements.push(<span key="text-end">{fullText.slice(currentPos)}</span>);
+    }
+    return elements;
+  };
+
+  const handleReflectionInput = (field, value) => {
+      // Hard limit on length
+      if (value.length <= MAX_INPUT_LENGTH) {
+          setReflectionAnswers(prev => ({ ...prev, [field]: value }));
+      }
+  };
+
+  // --- Voting & Download ---
+
+  const handleUserVote = (choice) => {
+    setUserVote(choice);
+    setTimeout(() => {
+        setSimulatedResults({ support: 62, neutral: 28, reject: 10 });
+    }, 800);
+  };
+
+  const getVoteText = (choice) => {
+      switch(choice) {
+          case 'support': return "Unterstützung";
+          case 'neutral': return "Anpassung";
+          case 'reject': return "Widerstand";
+          default: return "Keine Wahl getroffen";
+      }
+  };
+
+  const downloadProtocol = () => {
+    // Sicheres Sanitizing für den Export
+    const safeMotivation = normalizeForExport(reflectionAnswers.motivation);
+    const safeEthics = normalizeForExport(reflectionAnswers.ethics);
+    const safeTransfer = normalizeForExport(reflectionAnswers.transfer);
+
+    const text = `
+Lernsimulation: Kirchenwahl 1933 - Ergebnisprotokoll
+----------------------------------------------------
+TEIL 1: TEXTANALYSE
+Fortschritt: ${progress}% der Strategien gefunden.
+Fehlversuche: ${wrongAttempts} (Limit: ${MAX_WRONG_ATTEMPTS})
+Genutzte Hilfen: ${hintsUsedCount} Tipps
+Lösung vollständig aufgedeckt: ${solutionRevealed ? "Ja" : "Nein"}
+
+TEIL 2: ENTSCHEIDUNG
+Gewählt: ${getVoteText(userVote)}
+
+TEIL 3: REFLEXION
+1. Motivation:
+${safeMotivation}
+
+2. Ethik:
+${safeEthics}
+
+3. Transfer:
+${safeTransfer}
+    `.trim();
+
+    const element = document.createElement("a");
+    const file = new Blob([text], {type: 'text/plain'});
+    const url = URL.createObjectURL(file);
+    element.href = url;
+    element.download = "Protokoll_Kirchenwahl.txt";
+    document.body.appendChild(element); 
+    element.click();
+    document.body.removeChild(element);
+    setTimeout(() => URL.revokeObjectURL(url), 100); 
+  };
+
+  const handleReset = () => {
+      setPhase(1);
+      setUserMarks([]);
+      setSelectionMenu(null);
+      setWrongAttempts(0);
+      setUserVote(null);
+      setSimulatedResults(null);
+      setReflectionAnswers({ motivation: '', ethics: '', transfer: '' });
+      setToast({ msg: '', type: 'info', visible: false });
+      if(toastTimerRef.current) clearTimeout(toastTimerRef.current);
+      setActiveHint(null);
+      setHintsUsedCount(0);
+      setSolutionRevealed(false);
+      setShowConfirmModal(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-stone-100 text-stone-900 font-sans selection:bg-yellow-200">
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        
+        {/* Header */}
+        <header className="mb-8 border-b-2 border-stone-800 pb-4 print:hidden">
+          <div className="flex justify-between items-center mb-2">
+            <h1 className="text-3xl font-serif font-bold tracking-tight">Kirchenwahl 1933</h1>
+            <span className="bg-stone-800 text-stone-100 px-3 py-1 text-sm font-mono rounded">Szenario: 1933</span>
+          </div>
+          <p className="text-stone-600 italic">Eine Simulation zur Analyse politischer Sprache und religiöser Vereinnahmung.</p>
+        </header>
+
+        {/* Phase Navigation */}
+        <nav className="flex space-x-2 mb-8 overflow-x-auto pb-2 print:hidden">
+          {[
+            { id: 1, label: 'Textanalyse', icon: Search },
+            { id: 2, label: 'Positionen', icon: Users },
+            { id: 3, label: 'Entscheidung', icon: Vote },
+            { id: 4, label: 'Reflexion', icon: PenTool },
+            { id: 5, label: 'Protokoll', icon: FileText },
+          ].map((item) => (
+            <button
+              key={item.id}
+              onClick={() => { setPhase(item.id); setSelectionMenu(null); }}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-lg border transition-all whitespace-nowrap ${
+                phase === item.id 
+                  ? 'bg-stone-800 text-white border-stone-800 shadow-md' 
+                  : 'bg-white text-stone-600 border-stone-300 hover:bg-stone-200'
+              }`}
+            >
+              <item.icon size={18} />
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </nav>
+
+        {/* Content Area */}
+        <main className="bg-white rounded-xl shadow-xl border border-stone-200 overflow-hidden min-h-[600px] print:shadow-none print:border-none relative">
+          
+          {/* TOAST NOTIFICATION */}
+          {toast.visible && (
+            <div className={`absolute top-4 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded shadow-xl flex items-center gap-2 animate-in slide-in-from-top-4 fade-in duration-300 ${
+                toast.type === 'error' ? 'bg-red-600 text-white' : 'bg-stone-800 text-white'
+            }`}>
+                {toast.type === 'error' ? <AlertTriangle size={18}/> : <CheckCircle size={18}/>}
+                <span className="font-bold text-sm">{toast.msg}</span>
+            </div>
+          )}
+
+          {/* CONFIRM MODAL (Intern statt window.confirm) */}
+          {showConfirmModal && (
+            <div className="absolute inset-0 bg-black/50 z-[60] flex items-center justify-center p-4 animate-in fade-in">
+              <div className="bg-white rounded-lg p-6 max-w-sm shadow-2xl">
+                <h3 className="text-lg font-bold mb-2 flex items-center gap-2">
+                  <AlertTriangle className="text-orange-500" /> Lösung anzeigen?
+                </h3>
+                <p className="text-sm text-stone-600 mb-6">
+                  Möchtest du wirklich die komplette Lösung aufdecken? Versuche es zuerst mit einem Tipp, um den Lerneffekt zu steigern.
+                </p>
+                <div className="flex justify-end gap-3">
+                  <button 
+                    onClick={() => setShowConfirmModal(false)}
+                    className="px-4 py-2 text-sm text-stone-600 hover:bg-stone-100 rounded"
+                  >
+                    Abbrechen
+                  </button>
+                  <button 
+                    onClick={executeRevealSolution}
+                    className="px-4 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+                  >
+                    Ja, Lösung anzeigen
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* PHASE 1: Textanalyse (Freie Markierung) */}
+          {phase === 1 && (
+            <div className="p-8 relative">
+              <div className="flex flex-col md:flex-row justify-between items-start mb-6 gap-4">
+                <div>
+                  <h2 className="text-2xl font-serif font-bold mb-2 flex items-center gap-2">
+                    Phase 1: Die Quelle entschlüsseln
+                  </h2>
+                  <p className="text-stone-600 text-sm md:text-base flex items-center gap-2">
+                    <MousePointer2 size={16} className="text-stone-400"/> 
+                    <strong>Arbeitsauftrag:</strong> Markiere verdächtige Textstellen mit der Maus.
+                  </p>
+                </div>
+                
+                <div className="bg-stone-100 p-3 rounded-lg border border-stone-200 min-w-[200px]">
+                  <div className="flex justify-between text-xs uppercase font-bold text-stone-500 mb-1">
+                    <span>Entdeckt</span>
+                    <span>{foundCount} / {totalCount}</span>
+                  </div>
+                  <div className="w-full bg-stone-300 h-2 rounded-full overflow-hidden mb-2">
+                    <div className="bg-stone-800 h-full transition-all duration-500" style={{ width: `${progress}%` }}></div>
+                  </div>
+                  {wrongAttempts > 0 && (
+                      <div className={`text-xs font-bold ${wrongAttempts >= MAX_WRONG_ATTEMPTS ? 'text-red-600' : 'text-orange-500'}`}>
+                          {wrongAttempts >= MAX_WRONG_ATTEMPTS ? 'Keine Versuche mehr übrig' : `${wrongAttempts} Ungenauigkeiten`}
+                      </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Text Container mit lokalem Event Listener & Frame Ref */}
+              <div 
+                ref={textFrameRef} 
+                className="bg-stone-50 p-8 rounded-lg border-l-4 border-stone-800 font-serif text-lg leading-relaxed shadow-inner max-w-3xl mx-auto relative mb-6"
+              >
+                <div className="text-center mb-6 border-b border-stone-300 pb-4 select-none">
+                  <h3 className="font-bold uppercase tracking-widest text-stone-500 text-sm">Transkript</h3>
+                  <div className="font-bold text-xl mt-1">Rundfunkansprache zur Kirchenwahl</div>
+                  <div className="text-sm italic">Juli 1933</div>
+                </div>
+                
+                <div ref={textContainerRef} className="outline-none min-h-[200px]" onMouseUp={handleTextSelection}>
+                  {renderText()}
+                </div>
+
+                {/* Floating Action Menu */}
+                {selectionMenu && (
+                  <div 
+                    className="absolute z-40 bg-white rounded-lg shadow-2xl border border-stone-200 p-2 flex gap-2 animate-in zoom-in duration-200 select-none"
+                    style={{ top: selectionMenu.top, left: selectionMenu.left }}
+                    onMouseUp={(e) => e.stopPropagation()} 
+                  >
+                    <div className="text-xs absolute -top-6 left-0 right-0 text-center font-bold text-white bg-stone-800 rounded py-1 shadow">Kategorie wählen:</div>
+                    
+                    <button onClick={() => handleMarking('appeal')} className="flex flex-col items-center p-2 hover:bg-blue-50 rounded text-blue-900 transition w-20 group">
+                      <div className="w-6 h-6 rounded-full bg-blue-500 mb-1 border-2 border-white shadow-sm group-hover:scale-110 transition-transform"></div>
+                      <span className="text-xs font-bold">Appell</span>
+                    </button>
+                    
+                    <button onClick={() => handleMarking('promise')} className="flex flex-col items-center p-2 hover:bg-emerald-50 rounded text-emerald-900 transition w-20 group">
+                      <div className="w-6 h-6 rounded-full bg-emerald-500 mb-1 border-2 border-white shadow-sm group-hover:scale-110 transition-transform"></div>
+                      <span className="text-xs font-bold">Versprechen</span>
+                    </button>
+                    
+                    <button onClick={() => handleMarking('demand')} className="flex flex-col items-center p-2 hover:bg-amber-50 rounded text-amber-900 transition w-20 group">
+                      <div className="w-6 h-6 rounded-full bg-amber-500 mb-1 border-2 border-white shadow-sm group-hover:scale-110 transition-transform"></div>
+                      <span className="text-xs font-bold">Forderung</span>
+                    </button>
+                    
+                    <button onClick={() => handleMarking('threat')} className="flex flex-col items-center p-2 hover:bg-rose-50 rounded text-rose-900 transition w-20 group">
+                      <div className="w-6 h-6 rounded-full bg-rose-500 mb-1 border-2 border-white shadow-sm group-hover:scale-110 transition-transform"></div>
+                      <span className="text-xs font-bold">Drohung</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+              
+              {/* Aktiver Hinweis-Bereich */}
+              {activeHint && (
+                <div className="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded text-sm text-blue-900 flex items-start gap-3 animate-in fade-in slide-in-from-bottom-2">
+                  <Lightbulb className="flex-shrink-0 mt-0.5" size={20}/>
+                  <div>
+                    <strong className="block mb-1">Hilfestellung:</strong>
+                    {activeHint}
+                  </div>
+                </div>
+              )}
+
+              {/* Werkzeugleiste für Hilfe */}
+              <div className="flex flex-wrap justify-between items-center gap-4 border-t border-stone-200 pt-6">
+                 <div className="text-sm text-stone-500 italic">
+                    {progress < 100 ? "Du kommst nicht weiter?" : "Analyse abgeschlossen."}
+                 </div>
+                 <div className="flex gap-3">
+                    <button 
+                      onClick={generateHint}
+                      disabled={progress === 100 || solutionRevealed}
+                      className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-stone-700 bg-stone-100 hover:bg-stone-200 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <Lightbulb size={16}/> Tipp geben
+                    </button>
+                    
+                    <button 
+                      onClick={handleRevealRequest}
+                      disabled={progress === 100 || solutionRevealed}
+                      className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-stone-600 hover:text-red-700 hover:bg-red-50 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <FastForward size={16}/> Auflösen & Weiter
+                    </button>
+                 </div>
+              </div>
+
+            </div>
+          )}
+
+          {/* PHASE 2: Akteure (Statisch) */}
+          {phase === 2 && (
+            <div className="p-8 bg-stone-50 h-full">
+              <h2 className="text-2xl font-serif font-bold mb-6">Phase 2: Die Akteure</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {roles.map((role) => (
+                  <div key={role.id} className="bg-white p-6 rounded-lg shadow border border-stone-200">
+                    <div className="flex items-center gap-3 mb-4 border-b pb-3">
+                      <div className="p-2 bg-stone-100 rounded-full">{role.icon}</div>
+                      <div>
+                        <h3 className="font-bold text-lg">{role.title}</h3>
+                        <span className="text-xs uppercase tracking-wide text-stone-500">{role.short}</span>
+                      </div>
+                    </div>
+                    <p className="text-sm text-stone-700 italic mb-3">{role.description}</p>
+                    <ul className="list-disc list-inside space-y-1 text-sm text-stone-600 bg-stone-50 p-3 rounded">
+                      {role.arguments.map((arg, i) => <li key={i}>{arg}</li>)}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* PHASE 3: Entscheidung */}
+          {phase === 3 && (
+            <div className="p-8 flex flex-col items-center justify-center min-h-[400px]">
+              <h2 className="text-2xl font-serif font-bold mb-2">Phase 3: Die Gewissensfrage</h2>
+              {!userVote ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-3xl mt-8">
+                   <button onClick={() => handleUserVote('support')} className="p-6 bg-blue-50 border-2 border-blue-200 rounded-xl hover:scale-105 transition-all text-center group">
+                      <CheckCircle className="w-12 h-12 mx-auto mb-3 text-blue-600 group-hover:rotate-12 transition-transform" />
+                      <h3 className="font-bold text-blue-900">Begeisterung</h3>
+                   </button>
+                   <button onClick={() => handleUserVote('neutral')} className="p-6 bg-stone-50 border-2 border-stone-200 rounded-xl hover:scale-105 transition-all text-center group">
+                      <Users className="w-12 h-12 mx-auto mb-3 text-stone-600 group-hover:rotate-12 transition-transform" />
+                      <h3 className="font-bold text-stone-900">Anpassung</h3>
+                   </button>
+                   <button onClick={() => handleUserVote('reject')} className="p-6 bg-red-50 border-2 border-red-200 rounded-xl hover:scale-105 transition-all text-center group">
+                      <AlertTriangle className="w-12 h-12 mx-auto mb-3 text-red-600 group-hover:rotate-12 transition-transform" />
+                      <h3 className="font-bold text-red-900">Widerstand</h3>
+                   </button>
+                </div>
+              ) : (
+                <div className="bg-stone-900 text-stone-100 p-8 rounded-xl mt-8 max-w-xl text-center animate-in zoom-in">
+                  <h3 className="text-xl font-bold mb-2">Historische Einordnung</h3>
+                  <p>Du hast gewählt: <span className="text-blue-300">{getVoteText(userVote)}</span>.</p>
+                  <p className="mt-4 text-stone-400 text-sm">Die Mehrheit der Deutschen entschied sich 1933 für die Unterstützung oder die Anpassung.</p>
+                  <button onClick={() => setUserVote(null)} className="mt-6 underline text-xs text-stone-500 hover:text-white">Neu wählen</button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* PHASE 4: Reflexion (Datensparsam) */}
+          {phase === 4 && (
+            <div className="p-8 max-w-3xl mx-auto">
+              <h2 className="text-2xl font-serif font-bold mb-2">Phase 4: Reflexion</h2>
+              <div className="flex items-center gap-2 mb-6 bg-blue-50 text-blue-800 p-3 rounded text-sm border border-blue-100">
+                 <ShieldAlert size={16}/>
+                 <span>Datenschutz-Hinweis: Bitte keine Klarnamen oder personenbezogene Daten eintragen. Eingaben werden nur lokal verarbeitet.</span>
+              </div>
+              <div className="space-y-6">
+                 <div>
+                    <label className="block font-bold mb-2">1. Attraktivität des Angebots</label>
+                    <textarea 
+                      className="w-full p-3 border rounded h-24 focus:ring-2 focus:ring-stone-400 focus:outline-none" 
+                      placeholder="Warum wirkte die Rede damals überzeugend?"
+                      value={reflectionAnswers.motivation}
+                      maxLength={MAX_INPUT_LENGTH}
+                      onChange={e => handleReflectionInput('motivation', e.target.value)}
+                    ></textarea>
+                    <div className="text-right text-xs text-stone-400">{reflectionAnswers.motivation.length} / {MAX_INPUT_LENGTH}</div>
+                 </div>
+                 <div>
+                    <label className="block font-bold mb-2">2. Ethisches Dilemma</label>
+                    <textarea 
+                      className="w-full p-3 border rounded h-24 focus:ring-2 focus:ring-stone-400 focus:outline-none" 
+                      placeholder="Wo endet Loyalität, wo beginnt Verrat?"
+                      value={reflectionAnswers.ethics}
+                      maxLength={MAX_INPUT_LENGTH}
+                      onChange={e => handleReflectionInput('ethics', e.target.value)}
+                    ></textarea>
+                 </div>
+                 <div>
+                    <label className="block font-bold mb-2">3. Transfer heute</label>
+                    <textarea 
+                      className="w-full p-3 border rounded h-24 focus:ring-2 focus:ring-stone-400 focus:outline-none" 
+                      placeholder="Wo finden sich ähnliche Muster in heutigen Debatten?"
+                      value={reflectionAnswers.transfer}
+                      maxLength={MAX_INPUT_LENGTH}
+                      onChange={e => handleReflectionInput('transfer', e.target.value)}
+                    ></textarea>
+                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* PHASE 5: Protokoll */}
+          {phase === 5 && (
+            <div className="p-8 text-center">
+              <h2 className="text-2xl font-serif font-bold mb-6">Abschluss</h2>
+              <p className="mb-8 text-stone-600">Lade dein Arbeitsprotokoll herunter (bereinigtes .txt Format).</p>
+              <button 
+                onClick={downloadProtocol}
+                className="bg-stone-800 text-white px-6 py-3 rounded-lg hover:bg-stone-700 flex items-center gap-2 mx-auto shadow-lg transition-transform hover:-translate-y-1"
+              >
+                <Download/> Protokoll herunterladen
+              </button>
+            </div>
+          )}
+
+        </main>
+        
+        {/* Footer */}
+        <div className="mt-6 flex justify-between text-sm text-stone-500 print:hidden">
+            <button onClick={handleReset} className="hover:text-stone-800 flex items-center gap-1"><RotateCcw size={14}/> Neustart</button>
+            <span>Version: Secure-School-1.1</span>
+        </div>
+      </div>
+    </div>
+  );
+}
