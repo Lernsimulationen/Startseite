@@ -1,115 +1,97 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Q1 – Lernsimulationen</title>
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Q1 – Lernstudio</title>
 
   <style>
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-                   Roboto, Helvetica, Arial, sans-serif;
-      margin: 0;
-      padding: 2rem;
-      background-color: #f5f7fa;
-      color: #1f2937;
-      line-height: 1.6;
+    body{
+      font-family: system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      margin:0;
+      padding:2rem;
+      background:#f5f7fa;
+      color:#111827;
+      line-height:1.6;
     }
 
-    h1 {
-      margin-top: 0;
-      font-size: 2rem;
-      border-bottom: 3px solid #2563eb;
-      padding-bottom: 0.5rem;
+    h1{
+      margin-bottom:1rem;
+      border-bottom:3px solid #2563eb;
+      padding-bottom:.5rem;
     }
 
-    h2 {
-      margin-top: 2rem;
-      font-size: 1.3rem;
-      color: #2563eb;
+    .grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:12px;
+      max-width:520px;
     }
 
-    ul {
-      list-style: none;
-      padding-left: 0;
-      max-width: 600px;
+    @media(min-width:700px){
+      .grid{ grid-template-columns:1fr 1fr; }
     }
 
-    li {
-      margin-bottom: 0.75rem;
+    a.card{
+      display:block;
+      padding:14px 16px;
+      background:#ffffff;
+      border:1px solid #d1d5db;
+      border-radius:8px;
+      text-decoration:none;
+      color:#111827;
+      font-weight:600;
+      transition:background .15s, border-color .15s;
     }
 
-    a {
-      display: block;
-      padding: 0.75rem 1rem;
-      background-color: #ffffff;
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      text-decoration: none;
-      color: #1f2937;
-      font-weight: 500;
-      transition: background-color 0.2s, border-color 0.2s;
+    a.card:hover{
+      background:#eff6ff;
+      border-color:#2563eb;
     }
 
-    a:hover {
-      background-color: #eff6ff;
-      border-color: #2563eb;
+    .muted{
+      font-weight:500;
+      color:#6b7280;
+      font-size:.9rem;
+      margin-top:4px;
     }
 
-    .back-link {
-      margin-top: 2.5rem;
-      max-width: 600px;
-    }
-
-    .back-link a {
-      background-color: transparent;
-      border: none;
-      padding: 0;
-      color: #2563eb;
-      font-weight: 500;
-    }
-
-    footer {
-      margin-top: 3rem;
-      font-size: 0.85rem;
-      color: #6b7280;
-      border-top: 1px solid #d1d5db;
-      padding-top: 1rem;
-      max-width: 600px;
+    footer{
+      margin-top:2.5rem;
+      border-top:1px solid #d1d5db;
+      padding-top:1rem;
+      font-size:.85rem;
+      color:#6b7280;
     }
   </style>
 </head>
 
 <body>
-
-  <h1>Q1 – Lernsimulationen</h1>
+  <h1>Q1 – Lernstudio</h1>
 
   <p>
-    Auf dieser Seite findest du die digitalen Lernangebote für den Kurs Q1.
-    Die Materialien werden im Verlauf der Unterrichtsreihe ergänzt.
+    Übersicht der Materialien und Lernsimulationen für die Jahrgangsstufe Q1.
   </p>
 
-  <h2>Themen</h2>
+  <div class="grid">
+    <a class="card" href="ER/">
+      Evangelische Religionslehre
+      <div class="muted">Module, Texte, Lernspiele</div>
+    </a>
 
-  <ul>
-    <li>
-      <a href="lernsimulationen/kurse/q1/Hiobs-Klagen.html">Hiobs-Klagen</a>
-    </li>
-  </ul>
+    <a class="card" href="SW/">
+      Sozialwissenschaften
+      <div class="muted">Simulationen & Materialien</div>
+    </a>
 
-  <div class="back-link">
-    <p>
-      <a href="../../">← Zurück zur Startseite</a>
-    </p>
+    <a class="card" href="Hiobs-Klagen.html">
+      Hiobs Klagen
+      <div class="muted">Einzelnes Lernmodul</div>
+    </a>
   </div>
 
   <footer>
-    <p>
-      Diese Seite speichert keine personenbezogenen Daten.
-      Alle Inhalte laufen ausschließlich im Browser.
-    </p>
+    <a href="../">← Zurück zur Kursübersicht</a>
   </footer>
-
 </body>
 </html>
