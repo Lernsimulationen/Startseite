@@ -1,28 +1,55 @@
-<h2>Inhalte Q1</h2>
-<ul id="file-list">
-  <li>Lade Inhalte …</li>
-</ul>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lernstudio – Start</title>
+  <style>
+    body{
+      font-family: system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      margin:0; padding:2rem; background:#f5f7fa; color:#111827; line-height:1.6;
+    }
+    h1{ margin:0 0 1rem 0; font-size:2rem; border-bottom:3px solid #2563eb; padding-bottom:.5rem; }
+    p{ max-width:720px; }
+    .grid{ display:grid; grid-template-columns:1fr; gap:12px; max-width:520px; margin-top:1rem; }
+    @media(min-width:700px){ .grid{ grid-template-columns:1fr 1fr; } }
+    a.card{
+      display:block; padding:14px 16px; background:#fff; border:1px solid #d1d5db; border-radius:8px;
+      text-decoration:none; color:#111827; font-weight:600; transition:background .15s, border-color .15s;
+    }
+    a.card:hover{ background:#eff6ff; border-color:#2563eb; }
+    .muted{ font-weight:500; color:#6b7280; font-size:.9rem; margin-top:2px; }
+    footer{ margin-top:2.5rem; border-top:1px solid #d1d5db; padding-top:1rem; color:#6b7280; font-size:.85rem; max-width:720px;}
+  </style>
+</head>
+<body>
+  <h1>Lernstudio</h1>
 
-<script>
-fetch("https://api.github.com/repos/lernsimulationen/Startseite/contents/lernsimulationen/kurse/q1")
-  .then(res => res.json())
-  .then(files => {
-    const list = document.getElementById("file-list");
-    list.innerHTML = "";
+  <p>
+    Wähle deinen Kurs/Jahrgang. (Weitere Bereiche werden ergänzt.)
+  </p>
 
-    files
-      .filter(f => f.type === "file" && f.name !== "index.html")
-      .forEach(file => {
-        const li = document.createElement("li");
-        const a = document.createElement("a");
-        a.href = file.name;
-        a.textContent = file.name;
-        li.appendChild(a);
-        list.appendChild(li);
-      });
-  })
-  .catch(() => {
-    document.getElementById("file-list").innerHTML =
-      "<li>Inhalte konnten nicht geladen werden.</li>";
-  });
-</script>
+  <div class="grid">
+    <a class="card" href="lernsimulationen/kurse/5g/">
+      5G
+      <div class="muted">Materialien & Lernspiele</div>
+    </a>
+
+    <a class="card" href="lernsimulationen/kurse/q1/">
+      Q1
+      <div class="muted">ER / SW / Themen</div>
+    </a>
+
+    <!-- Vorlage für später:
+    <a class="card" href="lernsimulationen/kurse/q2/">
+      Q2
+      <div class="muted">folgt</div>
+    </a>
+    -->
+  </div>
+
+  <footer>
+    Diese Seite speichert keine personenbezogenen Daten. Inhalte laufen im Browser.
+  </footer>
+</body>
+</html>
