@@ -1,55 +1,107 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lernstudio – Start</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lernstudio – Startseite</title>
+
   <style>
     body{
       font-family: system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-      margin:0; padding:2rem; background:#f5f7fa; color:#111827; line-height:1.6;
+      margin:0;
+      padding:2rem;
+      background:#f5f7fa;
+      color:#111827;
+      line-height:1.6;
     }
-    h1{ margin:0 0 1rem 0; font-size:2rem; border-bottom:3px solid #2563eb; padding-bottom:.5rem; }
-    p{ max-width:720px; }
-    .grid{ display:grid; grid-template-columns:1fr; gap:12px; max-width:520px; margin-top:1rem; }
-    @media(min-width:700px){ .grid{ grid-template-columns:1fr 1fr; } }
+
+    h1{
+      margin-top:0;
+      border-bottom:3px solid #2563eb;
+      padding-bottom:.5rem;
+    }
+
+    p{
+      max-width:720px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:12px;
+      max-width:560px;
+      margin-top:1.5rem;
+    }
+
+    @media(min-width:700px){
+      .grid{ grid-template-columns:1fr 1fr; }
+    }
+
     a.card{
-      display:block; padding:14px 16px; background:#fff; border:1px solid #d1d5db; border-radius:8px;
-      text-decoration:none; color:#111827; font-weight:600; transition:background .15s, border-color .15s;
+      display:block;
+      padding:14px 16px;
+      background:#ffffff;
+      border:1px solid #d1d5db;
+      border-radius:8px;
+      text-decoration:none;
+      color:#111827;
+      font-weight:600;
+      transition:background .15s, border-color .15s;
     }
-    a.card:hover{ background:#eff6ff; border-color:#2563eb; }
-    .muted{ font-weight:500; color:#6b7280; font-size:.9rem; margin-top:2px; }
-    footer{ margin-top:2.5rem; border-top:1px solid #d1d5db; padding-top:1rem; color:#6b7280; font-size:.85rem; max-width:720px;}
+
+    a.card:hover{
+      background:#eff6ff;
+      border-color:#2563eb;
+    }
+
+    .muted{
+      font-weight:500;
+      color:#6b7280;
+      font-size:.9rem;
+      margin-top:4px;
+    }
+
+    footer{
+      margin-top:2.5rem;
+      border-top:1px solid #d1d5db;
+      padding-top:1rem;
+      font-size:.85rem;
+      color:#6b7280;
+      max-width:720px;
+    }
   </style>
 </head>
+
 <body>
+
   <h1>Lernstudio</h1>
 
   <p>
-    Wähle deinen Kurs/Jahrgang. (Weitere Bereiche werden ergänzt.)
+    Zentrale Übersicht der digitalen Lernangebote.
+    Bitte wähle deine Jahrgangsstufe.
   </p>
 
   <div class="grid">
     <a class="card" href="lernsimulationen/kurse/5g/">
       5G
-      <div class="muted">Materialien & Lernspiele</div>
+      <div class="muted">Sekundarstufe I</div>
     </a>
 
     <a class="card" href="lernsimulationen/kurse/q1/">
       Q1
-      <div class="muted">ER / SW / Themen</div>
+      <div class="muted">Sekundarstufe II</div>
     </a>
 
-    <!-- Vorlage für später:
     <a class="card" href="lernsimulationen/kurse/q2/">
       Q2
-      <div class="muted">folgt</div>
+      <div class="muted">Sekundarstufe II</div>
     </a>
-    -->
   </div>
 
   <footer>
-    Diese Seite speichert keine personenbezogenen Daten. Inhalte laufen im Browser.
+    Diese Seite speichert keine personenbezogenen Daten.
+    Alle Inhalte laufen ausschließlich im Browser.
   </footer>
+
 </body>
 </html>
