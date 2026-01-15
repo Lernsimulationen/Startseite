@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lernsimulation: Kirchenwahl 1933</title>
+    <style>
+        :root {
+            /* Colors matching the Tailwind Stone, Blue, Amber, Emerald, Rose palettes */
+            --stone-50: #fafaf9;
+            --stone-100: #f5f5f4;
+            --stone-200: #e7e5e4;
+            --stone-300: #d6d3d1;
+            --stone-400: #a8a29e;
+            --stone-500: #78716c;
+            --stone-600: #57534e;
+            --stone-700: #44403c;
+            --stone-800: #292524;
+            --stone-900: #1c1917;
+
+            --blue-50: #eff6ff;
+            --blue-100: #dbeafe;
+            --blue-200: #bfdbfe;
+            --blue-500: #3b82f6;
+            --blue-800: #1e40af;
+            --blue-900: #1e3a8a;
+
+            --amber-50: #fffbeb;
+            --amber-200: #fde68a;
+            --amber-500: #f59e0b;
+            --amber-900: #78350f;
+
+            --emerald-50: #ecfdf5;
+            --emerald-200: #a7f3d0;
+            --emerald-500: #10b981;
+            --emerald-900: #064e3b;
+
+            --rose-50: #fff1f2;
+            --rose-200: #fecdd3;
+            --rose-500: #f43f5e;
+            --rose-600: #e11d48;
+            --rose-700: #be123c;
+            --rose-900: #881337;
+
+            --white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--stone-100);
+            color: var(--stone-900);
+            margin: 0;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- Layout --- */
+        .container {
+            max-width: 56rem; /* 4xl */
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .header {
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--stone-800);
+            padding-bottom: 1rem;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .title {
+            font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.025em;
+        }
+
+        .badge {
+            background-color: var(--stone-800);
+            color: var(--stone-100);
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            border-radius: 0.25rem;
+        }
+
+        .subtitle {
+            color: var(--stone-600);
+            font-style: italic;
+            margin: 0;
+        }
+
+        /* --- Navigation --- */
+        .nav {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--stone-300);
+            background-color: var(--white);
+            color: var(--stone-600);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--stone-200);
+        }
+
+        .nav-btn.active {
+            background-color: var(--stone-800);
+            color: var(--white);
+            border-color: var(--stone-800);
+            box-shadow: var(--shadow);
+        }
+
+        /* --- Main Card --- */
+        .main-card {
+            background-color: var(--white);
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--stone-200);
+            min-height: 600px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .p-8 { padding: 2rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-6 { gap: 1.5rem; }
+        .w-full { width: 100%; }
+        .grid { display: grid; }
+        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+        
+        @media (min-width: 768px) {
+            .md-flex-row { flex-direction: row; }
+            .md-grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .md-grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+
+        /* --- Text Analysis Styles --- */
+        .progress-card {
+            background-color: var(--stone-100);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--stone-200);
+            min-width: 200px;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            background-color: var(--stone-300);
+            height: 0.5rem;
+            border-radius: 9999px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar-fill {
+            background-color: var(--stone-800);
+            height: 100%;
+            transition: width 0.5rem;
+        }
+
+        .transcript-box {
+            background-color: var(--stone-50);
+            padding: 2rem;
+            border-radius: 0.5rem;
+            border-left: 4px solid var(--stone-800);
+            font-family: ui-serif, Georgia, serif;
+            font-size: 1.125rem;
+            line-height: 1.625;
+            box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+            max-width: 48rem;
+            margin: 0 auto;
+            position: relative;
+            user-select: text; /* Explicitly allow selection */
+        }
+
+        .mark {
+            padding: 0 0.125rem;
+            border-radius: 0.125rem;
+            position: relative;
+            cursor: help;
+            border-bottom-width: 2px;
+            border-bottom-style: solid;
+        }
+
+        .mark-blue { background-color: var(--blue-200); color: var(--blue-900); border-color: var(--blue-500); }
+        .mark-emerald { background-color: var(--emerald-200); color: var(--emerald-900); border-color: var(--emerald-500); }
+        .mark-amber { background-color: var(--amber-200); color: var(--amber-900); border-color: var(--amber-500); }
+        .mark-rose { background-color: var(--rose-200); color: var(--rose-900); border-color: var(--rose-500); }
+
+        /* Tooltip */
+        .mark .tooltip {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 16rem;
+            background-color: var(--stone-800);
+            color: var(--white);
+            font-size: 0.75rem;
+            font-family: ui-sans-serif, sans-serif;
+            padding: 0.75rem;
+            border-radius: 0.25rem;
+            margin-bottom: 0.5rem;
+            z-index: 20;
+            box-shadow: var(--shadow-xl);
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .mark:hover .tooltip, .mark.active .tooltip {
+            display: block;
+        }
+
+        .mark .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -4px;
+            border-width: 4px;
+            border-style: solid;
+            border-color: var(--stone-800) transparent transparent transparent;
+        }
+
+        /* --- Floating Menu --- */
+        #floating-menu {
+            position: absolute;
+            z-index: 40;
+            background-color: var(--white);
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--stone-200);
+            padding: 0.5rem;
+            display: flex;
+            gap: 0.5rem;
+            animation: zoomIn 0.2s ease-out;
+        }
+
+        .menu-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 5rem;
+            transition: background-color 0.2s;
+        }
+        
+        .menu-btn:hover { background-color: var(--stone-100); }
+        .menu-btn:hover .color-dot { transform: scale(1.1); }
+
+        .color-dot {
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            border: 2px solid var(--white);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 0.25rem;
+            transition: transform 0.2s;
+        }
+
+        .menu-label { font-size: 0.75rem; font-weight: 700; }
+
+        /* --- Roles Phase --- */
+        .role-card {
+            background-color: var(--white);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--stone-200);
+        }
+        
+        .role-header { display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--stone-100); padding-bottom: 0.75rem; }
+        .role-icon-bg { padding: 0.5rem; background-color: var(--stone-100); border-radius: 9999px; }
+        .role-list { list-style: disc inside; background-color: var(--stone-50); padding: 0.75rem; border-radius: 0.25rem; color: var(--stone-600); font-size: 0.875rem; }
+
+        /* --- Voting Phase --- */
+        .vote-btn {
+            padding: 1.5rem;
+            background-color: var(--stone-50);
+            border: 2px solid var(--stone-200);
+            border-radius: 0.75rem;
+            cursor: pointer;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .vote-btn:hover { transform: scale(1.05); }
+        .vote-btn-blue { background-color: var(--blue-50); border-color: var(--blue-200); }
+        .vote-btn-blue:hover { background-color: var(--blue-100); }
+        .vote-btn-red { background-color: var(--rose-50); border-color: var(--rose-200); }
+        .vote-btn-red:hover { background-color: var(--rose-100); }
+
+        /* --- Reflection & Inputs --- */
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--stone-300);
+            border-radius: 0.25rem;
+            min-height: 6rem;
+            font-family: inherit;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        textarea:focus { outline: 2px solid var(--stone-400); }
+
+        /* --- Buttons --- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-weight: 700;
+            border-radius: 0.25rem;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 0.875rem;
+        }
+        .btn-primary { background-color: var(--stone-800); color: var(--white); }
+        .btn-primary:hover { background-color: var(--stone-700); }
+        .btn-light { background-color: var(--stone-100); color: var(--stone-700); }
+        .btn-light:hover { background-color: var(--stone-200); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* --- Toasts & Modals --- */
+        #toast-container {
+            position: absolute;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 50;
+        }
+        .toast {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.25rem;
+            box-shadow: var(--shadow-xl);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 700;
+            animation: slideDown 0.3s ease-out;
+            color: var(--white);
+        }
+        .toast-info { background-color: var(--stone-800); }
+        .toast-error { background-color: var(--rose-600); }
+        .toast-success { background-color: var(--emerald-500); }
+
+        .modal-overlay {
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 60;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            animation: fadeIn 0.2s;
+        }
+        .modal {
+            background-color: var(--white);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            max-width: 24rem;
+            box-shadow: var(--shadow-2xl);
+        }
+
+        /* --- Footer --- */
+        .footer {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            color: var(--stone-500);
+            font-size: 0.875rem;
+        }
+        .reset-btn { background: none; border: none; color: inherit; cursor: pointer; display: flex; align-items: center; gap: 0.25rem; }
+        .reset-btn:hover { color: var(--stone-800); }
+
+        @keyframes zoomIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes slideDown { from { transform: translateY(-1rem); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .hidden { display: none !important; }
+        .print-hidden { }
+        @media print {
+            .print-hidden { display: none; }
+            .main-card { box-shadow: none; border: none; min-height: auto; }
+        }
+        
+        /* SVG Icons */
+        svg { width: 1.25rem; height: 1.25rem; }
+        .icon-lg { width: 3rem; height: 3rem; }
+        .text-blue-600 { color: var(--blue-500); }
+        .text-red-600 { color: var(--rose-600); }
+        .text-gray-600 { color: var(--stone-600); }
+        .text-stone-800 { color: var(--stone-800); }
+        .text-orange-500 { color: var(--amber-500); }
+        .text-stone-400 { color: var(--stone-400); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <header class="header print-hidden">
+        <div class="header-top">
+            <h1 class="title">Kirchenwahl 1933</h1>
+            <span class="badge">Szenario: 1933</span>
+        </div>
+        <p class="subtitle">Eine Simulation zur Analyse politischer Sprache und religiöser Vereinnahmung.</p>
+    </header>
+
+    <!-- Nav -->
+    <nav class="nav print-hidden" id="nav-container"></nav>
+
+    <!-- Main Content -->
+    <main class="main-card" id="main-card">
+        <!-- Dynamic Content Injected Here -->
+    </main>
+
+    <!-- Footer -->
+    <div class="footer print-hidden">
+        <button class="reset-btn" onclick="app.reset()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74-2.74L3 12"/></svg>
+            Neustart
+        </button>
+        <span>Version: Secure-School-1.3 (Strict Matching)</span>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+    <!-- Modal Container -->
+    <div id="modal-container"></div>
+</div>
+
+<script>
+    // --- Configuration Rules ---
+    const SELECTION_RULES = {
+        MIN_CHARS: 8,
+        MAX_CHARS: 180,
+        MAX_WORDS: 35
+    };
+
+    const MATCH_RULES = {
+        MIN_COVER_TRUTH: 0.70,      // 70% der Lösung muss getroffen werden
+        MAX_SELECTION_FACTOR: 1.60, // Auswahl darf max. 1.6x so lang sein wie die Lösung
+        MIN_OVERLAP_CHARS: 10       // mindestens 10 Zeichen Überschneidung
+    };
+
+    // --- Data ---
+    const sourceData = [
+        { text: "Ich kann nur wünschen, dass er seinen Schutz solchen religiösen Gebilden angedeihen lässt, die ihm auch ihrerseits wieder ", type: "neutral" },
+        { text: "nützlich zu werden vermögen.", type: "demand", hint: "Funktionalisierung: Religion hat für den Staat vor allem dann einen Wert, wenn sie ihm nützt.", color: "amber" },
+        { text: " Gleichzeitig hat sich auch innerhalb der evangelischen Bekenntnisse im Kirchenvolk, in den ", type: "neutral" },
+        { text: "Deutschen Christen,", type: "appeal", hint: "Parteinahme: Der Staat hebt explizit die ihm treue Fraktion hervor.", color: "blue" },
+        { text: " eine Bewegung erhoben, die von dem Willen erfüllt, den großen Aufgaben der Zeit gerecht zu werden, eine Einigung der evangelischen Landeskirchen und Bekenntnisse anstrebt. Wenn diese Frage nun wirklich in Fluss geraten ist, dann wird vor der Geschichte nicht durch unwahre Einwendungen bestritten werden können, dass dies das ", type: "neutral" },
+        { text: "Verdienst der völkisch-politischen Umwelt", type: "appeal", hint: "Vereinnahmung: Kirchliche Entwicklungen werden als Erfolg der NS-Politik umgedeutet.", color: "blue" },
+        { text: " in Deutschland war. Und jede Bewegung innerhalb der evangelischen Bekenntnisse, die sich eindeutig und klar zu dieser nationalen und völkischen Bewegung bekannte, zu einer Zeit, da leider genauso wie in der katholischen Kirche zahlreiche ", type: "neutral" },
+        { text: "Pastoren und Superintendenten... auf fanatische Weise gegen diese nationale Erhebung... Stellung genommen haben.", type: "threat", hint: "Diffamierung: Kritiker werden pauschal als 'grundlose Fanatiker' abgewertet und ausgegrenzt.", color: "rose" },
+        { text: " Im Interesse des Wiederaufstiegs der deutschen Nation, wenn ich mich untrennbar mit der nationalsozialistischen Bewegung verbunden ansehe, wünsche ich daher verständlicherweise, dass die neuen Kirchenwahlen mit ihrem Ergebnis ", type: "neutral" },
+        { text: "unsere neue Volks- und Staatspolitik unterstützen werden.", type: "demand", hint: "Wahlbeeinflussung: Eine klare Forderung, die Kirche politisch gleichzuschalten.", color: "amber" },
+        { text: " Denn indem der Staat die ", type: "neutral" },
+        { text: "innere Freiheit des religiösen Lebens zu garantieren bereit ist,", type: "promise", hint: "Schein-Garantie: Freiheit wird versprochen, ist aber an politische Wohlverhaltensbedingungen geknüpft.", color: "emerald" },
+        { text: " hat er das Recht zu hoffen, dass in den Bekenntnissen diejenigen Kräfte gehören werden möchten, die entschlossen und gewillt sind, ", type: "neutral" },
+        { text: "auf ihrer Seite für die Freiheit der Nation sich einzusetzen.", type: "demand", hint: "Bedingung: Religiöse Freiheit gibt es nur im Tausch gegen totalen politischen Einsatz.", color: "amber" },
+        { text: " Dies wird aber nicht gewährleistet durch ", type: "neutral" },
+        { text: "weltabgewandte... Kräfte", type: "threat", hint: "Abwertung: Theologische Unabhängigkeit wird als 'Weltfremdheit' diskreditiert.", color: "rose" },
+        { text: " einer kirchlichen Verstärkung, sondern durch die Kräfte einer ", type: "neutral" },
+        { text: "lebendigen Bejahung.", type: "appeal", hint: "Propaganda-Begriff: Zustimmung zum NS-Staat wird als 'Lebendigkeit' und 'Kraft' verkauft.", color: "blue" },
+        { text: " Diese Kräfte, die in jenem Teil des evangelischen Kirchenvolkes in erster Linie versammelt, die als ", type: "neutral" },
+        { text: "Deutsche Christen bewusst auf dem Boden des nationalsozialistischen Staates stehen,", type: "appeal", hint: "Gleichschaltung: Identifikation von Kirche und Staat als Idealbild.", color: "blue" },
+        { text: " nicht in erzwungener Duldung, sondern in lebendiger Bejahung. Die ", type: "neutral" },
+        { text: "inneren religiösen Fragen der eigenen Bekenntnisse werden davon überhaupt nicht berührt.", type: "promise", hint: "Die große Lüge: Behauptung einer Trennung von Politik und Glaube, die der Text selbst widerlegt.", color: "emerald" },
+        { text: " Es ist nicht meine Aufgabe, dazu Stellung zu nehmen.", type: "neutral" }
+    ];
+
+    const roles = [
+        {
+            id: 'A',
+            title: 'Deutsche Christen',
+            iconType: 'checkCircle',
+            color: 'text-blue-600',
+            short: 'Pro-NS & National',
+            description: 'Sie sehen im Nationalsozialismus eine „nationale Erhebung“ und wollen eine kraftvolle Volkskirche.',
+            arguments: ['Gott offenbart sich in der deutschen Geschichte.', 'Wir brauchen eine Kirche, die „Ja“ zum Volk sagt.', 'Wer gegen den Staat ist, ist gegen die Ordnung Gottes.']
+        },
+        {
+            id: 'B',
+            title: 'Kritische Pfarrerschaft',
+            iconType: 'alertTriangle',
+            color: 'text-red-600',
+            short: 'Theologische Distanz',
+            description: 'Sie warnen vor der Vermischung von Politik und Glaube. Christus ist der einzige Herr der Kirche.',
+            arguments: ['Die Kirche dient dem Evangelium, keiner Partei.', 'Politische „Freiheit“ ist wertlos, wenn die Lehre verfälscht wird.', 'Glaube darf nicht instrumentalisiert werden.']
+        },
+        {
+            id: 'C',
+            title: 'Unentschlossene Gemeinde',
+            iconType: 'users',
+            color: 'text-gray-600',
+            short: 'Ängstlich & Hoffend',
+            description: 'Sie wollen Ruhe, Ordnung und keine Konflikte. Das Versprechen der „religiösen Freiheit“ klingt gut.',
+            arguments: ['Der Staat verspricht doch Schutz.', 'Warum sollen wir uns streiten? Einigkeit ist wichtig.', 'Vielleicht wird alles nicht so schlimm.']
+        }
+    ];
+
+    // --- Icons ---
+    const icons = {
+        bookOpen: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
+        users: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+        vote: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"/><path d="M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12H5V7Z"/><path d="M22 19H2"/></svg>',
+        penTool: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19 7-7 3 3-7 7-3-3z"/><path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="m2 2 7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>',
+        fileText: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>',
+        search: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
+        mousePointer2: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 5.18 6.63 13.91-4.57.65L12 24l-2.06-4.26-4.57-.65Z"/></svg>',
+        lightbulb: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2.4 1.5-3.8 0-3.2-2.7-5.5-6-5.5S6 4.5 6 7.7c0 1.4.5 2.8 1.5 3.8.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>',
+        fastForward: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 19 22 12 13 5 13 19"/><polygon points="2 19 11 12 2 5 2 19"/></svg>',
+        shieldAlert: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+        download: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+        checkCircle: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+        alertTriangle: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+        info: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
+        scale: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>'
+    };
+
+    // --- Helpers ---
+    function prepareTextData() {
+        let fullText = "";
+        const truthRanges = [];
+        sourceData.forEach(segment => {
+            const start = fullText.length;
+            fullText += segment.text;
+            const end = fullText.length;
+            if (segment.type !== 'neutral') {
+                truthRanges.push({ start, end, type: segment.type, hint: segment.hint, color: segment.color });
+            }
+        });
+        return { fullText, truthRanges };
+    }
+    const { fullText, truthRanges } = prepareTextData();
+
+    function normalizeForExport(str, maxLen = 1200) {
+        if (typeof str !== 'string') return '';
+        let clean = String(str).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+        clean = clean.replace(/\r\n|\r/g, '\n');
+        return clean.slice(0, maxLen);
+    }
+
+    function clampMenuPosition(top, left, width, height, containerRect) {
+        const padding = 8;
+        let safeLeft = Math.max(padding, left);
+        if (safeLeft + width > containerRect.width - padding) safeLeft = containerRect.width - width - padding;
+        if (safeLeft < padding) safeLeft = padding;
+
+        let safeTop = Math.max(padding, top);
+        if (safeTop + height > containerRect.height - padding) safeTop = containerRect.height - height - padding;
+        return { top: safeTop, left: safeLeft };
+    }
+
+    function countWords(str) {
+        return String(str).trim().split(/\s+/).filter(Boolean).length;
+    }
+
+    function overlap(aStart, aEnd, bStart, bEnd) {
+        const start = Math.max(aStart, bStart);
+        const end = Math.min(aEnd, bEnd);
+        return Math.max(0, end - start);
+    }
+
+    // --- State Management ---
+    const initialState = {
+        phase: 1,
+        userMarks: [],
+        selectionMenu: null,
+        wrongAttempts: 0,
+        userVote: null,
+        simulatedResults: null,
+        reflectionAnswers: { motivation: '', ethics: '', transfer: '' },
+        activeHint: null,
+        hintsUsedCount: 0,
+        solutionRevealed: false,
+        toast: null
+    };
+
+    const app = {
+        state: JSON.parse(JSON.stringify(initialState)),
+        toastTimer: null,
+
+        setState(updates) {
+            Object.assign(this.state, updates);
+            this.render();
+        },
+
+        reset() {
+            this.state = JSON.parse(JSON.stringify(initialState));
+            if (this.toastTimer) clearTimeout(this.toastTimer);
+            this.render();
+        },
+
+        showToast(msg, type = 'error') {
+            if (this.toastTimer) clearTimeout(this.toastTimer);
+            this.state.toast = { msg, type };
+            this.render();
+            this.toastTimer = setTimeout(() => {
+                this.state.toast = null;
+                this.render();
+            }, 4000);
+        },
+
+        // --- Logic Methods ---
+        handleTextSelection() {
+            if (this.state.wrongAttempts >= 40 || this.state.solutionRevealed) {
+                if (this.state.selectionMenu) this.setState({ selectionMenu: null });
+                return;
+            }
+
+            const selection = window.getSelection();
+            if (!selection.rangeCount || selection.isCollapsed) {
+                this.setState({ selectionMenu: null });
+                return;
+            }
+
+            // --- SELECTION CONSTRAINT CHECK ---
+            const selectedText = selection.toString() || '';
+            const trimmed = selectedText.trim();
+            
+            if (trimmed.length < SELECTION_RULES.MIN_CHARS) {
+                this.setState({ selectionMenu: null });
+                return;
+            }
+
+            if (trimmed.length > SELECTION_RULES.MAX_CHARS || countWords(trimmed) > SELECTION_RULES.MAX_WORDS) {
+                this.showToast("Markierung zu groß. Bitte eine präzisere Textstelle auswählen.", "error");
+                this.setState({ selectionMenu: null });
+                window.getSelection().removeAllRanges();
+                return;
+            }
+            // ----------------------------------
+
+            const range = selection.getRangeAt(0);
+            const textContainer = document.getElementById('transcript-text');
+            const wrapperFrame = document.getElementById('transcript-wrapper');
+
+            if (!textContainer || !textContainer.contains(range.commonAncestorContainer) || !wrapperFrame) {
+                this.setState({ selectionMenu: null });
+                return;
+            }
+
+            // Offset Calculation
+            let start = 0, end = 0;
+            let currentLen = 0;
+            
+            // TreeWalker to count offsets ignoring spans
+            const treeWalker = document.createTreeWalker(textContainer, NodeFilter.SHOW_TEXT, null, false);
+            let node;
+            let startFound = false, endFound = false;
+
+            while (node = treeWalker.nextNode()) {
+                const nodeLen = node.textContent.length;
+                if (!startFound && node === range.startContainer) {
+                    start = currentLen + range.startOffset;
+                    startFound = true;
+                }
+                if (!endFound && node === range.endContainer) {
+                    end = currentLen + range.endOffset;
+                    endFound = true;
+                }
+                currentLen += nodeLen;
+            }
+
+            // --- ROBUSTNESS CHECK ---
+            if (!startFound || !endFound) {
+                this.setState({ selectionMenu: null });
+                return;
+            }
+            // ------------------------
+
+            if (start >= end) {
+                this.setState({ selectionMenu: null });
+                return;
+            }
+
+            const rect = range.getBoundingClientRect();
+            const containerRect = wrapperFrame.getBoundingClientRect();
+            const MENU_WIDTH = 280;
+            const MENU_HEIGHT = 80;
+
+            const rawTop = rect.top - containerRect.top - 60;
+            const rawLeft = rect.left - containerRect.left + (rect.width / 2) - (MENU_WIDTH / 2);
+            const clamped = clampMenuPosition(rawTop, rawLeft, MENU_WIDTH, MENU_HEIGHT, containerRect);
+
+            this.setState({ selectionMenu: { top: clamped.top, left: clamped.left, start, end } });
+        },
+
+        handleMarking(selectedType) {
+            if (!this.state.selectionMenu) return;
+
+            const { start, end } = this.state.selectionMenu;
+            const selectionLength = end - start;
+            const selectionMid = start + selectionLength / 2;
+
+            // --- STRICT MATCHING LOGIC ---
+            const candidates = truthRanges.filter(t => t.type === selectedType)
+                .filter(t => !this.state.userMarks.some(m => m.start === t.start));
+
+            let best = null;
+            let bestScore = -1;
+
+            for (const t of candidates) {
+                // 1) Mitte der Auswahl muss in der Truth-Range liegen
+                if (!(selectionMid >= t.start && selectionMid <= t.end)) continue;
+
+                const ov = overlap(start, end, t.start, t.end);
+                if (ov < MATCH_RULES.MIN_OVERLAP_CHARS) continue;
+
+                const truthLen = t.end - t.start;
+                const coverTruth = ov / truthLen;
+
+                // 2) Truth-Abdeckung muss hoch genug sein
+                if (coverTruth < MATCH_RULES.MIN_COVER_TRUTH) continue;
+
+                // 3) Auswahl darf nicht viel größer sein als die Wahrheit
+                if (selectionLength > truthLen * MATCH_RULES.MAX_SELECTION_FACTOR) continue;
+
+                // Score: bevorzugt hohe Abdeckung + kleinere Auswahl
+                const score = (coverTruth * 100) - (selectionLength / truthLen) * 5;
+                if (score > bestScore) {
+                    bestScore = score;
+                    best = t;
+                }
+            }
+            // -----------------------------
+
+            const updates = { selectionMenu: null };
+            if (best) {
+                updates.userMarks = [...this.state.userMarks, { 
+                    start: best.start, end: best.end, type: best.type, color: best.color, hint: best.hint 
+                }];
+                this.showToast("Treffer – präzise Zuordnung!", "success");
+                if (this.state.activeHint && this.state.activeHint.includes("Lernhilfe")) {
+                    updates.activeHint = null;
+                }
+            } else {
+                updates.wrongAttempts = this.state.wrongAttempts + 1;
+                if (updates.wrongAttempts < 40) {
+                    this.showToast("Keine passende Zuordnung. Markiere genauer (kurzer Ausschnitt, treffende Worte).", "error");
+                }
+            }
+            window.getSelection().removeAllRanges();
+            this.setState(updates);
+        },
+
+        generateHint() {
+            const foundStarts = this.state.userMarks.map(m => m.start);
+            const missing = truthRanges.find(t => !foundStarts.includes(t.start));
+            
+            if (!missing) {
+                this.showToast("Du hast bereits alles gefunden!", "success");
+                return;
+            }
+
+            let hintText = "";
+            switch(missing.type) {
+                case 'appeal': hintText = "Lernhilfe: Suche nach Begriffen, die 'Wir-Gefühl', 'Volk' oder 'nationale Bewegung' positiv hervorheben (Appell)."; break;
+                case 'demand': hintText = "Lernhilfe: Wo fordert der Redner ganz konkret eine Gegenleistung oder Unterstützung von der Kirche? (Forderung)"; break;
+                case 'promise': hintText = "Lernhilfe: Der Staat verspricht Schutz oder Freiheit. Klingt das glaubwürdig oder ist es an Bedingungen geknüpft? (Versprechen)"; break;
+                case 'threat': hintText = "Lernhilfe: Achte auf aggressive Wörter. Wie werden Kritiker, Gegner oder Andersdenkende bezeichnet? (Drohung)"; break;
+                default: hintText = "Suche weiter im Text nach rhetorischen Mitteln.";
+            }
+
+            this.setState({ 
+                activeHint: hintText, 
+                hintsUsedCount: this.state.hintsUsedCount + 1 
+            });
+            this.showToast("Hinweis aktiviert (siehe unten)", "info");
+        },
+
+        revealSolution() {
+            const solutionMarks = truthRanges.map(t => ({...t}));
+            this.setState({ 
+                userMarks: solutionMarks, 
+                solutionRevealed: true, 
+                activeHint: "Lösung wurde vollständig angezeigt." 
+            });
+        },
+
+        handleUserVote(choice) {
+            this.setState({ userVote: choice });
+            setTimeout(() => {
+                this.setState({ simulatedResults: { support: 62, neutral: 28, reject: 10 } });
+            }, 800);
+        },
+
+        downloadProtocol() {
+            const { motivation, ethics, transfer } = this.state.reflectionAnswers;
+            const progress = truthRanges.length > 0 ? Math.round((this.state.userMarks.length / truthRanges.length) * 100) : 0;
+            const voteText = this.state.userVote === 'support' ? "Unterstützung" : 
+                             this.state.userVote === 'neutral' ? "Anpassung" : 
+                             this.state.userVote === 'reject' ? "Widerstand" : "Keine Wahl";
+
+            const text = `
+Lernsimulation: Kirchenwahl 1933 - Ergebnisprotokoll
+----------------------------------------------------
+TEIL 1: TEXTANALYSE
+Fortschritt: ${progress}% der Strategien gefunden.
+Fehlversuche: ${this.state.wrongAttempts} (Limit: 40)
+Genutzte Hilfen: ${this.state.hintsUsedCount} Tipps
+Lösung vollständig aufgedeckt: ${this.state.solutionRevealed ? "Ja" : "Nein"}
+
+TEIL 2: ENTSCHEIDUNG
+Gewählt: ${voteText}
+
+TEIL 3: REFLEXION
+1. Motivation:
+${normalizeForExport(motivation)}
+
+2. Ethik:
+${normalizeForExport(ethics)}
+
+3. Transfer:
+${normalizeForExport(transfer)}
+            `.trim();
+
+            const element = document.createElement("a");
+            const file = new Blob([text], {type: 'text/plain'});
+            element.href = URL.createObjectURL(file);
+            element.download = "Protokoll_Kirchenwahl.txt";
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        },
+
+        // --- RENDER METHODS ---
+
+        render() {
+            this.renderNav();
+            this.renderMain();
+            this.renderToast();
+        },
+
+        renderNav() {
+            const nav = document.getElementById('nav-container');
+            const phases = [
+                { id: 1, label: 'Textanalyse', icon: icons.search },
+                { id: 2, label: 'Positionen', icon: icons.users },
+                { id: 3, label: 'Entscheidung', icon: icons.vote },
+                { id: 4, label: 'Reflexion', icon: icons.penTool },
+                { id: 5, label: 'Protokoll', icon: icons.fileText },
+            ];
+            
+            nav.innerHTML = phases.map(p => `
+                <button class="nav-btn ${this.state.phase === p.id ? 'active' : ''}" onclick="app.setState({phase: ${p.id}, selectionMenu: null})">
+                    ${p.icon} <span>${p.label}</span>
+                </button>
+            `).join('');
+        },
+
+        renderMain() {
+            const main = document.getElementById('main-card');
+            main.innerHTML = ''; // Clear
+
+            if (this.state.phase === 1) this.renderPhase1(main);
+            else if (this.state.phase === 2) this.renderPhase2(main);
+            else if (this.state.phase === 3) this.renderPhase3(main);
+            else if (this.state.phase === 4) this.renderPhase4(main);
+            else if (this.state.phase === 5) this.renderPhase5(main);
+        },
+
+        renderPhase1(container) {
+            const progress = Math.round((this.state.userMarks.length / truthRanges.length) * 100);
+            
+            const html = `
+                <div class="p-8" style="position: relative;">
+                    <div class="flex flex-col md-flex-row justify-between items-center mb-6 gap-4" style="align-items: flex-start;">
+                        <div>
+                            <h2 class="title" style="font-size: 1.5rem; margin-bottom: 0.5rem; display:flex; align-items:center; gap:0.5rem;">Phase 1: Die Quelle entschlüsseln</h2>
+                            <p class="subtitle" style="display:flex; align-items:center; gap:0.5rem;">
+                                ${icons.mousePointer2} <strong>Arbeitsauftrag:</strong> Markiere verdächtige Textstellen mit der Maus.
+                            </p>
+                        </div>
+                        <div class="progress-card">
+                            <div class="flex justify-between" style="font-size: 0.75rem; font-weight: 700; color: var(--stone-500); margin-bottom: 0.25rem;">
+                                <span>Entdeckt</span>
+                                <span>${this.state.userMarks.length} / ${truthRanges.length}</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: ${progress}%"></div>
+                            </div>
+                            ${this.state.wrongAttempts > 0 ? `<div style="font-size:0.75rem; font-weight:700; color:${this.state.wrongAttempts >= 40 ? 'var(--rose-600)' : 'var(--amber-500)'}">${this.state.wrongAttempts >= 40 ? 'Keine Versuche mehr' : this.state.wrongAttempts + ' Ungenauigkeiten'}</div>` : ''}
+                        </div>
+                    </div>
+
+                    <!-- DIDACTIC INSTRUCTION BOX -->
+                    <div class="mb-6" style="padding: 1rem; background-color: var(--stone-50); border: 1px solid var(--stone-200); border-radius: 0.5rem;">
+                        <div style="font-weight: 700; margin-bottom: 0.5rem;">So ordnest du zu (kurz):</div>
+                        <ul style="margin: 0; padding-left: 1.25rem; color: var(--stone-700); font-size: 0.875rem; line-height: 1.4;">
+                            <li><strong>Appell:</strong> Wir-/Volk-/Nation-Begriffe, positive Mobilisierung.</li>
+                            <li><strong>Versprechen:</strong> Schutz/Freiheit/Garantie (oft an Bedingungen geknüpft).</li>
+                            <li><strong>Forderung:</strong> Erwartete Unterstützung/Gegenleistung („soll“, „muss“, „wird“).</li>
+                            <li><strong>Drohung/Diffamierung:</strong> Abwertung/Feindbild/Angriff auf Kritiker.</li>
+                        </ul>
+                        <div style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--stone-500); border-top: 1px dashed var(--stone-300); padding-top: 0.5rem;">
+                            <strong>Regel:</strong> Markiere möglichst kurz und präzise (1–2 Sätze). Zu große Markierungen werden abgelehnt.
+                        </div>
+                    </div>
+
+                    <div id="transcript-wrapper" class="transcript-box mb-6">
+                        <div style="text-align: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--stone-300); padding-bottom: 1rem; user-select: none;">
+                            <h3 style="font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--stone-500); font-weight: 700;">Transkript</h3>
+                            <div style="font-size: 1.25rem; font-weight: 700; margin-top: 0.25rem;">Rundfunkansprache zur Kirchenwahl</div>
+                            <div style="font-size: 0.875rem; font-style: italic;">Juli 1933</div>
+                        </div>
+                        <div id="transcript-text" style="outline: none; min-height: 200px;"></div>
+                        ${this.state.selectionMenu ? this.renderFloatingMenu() : ''}
+                    </div>
+
+                    ${this.state.activeHint ? `
+                    <div class="mb-6" style="padding: 1rem; background-color: var(--blue-50); border-left: 4px solid var(--blue-500); border-radius: 0.25rem; color: var(--blue-900); display: flex; gap: 0.75rem; font-size: 0.875rem;">
+                        ${icons.lightbulb}
+                        <div><strong style="display:block; margin-bottom:0.25rem;">Hilfestellung:</strong> ${this.state.activeHint}</div>
+                    </div>` : ''}
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; border-top: 1px solid var(--stone-200); padding-top: 1.5rem; flex-wrap: wrap;">
+                        <div style="font-size: 0.875rem; color: var(--stone-500); font-style: italic;">
+                            ${progress < 100 ? "Du kommst nicht weiter?" : "Analyse abgeschlossen."}
+                        </div>
+                        <div style="display: flex; gap: 0.75rem;">
+                            <button class="btn btn-light" onclick="app.generateHint()" ${progress === 100 || this.state.solutionRevealed ? 'disabled' : ''}>
+                                ${icons.lightbulb} Tipp geben
+                            </button>
+                            <button class="btn btn-light" onclick="document.getElementById('modal-container').innerHTML = app.renderConfirmModal()" ${progress === 100 || this.state.solutionRevealed ? 'disabled' : ''} style="color: var(--stone-600);">
+                                ${icons.fastForward} Auflösen & Weiter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+            this.renderTranscriptText();
+            
+            // Event Listeners for Touch Support
+            const textEl = document.getElementById('transcript-text');
+            const handler = () => setTimeout(() => app.handleTextSelection(), 10);
+            
+            // Re-attach listeners because innerHTML wiped it
+            textEl.addEventListener('mouseup', handler);
+            textEl.addEventListener('touchend', handler);
+        },
+
+        renderTranscriptText() {
+            const container = document.getElementById('transcript-text');
+            if (!container) return;
+
+            const marks = [...this.state.userMarks].sort((a, b) => a.start - b.start);
+            let currentPos = 0;
+            const fragment = document.createDocumentFragment();
+
+            marks.forEach(mark => {
+                if (mark.start > currentPos) {
+                    fragment.appendChild(document.createTextNode(fullText.slice(currentPos, mark.start)));
+                }
+
+                const span = document.createElement('span');
+                span.className = `mark mark-${mark.color}`;
+                span.textContent = fullText.slice(mark.start, mark.end);
+                
+                // Toggle active class on click for mobile tooltip
+                span.onclick = (e) => {
+                    e.stopPropagation();
+                    span.classList.toggle('active');
+                };
+
+                const tooltip = document.createElement('div');
+                tooltip.className = 'tooltip';
+                tooltip.textContent = mark.hint;
+                span.appendChild(tooltip);
+
+                fragment.appendChild(span);
+                currentPos = mark.end;
+            });
+
+            if (currentPos < fullText.length) {
+                fragment.appendChild(document.createTextNode(fullText.slice(currentPos)));
+            }
+
+            container.innerHTML = '';
+            container.appendChild(fragment);
+        },
+
+        renderFloatingMenu() {
+            const { top, left } = this.state.selectionMenu;
+            return `
+                <div id="floating-menu" style="top: ${top}px; left: ${left}px;" onmouseup="event.stopPropagation()" ontouchend="event.stopPropagation()">
+                    <div style="position: absolute; top: -1.5rem; left: 0; right: 0; text-align: center; font-size: 0.75rem; font-weight: 700; color: var(--white); background-color: var(--stone-800); border-radius: 0.25rem; padding: 0.25rem; box-shadow: var(--shadow);">Kategorie wählen:</div>
+                    <button class="menu-btn" onclick="app.handleMarking('appeal')">
+                        <div class="color-dot" style="background-color: var(--blue-500);"></div><span class="menu-label text-blue-600">Appell</span>
+                    </button>
+                    <button class="menu-btn" onclick="app.handleMarking('promise')">
+                        <div class="color-dot" style="background-color: var(--emerald-500);"></div><span class="menu-label" style="color:var(--emerald-500)">Versprechen</span>
+                    </button>
+                    <button class="menu-btn" onclick="app.handleMarking('demand')">
+                        <div class="color-dot" style="background-color: var(--amber-500);"></div><span class="menu-label text-orange-500">Forderung</span>
+                    </button>
+                    <button class="menu-btn" onclick="app.handleMarking('threat')">
+                        <div class="color-dot" style="background-color: var(--rose-500);"></div><span class="menu-label text-red-600">Drohung</span>
+                    </button>
+                </div>
+            `;
+        },
+
+        renderConfirmModal() {
+            return `
+                <div class="modal-overlay">
+                    <div class="modal">
+                        <h3 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            ${icons.alertTriangle} <span class="text-orange-500">Lösung anzeigen?</span>
+                        </h3>
+                        <p style="font-size: 0.875rem; color: var(--stone-600); margin-bottom: 1.5rem;">
+                            Möchtest du wirklich die komplette Lösung aufdecken? Versuche es zuerst mit einem Tipp, um den Lerneffekt zu steigern.
+                        </p>
+                        <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+                            <button class="btn btn-light" onclick="document.getElementById('modal-container').innerHTML = ''">Abbrechen</button>
+                            <button class="btn" style="background-color: var(--rose-600); color: white;" onclick="app.revealSolution(); document.getElementById('modal-container').innerHTML = ''">Ja, Lösung anzeigen</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        },
+
+        renderPhase2(container) {
+            const html = `
+                <div class="p-8" style="background-color: var(--stone-50); height: 100%;">
+                    <h2 class="title" style="margin-bottom: 1.5rem;">Phase 2: Die Akteure</h2>
+                    <div class="grid grid-cols-1 md-grid-cols-2 gap-6">
+                        ${roles.map(r => `
+                            <div class="role-card">
+                                <div class="role-header">
+                                    <div class="role-icon-bg ${r.color}">
+                                        ${icons[r.iconType] || icons.info}
+                                    </div>
+                                    <div>
+                                        <h3 style="font-weight: 700; font-size: 1.125rem; margin:0;">${r.title}</h3>
+                                        <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--stone-500);">${r.short}</span>
+                                    </div>
+                                </div>
+                                <p style="font-size: 0.875rem; font-style: italic; color: var(--stone-700); margin-bottom: 0.75rem;">${r.description}</p>
+                                <ul class="role-list">
+                                    ${r.arguments.map(arg => `<li>${arg}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        },
+
+        renderPhase3(container) {
+            let content = '';
+            if (!this.state.userVote) {
+                content = `
+                    <div class="grid grid-cols-1 md-grid-cols-3 gap-6 w-full" style="max-width: 48rem; margin-top: 2rem;">
+                        <button class="vote-btn vote-btn-blue" onclick="app.handleUserVote('support')">
+                            <div class="icon-lg text-blue-600" style="margin: 0 auto 0.75rem auto;">${icons.checkCircle}</div>
+                            <h3 style="font-weight: 700; color: var(--blue-900);">Begeisterung</h3>
+                        </button>
+                        <button class="vote-btn" onclick="app.handleUserVote('neutral')">
+                            <div class="icon-lg text-gray-600" style="margin: 0 auto 0.75rem auto;">${icons.users}</div>
+                            <h3 style="font-weight: 700; color: var(--stone-900);">Anpassung</h3>
+                        </button>
+                        <button class="vote-btn vote-btn-red" onclick="app.handleUserVote('reject')">
+                            <div class="icon-lg text-red-600" style="margin: 0 auto 0.75rem auto;">${icons.alertTriangle}</div>
+                            <h3 style="font-weight: 700; color: var(--rose-900);">Widerstand</h3>
+                        </button>
+                    </div>
+                `;
+            } else {
+                const voteText = this.state.userVote === 'support' ? "Unterstützung" : this.state.userVote === 'neutral' ? "Anpassung" : "Widerstand";
+                content = `
+                    <div style="background-color: var(--stone-900); color: var(--stone-100); padding: 2rem; border-radius: 0.75rem; margin-top: 2rem; max-width: 36rem; text-align: center; animation: zoomIn 0.3s;">
+                        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Historische Einordnung</h3>
+                        <p>Du hast gewählt: <span style="color: var(--blue-200); font-weight: 700;">${voteText}</span>.</p>
+                        <p style="margin-top: 1rem; font-size: 0.875rem; color: var(--stone-400);">Die Mehrheit der Deutschen entschied sich 1933 für die Unterstützung oder die Anpassung.</p>
+                        <button onclick="app.setState({userVote: null, simulatedResults: null})" style="background: none; border: none; color: var(--stone-500); text-decoration: underline; font-size: 0.75rem; margin-top: 1.5rem; cursor: pointer;">Neu wählen</button>
+                    </div>
+                `;
+            }
+
+            const html = `
+                <div class="p-8 flex flex-col items-center justify-center" style="min-height: 400px;">
+                    <h2 class="title" style="margin-bottom: 0.5rem;">Phase 3: Die Gewissensfrage</h2>
+                    ${content}
+                </div>
+            `;
+            container.innerHTML = html;
+        },
+
+        renderPhase4(container) {
+            const { motivation, ethics, transfer } = this.state.reflectionAnswers;
+            const html = `
+                <div class="p-8" style="max-width: 48rem; margin: 0 auto;">
+                    <h2 class="title" style="margin-bottom: 0.5rem;">Phase 4: Reflexion</h2>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; background-color: var(--blue-50); color: var(--blue-800); padding: 0.75rem; border-radius: 0.25rem; font-size: 0.875rem; border: 1px solid var(--blue-100);">
+                        ${icons.shieldAlert}
+                        <span>Datenschutz-Hinweis: Bitte keine Klarnamen oder personenbezogene Daten eintragen. Eingaben werden nur lokal verarbeitet.</span>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        <div>
+                            <label style="display: block; font-weight: 700; margin-bottom: 0.5rem;">1. Attraktivität des Angebots</label>
+                            <textarea placeholder="Warum wirkte die Rede damals überzeugend?" maxlength="1200" oninput="app.state.reflectionAnswers.motivation = this.value; this.nextElementSibling.textContent = this.value.length + ' / 1200'">${motivation}</textarea>
+                            <div style="text-align: right; font-size: 0.75rem; color: var(--stone-400);">${motivation.length} / 1200</div>
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: 700; margin-bottom: 0.5rem;">2. Ethisches Dilemma</label>
+                            <textarea placeholder="Wo endet Loyalität, wo beginnt Verrat?" maxlength="1200" oninput="app.state.reflectionAnswers.ethics = this.value">${ethics}</textarea>
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: 700; margin-bottom: 0.5rem;">3. Transfer heute</label>
+                            <textarea placeholder="Wo finden sich ähnliche Muster in heutigen Debatten?" maxlength="1200" oninput="app.state.reflectionAnswers.transfer = this.value">${transfer}</textarea>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        },
+
+        renderPhase5(container) {
+            const html = `
+                <div class="p-8" style="text-align: center;">
+                    <h2 class="title" style="margin-bottom: 1.5rem;">Abschluss</h2>
+                    <p style="margin-bottom: 2rem; color: var(--stone-600);">Lade dein Arbeitsprotokoll herunter (bereinigtes .txt Format).</p>
+                    <button class="btn btn-primary" onclick="app.downloadProtocol()" style="margin: 0 auto; box-shadow: var(--shadow-lg);">
+                        ${icons.download} Protokoll herunterladen
+                    </button>
+                </div>
+            `;
+            container.innerHTML = html;
+        },
+
+        renderToast() {
+            const container = document.getElementById('toast-container');
+            if (!this.state.toast) {
+                container.innerHTML = '';
+                return;
+            }
+            const { msg, type } = this.state.toast;
+            const typeClass = type === 'error' ? 'toast-error' : type === 'success' ? 'toast-success' : 'toast-info';
+            const icon = type === 'error' ? icons.alertTriangle : type === 'success' ? icons.checkCircle : icons.info;
+            
+            container.innerHTML = `
+                <div class="toast ${typeClass}">
+                    ${icon} <span>${msg}</span>
+                </div>
+            `;
+        }
+    };
+
+    // Initialize
+    app.render();
+
+</script>
+</body>
+</html>
