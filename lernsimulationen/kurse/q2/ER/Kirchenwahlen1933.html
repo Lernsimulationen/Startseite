@@ -461,7 +461,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74-2.74L3 12"/></svg>
             Neustart
         </button>
-        <span>Version: Secure-School-1.1</span>
+        <span>Version: Secure-School-1.2</span>
     </div>
 
     <!-- Toast Container -->
@@ -901,8 +901,14 @@ ${normalizeForExport(transfer)}
             `;
             container.innerHTML = html;
             this.renderTranscriptText();
-            // Re-attach listener because innerHTML wiped it
-            document.getElementById('transcript-text').addEventListener('mouseup', () => this.handleTextSelection());
+            
+            // Event Listeners for Touch Support
+            const textEl = document.getElementById('transcript-text');
+            const handler = () => setTimeout(() => app.handleTextSelection(), 10);
+            
+            // Re-attach listeners because innerHTML wiped it
+            textEl.addEventListener('mouseup', handler);
+            textEl.addEventListener('touchend', handler);
         },
 
         renderTranscriptText() {
@@ -948,7 +954,7 @@ ${normalizeForExport(transfer)}
         renderFloatingMenu() {
             const { top, left } = this.state.selectionMenu;
             return `
-                <div id="floating-menu" style="top: ${top}px; left: ${left}px;" onmouseup="event.stopPropagation()">
+                <div id="floating-menu" style="top: ${top}px; left: ${left}px;" onmouseup="event.stopPropagation()" ontouchend="event.stopPropagation()">
                     <div style="position: absolute; top: -1.5rem; left: 0; right: 0; text-align: center; font-size: 0.75rem; font-weight: 700; color: var(--white); background-color: var(--stone-800); border-radius: 0.25rem; padding: 0.25rem; box-shadow: var(--shadow);">Kategorie wählen:</div>
                     <button class="menu-btn" onclick="app.handleMarking('appeal')">
                         <div class="color-dot" style="background-color: var(--blue-500);"></div><span class="menu-label text-blue-600">Appell</span>
