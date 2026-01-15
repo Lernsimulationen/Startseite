@@ -1,1 +1,2045 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <!-- G) Usability: Zoom erlaubt für Barrierefreiheit -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeder fühlt anders - Ein Spiel über Gefühle</title>
+    <style>
+        :root {
+            --primary: #4A90E2;
+            --primary-dark: #357ABD;
+            --secondary: #50E3C2;
+            --accent: #FFD166;
+            --danger: #FF6B6B;
+            --success: #6BCB77;
+            --text: #2C3E50;
+            --bg: #F0F4F8;
+            --card-bg: #FFFFFF;
+            --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
 
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-stack);
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Layout & Container */
+        #app {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 1rem;
+            position: relative;
+        }
+
+        /* Typography */
+        h1, h2, h3 {
+            margin-top: 0;
+            color: var(--primary-dark);
+        }
+
+        h1 { font-size: 1.8rem; text-align: center; }
+        h2 { font-size: 1.4rem; }
+        p { font-size: 1.1rem; }
+
+        /* Components */
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 1rem;
+            transition: transform 0.2s;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 24px; /* Größere Touch-Targets */
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            font-weight: bold;
+            box-shadow: 0 4px 0 var(--primary-dark);
+            transition: transform 0.1s, box-shadow 0.1s, opacity 0.2s;
+            text-align: center;
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .btn:disabled {
+            background-color: #bdc3c7 !important;
+            box-shadow: none !important;
+            cursor: not-allowed;
+            opacity: 0.7;
+            transform: none;
+        }
+
+        .btn.secondary {
+            background-color: #95a5a6;
+            box-shadow: 0 4px 0 #7f8c8d;
+        }
+
+        .btn.success {
+            background-color: var(--success);
+            box-shadow: 0 4px 0 #4da859;
+        }
+
+        .btn.icon-only {
+            width: auto;
+            padding: 8px 12px;
+            margin: 0;
+            font-size: 1.2rem;
+            box-shadow: none;
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            height: 12px;
+            background-color: #e0e0e0;
+            border-radius: 6px;
+            margin: 10px 0 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--secondary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Emotion Selection Grid */
+        .emotion-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .emotion-btn {
+            background: #fff;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .emotion-btn.selected {
+            border-color: var(--primary);
+            background-color: #e3f2fd;
+            transform: scale(1.03);
+            font-weight: bold;
+        }
+
+        .emoji {
+            font-size: 2.2rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* Reaction Cards */
+        .current-card-display {
+            font-size: 1.3rem;
+            font-weight: bold;
+            padding: 25px;
+            background: #fff;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sort-controls {
+            display: flex;
+            gap: 15px;
+        }
+
+        .reaction-list-item {
+             background: white;
+            border: 1px solid #ddd;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Sentence Builder */
+        .sentence-parts-area {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .sentence-display {
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid var(--primary);
+            margin-bottom: 15px;
+            min-height: 3rem;
+        }
+
+        .part-btn {
+            background: white;
+            border: 1px solid #aaa;
+            padding: 10px 14px;
+            margin: 4px;
+            border-radius: 20px;
+            cursor: pointer;
+            display: inline-block;
+            user-select: none;
+        }
+        .part-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary-dark);
+        }
+        
+        .part-btn.custom-reason-btn {
+            background: #fff8e1;
+            border-color: var(--accent);
+        }
+
+        /* Utility */
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Bonus Game Styles */
+        .bonus-badge {
+            background: var(--accent);
+            color: #333;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        /* Input field custom */
+        textarea, input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-family: inherit;
+            font-size: 1rem;
+            margin-top: 10px;
+            resize: none;
+        }
+
+        .timer-display {
+            font-family: monospace;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--text);
+            background: #fff;
+            padding: 5px 10px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .situation-context {
+            font-style: italic;
+            background: #f8f9fa;
+            padding: 12px;
+            border-left: 5px solid var(--secondary);
+            margin-bottom: 15px;
+            font-size: 1rem;
+            color: #444;
+            line-height: 1.4;
+        }
+        
+        .log-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        .log-table th, .log-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            word-break: break-word;
+        }
+        .log-table th {
+            background-color: #f2f2f2;
+        }
+
+        /* Word Search Styles */
+        .ws-container {
+            border: 4px solid var(--accent);
+            padding: 10px;
+            border-radius: 16px;
+            background: #fffbea;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ws-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr); /* Larger grid */
+            gap: 2px;
+            margin: 20px auto;
+            max-width: 500px;
+            user-select: none;
+        }
+        .ws-cell {
+            aspect-ratio: 1;
+            border: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            background: #fff;
+            cursor: pointer;
+            border-radius: 3px;
+            font-size: 1.1rem;
+            transition: background 0.1s, transform 0.1s;
+        }
+        .ws-cell.selected {
+            background-color: var(--accent);
+            color: #333;
+            transform: scale(0.9);
+            border-color: #e6b800;
+        }
+        .ws-cell.found {
+            background-color: var(--success);
+            color: white;
+            border-color: var(--success);
+            animation: pop 0.3s ease-out;
+        }
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .ws-word-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        .ws-word {
+            padding: 6px 12px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            box-shadow: 0 2px 0 #eee;
+        }
+        .ws-word.done {
+            text-decoration: line-through;
+            color: #fff;
+            background: var(--success);
+            border-color: var(--success);
+            box-shadow: none;
+        }
+        
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 100;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: white; padding: 25px; border-radius: 12px;
+            max-width: 90%; width: 400px; text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* Confetti (Simple CSS implementation) */
+        .confetti {
+            position: absolute;
+            width: 10px; height: 10px;
+            background-color: #f00;
+            animation: fall linear forwards;
+            top: -10px;
+            z-index: 999;
+        }
+        @keyframes fall {
+            to { transform: translateY(100vh) rotate(720deg); }
+        }
+
+        /* Teacher Grid */
+        .teacher-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 15px;
+        }
+        .teacher-btn {
+            font-size: 0.9rem;
+            padding: 8px;
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .teacher-btn:hover { background: #e0e0e0; }
+
+        /* Footer */
+        footer {
+            margin-top: auto;
+            padding: 20px;
+            text-align: center;
+            color: #999;
+            font-size: 0.8rem;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <!-- Header -->
+    <header style="display: flex; justify-content: space-between; align-items: center; padding: 10px 5px;">
+        <div style="font-weight: bold; color: var(--primary); display:flex; align-items:center; gap:10px;">
+            <span>Jeder fühlt anders</span>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+             <button class="btn icon-only" onclick="saveIntermediate()" title="Jetzt zwischenspeichern">💾</button>
+            <div id="timer-display" class="timer-display">00:00</div>
+            <div id="score-display">⭐ 0 / 0</div>
+        </div>
+    </header>
+    
+    <div class="progress-container">
+        <div id="progress-bar" class="progress-bar"></div>
+    </div>
+
+    <!-- Dynamic Content Area -->
+    <main id="game-content"></main>
+
+    <!-- Footer for Teacher Button (Conditional) -->
+    <footer id="footer-area">
+    </footer>
+</div>
+
+<script>
+/**
+ * KONFIGURATION
+ * B) Lehrer-Menü absichern
+ * Setze dies auf true, um das Lehrermenü zu aktivieren.
+ * Standard ist false für Schüler-Tablets.
+ */
+const TEACHER_MODE = false;
+
+/**
+ * SICHERHEIT & HELFER
+ * A1: createElUnsafe entfernt. Nur sichere DOM-Manipulation.
+ * A2: createEl nutzt textContent.
+ */
+
+// Erstellt DOM-Elemente sicher
+function createEl(tag, text = '', className = '') {
+    const el = document.createElement(tag);
+    if (text) el.textContent = text;
+    if (className) el.className = className;
+    return el;
+}
+
+/**
+ * DATENSTRUKTUR
+ * E) Inhaltliche Anpassungen (wertschätzend, keine Absolutismen)
+ */
+const scenarios = [
+    {
+        id: 'landschulheim',
+        title: 'Situation 1: Landschulheim',
+        text: 'Die Klasse fährt für eine Woche ins Landschulheim. Alle packen ihre Koffer.',
+        reasons: [
+            { text: "ich mich auf meine Freunde freue", emotions: ['Fröhlich', 'Aufgeregt', 'Dankbar', 'Mutig'] },
+            { text: "ich Angst vor Heimweh habe", emotions: ['Ängstlich', 'Traurig', 'Einsam', 'Unsicher', 'Genervt'] },
+            { text: "ich Abenteuer erleben will", emotions: ['Fröhlich', 'Aufgeregt', 'Mutig', 'Stolz'] },
+            { text: "ich nicht woanders schlafen mag", emotions: ['Ängstlich', 'Unsicher', 'Genervt', 'Müde'] }
+        ],
+        reactions: [
+            { text: 'Jeden Abend anrufen', type: 'bad', feedback: 'Das könnte das Heimweh verstärken, weil du immer an Zuhause denkst.' },
+            { text: 'Kuscheltier mitnehmen', type: 'good', feedback: 'Ein Stück Zuhause gibt oft Sicherheit.' },
+            { text: 'Ablenken und spielen', type: 'good', feedback: 'Spaß vertreibt traurige Gedanken oft schnell.' },
+            { text: 'Sich im Klo verstecken', type: 'bad', feedback: 'Rückzug ist okay, aber wenn du dich versteckst, bleibst du mit der Angst allein.' },
+            { text: 'Mit Freund:in reden', type: 'good', feedback: 'Gefühle teilen hilft fast immer.' },
+            { text: 'So tun als ob alles okay ist', type: 'bad', feedback: 'Du musst dich nicht verstellen. Gefühle darf man zeigen.' }
+        ]
+    },
+    {
+        id: 'tafel',
+        title: 'Situation 2: An der Tafel',
+        text: 'Du musst an die Tafel kommen, um eine Matheaufgabe vorzurechnen.',
+        reasons: [
+            { text: "ich zeigen will, was ich kann", emotions: ['Stolz', 'Mutig', 'Fröhlich', 'Aufgeregt'] },
+            { text: "ich Angst habe, Fehler zu machen", emotions: ['Ängstlich', 'Unsicher', 'Beschämt', 'Aufgeregt'] },
+            { text: "ich mich beobachtet fühle", emotions: ['Unsicher', 'Ängstlich', 'Beschämt', 'Genervt'] },
+            { text: "ich gut in Mathe bin", emotions: ['Stolz', 'Entspannt', 'Fröhlich'] }
+        ],
+        reactions: [
+            { text: 'Tief durchatmen', type: 'good', feedback: 'Das beruhigt den Körper und den Kopf.' },
+            { text: 'Schnell irgendwas schreiben', type: 'bad', feedback: 'Hektik führt oft zu Leichtsinnsfehlern.' },
+            { text: 'Lehrer um Hilfe bitten', type: 'good', feedback: 'Fragen ist ein Zeichen von Stärke, nicht von Schwäche!' },
+            { text: 'Klasse auslachen', type: 'bad', feedback: 'Das ist unfreundlich und sorgt für schlechte Stimmung.' },
+            { text: 'Sich konzentrieren', type: 'good', feedback: 'Fokus auf die Aufgabe hilft gegen die Nervosität.' },
+            { text: 'Wegrennen', type: 'bad', feedback: 'Das verschiebt das Problem nur auf später.' }
+        ]
+    },
+    {
+        id: 'klassensprecher',
+        title: 'Situation 3: Die Wahl',
+        text: 'Die Klassensprecherwahl war heute. Du wurdest nicht gewählt.',
+        reasons: [
+            { text: "ich enttäuscht bin", emotions: ['Traurig', 'Enttäuscht', 'Wütend', 'Einsam'] },
+            { text: "ich keine Arbeit haben will", emotions: ['Erleichtert', 'Entspannt', 'Fröhlich'] },
+            { text: "ich mich unbeliebt fühle", emotions: ['Traurig', 'Einsam', 'Unsicher', 'Beschämt'] },
+            { text: "ich dem Gewinner es gönne", emotions: ['Fröhlich', 'Stolz', 'Dankbar'] }
+        ],
+        reactions: [
+            { text: 'Dem Gewinner gratulieren', type: 'good', feedback: 'Das ist sehr fair und sportlich.' },
+            { text: 'Gerüchte verbreiten', type: 'bad', feedback: 'Das ist unfair und verletzt andere.' },
+            { text: 'Nächstes Mal wieder versuchen', type: 'good', feedback: 'Genau! Nicht aufgeben.' },
+            { text: 'Alle beleidigen', type: 'bad', feedback: 'Wut ist okay, aber Beleidigungen lösen nichts.' },
+            { text: 'Stellvertreter werden', type: 'good', feedback: 'Auch in der zweiten Reihe kann man viel bewirken.' },
+            { text: 'Nie wieder mitmachen', type: 'bad', feedback: 'Zieh dich nicht zurück, nur weil es einmal nicht geklappt hat.' }
+        ]
+    },
+    {
+        id: 'strafarbeit',
+        title: 'Situation 4: Strafarbeit',
+        text: 'Der Lehrer gibt der ganzen Klasse eine Strafarbeit, obwohl nur zwei laut waren.',
+        reasons: [
+            { text: "ich das ungerecht finde", emotions: ['Wütend', 'Genervt', 'Traurig'] },
+            { text: "ich sauer auf den Lehrer bin", emotions: ['Wütend', 'Genervt'] },
+            { text: "ich Angst vor Ärger daheim habe", emotions: ['Ängstlich', 'Unsicher'] },
+            { text: "ich einfach meine Ruhe will", emotions: ['Müde', 'Genervt', 'Entspannt'] }
+        ],
+        reactions: [
+            { text: 'Höflich nachfragen', type: 'good', feedback: 'Ruhiges Reden klärt Missverständnisse am besten.' },
+            { text: 'Hefte durch die Gegend werfen', type: 'bad', feedback: 'Das sorgt meist nur für noch mehr Ärger.' },
+            { text: 'Mit den Störern reden', type: 'good', feedback: 'Vielleicht können sie die Situation klären.' },
+            { text: 'Arbeit verweigern', type: 'bad', feedback: 'Das könnte die Situation verschärfen.' },
+            { text: 'Trotzdem ordentlich machen', type: 'good', feedback: 'Das zeigt, dass du Verantwortung übernimmst.' },
+            { text: 'Den Lehrer anschreien', type: 'bad', feedback: 'Laut werden macht ein klärendes Gespräch unmöglich.' }
+        ]
+    },
+    {
+        id: 'gutenote',
+        title: 'Situation 5: Die Eins',
+        text: 'Du hast als einzige:r eine Eins in der schweren Englischarbeit.',
+        reasons: [
+            { text: "ich super stolz bin", emotions: ['Stolz', 'Fröhlich', 'Aufgeregt'] },
+            { text: "es mir peinlich ist", emotions: ['Beschämt', 'Unsicher', 'Ängstlich'] },
+            { text: "ich Angst vor Neid habe", emotions: ['Ängstlich', 'Unsicher'] },
+            { text: "ich viel gelernt habe", emotions: ['Stolz', 'Müde', 'Dankbar'] }
+        ],
+        reactions: [
+            { text: 'Anderen Hilfe anbieten', type: 'good', feedback: 'Das ist sehr kollegial und freundlich!' },
+            { text: 'Angeben und prahlen', type: 'bad', feedback: 'Das kann andere verletzen, die sich auch angestrengt haben.' },
+            { text: 'Sich innerlich freuen', type: 'good', feedback: 'Du darfst deinen Erfolg genießen.' },
+            { text: 'Note verstecken', type: 'bad', feedback: 'Du musst dich für Erfolg nicht verstecken.' },
+            { text: 'Sagen "war voll leicht"', type: 'bad', feedback: 'Für andere war es vielleicht schwer. Das klingt abwertend.' },
+            { text: 'Lernen hat sich gelohnt', type: 'good', feedback: 'Eine tolle Einstellung!' }
+        ]
+    },
+    {
+        id: 'abschreiben',
+        title: 'Situation 6: Erwischt!',
+        text: 'Du hast die Hausaufgaben vergessen und schreibst in der Pause schnell ab. Die Lehrkraft sieht es.',
+        reasons: [
+            { text: "ich mich schäme", emotions: ['Beschämt', 'Traurig', 'Unsicher'] },
+            { text: "ich mich ärgere", emotions: ['Wütend', 'Genervt'] },
+            { text: "ich Angst vor der Strafe habe", emotions: ['Ängstlich', 'Unsicher'] },
+            { text: "ich mich schuldig fühle", emotions: ['Traurig', 'Beschämt'] }
+        ],
+        reactions: [
+            { text: 'Fehler zugeben', type: 'good', feedback: 'Ehrlichkeit ist oft der beste Weg aus der Klemme.' },
+            { text: 'Lügen und leugnen', type: 'bad', feedback: 'Das macht das Vertrauen kaputt.' },
+            { text: 'Entschuldigen', type: 'good', feedback: 'Zeigt, dass du Verantwortung übernimmst.' },
+            { text: 'Lehrkraft beschuldigen', type: 'bad', feedback: 'Andere für eigene Fehler verantwortlich zu machen, ist unfair.' },
+            { text: 'Nacharbeiten anbieten', type: 'good', feedback: 'Ein gutes Angebot zur Wiedergutmachung.' },
+            { text: 'Wegrennen', type: 'bad', feedback: 'Damit läuft man nur vor der Verantwortung davon.' }
+        ]
+    },
+    {
+        id: 'turnen',
+        title: 'Situation 7: Turnen',
+        text: 'Im Sportunterricht sollt ihr eine Übung vor der Klasse vormachen, die du nicht gut kannst.',
+        reasons: [
+            { text: "ich Angst habe mich zu blamieren", emotions: ['Ängstlich', 'Beschämt', 'Unsicher'] },
+            { text: "ich es mit Humor nehme", emotions: ['Fröhlich', 'Entspannt', 'Mutig'] },
+            { text: "ich mich unsportlich fühle", emotions: ['Traurig', 'Unsicher', 'Beschämt'] },
+            { text: "ich mutig sein will", emotions: ['Mutig', 'Stolz', 'Aufgeregt'] }
+        ],
+        reactions: [
+            { text: 'Es einfach probieren', type: 'good', feedback: 'Mut bedeutet, es trotzdem zu tun!' },
+            { text: 'Sich krank stellen', type: 'bad', feedback: 'Vermeiden hilft dir nicht, die Angst zu überwinden.' },
+            { text: 'Über sich selbst lachen', type: 'good', feedback: 'Das nimmt der Situation die Spannung.' },
+            { text: 'Andere auslachen', type: 'bad', feedback: 'Andere abzuwerten, macht einen selbst nicht besser.' },
+            { text: 'Lehrkraft um Hilfe bitten', type: 'good', feedback: 'Hilfe annehmen ist sehr schlau.' },
+            { text: 'Verweigern', type: 'bad', feedback: 'Dann hast du es gar nicht erst versucht.' }
+        ]
+    },
+    {
+        id: 'gerede',
+        title: 'Situation 8: Getuschel',
+        text: 'Du kommst ins Klassenzimmer und eine Gruppe verstummt plötzlich und kichert.',
+        reasons: [
+            { text: "ich verunsichert bin", emotions: ['Unsicher', 'Ängstlich'] },
+            { text: "ich wütend werde", emotions: ['Wütend', 'Genervt'] },
+            { text: "ich mich ausgeschlossen fühle", emotions: ['Einsam', 'Traurig', 'Verletzt'] },
+            { text: "es mir egal ist", emotions: ['Entspannt', 'Gleichgültig', 'Stolz'] }
+        ],
+        reactions: [
+            { text: 'Ruhig nachfragen', type: 'good', feedback: 'Vielleicht war es gar nicht wegen dir? Fragen klärt auf.' },
+            { text: 'Sofort zurück beleidigen', type: 'bad', feedback: 'Das schaukelt den Streit nur hoch.' },
+            { text: 'Zu Freunden gehen', type: 'good', feedback: 'Unterstützung tut in solchen Momenten gut.' },
+            { text: 'Weinen und wegrennen', type: 'bad', feedback: 'Das ist verständlich, aber Freunde könnten dir jetzt besser helfen.' },
+            { text: 'Selbstbewusst ignorieren', type: 'good', feedback: 'Zeigt, dass du dich nicht so leicht ärgern lässt.' },
+            { text: 'Gerüchte erfinden', type: 'bad', feedback: 'Rache macht niemanden glücklicher.' }
+        ]
+    },
+    {
+        id: 'lob',
+        title: 'Situation 9: Lob',
+        text: 'Die Lehrkraft lobt dein Bild im Kunstunterricht sehr laut vor allen anderen.',
+        reasons: [
+            { text: "ich mich riesig freue", emotions: ['Fröhlich', 'Stolz', 'Aufgeregt', 'Dankbar'] },
+            { text: "ich rot vor Scham werde", emotions: ['Beschämt', 'Unsicher'] },
+            { text: "ich im Boden versinken will", emotions: ['Beschämt', 'Unsicher', 'Ängstlich'] },
+            { text: "ich motiviert bin", emotions: ['Stolz', 'Mutig', 'Aufgeregt'] }
+        ],
+        reactions: [
+            { text: 'Danke sagen', type: 'good', feedback: 'Einfach und höflich.' },
+            { text: 'Sagen "Das Bild ist hässlich"', type: 'bad', feedback: 'Mach deine Leistung nicht schlechter als sie ist.' },
+            { text: 'Lächeln', type: 'good', feedback: 'Freude zu zeigen ist völlig okay.' },
+            { text: 'Gesicht verstecken', type: 'bad', feedback: 'Du darfst zu deinem Erfolg stehen.' },
+            { text: 'Anderen Tipps geben', type: 'good', feedback: 'Toll, wenn du dein Können teilst!' },
+            { text: 'Angeben', type: 'bad', feedback: 'Bescheidenheit kommt oft besser an, auch wenn das Bild toll ist.' }
+        ]
+    },
+    {
+        id: 'party',
+        title: 'Situation 10: Die Party',
+        text: 'Ein beliebter Mitschüler gibt eine Party. Du wurdest nicht eingeladen.',
+        reasons: [
+            { text: "ich mich einsam fühle", emotions: ['Einsam', 'Traurig', 'Verletzt'] },
+            { text: "ich froh bin (mag eh keine Partys)", emotions: ['Erleichtert', 'Fröhlich', 'Entspannt'] },
+            { text: "ich mich frage 'Warum ich?'", emotions: ['Unsicher', 'Traurig', 'Wütend'] },
+            { text: "ich eifersüchtig bin", emotions: ['Neidisch', 'Wütend', 'Traurig'] }
+        ],
+        reactions: [
+            { text: 'Eigenen Filmabend machen', type: 'good', feedback: 'Gut für sich selbst zu sorgen, ist wichtig.' },
+            { text: 'Böse Nachrichten schreiben', type: 'bad', feedback: 'Das zeigt nur, wie sehr es dich verletzt hat.' },
+            { text: 'Andere Freunde treffen', type: 'good', feedback: 'Du bist nicht allein, auch ohne diese Party.' },
+            { text: 'Sich selbst einladen', type: 'bad', feedback: 'Das kann für alle Beteiligten unangenehm sein.' },
+            { text: 'Akzeptieren, dass es so ist', type: 'good', feedback: 'Man kann nicht auf jeder Party tanzen.' },
+            { text: 'Gerüchte über die Party streuen', type: 'bad', feedback: 'Gemeinheiten helfen nicht gegen die Enttäuschung.' }
+        ]
+    }
+];
+
+const emotionsList = [
+    { name: 'Fröhlich', icon: '😄' },
+    { name: 'Wütend', icon: '😡' },
+    { name: 'Traurig', icon: '😢' },
+    { name: 'Ängstlich', icon: '😨' },
+    { name: 'Stolz', icon: '😎' },
+    { name: 'Beschämt', icon: '😳' },
+    { name: 'Überrascht', icon: '😲' },
+    { name: 'Genervt', icon: '🙄' },
+    { name: 'Einsam', icon: '😔' },
+    { name: 'Entspannt', icon: '😌' },
+    { name: 'Neidisch', icon: '😠' },
+    { name: 'Aufgeregt', icon: '🤩' },
+    { name: 'Unsicher', icon: '😕' },
+    { name: 'Mutig', icon: '🦁' },
+    { name: 'Müde', icon: '😴' },
+    { name: 'Dankbar', icon: '🙏' }
+];
+
+const bonusLevels = [
+    {
+        triggerAfter: 2, 
+        type: 'quiz',
+        title: 'Bonus: Gefühl oder Gedanke?',
+        question: 'Was ist der Unterschied? Ordne zu!',
+        items: [
+            { text: '"Ich schaffe das nie"', correct: 'Gedanke' },
+            { text: '"Ich fühle mich traurig"', correct: 'Gefühl' },
+            { text: '"Das ist ungerecht!"', correct: 'Gedanke' },
+            { text: '"Ich habe Wut im Bauch"', correct: 'Gefühl' }
+        ]
+    },
+    {
+        triggerAfter: 5, 
+        type: 'face',
+        title: 'Bonus: Gesicht & Gefühl',
+        text: 'Jemand verschränkt die Arme, zieht die Augenbrauen zusammen und presst die Lippen aufeinander. Wie fühlt sich die Person?',
+        options: ['Entspannt', 'Wütend', 'Fröhlich'],
+        correct: 'Wütend'
+    },
+    {
+        triggerAfter: 8, 
+        type: 'say',
+        title: 'Bonus: Was sagst du?',
+        text: 'Dein Freund weint, weil er eine schlechte Note hat. Was ist am nettesten?',
+        options: [
+            { text: 'Heul doch nicht rum.', score: 0 },
+            { text: 'Das wird bestimmt besser. Wollen wir zusammen lernen?', score: 1 },
+            { text: 'Tja, hättest du mal gelernt.', score: 0 }
+        ]
+    }
+];
+
+const wsWords = ["MUTIG", "STOLZ", "FROH", "ANGST", "WUT"];
+
+const adjectives = ['Mutiger', 'Schlauer', 'Schneller', 'Lustiger', 'Netter', 'Starker', 'Froher', 'Bunter', 'Wilder', 'Ruhiger'];
+const animals = ['Fuchs', 'Löwe', 'Adler', 'Delfin', 'Tiger', 'Panda', 'Koala', 'Wolf', 'Bär', 'Falke'];
+
+function generateNickname() {
+    const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+    const ani = animals[Math.floor(Math.random() * animals.length)];
+    return `${adj} ${ani}`;
+}
+
+/**
+ * GAME STATE MANAGEMENT
+ * A3: Punkte nicht farmbar machen -> scores Struktur
+ */
+let gameState = {
+    currentScenarioIndex: 0,
+    stars: 0,
+    maxStarsSoFar: 0,
+    playerData: {
+        history: [], // {scenario, emotions, mainEmotion, sentence, result, reactions: []}
+        tempSelection: null 
+    },
+    // A3 Fix: Persistente Speicherung des Fortschritts pro Szenario
+    scores: {}, 
+    // Bonus state tracker (Fix 1)
+    bonusState: {}, 
+    nickname: '',
+    elapsedSeconds: 0,
+    timerInterval: null,
+    isInputBlocked: false, 
+    foundWords: [] 
+};
+
+// DOM Elements
+const app = document.getElementById('game-content');
+const progressBar = document.getElementById('progress-bar');
+const scoreDisplay = document.getElementById('score-display');
+const timerDisplay = document.getElementById('timer-display');
+
+/**
+ * CORE FUNCTIONS
+ */
+
+function updateUI() {
+    scoreDisplay.textContent = `⭐ ${gameState.stars} / ${gameState.maxStarsSoFar}`;
+    const percent = ((gameState.currentScenarioIndex) / scenarios.length) * 100;
+    progressBar.style.width = `${Math.min(100, Math.max(0, percent))}%`;
+}
+
+// A3: Safe Add Stars (Nur aufrufen, wenn Validierung vorher erfolgreich)
+function addStars(amount) {
+    gameState.stars += amount;
+    // C: Kein automatischer localStorage hier
+    scoreDisplay.style.transform = "scale(1.5)";
+    scoreDisplay.style.color = "#FFD166";
+    setTimeout(() => {
+        scoreDisplay.style.transform = "scale(1)";
+        scoreDisplay.style.color = "";
+    }, 300);
+}
+
+// A3: Safe Add Max (Nur einmal pro logischem Schritt)
+function addMaxPossible(amount) {
+    gameState.maxStarsSoFar += amount;
+    updateUI();
+}
+
+/**
+ * TIMER
+ */
+function startTimer() {
+    if(gameState.timerInterval) clearInterval(gameState.timerInterval);
+    gameState.timerInterval = setInterval(() => {
+        gameState.elapsedSeconds++;
+        const mins = Math.floor(gameState.elapsedSeconds / 60);
+        const secs = gameState.elapsedSeconds % 60;
+        timerDisplay.textContent = 
+            (mins < 10 ? "0" + mins : mins) + ":" + 
+            (secs < 10 ? "0" + secs : secs);
+    }, 1000);
+}
+
+function stopTimer() {
+    if(gameState.timerInterval) clearInterval(gameState.timerInterval);
+}
+
+/**
+ * SCREENS
+ */
+
+// Startscreen
+function renderStartScreen() {
+    gameState.nickname = generateNickname();
+    app.innerHTML = ''; 
+
+    const card = createEl('div', '', 'card fade-in');
+    card.style.textAlign = 'center';
+    
+    card.appendChild(createEl('h1', '👋 Hallo!'));
+    card.appendChild(createEl('p', 'Willkommen zum Spiel "Jeder fühlt anders".'));
+    card.appendChild(createEl('p', 'Dein Spiel-Name für heute ist:'));
+    
+    const nickBox = createEl('div', gameState.nickname);
+    nickBox.style.cssText = "background: #e3f2fd; padding: 15px; border-radius: 12px; font-size: 1.5rem; font-weight: bold; color: var(--primary-dark); margin: 10px 0;";
+    card.appendChild(nickBox);
+
+    card.appendChild(createEl('p', 'Es gibt kein "Richtig" oder "Falsch". Es geht darum, wie unterschiedlich man sich fühlen kann.'));
+
+    const btn = createEl('button', "Los geht's!", 'btn');
+    btn.onclick = startGame;
+    card.appendChild(btn);
+
+    app.appendChild(card);
+    
+    // Lehrer-Button nur rendern, wenn TEACHER_MODE true ist
+    const footer = document.getElementById('footer-area');
+    footer.innerHTML = '';
+    if (TEACHER_MODE) {
+        const tBtn = createEl('button', '🎓 Lehrer');
+        tBtn.style.cssText = "background:none; border:none; color:#bbb; cursor:pointer; font-size:0.8rem;";
+        tBtn.onclick = openTeacherMenu;
+        footer.appendChild(tBtn);
+    }
+    
+    updateUI();
+}
+
+function startGame() {
+    // Reset State
+    gameState.currentScenarioIndex = 0;
+    gameState.stars = 0;
+    gameState.maxStarsSoFar = 0;
+    gameState.playerData.history = [];
+    gameState.playerData.tempSelection = null;
+    gameState.scores = {};
+    gameState.bonusState = {}; // Reset bonus state
+    gameState.elapsedSeconds = 0;
+    gameState.isInputBlocked = false;
+    gameState.foundWords = [];
+    
+    startTimer();
+    renderScenarioIntro();
+}
+
+// Intro Szenario
+function renderScenarioIntro() {
+    const scenario = scenarios[gameState.currentScenarioIndex];
+    if(!scenario) return renderEndScreen(); 
+
+    // Init score tracking for this scenario if not exists
+    if (!gameState.scores[scenario.id]) {
+        gameState.scores[scenario.id] = { mg1: false, mg2: false, mg3Count: 0 };
+    }
+
+    app.innerHTML = '';
+    const card = createEl('div', '', 'card fade-in');
+    
+    card.appendChild(createEl('h2', scenario.title));
+    
+    const textP = createEl('p', scenario.text);
+    textP.style.fontSize = "1.3rem";
+    card.appendChild(textP);
+
+    const iconDiv = createEl('div');
+    iconDiv.style.cssText = "text-align: center; margin-top: 2rem;";
+    const iconSpan = createEl('span', '🤔');
+    iconSpan.style.fontSize = "4rem";
+    iconDiv.appendChild(iconSpan);
+    card.appendChild(iconDiv);
+
+    const footerDiv = createEl('div');
+    footerDiv.style.marginTop = "auto";
+    const btn = createEl('button', 'Wie fühlt man sich da?', 'btn');
+    btn.onclick = () => startMiniGame1();
+    footerDiv.appendChild(btn);
+    card.appendChild(footerDiv);
+
+    app.appendChild(card);
+    updateUI();
+}
+
+// Minigame 1: Gefühle wählen
+function startMiniGame1() {
+    const scenario = scenarios[gameState.currentScenarioIndex];
+    let selectedEmotions = [];
+
+    // Restore selection if back button was used
+    if(gameState.playerData.tempSelection && gameState.playerData.tempSelection.scenarioId === scenario.id) {
+        selectedEmotions = [...gameState.playerData.tempSelection.emotions];
+    }
+
+    app.innerHTML = '';
+    const card = createEl('div', '', 'card fade-in');
+
+    const ctx = createEl('p', `Situation: ${scenario.text}`, 'situation-context');
+    card.appendChild(ctx);
+    
+    // A1: Secure HTML building
+    const h3 = createEl('h3', 'Minispiel 1/3: Gefühls-Checker');
+    card.appendChild(h3);
+    
+    const p = createEl('p');
+    p.appendChild(document.createTextNode("Wähle mindestens "));
+    const strong = createEl('strong', "zwei unterschiedliche");
+    p.appendChild(strong);
+    p.appendChild(document.createTextNode(" Gefühle aus."));
+    card.appendChild(p);
+
+    const grid = createEl('div', '', 'emotion-grid');
+    
+    emotionsList.forEach(emo => {
+        const btn = createEl('div', '', 'emotion-btn');
+        if(selectedEmotions.includes(emo.name)) btn.classList.add('selected');
+        
+        const icon = createEl('span', emo.icon, 'emoji');
+        const text = createEl('span', emo.name);
+        
+        btn.appendChild(icon);
+        btn.appendChild(text);
+
+        btn.onclick = () => {
+            if(selectedEmotions.includes(emo.name)) {
+                selectedEmotions = selectedEmotions.filter(e => e !== emo.name);
+                btn.classList.remove('selected');
+            } else {
+                if(selectedEmotions.length < 3) {
+                    selectedEmotions.push(emo.name);
+                    btn.classList.add('selected');
+                }
+            }
+        };
+        grid.appendChild(btn);
+    });
+    card.appendChild(grid);
+
+    const msgArea = createEl('p');
+    msgArea.style.cssText = "color: var(--danger); min-height: 1.5rem;";
+    card.appendChild(msgArea);
+
+    const nextBtn = createEl('button', 'Weiter', 'btn');
+    nextBtn.onclick = () => {
+        if(selectedEmotions.length < 2) {
+            msgArea.textContent = "Bitte wähle mindestens zwei Gefühle aus!";
+            return;
+        }
+        gameState.playerData.tempSelection = {
+            scenarioId: scenario.id,
+            emotions: selectedEmotions
+        };
+        
+        // A3: Check persistent score state
+        if(!gameState.scores[scenario.id].mg1) {
+           addMaxPossible(1);
+           addStars(1);
+           gameState.scores[scenario.id].mg1 = true;
+        }
+        
+        startMiniGame2(selectedEmotions);
+    };
+    card.appendChild(nextBtn);
+
+    app.appendChild(card);
+}
+
+// Minigame 2: Satzbau
+function startMiniGame2(selectedEmotions) {
+    const scenario = scenarios[gameState.currentScenarioIndex];
+    let mainEmotion = null;
+    let selectedReason = null;
+    let isCustomReason = false;
+
+    app.innerHTML = '';
+    const card = createEl('div', '', 'card fade-in');
+
+    card.appendChild(createEl('p', `Situation: ${scenario.text}`, 'situation-context'));
+    card.appendChild(createEl('h3', 'Minispiel 2/3: Der Satz-Baumeister'));
+    card.appendChild(createEl('p', 'Baue einen logischen Satz aus den Bausteinen.'));
+
+    const sentenceDisplay = createEl('div', '', 'sentence-display');
+    renderSentence(sentenceDisplay, null, null);
+    card.appendChild(sentenceDisplay);
+
+    // Part 1
+    const part1 = createEl('div', '', 'sentence-parts-area');
+    const label1 = createEl('strong', '1. Wähle dein Hauptgefühl:');
+    part1.appendChild(label1);
+    part1.appendChild(createEl('br'));
+    
+    const area1 = createEl('div');
+    area1.style.marginTop = "5px";
+    
+    selectedEmotions.forEach(emo => {
+        const b = createEl('div', emo, 'part-btn');
+        b.onclick = () => {
+            mainEmotion = emo;
+            Array.from(area1.children).forEach(c => c.classList.remove('active'));
+            b.classList.add('active');
+            renderSentence(sentenceDisplay, mainEmotion, selectedReason);
+        };
+        area1.appendChild(b);
+    });
+    part1.appendChild(area1);
+    card.appendChild(part1);
+
+    // Part 2
+    const part2 = createEl('div', '', 'sentence-parts-area');
+    const label2 = createEl('strong', '2. Wähle die passende Begründung:');
+    part2.appendChild(label2);
+    part2.appendChild(createEl('br'));
+    
+    const area2 = createEl('div');
+    area2.style.marginTop = "5px";
+
+    const customContainer = createEl('div', '', 'hidden');
+    customContainer.style.marginTop = "10px";
+    
+    const customInput = createEl('input');
+    customInput.type = "text";
+    customInput.placeholder = "... weil ich ...";
+    customInput.maxLength = 120;
+    
+    const customConfirm = createEl('button', 'Übernehmen', 'btn success');
+    customConfirm.style.cssText = "padding: 5px 15px; width:auto; font-size: 0.9rem; margin-top:5px;";
+    
+    customConfirm.onclick = () => {
+        const val = customInput.value.trim();
+        if(val.length > 0) {
+            selectedReason = val;
+            isCustomReason = true;
+            renderSentence(sentenceDisplay, mainEmotion, selectedReason);
+        }
+    };
+    
+    customContainer.appendChild(customInput);
+    customContainer.appendChild(customConfirm);
+
+    scenario.reasons.forEach(r => {
+        const b = createEl('div', `... ${r.text}.`, 'part-btn');
+        b.onclick = () => {
+            selectedReason = r.text;
+            isCustomReason = false;
+            customContainer.classList.add('hidden');
+            
+            Array.from(area2.children).forEach(c => {
+                if(c.classList.contains('part-btn')) c.classList.remove('active');
+            });
+            b.classList.add('active');
+            renderSentence(sentenceDisplay, mainEmotion, selectedReason);
+        };
+        area2.appendChild(b);
+    });
+
+    const customBtn = createEl('div', '... [ Eigene Begründung schreiben ]', 'part-btn custom-reason-btn');
+    customBtn.onclick = () => {
+        Array.from(area2.children).forEach(c => {
+           if(c.classList.contains('part-btn')) c.classList.remove('active');
+        });
+        customBtn.classList.add('active');
+        customContainer.classList.remove('hidden');
+    };
+    area2.appendChild(customBtn);
+    
+    part2.appendChild(area2);
+    part2.appendChild(customContainer);
+    card.appendChild(part2);
+
+    const validationMsg = createEl('p');
+    validationMsg.style.cssText = "color: var(--danger); min-height: 1.5rem;";
+    card.appendChild(validationMsg);
+
+    const btnRow = createEl('div');
+    
+    const checkBtn = createEl('button', 'Satz prüfen & Weiter', 'btn');
+    checkBtn.onclick = () => {
+        if(!mainEmotion) {
+            validationMsg.textContent = "Bitte wähle zuerst ein Hauptgefühl aus.";
+            return;
+        }
+        if(!selectedReason) {
+            validationMsg.textContent = "Bitte wähle eine Begründung aus.";
+            return;
+        }
+
+        if(!isCustomReason) {
+             const reasonObj = scenario.reasons.find(r => r.text === selectedReason);
+             if(reasonObj && reasonObj.emotions.includes(mainEmotion)) {
+                 proceed();
+             } else {
+                 validationMsg.textContent = `Hmm, passt "weil ${selectedReason}" wirklich zu "${mainEmotion}"? Probiere eine andere Kombination!`;
+             }
+        } else {
+            proceed();
+        }
+
+        function proceed() {
+            gameState.playerData.history.push({
+                scenario: scenario.title,
+                emotions: selectedEmotions,
+                mainEmotion: mainEmotion,
+                reason: selectedReason,
+                sentence: `Ich fühle mich ${mainEmotion}, weil ${selectedReason}.`,
+                reactions: [] 
+            });
+            
+            // A3: Check persistent score state
+            if(!gameState.scores[scenario.id].mg2) {
+                addMaxPossible(1);
+                addStars(1);
+                gameState.scores[scenario.id].mg2 = true;
+            }
+            startMiniGame3();
+        }
+    };
+    btnRow.appendChild(checkBtn);
+
+    const backBtn = createEl('button', '⬅ Zurück (Gefühle ändern)', 'btn secondary');
+    backBtn.style.marginTop = "20px";
+    backBtn.onclick = () => startMiniGame1();
+    btnRow.appendChild(backBtn);
+
+    card.appendChild(btnRow);
+    app.appendChild(card);
+}
+
+function renderSentence(container, emo, reason) {
+    container.innerHTML = ''; 
+    container.appendChild(document.createTextNode("Ich fühle mich "));
+    
+    const spanEmo = createEl('span', emo ? emo : "...");
+    if(emo) spanEmo.style.cssText = "border-bottom: 2px solid var(--primary); font-weight:bold; color:var(--primary);";
+    else spanEmo.style.color = "#aaa";
+    container.appendChild(spanEmo);
+
+    container.appendChild(document.createTextNode(" , weil "));
+
+    let rText = reason ? reason : "...";
+    if(rText.length > 50) rText = rText.substring(0, 50) + "...";
+    
+    const spanReason = createEl('span', rText);
+    if(reason) spanReason.style.cssText = "border-bottom: 2px solid var(--secondary); font-weight:bold; color:var(--text);";
+    else spanReason.style.color = "#aaa";
+    container.appendChild(spanReason);
+    
+    container.appendChild(document.createTextNode("."));
+}
+
+// Minigame 3: Sortieren
+function startMiniGame3() {
+    const scenario = scenarios[gameState.currentScenarioIndex];
+    let cards = [...scenario.reactions];
+    cards.sort(() => Math.random() - 0.5); 
+    
+    // Fix 2: Ablaufprüfung
+    const scId = scenario.id;
+    const scoreState = gameState.scores[scId];
+    const lastHist = gameState.playerData.history[gameState.playerData.history.length - 1];
+    
+    // Check prerequisites: MG1 done, MG2 done, History entry exists for this scenario
+    if (!scoreState || !scoreState.mg1 || !scoreState.mg2 || !lastHist || lastHist.scenario !== scenario.title) {
+        app.innerHTML = '';
+        const card = createEl('div', '', 'card fade-in');
+        card.style.textAlign = 'center';
+        card.appendChild(createEl('h3', 'Ups!'));
+        card.appendChild(createEl('p', 'Bitte erst die vorherigen Schritte machen.'));
+        const btn = createEl('button', 'Zurück zum Start der Situation', 'btn');
+        btn.onclick = renderScenarioIntro;
+        card.appendChild(btn);
+        app.appendChild(card);
+        return;
+    }
+
+    // Check if already fully played (prevent replay loop)
+    if (scoreState.mg3Count >= cards.length) {
+        app.innerHTML = '';
+        const card = createEl('div', '', 'card fade-in');
+        card.style.textAlign = 'center';
+        card.appendChild(createEl('h3', 'Schon erledigt!'));
+        card.appendChild(createEl('p', 'Du hast diese Situation schon bearbeitet.'));
+        const btn = createEl('button', 'Weiter', 'btn');
+        btn.onclick = checkBonusOrNext;
+        card.appendChild(btn);
+        app.appendChild(card);
+        return;
+    }
+
+    let currentCardIndex = 0;
+    gameState.isInputBlocked = false;
+
+    // A2: create modal safely
+    let overlay = document.querySelector('.modal-overlay');
+    if(!overlay) {
+        overlay = createEl('div', '', 'modal-overlay hidden');
+        document.body.appendChild(overlay);
+    }
+    
+    let content = document.getElementById('modal-text-content');
+    if(!content) {
+        overlay.innerHTML = ''; 
+        content = createEl('div', '', 'modal-content');
+        content.id = 'modal-text-content';
+        overlay.appendChild(content);
+    }
+    overlay.classList.add('hidden');
+
+    function showCard() {
+        if(currentCardIndex >= cards.length) {
+            finishGame3();
+            return;
+        }
+
+        app.innerHTML = '';
+        const cardContainer = createEl('div', '', 'card fade-in');
+        
+        cardContainer.appendChild(createEl('p', `Situation: ${scenario.text}`, 'situation-context'));
+        cardContainer.appendChild(createEl('h3', 'Minispiel 3/3: Helfer-Check'));
+        cardContainer.appendChild(createEl('p', 'Hilft diese Reaktion oder schadet sie eher?'));
+
+        const display = createEl('div', cards[currentCardIndex].text, 'current-card-display');
+        cardContainer.appendChild(display);
+
+        const controls = createEl('div', '', 'sort-controls');
+        
+        const btnGood = createEl('button', '✅ Hilft', 'btn success');
+        btnGood.onclick = (e) => handleChoice('good', e.target, btnBad);
+        
+        const btnBad = createEl('button', '❌ Schadet', 'btn secondary');
+        btnBad.style.cssText = "background: var(--danger); box-shadow: 0 4px 0 #c0392b;";
+        btnBad.onclick = (e) => handleChoice('bad', e.target, btnGood);
+
+        controls.appendChild(btnGood);
+        controls.appendChild(btnBad);
+        cardContainer.appendChild(controls);
+        
+        const counter = createEl('p', `Karte ${currentCardIndex + 1} von ${cards.length}`);
+        counter.style.cssText = "text-align: center; margin-top: 10px; color: #777;";
+        cardContainer.appendChild(counter);
+
+        app.appendChild(cardContainer);
+    }
+
+    function handleChoice(type, clickedBtn, otherBtn) {
+        if(gameState.isInputBlocked) return; 
+        gameState.isInputBlocked = true;
+        
+        // A4: Immediate disable
+        clickedBtn.disabled = true;
+        otherBtn.disabled = true;
+
+        const card = cards[currentCardIndex];
+        
+        // A3: Scoring check (count rated cards)
+        if(gameState.scores[scenario.id].mg3Count < cards.length) {
+             addMaxPossible(1);
+             // Logic score
+             if(type === card.type) addStars(1);
+             gameState.scores[scenario.id].mg3Count++;
+        }
+
+        // Record
+        const lastEntry = gameState.playerData.history[gameState.playerData.history.length - 1];
+        if(lastEntry) {
+            lastEntry.reactions.push({
+                card: card.text,
+                userChoice: type === 'good' ? 'Hilft' : 'Schadet',
+                correct: type === card.type ? 'Richtig' : 'Falsch'
+            });
+        }
+
+        // Setup Modal
+        let overlay = document.querySelector('.modal-overlay');
+        if(!overlay) {
+             overlay = createEl('div', '', 'modal-overlay');
+             document.body.appendChild(overlay);
+        }
+        let modalContent = document.getElementById('modal-text-content');
+        if(!modalContent) {
+            overlay.innerHTML = '';
+            modalContent = createEl('div', '', 'modal-content');
+            modalContent.id = 'modal-text-content';
+            overlay.appendChild(modalContent);
+        }
+
+        modalContent.innerHTML = '';
+        
+        const title = createEl('h2');
+        // E1: Inhaltliche Anpassung
+        if(type === card.type) {
+            title.textContent = "Das hilft eher 👍";
+            title.style.color = "var(--success)";
+        } else {
+            title.textContent = "Das könnte eher schaden 🤔";
+            title.style.color = "var(--danger)";
+        }
+        
+        const fb = createEl('p', card.feedback);
+        fb.style.fontSize = "1.1rem";
+
+        const nextBtn = createEl('button', 'Weiter', 'btn');
+        nextBtn.onclick = () => {
+            overlay.classList.add('hidden');
+            gameState.isInputBlocked = false;
+            currentCardIndex++;
+            showCard();
+        };
+
+        modalContent.appendChild(title);
+        modalContent.appendChild(fb);
+        modalContent.appendChild(nextBtn);
+        
+        overlay.classList.remove('hidden');
+    }
+
+    function finishGame3() {
+        app.innerHTML = '';
+        const card = createEl('div', '', 'card fade-in');
+        card.style.textAlign = 'center';
+        
+        card.appendChild(createEl('h2', 'Situation geschafft!'));
+        const span = createEl('div', '🎉');
+        span.style.fontSize = "3rem";
+        card.appendChild(span);
+        
+        card.appendChild(createEl('p', 'Du hast dich super in die Situation hineinversetzt.'));
+        
+        const btn = createEl('button', 'Nächste Situation', 'btn');
+        btn.onclick = checkBonusOrNext;
+        card.appendChild(btn);
+        
+        app.appendChild(card);
+    }
+
+    showCard();
+}
+
+function checkBonusOrNext() {
+    const completedIndex = gameState.currentScenarioIndex;
+    const bonus = bonusLevels.find(b => b.triggerAfter === (completedIndex + 1));
+
+    if(bonus) {
+        renderBonusLevel(bonus);
+    } else {
+        gameState.currentScenarioIndex++;
+        if(gameState.currentScenarioIndex >= scenarios.length) {
+            renderEndScreen();
+        } else {
+            renderScenarioIntro();
+        }
+    }
+}
+
+function renderBonusLevel(bonus) {
+    // Fix 1: Persistent Bonus State tracking
+    const bonusId = bonus.title; // Unique enough
+    if (!gameState.bonusState[bonusId]) {
+        gameState.bonusState[bonusId] = {
+            items: {}, // for quiz
+            completed: false // for single-choice levels like face/say
+        };
+    }
+    const state = gameState.bonusState[bonusId];
+
+    app.innerHTML = '';
+    const card = createEl('div', '', 'card fade-in');
+    card.style.border = "2px solid var(--accent)";
+    
+    const badge = createEl('div', '⭐ BONUS RUNDE', 'bonus-badge');
+    card.appendChild(badge);
+    card.appendChild(createEl('h3', bonus.title));
+    
+    // For finishing the bonus screen
+    const finishBonus = () => {
+         const btn = createEl('button', 'Fertig', 'btn');
+         btn.style.marginTop = "20px";
+         btn.onclick = () => {
+             gameState.currentScenarioIndex++;
+             if(gameState.currentScenarioIndex >= scenarios.length) renderEndScreen();
+             else renderScenarioIntro();
+         };
+         card.appendChild(btn);
+    };
+
+    // Logic per Type
+    if(bonus.type === 'quiz') {
+        const area = createEl('div');
+        bonus.items.forEach((item, idx) => {
+            const row = createEl('div');
+            row.style.cssText = "background:#f0f0f0; margin:5px; padding:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;";
+            
+            row.appendChild(createEl('span', item.text));
+            
+            const btnGroup = createEl('div');
+            
+            // Check if already answered
+            const itemState = state.items[idx];
+            
+            ['Gefühl', 'Gedanke'].forEach(opt => {
+                const b = createEl('button', opt);
+                b.style.padding = "5px 10px";
+                b.style.marginLeft = "5px";
+                
+                // If answered, disable and show color
+                if (itemState) {
+                    b.disabled = true;
+                    if (itemState.correct && opt === item.correct) {
+                        row.style.background = "#d4edda";
+                    } else if (!itemState.correct && itemState.userChoice === opt) {
+                        row.style.background = "#f8d7da";
+                    }
+                } else {
+                    // Logic to answer
+                    b.onclick = function() {
+                        // Mark as answered in state
+                        const isCorrect = (item.correct === opt);
+                        state.items[idx] = { answered: true, userChoice: opt, correct: isCorrect };
+                        
+                        // Disable UI immediately
+                        Array.from(btnGroup.children).forEach(child => child.disabled = true);
+                        
+                        // Score ONCE per item
+                        addMaxPossible(1);
+                        if(isCorrect) {
+                            row.style.background = "#d4edda"; 
+                            addStars(1);
+                        } else {
+                            row.style.background = "#f8d7da"; 
+                        }
+                        
+                        // Check if all answered to show finish
+                        const allDone = bonus.items.every((_, i) => state.items[i]);
+                        if (allDone) finishBonus();
+                    };
+                }
+                btnGroup.appendChild(b);
+            });
+            row.appendChild(btnGroup);
+            area.appendChild(row);
+        });
+        card.appendChild(area);
+        
+        // Show finish button if all already answered (re-render case)
+        if (bonus.items.every((_, i) => state.items[i])) finishBonus();
+
+    } 
+    else if(bonus.type === 'face') {
+        const center = createEl('div');
+        center.style.textAlign = 'center';
+        
+        const face = createEl('div', '😡');
+        face.style.fontSize = "4rem";
+        center.appendChild(face);
+        center.appendChild(createEl('p', bonus.text));
+        
+        const optsDiv = createEl('div');
+        const isDone = state.completed;
+
+        bonus.options.forEach(opt => {
+            const b = createEl('button', opt, 'btn secondary');
+            b.style.marginTop = "5px";
+            
+            if (isDone) {
+                b.disabled = true;
+                if (opt === bonus.correct) b.style.backgroundColor = "var(--success)";
+            } else {
+                b.onclick = () => {
+                     // Mark state
+                     state.completed = true;
+                     
+                     // Disable all
+                     Array.from(optsDiv.children).forEach(c => c.disabled = true);
+                     
+                     // Score ONCE
+                     addMaxPossible(2);
+                     if(opt === bonus.correct) {
+                         b.style.backgroundColor = "var(--success)";
+                         addStars(2);
+                     } else {
+                         b.style.backgroundColor = "var(--danger)";
+                     }
+                     setTimeout(finishBonus, 500);
+                };
+            }
+            optsDiv.appendChild(b);
+        });
+        center.appendChild(optsDiv);
+        card.appendChild(center);
+        
+        if (isDone) finishBonus();
+    }
+    else if(bonus.type === 'say') {
+        card.appendChild(createEl('p', bonus.text));
+        const isDone = state.completed;
+        
+        bonus.options.forEach(opt => {
+            const div = createEl('div', opt.text, 'reaction-list-item');
+            
+            if (isDone) {
+                // If done, show result visually but disable click
+                // Hard to know which one was clicked without more state, but sufficient to just disable interactivity
+                // Or simply show correct/incorrect markers. For simplicity, just disable logic.
+                div.style.cursor = "default";
+                // Optionally show if it was good/bad based on score
+                if(opt.score > 0) div.style.background = "#d4edda"; // hint correct ones
+            } else {
+                div.onclick = () => {
+                    state.completed = true;
+                    Array.from(card.querySelectorAll('.reaction-list-item')).forEach(el => el.onclick = null);
+                    
+                    addMaxPossible(2);
+                    if(opt.score > 0) {
+                        div.style.background = "#d4edda";
+                        div.textContent += " ✅ Das ist sehr einfühlsam!";
+                        addStars(2);
+                    } else {
+                        div.style.background = "#f8d7da";
+                        div.textContent += " ❌ Das könnte verletzen.";
+                    }
+                    setTimeout(finishBonus, 1000);
+                };
+            }
+            card.appendChild(div);
+        });
+        
+        if(isDone) finishBonus();
+    }
+
+    app.appendChild(card);
+}
+
+// End Screen & Export
+function renderEndScreen() {
+    stopTimer();
+    app.innerHTML = '';
+    const card = createEl('div', '', 'card fade-in');
+
+    card.appendChild(createEl('h1', `🎉 Geschafft, ${gameState.nickname}!`));
+
+    const scoreBox = createEl('div');
+    scoreBox.style.cssText = "background: #e3f2fd; padding: 20px; border-radius: 12px; text-align: center; margin: 20px 0;";
+    scoreBox.appendChild(createEl('h2', 'Deine Empathie-Sterne'));
+    const stars = createEl('div', `⭐ ${gameState.stars} / ${gameState.maxStarsSoFar}`);
+    stars.style.cssText = "font-size: 3rem; color: var(--accent);";
+    scoreBox.appendChild(stars);
+    card.appendChild(scoreBox);
+
+    card.appendChild(createEl('hr'));
+    card.appendChild(createEl('h3', 'Deine Reflexion'));
+    card.appendChild(createEl('p', 'Schreibe kurz auf, was dir heute am Spiel wichtig war.'));
+    
+    const privHint = createEl('p', 'Hinweis: Bitte keine echten Namen oder Geheimnisse schreiben.');
+    privHint.style.fontSize = "0.85rem";
+    privHint.style.color = "#777";
+    card.appendChild(privHint);
+
+    const textArea = createEl('textarea');
+    textArea.id = 'finalReflection';
+    textArea.rows = 4;
+    textArea.placeholder = "Ich habe bemerkt, dass...";
+    textArea.maxLength = 250; 
+    card.appendChild(textArea);
+
+    // Protocol Preview (simplified table)
+    const tableDiv = createEl('div');
+    tableDiv.style.marginTop = "20px";
+    tableDiv.style.maxHeight = "200px";
+    tableDiv.style.overflowY = "auto";
+    tableDiv.appendChild(createEl('h4', 'Verlauf:'));
+    
+    const table = createEl('table', '', 'log-table');
+    const thead = createEl('thead');
+    const trH = createEl('tr');
+    trH.appendChild(createEl('th', 'Situation'));
+    trH.appendChild(createEl('th', 'Satz'));
+    thead.appendChild(trH);
+    table.appendChild(thead);
+    
+    const tbody = createEl('tbody');
+    gameState.playerData.history.forEach(entry => {
+        const tr = createEl('tr');
+        const td1 = createEl('td', entry.scenario);
+        const td2 = createEl('td', entry.sentence);
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    tableDiv.appendChild(table);
+    card.appendChild(tableDiv);
+
+    const dlBtn = createEl('button', 'Protokoll speichern (.txt) 💾', 'btn');
+    dlBtn.onclick = () => downloadProtocol(textArea.value);
+    card.appendChild(dlBtn);
+
+    // Word Search Teaser
+    const wsDiv = createEl('div');
+    wsDiv.style.cssText = "margin-top:30px; border-top: 2px dashed #ddd; padding-top:20px;";
+    wsDiv.appendChild(createEl('h3', 'Freigeschalteter Bonus: Gefühle-Suchsel'));
+    wsDiv.appendChild(createEl('p', 'Findest du die versteckten Wörter?'));
+    const wsBtn = createEl('button', 'Suchsel starten! 🔍', 'btn secondary');
+    wsBtn.style.backgroundColor = "var(--accent)";
+    wsBtn.style.color = "black";
+    wsBtn.onclick = startWordSearch;
+    wsDiv.appendChild(wsBtn);
+    card.appendChild(wsDiv);
+
+    const restartBtn = createEl('button', 'Spiel neu starten 🔄', 'btn secondary');
+    restartBtn.style.marginTop = "40px";
+    restartBtn.onclick = () => {
+        if(confirm("Möchtest du wirklich von vorne anfangen?")) location.reload();
+    };
+    card.appendChild(restartBtn);
+
+    app.appendChild(card);
+}
+
+// Download function safe
+function downloadProtocol(reflection) {
+    const timeStr = timerDisplay.textContent;
+    const dateStr = new Date().toLocaleDateString();
+    
+    let lines = [];
+    lines.push(`PROTOKOLL: JEDER FÜHLT ANDERS`);
+    lines.push(`===============================`);
+    lines.push(`Spieler: ${gameState.nickname}`); 
+    lines.push(`Datum: ${dateStr}`);
+    lines.push(`Zeit: ${timeStr}`);
+    lines.push(`Sterne: ${gameState.stars} / ${gameState.maxStarsSoFar}`);
+    lines.push(``);
+    lines.push(`REFLEXION:`);
+    // Basic sanitization
+    const safeRefl = reflection ? reflection.replace(/[<>]/g, '') : '(Keine Reflexion eingegeben)';
+    lines.push(safeRefl); 
+    lines.push(``);
+    lines.push(`VERLAUF:`);
+    
+    gameState.playerData.history.forEach((entry, i) => {
+        lines.push(`${i+1}. ${entry.scenario}`);
+        lines.push(`   Gefühle: ${entry.emotions.join(', ')}`);
+        lines.push(`   Satz: ${entry.sentence}`);
+        if(entry.reactions && entry.reactions.length > 0) {
+            lines.push(`   Karten-Entscheidungen:`);
+            entry.reactions.forEach(r => {
+                lines.push(`     - "${r.card}": ${r.userChoice} (${r.correct})`);
+            });
+        }
+        lines.push(`-------------------------------`);
+    });
+
+    lines.push(``);
+    if(gameState.foundWords.length > 0) {
+        lines.push(`Suchsel gelöst: ${gameState.foundWords.join(', ')}`);
+    }
+
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    // Filename sanitization
+    const safeNick = gameState.nickname.replace(/[^a-z0-9]/gi, '_');
+    // C: Distinction between intermediate and final
+    const suffix = reflection === "--- ZWISCHENSPEICHERUNG (Noch nicht abgeschlossen) ---" ? "_Zwischenstand" : "";
+    a.download = `Protokoll_${safeNick}${suffix}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+}
+
+// Intermediate Save
+function saveIntermediate() {
+    downloadProtocol("--- ZWISCHENSPEICHERUNG (Noch nicht abgeschlossen) ---");
+}
+
+// Teacher Menu Logic
+function openTeacherMenu() {
+    if (!TEACHER_MODE) return; 
+
+    let overlay = document.querySelector('.modal-overlay');
+    if(!overlay) {
+        overlay = createEl('div', '', 'modal-overlay hidden');
+        document.body.appendChild(overlay);
+    }
+    
+    overlay.innerHTML = '';
+    const content = createEl('div', '', 'modal-content');
+    
+    content.appendChild(createEl('h2', 'Lehrer-Login'));
+    content.appendChild(createEl('p', 'Passwort eingeben:'));
+    
+    const pwInput = createEl('input');
+    pwInput.type = "password";
+    pwInput.placeholder = "Passwort";
+    content.appendChild(pwInput);
+    
+    const loginBtn = createEl('button', 'Login', 'btn');
+    loginBtn.style.marginTop = "10px";
+    loginBtn.onclick = () => {
+        if(pwInput.value === "Gustav") {
+            renderTeacherControls(content);
+        } else {
+            alert("Falsches Passwort");
+        }
+    };
+    content.appendChild(loginBtn);
+    
+    const cancelBtn = createEl('button', 'Abbrechen', 'btn secondary');
+    cancelBtn.style.marginTop = "10px";
+    cancelBtn.onclick = () => overlay.classList.add('hidden');
+    content.appendChild(cancelBtn);
+
+    overlay.appendChild(content);
+    overlay.classList.remove('hidden');
+}
+
+function renderTeacherControls(container) {
+    container.innerHTML = '';
+    container.appendChild(createEl('h3', 'Lehrer-Menü'));
+    container.appendChild(createEl('p', 'Springe zu:'));
+
+    const grid = createEl('div', '', 'teacher-grid');
+
+    // Start
+    const startBtn = createEl('button', 'Start', 'teacher-btn');
+    startBtn.onclick = () => {
+        document.querySelector('.modal-overlay').classList.add('hidden');
+        renderStartScreen();
+    };
+    grid.appendChild(startBtn);
+
+    // Scenarios
+    scenarios.forEach((s, idx) => {
+        const b = createEl('button', `Sit. ${idx + 1}`, 'teacher-btn');
+        b.onclick = () => {
+             gameState.currentScenarioIndex = idx;
+             document.querySelector('.modal-overlay').classList.add('hidden');
+             renderScenarioIntro();
+        };
+        grid.appendChild(b);
+    });
+
+    // Bonuses
+    bonusLevels.forEach((b, idx) => {
+        const btn = createEl('button', `Bonus ${idx+1}`, 'teacher-btn');
+        btn.onclick = () => {
+            document.querySelector('.modal-overlay').classList.add('hidden');
+            renderBonusLevel(b);
+        };
+        grid.appendChild(btn);
+    });
+
+    // End
+    const endBtn = createEl('button', 'Auswertung', 'teacher-btn');
+    endBtn.onclick = () => {
+        document.querySelector('.modal-overlay').classList.add('hidden');
+        renderEndScreen();
+    };
+    grid.appendChild(endBtn);
+
+    container.appendChild(grid);
+    
+    const closeBtn = createEl('button', 'Schließen', 'btn secondary');
+    closeBtn.style.marginTop = "15px";
+    closeBtn.onclick = () => document.querySelector('.modal-overlay').classList.add('hidden');
+    container.appendChild(closeBtn);
+}
+
+
+// Word Search Logic
+const wsGridSize = 12; // Larger Grid
+let wsSelectionStart = null;
+
+// D: Robustness Fix
+function startWordSearch() {
+    app.innerHTML = '';
+    const card = createEl('div', '', 'card fade-in');
+    
+    card.appendChild(createEl('h3', 'Bonus-Belohnung: Gefühle-Suchsel'));
+    card.appendChild(createEl('p', 'Tippe auf den ersten und dann auf den letzten Buchstaben.'));
+
+    // Container for styling
+    const container = createEl('div', '', 'ws-container');
+
+    // Grid Generation Logic with Retries
+    let gridData;
+    let placedWords = [];
+    let success = false;
+    let maxTotalAttempts = 10;
+
+    for (let attempt = 0; attempt < maxTotalAttempts; attempt++) {
+        gridData = Array(wsGridSize).fill(null).map(() => Array(wsGridSize).fill(''));
+        placedWords = [];
+        
+        // Try placing all words
+        let allPlaced = true;
+        for (let w of wsWords) {
+            let placed = false;
+            let wordAttempts = 0;
+            while(!placed && wordAttempts < 200) { 
+                wordAttempts++;
+                const dir = Math.random() > 0.5 ? 'H' : 'V';
+                const r = Math.floor(Math.random() * wsGridSize);
+                const c = Math.floor(Math.random() * wsGridSize);
+                
+                if(canPlaceWord(gridData, w, r, c, dir)) {
+                    placeWord(gridData, w, r, c, dir);
+                    placed = true;
+                    placedWords.push(w);
+                }
+            }
+            if(!placed) {
+                allPlaced = false;
+                break; // Restart whole grid
+            }
+        }
+        
+        if (allPlaced) {
+            success = true;
+            break;
+        }
+    }
+
+    // Fallback: If grid gen failed 10 times, place only what fits horizontally
+    if (!success) {
+        console.warn("WordSearch Gen failed, fallback to simple placement.");
+        gridData = Array(wsGridSize).fill(null).map(() => Array(wsGridSize).fill(''));
+        placedWords = [];
+        let currentRow = 0;
+        wsWords.forEach(w => {
+            if (currentRow < wsGridSize && w.length <= wsGridSize) {
+                placeWord(gridData, w, currentRow, 0, 'H');
+                placedWords.push(w);
+                currentRow++;
+            }
+        });
+    }
+
+    // Fill letters
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    for(let r=0; r<wsGridSize; r++) {
+        for(let c=0; c<wsGridSize; c++) {
+            if(gridData[r][c] === '') gridData[r][c] = letters[Math.floor(Math.random() * letters.length)];
+        }
+    }
+
+    // Update global state tracking
+    // We only track progress on placed words
+    // Reset found words for new game if desired, or keep if persisting session
+    // Here we restart game logic for WS
+    gameState.foundWords = []; 
+
+    const wordList = createEl('div', '', 'ws-word-list');
+    placedWords.forEach(w => {
+        const span = createEl('div', w, 'ws-word');
+        span.id = `ws-word-${w}`;
+        wordList.appendChild(span);
+    });
+    container.appendChild(wordList);
+
+    const gridDiv = createEl('div', '', 'ws-grid');
+    for(let r=0; r<wsGridSize; r++) {
+        for(let c=0; c<wsGridSize; c++) {
+            const cell = createEl('div', gridData[r][c], 'ws-cell');
+            cell.dataset.r = r;
+            cell.dataset.c = c;
+            cell.dataset.char = gridData[r][c];
+            cell.onclick = () => handleCellClick(cell, gridData, placedWords);
+            gridDiv.appendChild(cell);
+        }
+    }
+    container.appendChild(gridDiv);
+    card.appendChild(container);
+
+    const msg = createEl('p', '');
+    msg.id = 'ws-msg';
+    msg.style.cssText = "text-align:center; min-height:1.5em; font-weight:bold; margin-top: 15px;";
+    card.appendChild(msg);
+
+    const back = createEl('button', 'Zurück zur Auswertung', 'btn secondary');
+    back.onclick = renderEndScreen;
+    card.appendChild(back);
+
+    app.appendChild(card);
+}
+
+function canPlaceWord(grid, word, r, c, dir) {
+    if(dir === 'H' && c + word.length > wsGridSize) return false;
+    if(dir === 'V' && r + word.length > wsGridSize) return false;
+    for(let i=0; i<word.length; i++) {
+        let nr = dir === 'V' ? r+i : r;
+        let nc = dir === 'H' ? c+i : c;
+        if(grid[nr][nc] !== '' && grid[nr][nc] !== word[i]) return false;
+    }
+    return true;
+}
+
+function placeWord(grid, word, r, c, dir) {
+    for(let i=0; i<word.length; i++) {
+        let nr = dir === 'V' ? r+i : r;
+        let nc = dir === 'H' ? c+i : c;
+        grid[nr][nc] = word[i];
+    }
+}
+
+function handleCellClick(cell, gridData, activeWords) {
+    const r = parseInt(cell.dataset.r);
+    const c = parseInt(cell.dataset.c);
+    const msg = document.getElementById('ws-msg');
+
+    if(!wsSelectionStart) {
+        wsSelectionStart = {r, c};
+        cell.classList.add('selected');
+        msg.textContent = "Erster Buchstabe gewählt...";
+        msg.style.color = "var(--text)";
+    } else {
+        const start = wsSelectionStart;
+        const end = {r, c};
+        wsSelectionStart = null;
+        document.querySelectorAll('.ws-cell.selected').forEach(el => el.classList.remove('selected'));
+        checkWordSelection(start, end, gridData, activeWords);
+    }
+}
+
+function checkWordSelection(start, end, gridData, activeWords) {
+    const msg = document.getElementById('ws-msg');
+    let word = "";
+    let coords = [];
+    
+    // Check Alignment
+    if(start.r === end.r) { 
+        const minC = Math.min(start.c, end.c);
+        const maxC = Math.max(start.c, end.c);
+        for(let i=minC; i<=maxC; i++) {
+            word += gridData[start.r][i];
+            coords.push({r: start.r, c: i});
+        }
+    } else if (start.c === end.c) { 
+        const minR = Math.min(start.r, end.r);
+        const maxR = Math.max(start.r, end.r);
+        for(let i=minR; i<=maxR; i++) {
+            word += gridData[i][start.c];
+            coords.push({r: i, c: start.c});
+        }
+    } else {
+        msg.textContent = "Nur waagerecht oder senkrecht!";
+        msg.style.color = "var(--danger)";
+        return;
+    }
+
+    const revWord = word.split('').reverse().join('');
+    let found = null;
+
+    if(activeWords.includes(word) && !gameState.foundWords.includes(word)) found = word;
+    else if(activeWords.includes(revWord) && !gameState.foundWords.includes(revWord)) found = revWord;
+
+    if(found) {
+        gameState.foundWords.push(found);
+        msg.textContent = `Super! "${found}" gefunden!`;
+        msg.style.color = "var(--success)";
+        
+        const wordEl = document.getElementById(`ws-word-${found}`);
+        if(wordEl) wordEl.classList.add('done');
+        
+        const allCells = document.querySelectorAll('.ws-cell');
+        coords.forEach(co => {
+             const cEl = Array.from(allCells).find(el => el.dataset.r == co.r && el.dataset.c == co.c);
+             if(cEl) cEl.classList.add('found');
+        });
+
+        if(gameState.foundWords.length === activeWords.length) {
+            msg.textContent = "Glückwunsch! Alle Wörter gefunden!";
+            fireConfetti();
+        }
+    } else {
+        if(gameState.foundWords.includes(word) || gameState.foundWords.includes(revWord)) {
+             msg.textContent = "Schon gefunden!";
+        } else {
+             msg.textContent = "Das ist keines der gesuchten Wörter.";
+             msg.style.color = "var(--danger)";
+        }
+    }
+}
+
+function fireConfetti() {
+    for(let i=0; i<50; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = Math.random() * 100 + 'vw';
+        c.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+        c.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 5000);
+    }
+}
+
+// Start
+renderStartScreen();
+
+</script>
+</body>
+</html>
