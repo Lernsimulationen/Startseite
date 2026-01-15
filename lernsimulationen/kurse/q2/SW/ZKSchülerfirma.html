@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- SECURITY: Content Security Policy (CSP) für Schulen -->
+    <!-- Erlaubt nur Ressourcen aus der gleichen Quelle und Inline-CSS/JS. Verbietet alles Externe. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; frame-src 'none'; object-src 'none';">
+    
+    <title>Lernsimulation: School-Snack Manager (Secure)</title>
+    
+    <style>
+        /* CSS Reset & Variablen */
+        :root {
+            --color-primary: #059669; /* Emerald 600 */
+            --color-primary-dark: #047857;
+            --color-bg: #f3f4f6;
+            --color-text: #1f2937;
+            --color-white: #ffffff;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius: 0.75rem;
+            --color-disabled: #9ca3af;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            margin: 0;
+            padding-bottom: 2rem;
+            line-height: 1.5;
+        }
+
+        /* Utility Klassen */
+        .container { max-width: 900px; margin: 0 auto; padding: 1rem; }
+        .card { background: var(--color-white); border-radius: var(--radius); padding: 2rem; box-shadow: var(--shadow); margin-bottom: 1.5rem; }
+        
+        .btn {
+            background-color: var(--color-primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .btn:hover:not(:disabled) { background-color: var(--color-primary-dark); transform: translateY(-1px); }
+        .btn:disabled { background-color: var(--color-disabled); cursor: not-allowed; opacity: 0.7; transform: none; }
+        
+        .btn-outline { background: transparent; border: 2px solid #e5e7eb; color: var(--color-text); }
+        .btn-outline:hover:not(:disabled) { border-color: var(--color-primary); background-color: #ecfdf5; }
+        .btn-outline.active { background-color: var(--color-primary); color: white; border-color: var(--color-primary); }
+
+        .header-bar { background-color: #064e3b; color: white; padding: 1rem; position: sticky; top: 0; z-index: 10; box-shadow: var(--shadow); }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .grid-2 { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+        
+        .badge { display: flex; flex-direction: column; align-items: center; padding: 0.5rem; min-width: 80px; }
+        .badge-val { font-weight: bold; font-size: 1.1rem; }
+        .badge-label { font-size: 0.75rem; opacity: 0.8; }
+        
+        input[type="range"] { width: 100%; cursor: pointer; }
+        input[type="number"], textarea { width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; }
+        
+        /* Helpers */
+        .text-center { text-align: center; }
+        .text-sm { font-size: 0.875rem; }
+        .text-red { color: #dc2626; }
+        .text-green { color: #059669; }
+        .bg-red-light { background-color: #fef2f2; color: #991b1b; padding: 1rem; border-radius: 0.5rem; }
+        .bg-blue-light { background-color: #eff6ff; color: #1e40af; padding: 1rem; border-radius: 0.5rem; }
+        .hidden { display: none; }
+
+        @media (min-width: 768px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
+        @media print { .no-print { display: none; } body { background: white; } .card { box-shadow: none; border: 1px solid #eee; } }
+    </style>
+</head>
+<body>
+
+    <div id="app">
+        <div class="text-center" style="padding-top: 50px;">Initialisiere sichere Umgebung...</div>
+    </div>
+
+    <script>
+        /**
+         * ==========================================
+         * 1. SECURITY & UTILS
+         * ==========================================
+         */
+
+        // Sanitizer: Verhindert NaN, Infinity und Extremwerte
+        // WICHTIG: Number.isFinite schützt vor Infinity
+        function safeInt(value, min, max, fallback) {
+            const num = parseInt(value, 10);
+            if (!Number.isFinite(num)) return fallback;
+            return Math.min(Math.max(num, min), max);
+        }
+
+        function safeFloat(value, min, max, fallback) {
+            const num = parseFloat(value);
+            if (!Number.isFinite(num)) return fallback;
+            return Math.min(Math.max(num, min), max);
+        }
+
+        // DOM Builder Helper: Ersetzt innerHTML durch sichere DOM-Methoden
+        // Verhindert XSS, da textContent genutzt wird
+        function el(tag, props = {}, ...children) {
+            const element = document.createElement(tag);
+            
+            for (const [key, value] of Object.entries(props)) {
+                if (key.startsWith('on') && typeof value === 'function') {
+                    // Event Listener statt Inline-Handler (CSP-konform)
+                    const eventName = key.substring(2).toLowerCase();
+                    element.addEventListener(eventName, value);
+                } else if (key === 'style' && typeof value === 'object') {
+                    Object.assign(element.style, value);
+                } else if (key === 'className') {
+                    element.className = value;
+                } else if (key === 'disabled' && value === true) {
+                    element.setAttribute('disabled', ''); // Visuell disabled
+                    element.disabled = true; // Logisch disabled
+                } else if (value !== false && value !== null && value !== undefined) {
+                    element.setAttribute(key, value);
+                }
+            }
+
+            children.forEach(child => {
+                if (child === null || child === undefined) return;
+                if (typeof child === 'string' || typeof child === 'number') {
+                    element.textContent += child; // XSS-Schutz: textContent statt innerHTML
+                } else if (child instanceof Node) {
+                    element.appendChild(child);
+                } else if (Array.isArray(child)) {
+                    child.forEach(c => {
+                        if (c) element.appendChild(c instanceof Node ? c : document.createTextNode(String(c)));
+                    });
+                }
+            });
+            return element;
+        }
+
+        const formatMoney = (val) => `${Math.round(val).toLocaleString('de-DE')} €`;
+        const formatTime = (seconds) => {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        };
+
+        /**
+         * ==========================================
+         * 2. DATEN & KONSTANTEN
+         * ==========================================
+         */
+
+        const FINANCE_QUESTIONS = [
+            { id: 1, item: 'Neuer Smoothie-Mixer', correctCategory: 'Aktiv', explanation: 'Geräte gehören zum Anlagevermögen (Aktivseite).' },
+            { id: 2, item: 'Kredit vom Förderverein', correctCategory: 'Passiv', explanation: 'Geliehenes Geld ist Fremdkapital (Passivseite).' },
+            { id: 3, item: 'Einkauf Obst & Gemüse', correctCategory: 'Aufwand', explanation: 'Zutatenverbrauch mindert den Gewinn (Aufwand).' },
+            { id: 4, item: 'Erlöse Pausenverkauf', correctCategory: 'Ertrag', explanation: 'Einnahmen aus Verkäufen sind Erträge.' },
+            { id: 5, item: 'Wechselgeld in der Kasse', correctCategory: 'Aktiv', explanation: 'Bargeld ist Umlaufvermögen (Kasse).' },
+            { id: 6, item: 'Offene Rechnung beim Bäcker', correctCategory: 'Passiv', explanation: 'Noch nicht bezahlte Rechnungen sind Verbindlichkeiten.' },
+            { id: 7, item: 'Werbeplakate drucken', correctCategory: 'Aufwand', explanation: 'Werbekosten sind sofortiger Aufwand.' },
+            { id: 8, item: 'Spende von Eltern', correctCategory: 'Ertrag', explanation: 'Zuflüsse ohne Gegenleistung sind oft Erträge.' },
+            { id: 9, item: 'Lastenfahrrad', correctCategory: 'Aktiv', explanation: 'Fahrzeuge sind Anlagevermögen.' },
+            { id: 10, item: 'Rücklage für Klassenfahrt', correctCategory: 'Passiv', explanation: 'Eigenkapital/Rücklagen.' },
+            { id: 11, item: 'Servietten & Pappbecher', correctCategory: 'Aufwand', explanation: 'Verbrauchsmaterial ist Aufwand.' },
+            { id: 12, item: 'Schüler-Aktienkapital', correctCategory: 'Passiv', explanation: 'Eigenkapital.' },
+            { id: 13, item: 'Zinserträge vom Sparbuch', correctCategory: 'Ertrag', explanation: 'Zinsen sind Finanzerträge.' },
+            { id: 14, item: 'Reparatur der Kaffeemaschine', correctCategory: 'Aufwand', explanation: 'Instandhaltung ist sofortiger Aufwand.' },
+            { id: 15, item: 'Vorräte an Riegeln', correctCategory: 'Aktiv', explanation: 'Lagerbestände gehören zum Umlaufvermögen.' }
+        ];
+
+        const DILEMMAS = {
+            1: {
+                id: 1,
+                title: 'Dilemma: Die Verpackungsfrage',
+                description: 'Die Schüler beschweren sich über klebrige Hände. Wie verpacken wir die Snacks?',
+                options: [
+                    { label: 'Plastikverpackung (Billig)', profitChange: -50, stakeholderChange: -10, sustainabilityChange: -30, feedback: 'Billig und sauber, aber der Müll quillt über.', theoryNote: 'Externalisierung von Kosten: Wir sparen, die Umwelt zahlt.' },
+                    { label: 'Pfandsystem (Tupperdosen)', profitChange: -300, stakeholderChange: 5, sustainabilityChange: 30, feedback: 'Teuer in der Anschaffung, aber null Müll!', theoryNote: 'Kreislaufwirtschaft: Ressourcen werden wiederverwendet.' },
+                    { label: 'Beschichtetes Papier ("Greenwashing")', profitChange: -150, stakeholderChange: -5, sustainabilityChange: -10, feedback: 'Sieht öko aus, ist aber Sondermüll.', theoryNote: 'Greenwashing: Falscher Anschein von Nachhaltigkeit.' }
+                ]
+            },
+            2: {
+                id: 2,
+                title: 'Dilemma: Der Mensa-Konflikt',
+                description: 'Die Mensa beschwert sich über Konkurrenz. Der Schulleiter droht.',
+                options: [
+                    { label: 'Aggressive Konkurrenz', profitChange: 200, stakeholderChange: -40, sustainabilityChange: 0, feedback: 'Umsatz gut, aber Stimmung im Lehrerzimmer eisig.', theoryNote: 'Verdrängungswettbewerb: Risiko von Konflikten mit Stakeholdern.' },
+                    { label: 'Kooperation (Ergänzung)', profitChange: -50, stakeholderChange: 30, sustainabilityChange: 10, feedback: 'Weniger Umsatz, aber alle sind glücklich.', theoryNote: 'Stakeholder-Dialog: Langfristige Existenzsicherung.' },
+                    { label: 'Schulleiter "beschenken"', profitChange: -100, stakeholderChange: -20, sustainabilityChange: -5, feedback: 'Er drückt ein Auge zu, aber Gerüchte gehen um.', theoryNote: 'Compliance: Korruption ist illegal und schadet dem Ruf.' }
+                ]
+            },
+            3: {
+                id: 3,
+                title: 'Dilemma: Wohin mit dem Gewinn?',
+                description: 'Das Jahr lief gut. Was machen wir mit dem Überschuss?',
+                options: [
+                    { label: 'Alles ausschütten', profitChange: -500, stakeholderChange: 20, sustainabilityChange: 0, feedback: 'Party! Aber kein Geld für Investitionen.', theoryNote: 'Shareholder-Value: Fokus auf kurzfristige Auszahlung.' },
+                    { label: 'Spende (Regenwald)', profitChange: -300, stakeholderChange: 10, sustainabilityChange: 40, feedback: 'Tolles Image! Echte Weltverbesserer.', theoryNote: 'CSR: Corporate Social Responsibility.' },
+                    { label: 'Reinvestition', profitChange: 0, stakeholderChange: 15, sustainabilityChange: 10, feedback: 'Wir sichern die Zukunft der Firma.', theoryNote: 'Thesaurierung: Gewinne stärken das Eigenkapital.' }
+                ]
+            }
+        };
+
+        const MATERIAL_OPTIONS = {
+            cheap: { label: 'Discounter (Billig)', cost: 0.80, imageEffect: -15, qualityEffect: -10, demandBonus: -100 },
+            standard: { label: 'Supermarkt (Mix)', cost: 1.20, imageEffect: 0, qualityEffect: 0, demandBonus: 0 },
+            premium: { label: 'Bio & Regional', cost: 1.90, imageEffect: 15, qualityEffect: 15, demandBonus: 150 }
+        };
+
+        /**
+         * ==========================================
+         * 3. STATE MANAGEMENT
+         * ==========================================
+         */
+
+        const INITIAL_STATE_TEMPLATE = {
+            phase: 'intro',
+            year: 1,
+            scores: { profit: 2000, stakeholder: 50, sustainability: 50 },
+            targets: { profit: 3000, image: 60 },
+            history: [],
+            lastEvent: null,
+            startTime: 0,
+            elapsedTime: 0,
+            reflections: { q1: '', q2: '', q3: '' },
+            usedQuestionIds: [],
+            productionValues: { quantity: 500, price: 2.50, marketing: 50, material: 'standard' },
+            financeState: { timeLeft: 45, currentQIndex: 0, score: 0, currentQuestions: [], feedback: null, phaseComplete: false },
+            dilemmaState: { feedback: '', theory: '', optionLabel: '' },
+            isProcessing: false 
+        };
+
+        let state = JSON.parse(JSON.stringify(INITIAL_STATE_TEMPLATE));
+        let timerInterval = null;
+        let financeTimerInterval = null;
+
+        // Render Trigger
+        function setState(newState) {
+            state = { ...state, ...newState };
+            requestAnimationFrame(render); // Performance Optimierung
+        }
+
+        // Robuster Global Timer (nutzt Date.now delta)
+        function startGlobalTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            const start = Date.now();
+            timerInterval = setInterval(() => {
+                const now = Date.now();
+                const deltaSeconds = Math.floor((now - start) / 1000);
+                setState({ elapsedTime: deltaSeconds });
+            }, 1000);
+        }
+
+        // Safer Restart
+        function resetGame() {
+            if (timerInterval) clearInterval(timerInterval);
+            if (financeTimerInterval) clearInterval(financeTimerInterval);
+            state = JSON.parse(JSON.stringify(INITIAL_STATE_TEMPLATE));
+            render();
+        }
+
+        /**
+         * ==========================================
+         * 4. RENDER LOGIC (DOM Building)
+         * ==========================================
+         */
+
+        function render() {
+            const app = document.getElementById('app');
+            app.textContent = ''; // DOM sicher leeren
+
+            if (state.phase !== 'intro' && state.phase !== 'gameover') {
+                app.appendChild(renderHeader());
+            }
+
+            let content;
+            switch (state.phase) {
+                case 'intro': content = renderIntro(); break;
+                case 'production': content = renderProduction(); break;
+                case 'finance': content = renderFinance(); break;
+                case 'dilemma': content = renderDilemma(); break;
+                case 'summary': content = renderSummary(); break;
+                case 'gameover': content = renderGameOver(); break;
+            }
+            if (content) app.appendChild(content);
+        }
+
+        function renderHeader() {
+            return el('div', { className: 'header-bar flex-between no-print' },
+                el('div', {},
+                    el('div', { style: 'font-weight:bold; font-size:1.2rem;' }, 
+                        '🥪 School-Snack GmbH ',
+                        el('span', { style: 'font-size:0.8rem; background:#047857; padding:2px 6px; border-radius:4px;' }, `Jahr ${state.year} / 3`)
+                    ),
+                    el('div', { style: 'font-size:0.8rem; opacity:0.8; margin-top:4px;' }, `Ziel: >${state.targets.profit}€ Gewinn & >${state.targets.image} Image`)
+                ),
+                el('div', { style: 'display:flex; gap:1.5rem;' },
+                    createBadge('Konto', formatMoney(state.scores.profit), '#fcd34d'),
+                    createBadge('Beliebtheit', state.scores.stakeholder, '#d8b4fe'),
+                    createBadge('Öko', state.scores.sustainability, '#86efac'),
+                    el('div', { className: 'badge', style: 'background:#065f46; border-radius:4px;' },
+                        el('div', { className: 'badge-val' }, `⏰ ${formatTime(state.elapsedTime)}`)
+                    )
+                ),
+                el('button', { 
+                    className: 'btn btn-outline', 
+                    style: 'border-color:white; color:white; padding: 4px 8px; font-size: 0.8rem;',
+                    onClick: () => skipPhase(),
+                    disabled: state.isProcessing // Global disable check
+                }, '⏩ Skip')
+            );
+        }
+
+        function createBadge(label, val, color) {
+            return el('div', { className: 'badge' },
+                el('div', { className: 'badge-val', style: `color:${color};` }, val),
+                el('div', { className: 'badge-label' }, label)
+            );
+        }
+
+        // --- PHASE: INTRO ---
+        function renderIntro() {
+            const container = el('div', { className: 'container' });
+            
+            // Ziel-Inputs Refs
+            let profitInput, imageInput;
+
+            const card = el('div', { className: 'card text-center', style: 'border-top: 4px solid var(--color-primary);' },
+                el('h1', { style: 'margin-bottom:1rem;' }, 'Schülerfirma: School-Snack'),
+                el('div', { className: 'bg-blue-light text-center', style: 'margin-bottom:1.5rem; text-align:left;' },
+                    el('strong', {}, 'ℹ️ Spielablauf:'),
+                    el('br'), 'Sie sind der Vorstand. 3 Geschäftsjahre.',
+                    el('ul', { style: 'margin:0; padding-left:1.2rem;' },
+                        el('li', {}, el('strong', {}, 'Phase 1:'), ' Produktion & Preis'),
+                        el('li', {}, el('strong', {}, 'Phase 2:'), ' Finanzen (Achtung: Steuerberater kostet!)'),
+                        el('li', {}, el('strong', {}, 'Phase 3:'), ' Strategische Entscheidungen')
+                    )
+                ),
+                el('div', { className: 'bg-blue-light', style: 'background:#ecfdf5; color:#065f46; text-align:left; margin-bottom:1.5rem;' },
+                    el('strong', {}, '🏆 Ziele definieren:'),
+                    el('div', { className: 'grid-2', style: 'margin-top:1rem;' },
+                        el('div', {}, 
+                            el('label', {}, 'Ziel-Gewinn (€):'),
+                            profitInput = el('input', { type: 'number', value: state.targets.profit, min: 500, max: 100000, step: 100 })
+                        ),
+                        el('div', {}, 
+                            el('label', {}, 'Ziel-Image (0-100):'),
+                            imageInput = el('input', { type: 'number', value: state.targets.image, min: 10, max: 100, step: 5 })
+                        )
+                    )
+                ),
+                el('button', { 
+                    className: 'btn', 
+                    onClick: () => startGame(profitInput.value, imageInput.value) 
+                }, '🚀 Firma öffnen & starten')
+            );
+
+            container.appendChild(card);
+            return container;
+        }
+
+        function startGame(pVal, iVal) {
+            // Validierung
+            const profit = safeInt(pVal, 500, 100000, 3000);
+            const image = safeInt(iVal, 10, 100, 60);
+
+            startGlobalTimer();
+            setState({ 
+                phase: 'production', 
+                targets: { profit, image },
+                startTime: Date.now(),
+                elapsedTime: 0
+            });
+        }
+
+        // --- PHASE: PRODUCTION ---
+        function renderProduction() {
+            const { quantity, price, marketing, material } = state.productionValues;
+            
+            // Kalkulation
+            const matInfo = MATERIAL_OPTIONS[material];
+            const fixedCost = 200;
+            const imageFactor = (state.scores.sustainability + state.scores.stakeholder) / 100;
+            const reputationBonus = (imageFactor - 1) * 300; 
+            const priceEffect = (price - 2.50) * 250; 
+            const marketingEffect = Math.sqrt(marketing) * 5;
+            const matBonus = matInfo.demandBonus;
+            
+            let demand = 600 + reputationBonus - priceEffect + marketingEffect + matBonus;
+            demand = Math.max(0, Math.round(demand));
+
+            const sales = Math.min(quantity, demand);
+            const unsold = Math.max(0, quantity - sales);
+            const wasteCost = unsold * 0.20; 
+
+            const varCost = quantity * matInfo.cost;
+            const totalCost = fixedCost + varCost + marketing;
+            const revenue = sales * price;
+            const projectedProfit = revenue - totalCost - wasteCost;
+
+            const container = el('div', { className: 'container' });
+            
+            // Material Buttons
+            const matButtons = Object.keys(MATERIAL_OPTIONS).map(k => {
+                const isActive = material === k;
+                return el('button', { 
+                    className: isActive ? 'btn btn-outline active' : 'btn btn-outline',
+                    style: 'flex:1; font-size:0.8rem;',
+                    disabled: state.isProcessing,
+                    onClick: () => updateProd('material', k)
+                }, 
+                MATERIAL_OPTIONS[k].label, el('br'), el('small', {}, `${MATERIAL_OPTIONS[k].cost.toFixed(2)}€`));
+            });
+
+            // Input Helper
+            const createRange = (val, min, max, step, key) => el('input', {
+                type: 'range', min, max, step, value: val,
+                disabled: state.isProcessing,
+                onInput: (e) => updateProd(key, e.target.value)
+            });
+
+            container.appendChild(el('div', { className: 'card' },
+                el('h2', {}, 'Phase 1: Der Pausenverkauf (M8)'),
+                el('div', { className: 'bg-blue-light text-sm', style: 'margin-bottom:1rem;' }, 'Tipp: Image bestimmt Nachfrage. Müll kostet 0,20€ Strafe pro Stück!'),
+                
+                el('div', { className: 'grid-2' },
+                    // Inputs Column
+                    el('div', {},
+                        el('div', { className: 'card', style: 'padding:1rem; margin-bottom:1rem; border:1px solid #eee; box-shadow:none;' },
+                            el('label', {}, '📦 Zutaten-Qualität'),
+                            el('div', { style: 'display:flex; gap:0.5rem; margin-top:0.5rem;' }, matButtons)
+                        ),
+                        el('div', { className: 'card', style: 'padding:1rem; margin-bottom:1rem; border:1px solid #eee; box-shadow:none;' },
+                            el('div', { className: 'flex-between' }, el('label', {}, '💰 Preis'), el('strong', {}, `${price.toFixed(2)} €`)),
+                            createRange(price, 1.00, 5.00, 0.10, 'price'),
+                            el('div', { className: 'flex-between', style: 'margin-top:1rem;' }, el('label', {}, '📣 Werbung'), el('strong', {}, `${marketing} €`)),
+                            createRange(marketing, 0, 500, 10, 'marketing')
+                        ),
+                        el('div', { className: 'card', style: 'padding:1rem; border:1px solid #eee; box-shadow:none; background:#fff7ed;' },
+                            el('div', { className: 'flex-between' }, el('label', { style: 'color:#9a3412;' }, '🛒 Menge'), el('strong', { style: 'color:#9a3412;' }, `${quantity} Stk.`)),
+                            createRange(quantity, 100, 1500, 50, 'quantity')
+                        )
+                    ),
+                    // Stats Column
+                    el('div', { className: 'card', style: 'background:#1f2937; color:white;' },
+                        el('h3', { style: 'color:#9ca3af; text-transform:uppercase; font-size:0.8rem;' }, 'Prognose'),
+                        el('div', { className: 'flex-between' }, 'Nachfrage:', el('span', { style: `font-family:monospace; color:${demand < quantity ? '#fca5a5' : '#86efac'}` }, `${demand} Stk.`)),
+                        el('div', { className: 'flex-between text-sm', style: 'margin-top:0.5rem; border-top:1px solid #374151; padding-top:0.5rem;' }, 'Umsatz:', el('span', { className: 'text-green' }, `+${revenue.toFixed(2)} €`)),
+                        el('div', { className: 'flex-between text-sm' }, 'Kosten:', el('span', { className: 'text-red' }, `-${totalCost.toFixed(2)} €`)),
+                        unsold > 0 ? el('div', { className: 'flex-between text-sm text-red' }, `🗑️ Müll-Malus (${unsold}):`, el('span', {}, `-${wasteCost.toFixed(2)} €`)) : null,
+                        el('div', { className: 'flex-between', style: 'margin-top:1rem; font-size:1.2rem; font-weight:bold; border-top:1px solid #374151; padding-top:0.5rem;' }, 'Gewinn:', el('span', { style: `color:${projectedProfit >= 0 ? '#60a5fa' : '#f87171'}` }, `${projectedProfit.toFixed(2)} €`)),
+                        
+                        el('button', {
+                            className: 'btn',
+                            style: 'width:100%; margin-top:1.5rem; justify-content:center;',
+                            disabled: state.isProcessing, // Anti-Spam (Visuell)
+                            onClick: () => confirmProduction(projectedProfit, unsold, material)
+                        }, 'Verkauf starten ➡️')
+                    )
+                )
+            ));
+            return container;
+        }
+
+        function updateProd(key, val) {
+            if (state.isProcessing) return;
+            if (key === 'quantity') val = safeInt(val, 100, 1500, 500);
+            if (key === 'price') val = safeFloat(val, 1.0, 5.0, 2.5);
+            if (key === 'marketing') val = safeInt(val, 0, 500, 50);
+            
+            const newVals = { ...state.productionValues, [key]: val };
+            setState({ productionValues: newVals });
+        }
+
+        function confirmProduction(profit, unsold, materialKey) {
+            if (state.isProcessing) return; // Anti-Spam (Logisch)
+            setState({ isProcessing: true }); 
+
+            const matInfo = MATERIAL_OPTIONS[materialKey];
+            let sustChange = matInfo.imageEffect;
+            let stakeChange = matInfo.qualityEffect;
+
+            if (unsold > 100) sustChange -= 8;
+
+            const newScores = {
+                profit: Math.round(state.scores.profit + profit),
+                stakeholder: safeInt(state.scores.stakeholder + stakeChange, 0, 100, 50),
+                sustainability: safeInt(state.scores.sustainability + sustChange, 0, 100, 50)
+            };
+
+            // Neue Fragen wählen (Verhindert doppelte Fragen über Jahre hinweg)
+            const availableQs = FINANCE_QUESTIONS.filter(q => !state.usedQuestionIds.includes(q.id));
+            // Shuffle
+            for (let i = availableQs.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [availableQs[i], availableQs[j]] = [availableQs[j], availableQs[i]];
+            }
+            // Fallback falls Fragen ausgehen (sollte bei 15 Fragen / 3 Runden x 3 Fragen nicht passieren)
+            const selectedQs = availableQs.slice(0, 3);
+
+            setState({
+                scores: newScores,
+                phase: 'finance',
+                isProcessing: false,
+                financeState: { 
+                    timeLeft: 45, 
+                    currentQIndex: 0, 
+                    score: 0, 
+                    currentQuestions: selectedQs, 
+                    feedback: null, 
+                    phaseComplete: false 
+                }
+            });
+
+            // Start Finance Timer
+            if (financeTimerInterval) clearInterval(financeTimerInterval);
+            financeTimerInterval = setInterval(() => {
+                // Timer greift direkt auf den aktuellen State zu via Funktions-Scope? Nein, state ist global.
+                // Aber Vorsicht vor Stale-Closures wenn wir React nutzen würden. Hier ist state mutable global -> OK.
+                if (state.financeState.timeLeft > 0 && !state.financeState.phaseComplete) {
+                    setState({ financeState: { ...state.financeState, timeLeft: state.financeState.timeLeft - 1 } });
+                } else if (state.financeState.timeLeft <= 0 && !state.financeState.phaseComplete) {
+                    finishFinancePhase(true);
+                }
+            }, 1000);
+        }
+
+        // --- PHASE: FINANCE ---
+        function renderFinance() {
+            const fs = state.financeState;
+            const currentQ = fs.currentQuestions[fs.currentQIndex];
+            const div = el('div', { className: 'container' });
+
+            // Falls Fragen ausgegangen sind oder Phase beendet
+            if (fs.phaseComplete || !currentQ) {
+                const mistakes = fs.currentQuestions.length > 0 ? (fs.currentQuestions.length - fs.score) : 0;
+                const penalty = mistakes * 50;
+
+                div.appendChild(el('div', { className: 'card text-center' },
+                    el('h2', {}, 'Abrechnung fertig!'),
+                    el('div', { style: 'font-size:3rem;' }, fs.score === fs.currentQuestions.length ? '👨‍💼' : '💸'),
+                    el('p', {}, `Ergebnis: ${fs.score} / ${fs.currentQuestions.length} richtig`),
+                    el('div', { className: 'bg-red-light text-left', style: 'max-width:300px; margin: 1rem auto;' },
+                        el('strong', {}, '💼 Kosten Steuerberater:'), el('br'),
+                        `${mistakes} Fehler x 50€ = `, el('strong', { className: 'text-red' }, `-${penalty} €`)
+                    ),
+                    el('button', { className: 'btn', onClick: () => nextPhaseAfterFinance(penalty) }, 'Weiter ➡️')
+                ));
+                return div;
+            }
+
+            // Fragemodus
+            const options = ['Aktiv', 'Passiv', 'Aufwand', 'Ertrag'].map(cat => 
+                el('button', { 
+                    className: 'btn btn-outline', 
+                    style: 'padding:1.5rem; font-size:1.1rem; font-weight:bold;',
+                    disabled: state.isProcessing, // Buttons sperren nach Antwort
+                    onClick: () => answerFinance(cat) 
+                }, cat)
+            );
+
+            div.appendChild(el('div', { className: 'card', style: 'border-top: 4px solid #8b5cf6;' },
+                el('div', { className: 'flex-between', style: 'border-bottom:1px solid #eee; padding-bottom:1rem; margin-bottom:1rem;' },
+                    el('h2', {}, 'Kassenprüfung'),
+                    el('div', { className: 'bg-blue-light', style: 'font-family:monospace; font-weight:bold;' }, `⏱️ ${fs.timeLeft}s`)
+                ),
+                el('div', { className: 'text-center' },
+                    el('div', { style: 'font-size:1.5rem; font-weight:bold; margin-bottom:1.5rem; padding:1rem; background:#f9fafb; border-radius:0.5rem;' },
+                        `"${currentQ.item}"`
+                    ),
+                    fs.feedback ? el('div', {}, 
+                        el('div', { className: fs.feedback.type === 'success' ? 'bg-blue-light' : 'bg-red-light', style: 'margin-bottom:1rem;' },
+                            el('strong', {}, fs.feedback.msg), el('br'), el('small', {}, fs.feedback.explanation)
+                        ),
+                        el('button', { className: 'btn', onClick: () => nextFinanceQuestion() }, 'Nächster Beleg')
+                    ) : el('div', { className: 'grid-2' }, options)
+                ),
+                el('div', { className: 'text-center text-sm', style: 'margin-top:1rem; color:#6b7280;' }, `Frage ${fs.currentQIndex + 1} von ${fs.currentQuestions.length}`)
+            ));
+            return div;
+        }
+
+        function answerFinance(cat) {
+            if (state.isProcessing) return;
+            const fs = state.financeState;
+            const currentQ = fs.currentQuestions[fs.currentQIndex];
+            const isCorrect = cat === currentQ.correctCategory;
+            
+            setState({
+                isProcessing: true, // Lock UI
+                financeState: {
+                    ...fs,
+                    score: isCorrect ? fs.score + 1 : fs.score,
+                    feedback: {
+                        type: isCorrect ? 'success' : 'error',
+                        msg: isCorrect ? 'Korrekt!' : `Falsch! Richtig wäre: ${currentQ.correctCategory}.`,
+                        explanation: currentQ.explanation
+                    }
+                }
+            });
+        }
+
+        function nextFinanceQuestion() {
+            const fs = state.financeState;
+            if (fs.currentQIndex < fs.currentQuestions.length - 1) {
+                setState({
+                    isProcessing: false, // Unlock
+                    financeState: { ...fs, currentQIndex: fs.currentQIndex + 1, feedback: null }
+                });
+            } else {
+                finishFinancePhase(false);
+            }
+        }
+
+        function finishFinancePhase(forced) {
+            if (financeTimerInterval) clearInterval(financeTimerInterval);
+            setState({
+                isProcessing: false,
+                financeState: { ...state.financeState, phaseComplete: true, feedback: null }
+            });
+        }
+
+        function nextPhaseAfterFinance(penalty) {
+            const newProfit = Math.round(state.scores.profit - penalty);
+            const usedIds = [...state.usedQuestionIds, ...state.financeState.currentQuestions.map(q => q.id)];
+
+            setState({
+                scores: { ...state.scores, profit: newProfit },
+                usedQuestionIds: usedIds,
+                phase: 'dilemma',
+                dilemmaState: { feedback: '', theory: '', optionLabel: '' }
+            });
+        }
+
+        // --- PHASE: DILEMMA ---
+        function renderDilemma() {
+            const scenario = DILEMMAS[state.year];
+            const ds = state.dilemmaState;
+            const div = el('div', { className: 'container' });
+
+            if (ds.feedback) {
+                div.appendChild(el('div', { className: 'card text-center' },
+                    el('div', { style: 'font-size:3rem; margin-bottom:1rem;' }, '⚖️'),
+                    el('h2', {}, 'Entscheidung getroffen'),
+                    el('p', { style: 'font-size:1.1rem;' }, ds.feedback),
+                    el('div', { className: 'bg-blue-light text-left', style: 'margin: 1.5rem auto; max-width:500px;' },
+                        el('strong', {}, '🎓 BWL-Hintergrund:'), el('br'), ds.theory
+                    ),
+                    el('div', { className: 'text-sm text-red', style: 'margin-bottom:1rem;' }, 'Nach Klick: Jahresabschluss & Steuerberechnung (15% auf Gewinn > 2000€).'),
+                    el('button', { 
+                        className: 'btn', 
+                        disabled: state.isProcessing, // Sperren beim Übergang
+                        onClick: () => finishYear(ds.optionLabel) 
+                    }, `${state.year < 3 ? 'Nächstes Jahr starten' : 'Abschlussbericht'} ➡️`)
+                ));
+                return div;
+            }
+
+            const options = scenario.options.map((opt, idx) => 
+                el('button', { 
+                    className: 'card', 
+                    style: 'text-align:left; padding:1rem; cursor:pointer; margin:0; border:2px solid transparent;',
+                    disabled: state.isProcessing, // Sperren
+                    onClick: () => resolveDilemma(idx)
+                }, 
+                    el('div', { style: 'font-weight:bold;' }, opt.label),
+                    el('div', { className: 'text-sm', style: 'color:#6b7280; margin-top:4px;' }, 
+                        'Kasse: ', el('span', { className: opt.profitChange > 0 ? 'text-green' : 'text-red' }, `${opt.profitChange}€`), ' | ',
+                        'Image: ', el('span', { className: opt.stakeholderChange > 0 ? 'text-green' : 'text-red' }, opt.stakeholderChange)
+                    )
+                )
+            );
+
+            div.appendChild(el('div', { className: 'card' },
+                el('div', { className: 'flex-between', style: 'border-bottom:1px solid #eee; padding-bottom:1rem; margin-bottom:1rem;' },
+                    el('h2', {}, 'Phase 3: Strategie (M10)'),
+                    el('span', { className: 'badge', style: 'background:#fef3c7; color:#92400e;' }, 'Dilemma')
+                ),
+                el('div', { className: 'grid-2' },
+                    el('div', { style: 'padding:1rem; background:#f3f4f6; border-radius:0.5rem;' },
+                        el('h3', {}, scenario.title),
+                        el('p', {}, scenario.description)
+                    ),
+                    el('div', { style: 'display:flex; flex-direction:column; gap:0.5rem;' }, options)
+                )
+            ));
+            return div;
+        }
+
+        function resolveDilemma(idx) {
+            if (state.isProcessing) return;
+            setState({ isProcessing: true }); // Sofort sperren
+
+            const scenario = DILEMMAS[state.year];
+            const opt = scenario.options[idx];
+
+            const newScores = {
+                profit: Math.round(state.scores.profit + opt.profitChange),
+                stakeholder: safeInt(state.scores.stakeholder + opt.stakeholderChange, 0, 100, 0),
+                sustainability: safeInt(state.scores.sustainability + opt.sustainabilityChange, 0, 100, 0)
+            };
+
+            setState({
+                scores: newScores,
+                isProcessing: false, // Entsperren für Feedback-Screen
+                dilemmaState: { feedback: opt.feedback, theory: opt.theoryNote, optionLabel: opt.label }
+            });
+        }
+
+        function finishYear(decisionLabel) {
+            if (state.isProcessing) return; // Anti-Spam
+            setState({ isProcessing: true }); // Sperren für Übergang
+
+            // Steuerberechnung zum Zeitpunkt des Abschlusses
+            let currentProfit = state.scores.profit;
+            let tax = 0;
+            if (currentProfit > 2000) {
+                tax = Math.round((currentProfit - 2000) * 0.15);
+            }
+            
+            const finalProfit = currentProfit - tax;
+            const taxMsg = tax > 0 ? ` (inkl. ${tax}€ Steuer)` : '';
+            const historyEntry = `Jahr ${state.year}: ${decisionLabel}${taxMsg}`;
+
+            // Check Game Over
+            if (finalProfit < -500) {
+                setState({
+                    scores: { ...state.scores, profit: finalProfit },
+                    lastEvent: 'Zahlungsunfähig! Konto zu stark überzogen.',
+                    phase: 'gameover',
+                    isProcessing: false
+                });
+                return;
+            }
+
+            const nextYear = state.year + 1;
+            const nextPhase = nextYear > 3 ? 'summary' : 'production';
+
+            setState({
+                scores: { ...state.scores, profit: finalProfit },
+                history: [...state.history, historyEntry],
+                year: Math.min(nextYear, 3), 
+                phase: nextPhase,
+                productionValues: { quantity: 500, price: 2.50, marketing: 50, material: 'standard' },
+                isProcessing: false
+            });
+        }
+
+        // Überspringen (Notfall/Debug)
+        function skipPhase() {
+            if (state.isProcessing) return;
+            if (state.phase === 'production') setState({ phase: 'finance' });
+            else if (state.phase === 'finance') finishFinancePhase(true);
+            else if (state.phase === 'dilemma') {
+                const opt = DILEMMAS[state.year].options[0];
+                resolveDilemma(0);
+                setTimeout(() => finishYear(opt.label + " (Skipped)"), 100);
+            }
+        }
+
+        // --- PHASE: SUMMARY ---
+        function renderSummary() {
+            if (timerInterval) clearInterval(timerInterval);
+
+            const { profit, stakeholder, sustainability } = state.scores;
+            const avgImage = Math.round((stakeholder + sustainability) / 2);
+            
+            const goalProfit = state.targets.profit;
+            const goalImage = state.targets.image;
+            
+            const successProfit = profit >= goalProfit;
+            const successImage = avgImage >= goalImage;
+            const successTotal = successProfit && successImage;
+
+            const div = el('div', { className: 'container' });
+            div.appendChild(el('div', { className: 'card text-center' },
+                el('h1', {}, 'Abschlussbericht'),
+                el('p', {}, `Gespielte Zeit: ${formatTime(state.elapsedTime)}`),
+                
+                el('div', { style: `padding:1.5rem; border-radius:1rem; border:2px solid; margin:1.5rem 0; background:${successTotal ? '#dcfce7' : '#fee2e2'}; border-color:${successTotal ? '#22c55e' : '#ef4444'}; color:${successTotal ? '#166534' : '#991b1b'};` },
+                    el('h2', { style: 'margin:0;' }, successTotal ? "🎉 ZIEL ERREICHT!" : "❌ ZIEL VERFEHLT")
+                ),
+
+                el('div', { className: 'grid-2 text-left' },
+                    el('div', { className: 'card', style: 'box-shadow:none; border:1px solid #eee;' },
+                        el('h3', {}, 'Ziele vs. Ist'),
+                        el('div', { className: 'flex-between', style: 'border-bottom:1px solid #eee; padding:0.5rem 0;' },
+                            'Gewinn (Ziel: ' + goalProfit + '€):', el('strong', { className: successProfit ? 'text-green' : 'text-red' }, `${profit} € ${successProfit ? '✔' : '✘'}`)
+                        ),
+                        el('div', { className: 'flex-between', style: 'padding:0.5rem 0;' },
+                            'Image (Ziel: ' + goalImage + '):', el('strong', { className: successImage ? 'text-green' : 'text-red' }, `${avgImage} ${successImage ? '✔' : '✘'}`)
+                        )
+                    ),
+                    el('div', { className: 'card', style: 'box-shadow:none; border:1px solid #eee;' },
+                        el('h3', {}, 'Historie'),
+                        el('div', { style: 'font-size:0.8rem; font-family:monospace; max-height:100px; overflow-y:auto;' }, 
+                            state.history.map(h => el('div', {}, '• ' + h))
+                        )
+                    )
+                ),
+
+                el('div', { className: 'text-left', style: 'margin-top:2rem;' },
+                    el('h3', {}, '📝 Persönliche Reflexion'),
+                    el('label', { className: 'text-sm' }, '1. Welcher Zielkonflikt war am schwierigsten?'),
+                    el('textarea', { rows: 3, id: 'ref1', onInput: (e) => state.reflections.q1 = e.target.value }),
+                    el('label', { className: 'text-sm', style: 'margin-top:1rem; display:block;' }, '2. Würdet ihr in der Realität genauso entscheiden?'),
+                    el('textarea', { rows: 3, id: 'ref2', onInput: (e) => state.reflections.q2 = e.target.value })
+                ),
+
+                el('div', { style: 'margin-top:2rem; display:flex; gap:1rem; justify-content:center;' },
+                    el('button', { className: 'btn btn-outline', onClick: () => downloadTxt() }, '💾 Bericht speichern (.txt)'),
+                    el('button', { className: 'btn', onClick: () => resetGame() }, 'Neustart')
+                )
+            ));
+            return div;
+        }
+
+        function downloadTxt() {
+            // Text sicher zusammenbauen (kein HTML)
+            const text = [
+                'SCHUL-SNACK MANAGER - BERICHT',
+                '-----------------------------',
+                `Datum: ${new Date().toLocaleDateString()}`,
+                `Zeit: ${formatTime(state.elapsedTime)}`,
+                '',
+                'ERGEBNIS',
+                '--------',
+                `Gewinn: ${state.scores.profit} €`,
+                `Image:  ${Math.round((state.scores.stakeholder + state.scores.sustainability)/2)}`,
+                '',
+                'VERLAUF',
+                '-------',
+                ...state.history,
+                '',
+                'REFLEXION',
+                '---------',
+                '1. Konflikt:', state.reflections.q1.substring(0, 1000), // Limitierung
+                '2. Realität:', state.reflections.q2.substring(0, 1000)
+            ].join('\n');
+
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'SchulSnack_Bericht.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // --- PHASE: GAME OVER ---
+        function renderGameOver() {
+            return el('div', { className: 'container' },
+                el('div', { className: 'card text-center', style: 'border-top:4px solid #dc2626;' },
+                    el('h1', { className: 'text-red' }, 'GAME OVER'),
+                    el('p', { style: 'font-size:1.2rem;' }, state.lastEvent),
+                    el('button', { className: 'btn', style: 'background:#dc2626;', onClick: () => resetGame() }, 'Neustart')
+                )
+            );
+        }
+
+        // Start
+        render();
+
+    </script>
+</body>
+</html>
