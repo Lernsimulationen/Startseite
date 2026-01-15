@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Strikte CSP: Keine externen Verbindungen, nur Inline-Styles/Scripts dieser Datei erlaubt -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; object-src 'none';">
+    <title>MinuteTrader – Der Tag zählt (Secured Edition)</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-panel: #1e293b;
+            --primary: #3b82f6;
+            --secondary: #64748b;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            overflow: hidden;
+            line-height: 1.5;
+            height: 100vh;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            grid-template-rows: auto 1fr 200px;
+            height: 100vh;
+            max-width: 1600px;
+            margin: 0 auto;
+            background: var(--border);
+            gap: 1px;
+        }
+
+        header {
+            grid-column: 1 / -1;
+            background: var(--bg-panel);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        main {
+            background: var(--bg-dark);
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            overflow: hidden;
+        }
+
+        sidebar {
+            background: var(--bg-panel);
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            overflow-y: auto;
+        }
+
+        footer {
+            grid-column: 1 / -1;
+            background: var(--bg-panel);
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        /* UI Elements */
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem;
+        }
+
+        h1 { font-size: 1.25rem; color: var(--primary); }
+        .label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: bold; }
+        .value { font-size: 1.1rem; font-weight: bold; }
+
+        button {
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            padding: 0.6rem 1rem;
+            font-weight: bold;
+            transition: opacity 0.2s;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary { background: var(--primary); }
+        .btn-buy { background: var(--accent-green); }
+        .btn-sell { background: var(--accent-red); }
+        .btn-neutral { background: var(--secondary); }
+        button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        input, select {
+            background: #0f172a;
+            border: 1px solid var(--border);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        #chart-container {
+            flex-grow: 1;
+            position: relative;
+            background: #0b1120;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-top: 0.5rem;
+        }
+
+        canvas { width: 100%; height: 100%; }
+
+        .stress-bar-container {
+            width: 100px;
+            height: 8px;
+            background: #334155;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        #stress-fill { height: 100%; width: 0%; transition: width 0.4s, background 0.4s; }
+
+        .news-feed { height: 80px; overflow-y: hidden; margin-bottom: 0.5rem; }
+        .news-item { 
+            padding: 0.5rem; 
+            border-left: 3px solid var(--primary);
+            background: rgba(59, 130, 246, 0.1);
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+        }
+
+        .journal-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+        .journal-table th { text-align: left; color: var(--text-muted); padding: 0.4rem; border-bottom: 1px solid var(--border); }
+        .journal-table td { padding: 0.4rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+        .profit { color: var(--accent-green); }
+        .loss { color: var(--accent-red); }
+
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: var(--bg-panel);
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid var(--primary);
+        }
+
+        .risk-btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 4px; }
+        .risk-btn { font-size: 0.7rem; padding: 4px; background: var(--secondary); }
+        .risk-btn.active { background: var(--primary); }
+
+        @media (max-width: 900px) {
+            .app-container { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr auto; height: auto; overflow: visible; }
+            body { overflow-y: auto; height: auto; }
+            .app-container { height: auto; }
+            #chart-container { height: 300px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <div>
+                <h1>MinuteTrader</h1>
+                <span id="ui-mode-tag" style="font-size: 0.6rem; opacity: 0.7;"></span>
+            </div>
+            <div style="display: flex; gap: 1.5rem; align-items: center;">
+                <div><span class="label">Kapital</span><br><span class="value" id="ui-balance">10.000,00 €</span></div>
+                <div><span class="label">Stress</span><div class="stress-bar-container"><div id="stress-fill"></div></div></div>
+                <div><span class="label">Tick</span><br><span class="value"><span id="ui-tick">1</span>/12</span></div>
+            </div>
+        </header>
+
+        <main>
+            <div id="news-container" class="news-feed"></div>
+            <div id="chart-container">
+                <canvas id="main-chart"></canvas>
+            </div>
+        </main>
+
+        <sidebar>
+            <div class="card">
+                <span class="label">Asset</span>
+                <select id="asset-selector" style="margin-top:4px;">
+                    <option value="ETF">Welt-ETF (Konservativ)</option>
+                    <option value="STOCK">Tech-Aktie (Spekulativ)</option>
+                    <option value="CRYPTO">Crypto (Sehr riskant)</option>
+                </select>
+            </div>
+
+            <div class="card">
+                <span class="label">Risiko pro Trade</span>
+                <div class="risk-btns" id="risk-selector">
+                    <button class="risk-btn active" data-risk="0.01">1%</button>
+                    <button class="risk-btn" data-risk="0.02">2%</button>
+                    <button class="risk-btn" data-risk="0.05">5%</button>
+                    <button class="risk-btn" data-risk="0.10">10%</button>
+                </div>
+                <div style="margin-top: 8px; font-size: 0.75rem; opacity: 0.8;">
+                    Eingesetzter Betrag: <span id="ui-risk-amount">100 €</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <label class="label">Stop-Loss (Preis)</label>
+                <input type="text" id="input-sl" placeholder="Zahl (z.B. 95,50)">
+                <label class="label" style="margin-top:8px; display:block;">Take-Profit (Optional)</label>
+                <input type="text" id="input-tp" placeholder="Zahl (z.B. 110)">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <button id="btn-buy" class="btn-buy">KAUFEN</button>
+                <button id="btn-sell" class="btn-sell">SHORT</button> 
+            </div>
+            <button id="btn-skip" class="btn-neutral">NÄCHSTER TICK (PASSIV)</button>
+
+            <div id="active-pos-card" class="card" style="display:none; border-color: var(--primary);">
+                <span class="label">Offene Position</span>
+                <div id="ui-pos-details" style="font-size: 0.8rem; margin: 4px 0;"></div>
+                <button id="btn-close" class="btn-sell" style="width: 100%; padding: 4px;">GLATTSTELLEN</button>
+            </div>
+        </sidebar>
+
+        <footer>
+            <table class="journal-table">
+                <thead>
+                    <tr>
+                        <th>Tick</th>
+                        <th>Asset</th>
+                        <th>Typ</th>
+                        <th>Size</th>
+                        <th>Entry</th>
+                        <th>Exit</th>
+                        <th>P/L Netto</th>
+                        <th>Grund</th>
+                    </tr>
+                </thead>
+                <tbody id="journal-body"></tbody>
+            </table>
+        </footer>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-start" class="modal" style="display: flex;">
+        <div class="modal-content">
+            <h2>MinuteTrader</h2>
+            <p style="margin: 1rem 0; font-size: 0.9rem;">Lerne Risikomanagement. Deine Aufgabe: Schließe den Tag (12 Ticks) diszipliniert ab.</p>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <button id="start-standard" class="btn-primary">Standard Modus (Long only)</button>
+                <button id="start-pro" class="btn-neutral">Pro Modus (Short erlaubt)</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-end" class="modal">
+        <div class="modal-content">
+            <h2 id="end-title">Abschlussbericht</h2>
+            <div id="end-stats" style="margin: 1rem 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;"></div>
+            <div id="end-score" class="card" style="margin-bottom: 1rem;"></div>
+            <button onclick="location.reload()" class="btn-primary" style="width:100%;">Neustart</button>
+        </div>
+    </div>
+
+    <script>
+        "use strict";
+
+        const CONFIG = {
+            START_BALANCE: 10000,
+            MAX_TICKS: 12,
+            MIN_PRICE: 0.01,
+            MAX_NOTIFICATIONS: 15,
+            MAX_RISK_HARD_LIMIT: 0.10, // Max 10%
+            DAILY_STOP_LOSS: 0.10,    // 10% vom Startkapital
+            ASSETS: {
+                ETF: { name: "Welt-ETF", vola: 0.005, spread: 0.0005, fee: 2.0 },
+                STOCK: { name: "Tech-Aktie", vola: 0.015, spread: 0.001, fee: 5.0 },
+                CRYPTO: { name: "Crypto Index", vola: 0.045, spread: 0.006, fee: 1.0 }
+            }
+        };
+
+        const NEWS_CARDS = [
+            { text: "Zentralbank erhöht Leitzins moderat.", impact: { ETF: -1, STOCK: -2, CRYPTO: -3 }, sentiment: "bearish" },
+            { text: "Wirtschaftswachstum übertrifft Erwartungen.", impact: { ETF: 2, STOCK: 3, CRYPTO: 1 }, sentiment: "bullish" },
+            { text: "Sicherheitslücke bei Cloud-Anbietern entdeckt.", impact: { ETF: -1, STOCK: -5, CRYPTO: -2 }, sentiment: "bearish" },
+            { text: "Institutionelle Anleger steigen in Krypto ein.", impact: { ETF: 0, STOCK: 1, CRYPTO: 6 }, sentiment: "bullish" },
+            { text: "Handelsstreitigkeiten belasten Exportwerte.", impact: { ETF: -2, STOCK: -1, CRYPTO: 0 }, sentiment: "bearish" }
+        ];
+
+        // Security Utility: Sanitizing Numbers
+        function parseInput(val) {
+            if (!val) return NaN;
+            let sanitized = val.toString().replace(',', '.').replace(/[^-0.9.]/g, '');
+            let num = parseFloat(sanitized);
+            return isFinite(num) ? num : NaN;
+        }
+
+        class Game {
+            constructor() {
+                this.state = {
+                    balance: CONFIG.START_BALANCE,
+                    tick: 1,
+                    mode: 'standard',
+                    assetKey: 'ETF',
+                    prices: { ETF: [100], STOCK: [250], CRYPTO: [45000] },
+                    position: null,
+                    journal: [],
+                    stress: 0,
+                    riskPercent: 0.01,
+                    isOver: false
+                };
+                this.chart = new ChartRenderer('main-chart');
+                this.bindEvents();
+            }
+
+            bindEvents() {
+                document.getElementById('start-standard').onclick = () => this.start('standard');
+                document.getElementById('start-pro').onclick = () => this.start('pro');
+                document.getElementById('asset-selector').onchange = (e) => {
+                    this.state.assetKey = e.target.value;
+                    this.updateUI();
+                };
+                document.querySelectorAll('.risk-btn').forEach(btn => {
+                    btn.onclick = (e) => {
+                        const r = parseFloat(e.target.dataset.risk);
+                        this.state.riskPercent = Math.min(r, CONFIG.MAX_RISK_HARD_LIMIT);
+                        document.querySelectorAll('.risk-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.updateUI();
+                    };
+                });
+                document.getElementById('btn-buy').onclick = () => this.executeTrade(1);
+                document.getElementById('btn-sell').onclick = () => this.executeTrade(-1);
+                document.getElementById('btn-skip').onclick = () => this.nextTick("Warten");
+                document.getElementById('btn-close').onclick = () => this.closePosition("Manuell");
+            }
+
+            start(mode) {
+                this.state.mode = mode;
+                document.getElementById('modal-start').style.display = 'none';
+                document.getElementById('ui-mode-tag').textContent = mode.toUpperCase() + " MODUS";
+                document.getElementById('btn-sell').disabled = (mode !== 'pro');
+                this.showNews(NEWS_CARDS[0]);
+                this.updateUI();
+            }
+
+            updateUI() {
+                const s = this.state;
+                const price = s.prices[s.assetKey].slice(-1)[0];
+                
+                document.getElementById('ui-balance').textContent = this.formatEuro(s.balance);
+                document.getElementById('ui-tick').textContent = s.tick;
+                document.getElementById('ui-risk-amount').textContent = this.formatEuro(s.balance * s.riskPercent);
+                
+                // Stress Bar
+                const sf = document.getElementById('stress-fill');
+                sf.style.width = Math.min(s.stress, 100) + "%";
+                sf.style.backgroundColor = s.stress > 70 ? "var(--accent-red)" : (s.stress > 40 ? "orange" : "var(--accent-green)");
+
+                // Position
+                const pCard = document.getElementById('active-pos-card');
+                const pDetails = document.getElementById('ui-pos-details');
+                if (s.position) {
+                    pCard.style.display = 'block';
+                    const pl = (price - s.position.entry) * s.position.size * s.position.side;
+                    pDetails.textContent = `${s.position.side > 0 ? 'LONG':'SHORT'} | ${s.position.size.toFixed(4)} Einheiten | GuV: ${pl.toFixed(2)} €`;
+                    pDetails.className = pl >= 0 ? "profit" : "loss";
+                } else {
+                    pCard.style.display = 'none';
+                }
+
+                this.chart.draw(s.prices[s.assetKey], s.position);
+            }
+
+            executeTrade(side) {
+                const s = this.state;
+                if (s.position || s.isOver) return;
+
+                const entryPrice = s.prices[s.assetKey].slice(-1)[0];
+                const sl = parseInput(document.getElementById('input-sl').value);
+                const tp = parseInput(document.getElementById('input-tp').value);
+
+                // Validation
+                if (isNaN(sl)) return this.notify("Fehler: Gültigen Stop-Loss angeben.");
+                
+                const dist = Math.abs(entryPrice - sl);
+                // Mindestdistanz 0.1% des Preises um Division durch Null / Extreme Größen zu verhindern
+                if (dist < (entryPrice * 0.001)) {
+                    return this.notify("SL zu nah am Kurs (Sicherheitsabstand nötig).");
+                }
+
+                if (side === 1 && sl >= entryPrice) return this.notify("SL muss unter Einstieg liegen.");
+                if (side === -1 && sl <= entryPrice) return this.notify("SL muss über Einstieg liegen.");
+
+                const riskVal = s.balance * s.riskPercent;
+                const size = riskVal / dist;
+                
+                // Kosten-Abzug direkt bei Entry
+                const assetCfg = CONFIG.ASSETS[s.assetKey];
+                const totalFee = assetCfg.fee + (entryPrice * assetCfg.spread * size);
+                
+                s.balance -= totalFee;
+                s.position = { asset: s.assetKey, entry: entryPrice, sl, tp, size, side, fees: totalFee };
+                s.stress += (s.riskPercent * 150);
+                
+                this.notify(`Trade eröffnet: ${side > 0 ? 'Buy':'Sell'}. Fee: ${totalFee.toFixed(2)}€`);
+                this.nextTick("Trade-Start");
+            }
+
+            nextTick(reason) {
+                const s = this.state;
+                if (s.isOver) return;
+
+                s.tick++;
+                const news = NEWS_CARDS[Math.floor(Math.random() * NEWS_CARDS.length)];
+                this.showNews(news);
+
+                // Preis-Update
+                for (let k in CONFIG.ASSETS) {
+                    const cfg = CONFIG.ASSETS[k];
+                    const last = s.prices[k].slice(-1)[0];
+                    const impact = (news.impact[k] || 0) * 0.005;
+                    const rand = (Math.random() - 0.5) * 2 * cfg.vola;
+                    const change = last * (impact + rand);
+                    s.prices[k].push(Math.max(CONFIG.MIN_PRICE, last + change));
+                }
+
+                // Check SL/TP
+                if (s.position) {
+                    const curr = s.prices[s.position.asset].slice(-1)[0];
+                    if (s.position.side > 0) {
+                        if (curr <= s.position.sl) this.closePosition("Stop Loss");
+                        else if (s.position.tp && curr >= s.position.tp) this.closePosition("Take Profit");
+                    } else {
+                        if (curr >= s.position.sl) this.closePosition("Stop Loss");
+                        else if (s.position.tp && curr <= s.position.tp) this.closePosition("Take Profit");
+                    }
+                }
+
+                if (s.tick > CONFIG.MAX_TICKS) return this.endGame("Tag beendet");
+                
+                const drawdown = (CONFIG.START_BALANCE - s.balance) / CONFIG.START_BALANCE;
+                if (drawdown >= CONFIG.DAILY_STOP_LOSS) return this.endGame("Tagesverlust-Limit erreicht!");
+
+                if (reason === "Warten") s.stress = Math.max(0, s.stress - 20);
+                this.updateUI();
+            }
+
+            closePosition(reason) {
+                const s = this.state;
+                if (!s.position) return;
+
+                const exitPrice = s.prices[s.position.asset].slice(-1)[0];
+                const netPL = (exitPrice - s.position.entry) * s.position.size * s.position.side;
+
+                s.balance += netPL; // Nur das Netto-Resultat addieren (Gebühren wurden bei Entry abgezogen)
+                
+                const entry = {
+                    tick: s.tick,
+                    asset: s.position.asset,
+                    type: s.position.side > 0 ? 'Long' : 'Short',
+                    size: s.position.size.toFixed(2),
+                    entry: s.position.entry.toFixed(2),
+                    exit: exitPrice.toFixed(2),
+                    pl: netPL,
+                    reason: reason
+                };
+                s.journal.push(entry);
+                this.addJournalRow(entry);
+                
+                s.position = null;
+                this.notify(`Position glattgestellt: ${netPL.toFixed(2)} €`);
+                this.updateUI();
+            }
+
+            showNews(news) {
+                const container = document.getElementById('news-container');
+                const div = document.createElement('div');
+                div.className = 'news-item';
+                const label = document.createElement('span');
+                label.className = 'label';
+                label.textContent = `Tick ${this.state.tick}: `;
+                const text = document.createElement('span');
+                text.textContent = news.text;
+                div.appendChild(label);
+                div.appendChild(text);
+                
+                container.prepend(div);
+                while (container.children.length > CONFIG.MAX_NOTIFICATIONS) container.lastChild.remove();
+            }
+
+            notify(msg) {
+                const container = document.getElementById('news-container');
+                const div = document.createElement('div');
+                div.className = 'news-item';
+                div.style.borderLeftColor = "var(--accent-green)";
+                div.textContent = `SYSTEM: ${msg}`;
+                container.prepend(div);
+                setTimeout(() => { if(div.parentNode) div.style.opacity = 0.5; }, 2000);
+            }
+
+            addJournalRow(e) {
+                const tbody = document.getElementById('journal-body');
+                const tr = document.createElement('tr');
+                const cells = [e.tick, e.asset, e.type, e.size, e.entry, e.exit, `${e.pl.toFixed(2)} €`, e.reason];
+                cells.forEach((c, i) => {
+                    const td = document.createElement('td');
+                    td.textContent = c;
+                    if(i === 6) td.className = e.pl >= 0 ? "profit" : "loss";
+                    tr.appendChild(td);
+                });
+                tbody.prepend(tr);
+            }
+
+            endGame(msg) {
+                this.state.isOver = true;
+                if(this.state.position) this.closePosition("EOD");
+                
+                document.getElementById('modal-end').style.display = 'flex';
+                document.getElementById('end-title').textContent = msg;
+                
+                const stats = document.getElementById('end-stats');
+                stats.textContent = '';
+                const finalPL = this.state.balance - CONFIG.START_BALANCE;
+                
+                this.createStatCard(stats, "Kapital", this.formatEuro(this.state.balance));
+                this.createStatCard(stats, "Netto P/L", this.formatEuro(finalPL));
+
+                const scoreBox = document.getElementById('end-score');
+                scoreBox.textContent = '';
+                const h3 = document.createElement('h3');
+                h3.textContent = finalPL >= 0 ? "Ergebnis: Profitabel" : "Ergebnis: Verlusttag";
+                scoreBox.appendChild(h3);
+                const p = document.createElement('p');
+                p.style.fontSize = "0.8rem";
+                p.textContent = "Hinweis: Im Trading gewinnt nicht der mit dem meisten Glück, sondern der mit der besten Risikokontrolle.";
+                scoreBox.appendChild(p);
+            }
+
+            createStatCard(p, l, v) {
+                const div = document.createElement('div');
+                div.className = 'card';
+                const spanL = document.createElement('span');
+                spanL.className = 'label';
+                spanL.textContent = l;
+                const br = document.createElement('br');
+                const spanV = document.createElement('span');
+                spanV.className = 'value';
+                spanV.textContent = v;
+                div.appendChild(spanL); div.appendChild(br); div.appendChild(spanV);
+                p.appendChild(div);
+            }
+
+            formatEuro(val) {
+                return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(val);
+            }
+        }
+
+        class ChartRenderer {
+            constructor(id) {
+                this.canvas = document.getElementById(id);
+                this.ctx = this.canvas.getContext('2d');
+                window.onresize = () => this.resize();
+                this.resize();
+            }
+            resize() {
+                const container = this.canvas.parentElement;
+                this.canvas.width = container.clientWidth || 300;
+                this.canvas.height = container.clientHeight || 200;
+            }
+            draw(prices, pos) {
+                const { ctx, canvas } = this;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                if (prices.length < 1) return;
+
+                const pad = 30;
+                const w = canvas.width - pad * 2;
+                const h = canvas.height - pad * 2;
+                const min = Math.min(...prices) * 0.98;
+                const max = Math.max(...prices) * 1.02;
+                const rng = max - min;
+
+                ctx.strokeStyle = '#334155';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                for(let i=0; i<=4; i++) {
+                    let y = pad + (h/4)*i;
+                    ctx.moveTo(pad, y); ctx.lineTo(pad+w, y);
+                }
+                ctx.stroke();
+
+                ctx.strokeStyle = '#3b82f6';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                prices.forEach((p, i) => {
+                    const x = pad + (w / (CONFIG.MAX_TICKS)) * i;
+                    const y = canvas.height - (pad + ((p - min) / rng) * h);
+                    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                });
+                ctx.stroke();
+
+                if (pos) {
+                    this.drawLevel(pos.entry, "Entry", "#3b82f6", min, max, h, pad, w);
+                    this.drawLevel(pos.sl, "SL", "#ef4444", min, max, h, pad, w);
+                    if(pos.tp) this.drawLevel(pos.tp, "TP", "#22c55e", min, max, h, pad, w);
+                }
+            }
+            drawLevel(v, l, c, min, max, h, pad, w) {
+                const y = this.canvas.height - (pad + ((v - min) / (max - min)) * h);
+                if (y < pad || y > h + pad) return;
+                this.ctx.setLineDash([4, 4]);
+                this.ctx.strokeStyle = c;
+                this.ctx.beginPath();
+                this.ctx.moveTo(pad, y); this.ctx.lineTo(pad+w, y);
+                this.ctx.stroke();
+                this.ctx.setLineDash([]);
+                this.ctx.fillStyle = c;
+                this.ctx.font = "9px sans-serif";
+                this.ctx.fillText(l, pad + 2, y - 2);
+            }
+        }
+
+        const game = new Game();
+    </script>
+</body>
+</html>
