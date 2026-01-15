@@ -461,7 +461,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74-2.74L3 12"/></svg>
             Neustart
         </button>
-        <span>Version: Secure-School-1.3 (Strict Matching)</span>
+        <span>Version: Secure-School-1.4 (iPad-Ready)</span>
     </div>
 
     <!-- Toast Container -->
@@ -480,9 +480,18 @@
 
     const MATCH_RULES = {
         MIN_COVER_TRUTH: 0.70,      // 70% der Lösung muss getroffen werden
-        MAX_SELECTION_FACTOR: 1.60, // Auswahl darf max. 1.6x so lang sein wie die Lösung
-        MIN_OVERLAP_CHARS: 10       // mindestens 10 Zeichen Überschneidung
+        MAX_SELECTION_FACTOR: 1.50, // Auswahl darf max. 1.5x so lang sein wie die Lösung
+        MIN_OVERLAP_CHARS: 10       // Mindestens 10 Zeichen Überschneidung
     };
+
+    // --- Helpers ---
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
 
     // --- Data ---
     const sourceData = [
@@ -622,6 +631,7 @@
     const app = {
         state: JSON.parse(JSON.stringify(initialState)),
         toastTimer: null,
+        selectionHandler: null, // Für Event Listener Cleanup/Debounce
 
         setState(updates) {
             Object.assign(this.state, updates);
@@ -653,66 +663,41 @@
 
             const selection = window.getSelection();
             if (!selection.rangeCount || selection.isCollapsed) {
-                this.setState({ selectionMenu: null });
+                // Nur schließen, wenn wir nicht gerade im Menü interagieren (wird über Event-Handler gesteuert)
                 return;
             }
-
-            // --- SELECTION CONSTRAINT CHECK ---
-            const selectedText = selection.toString() || '';
-            const trimmed = selectedText.trim();
-            
-            if (trimmed.length < SELECTION_RULES.MIN_CHARS) {
-                this.setState({ selectionMenu: null });
-                return;
-            }
-
-            if (trimmed.length > SELECTION_RULES.MAX_CHARS || countWords(trimmed) > SELECTION_RULES.MAX_WORDS) {
-                this.showToast("Markierung zu groß. Bitte eine präzisere Textstelle auswählen.", "error");
-                this.setState({ selectionMenu: null });
-                window.getSelection().removeAllRanges();
-                return;
-            }
-            // ----------------------------------
 
             const range = selection.getRangeAt(0);
             const textContainer = document.getElementById('transcript-text');
             const wrapperFrame = document.getElementById('transcript-wrapper');
 
+            // Sicherheitscheck: Ist die Auswahl innerhalb unseres Textes?
             if (!textContainer || !textContainer.contains(range.commonAncestorContainer) || !wrapperFrame) {
                 this.setState({ selectionMenu: null });
                 return;
             }
 
-            // Offset Calculation
-            let start = 0, end = 0;
-            let currentLen = 0;
+            // --- iOS-Stable Offset Calculation ---
+            // Statt TreeWalker nutzen wir Range-Methoden, die auf iOS zuverlässiger sind
+            const preSelectionRange = range.cloneRange();
+            preSelectionRange.selectNodeContents(textContainer);
+            preSelectionRange.setEnd(range.startContainer, range.startOffset);
             
-            // TreeWalker to count offsets ignoring spans
-            const treeWalker = document.createTreeWalker(textContainer, NodeFilter.SHOW_TEXT, null, false);
-            let node;
-            let startFound = false, endFound = false;
+            const start = preSelectionRange.toString().length;
+            const selectionText = range.toString();
+            const end = start + selectionText.length;
 
-            while (node = treeWalker.nextNode()) {
-                const nodeLen = node.textContent.length;
-                if (!startFound && node === range.startContainer) {
-                    start = currentLen + range.startOffset;
-                    startFound = true;
-                }
-                if (!endFound && node === range.endContainer) {
-                    end = currentLen + range.endOffset;
-                    endFound = true;
-                }
-                currentLen += nodeLen;
-            }
-
-            // --- ROBUSTNESS CHECK ---
-            if (!startFound || !endFound) {
+            // --- Didactic Constraints ---
+            const trimmedText = selectionText.trim();
+            
+            if (trimmedText.length < SELECTION_RULES.MIN_CHARS) {
                 this.setState({ selectionMenu: null });
                 return;
             }
-            // ------------------------
 
-            if (start >= end) {
+            if (trimmedText.length > SELECTION_RULES.MAX_CHARS || countWords(trimmedText) > SELECTION_RULES.MAX_WORDS) {
+                this.showToast("Zu viel markiert! Bitte wähle nur den kernigen Abschnitt (1-2 Sätze).", "error");
+                window.getSelection().removeAllRanges();
                 this.setState({ selectionMenu: null });
                 return;
             }
@@ -722,8 +707,11 @@
             const MENU_WIDTH = 280;
             const MENU_HEIGHT = 80;
 
-            const rawTop = rect.top - containerRect.top - 60;
-            const rawLeft = rect.left - containerRect.left + (rect.width / 2) - (MENU_WIDTH / 2);
+            // Position relativ zum Wrapper berechnen
+            const rawTop = rect.top - containerRect.top - 60; // Standard: über dem Text
+            // Zentrieren horizontal
+            const rawLeft = (rect.left - containerRect.left) + (rect.width / 2) - (MENU_WIDTH / 2);
+            
             const clamped = clampMenuPosition(rawTop, rawLeft, MENU_WIDTH, MENU_HEIGHT, containerRect);
 
             this.setState({ selectionMenu: { top: clamped.top, left: clamped.left, start, end } });
@@ -734,53 +722,52 @@
 
             const { start, end } = this.state.selectionMenu;
             const selectionLength = end - start;
-            const selectionMid = start + selectionLength / 2;
+            // Die mathematische Mitte der Nutzerauswahl
+            const selectionMid = start + (selectionLength / 2);
 
             // --- STRICT MATCHING LOGIC ---
             const candidates = truthRanges.filter(t => t.type === selectedType)
                 .filter(t => !this.state.userMarks.some(m => m.start === t.start));
 
-            let best = null;
+            let bestMatch = null;
             let bestScore = -1;
 
             for (const t of candidates) {
-                // 1) Mitte der Auswahl muss in der Truth-Range liegen
+                // REGEL 1: "Center-Check" - Mitte muss getroffen sein
                 if (!(selectionMid >= t.start && selectionMid <= t.end)) continue;
 
                 const ov = overlap(start, end, t.start, t.end);
+                const truthLen = t.end - t.start;
+
+                // REGEL 2: Mindestlänge Überlappung
                 if (ov < MATCH_RULES.MIN_OVERLAP_CHARS) continue;
 
-                const truthLen = t.end - t.start;
-                const coverTruth = ov / truthLen;
+                // REGEL 3: Hohe Abdeckung erforderlich
+                const coverage = ov / truthLen;
+                if (coverage < MATCH_RULES.MIN_COVER_TRUTH) continue;
 
-                // 2) Truth-Abdeckung muss hoch genug sein
-                if (coverTruth < MATCH_RULES.MIN_COVER_TRUTH) continue;
-
-                // 3) Auswahl darf nicht viel größer sein als die Wahrheit
+                // REGEL 4: Auswahl darf nicht viel größer sein als die Lösung
                 if (selectionLength > truthLen * MATCH_RULES.MAX_SELECTION_FACTOR) continue;
 
-                // Score: bevorzugt hohe Abdeckung + kleinere Auswahl
-                const score = (coverTruth * 100) - (selectionLength / truthLen) * 5;
-                if (score > bestScore) {
-                    bestScore = score;
-                    best = t;
+                if (coverage > bestScore) {
+                    bestScore = coverage;
+                    bestMatch = t;
                 }
             }
-            // -----------------------------
 
             const updates = { selectionMenu: null };
-            if (best) {
+            if (bestMatch) {
                 updates.userMarks = [...this.state.userMarks, { 
-                    start: best.start, end: best.end, type: best.type, color: best.color, hint: best.hint 
+                    start: bestMatch.start, end: bestMatch.end, type: bestMatch.type, color: bestMatch.color, hint: bestMatch.hint 
                 }];
-                this.showToast("Treffer – präzise Zuordnung!", "success");
+                this.showToast("Treffer! Präzise erkannt.", "success");
                 if (this.state.activeHint && this.state.activeHint.includes("Lernhilfe")) {
                     updates.activeHint = null;
                 }
             } else {
                 updates.wrongAttempts = this.state.wrongAttempts + 1;
                 if (updates.wrongAttempts < 40) {
-                    this.showToast("Keine passende Zuordnung. Markiere genauer (kurzer Ausschnitt, treffende Worte).", "error");
+                    this.showToast("Das war ungenau oder die falsche Kategorie. Versuche, den Kern der Aussage präziser zu treffen.", "error");
                 }
             }
             window.getSelection().removeAllRanges();
@@ -906,13 +893,19 @@ ${normalizeForExport(transfer)}
         renderPhase1(container) {
             const progress = Math.round((this.state.userMarks.length / truthRanges.length) * 100);
             
+            // Globaler Selection Listener (nur einmal registrieren)
+            if (!this.selectionHandler) {
+                this.selectionHandler = debounce(() => this.handleTextSelection(), 200);
+                document.addEventListener('selectionchange', this.selectionHandler);
+            }
+
             const html = `
                 <div class="p-8" style="position: relative;">
                     <div class="flex flex-col md-flex-row justify-between items-center mb-6 gap-4" style="align-items: flex-start;">
                         <div>
                             <h2 class="title" style="font-size: 1.5rem; margin-bottom: 0.5rem; display:flex; align-items:center; gap:0.5rem;">Phase 1: Die Quelle entschlüsseln</h2>
                             <p class="subtitle" style="display:flex; align-items:center; gap:0.5rem;">
-                                ${icons.mousePointer2} <strong>Arbeitsauftrag:</strong> Markiere verdächtige Textstellen mit der Maus.
+                                ${icons.mousePointer2} <strong>Arbeitsauftrag:</strong> Markiere verdächtige Textstellen mit dem Finger/Maus.
                             </p>
                         </div>
                         <div class="progress-card">
@@ -927,17 +920,17 @@ ${normalizeForExport(transfer)}
                         </div>
                     </div>
 
-                    <!-- DIDACTIC INSTRUCTION BOX -->
+                    <!-- DIDAKTISCHE ERKLÄRUNG (Transparenz) -->
                     <div class="mb-6" style="padding: 1rem; background-color: var(--stone-50); border: 1px solid var(--stone-200); border-radius: 0.5rem;">
-                        <div style="font-weight: 700; margin-bottom: 0.5rem;">So ordnest du zu (kurz):</div>
-                        <ul style="margin: 0; padding-left: 1.25rem; color: var(--stone-700); font-size: 0.875rem; line-height: 1.4;">
-                            <li><strong>Appell:</strong> Wir-/Volk-/Nation-Begriffe, positive Mobilisierung.</li>
-                            <li><strong>Versprechen:</strong> Schutz/Freiheit/Garantie (oft an Bedingungen geknüpft).</li>
-                            <li><strong>Forderung:</strong> Erwartete Unterstützung/Gegenleistung („soll“, „muss“, „wird“).</li>
-                            <li><strong>Drohung/Diffamierung:</strong> Abwertung/Feindbild/Angriff auf Kritiker.</li>
+                        <div style="font-weight: 700; margin-bottom: 0.5rem;">Kategorien & Regeln:</div>
+                        <ul style="margin: 0; padding-left: 1.25rem; color: var(--stone-700); font-size: 0.875rem; line-height: 1.5;">
+                            <li><strong>Appell:</strong> Positive Wörter ("Wir", "Volk"), die Gefühle ansprechen.</li>
+                            <li><strong>Versprechen:</strong> Der Staat sichert Schutz oder Freiheit zu (oft trügerisch).</li>
+                            <li><strong>Forderung:</strong> Was die Kirche tun <em>muss</em> ("Dienst", "Unterstützung").</li>
+                            <li><strong>Drohung:</strong> Angriffe auf Gegner ("Fanatiker", "bekämpfen").</li>
                         </ul>
-                        <div style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--stone-500); border-top: 1px dashed var(--stone-300); padding-top: 0.5rem;">
-                            <strong>Regel:</strong> Markiere möglichst kurz und präzise (1–2 Sätze). Zu große Markierungen werden abgelehnt.
+                        <div style="margin-top: 0.75rem; font-size: 0.75rem; color: var(--rose-700); border-top: 1px dashed var(--stone-300); padding-top: 0.5rem; font-weight: 700;">
+                            ⚠️ Regel: Markiere nur den Kern der Aussage (nicht den ganzen Absatz!). Zu große Markierungen werden abgelehnt.
                         </div>
                     </div>
 
@@ -959,7 +952,7 @@ ${normalizeForExport(transfer)}
 
                     <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; border-top: 1px solid var(--stone-200); padding-top: 1.5rem; flex-wrap: wrap;">
                         <div style="font-size: 0.875rem; color: var(--stone-500); font-style: italic;">
-                            ${progress < 100 ? "Du kommst nicht weiter?" : "Analyse abgeschlossen."}
+                            ${progress < 100 ? "Nicht raten – genau lesen!" : "Analyse abgeschlossen."}
                         </div>
                         <div style="display: flex; gap: 0.75rem;">
                             <button class="btn btn-light" onclick="app.generateHint()" ${progress === 100 || this.state.solutionRevealed ? 'disabled' : ''}>
@@ -974,14 +967,6 @@ ${normalizeForExport(transfer)}
             `;
             container.innerHTML = html;
             this.renderTranscriptText();
-            
-            // Event Listeners for Touch Support
-            const textEl = document.getElementById('transcript-text');
-            const handler = () => setTimeout(() => app.handleTextSelection(), 10);
-            
-            // Re-attach listeners because innerHTML wiped it
-            textEl.addEventListener('mouseup', handler);
-            textEl.addEventListener('touchend', handler);
         },
 
         renderTranscriptText() {
@@ -1026,19 +1011,25 @@ ${normalizeForExport(transfer)}
 
         renderFloatingMenu() {
             const { top, left } = this.state.selectionMenu;
+            // WICHTIG: onpointerdown mit preventDefault verhindert, dass der Browser
+            // den Klick als "neue Auswahl starten" interpretiert -> Auswahl bleibt erhalten!
             return `
-                <div id="floating-menu" style="top: ${top}px; left: ${left}px;" onmouseup="event.stopPropagation()" ontouchend="event.stopPropagation()">
+                <div id="floating-menu" 
+                     style="top: ${top}px; left: ${left}px;" 
+                     onpointerdown="event.preventDefault(); event.stopPropagation();"
+                >
                     <div style="position: absolute; top: -1.5rem; left: 0; right: 0; text-align: center; font-size: 0.75rem; font-weight: 700; color: var(--white); background-color: var(--stone-800); border-radius: 0.25rem; padding: 0.25rem; box-shadow: var(--shadow);">Kategorie wählen:</div>
-                    <button class="menu-btn" onclick="app.handleMarking('appeal')">
+                    
+                    <button class="menu-btn" onpointerup="app.handleMarking('appeal')">
                         <div class="color-dot" style="background-color: var(--blue-500);"></div><span class="menu-label text-blue-600">Appell</span>
                     </button>
-                    <button class="menu-btn" onclick="app.handleMarking('promise')">
+                    <button class="menu-btn" onpointerup="app.handleMarking('promise')">
                         <div class="color-dot" style="background-color: var(--emerald-500);"></div><span class="menu-label" style="color:var(--emerald-500)">Versprechen</span>
                     </button>
-                    <button class="menu-btn" onclick="app.handleMarking('demand')">
+                    <button class="menu-btn" onpointerup="app.handleMarking('demand')">
                         <div class="color-dot" style="background-color: var(--amber-500);"></div><span class="menu-label text-orange-500">Forderung</span>
                     </button>
-                    <button class="menu-btn" onclick="app.handleMarking('threat')">
+                    <button class="menu-btn" onpointerup="app.handleMarking('threat')">
                         <div class="color-dot" style="background-color: var(--rose-500);"></div><span class="menu-label text-red-600">Drohung</span>
                     </button>
                 </div>
