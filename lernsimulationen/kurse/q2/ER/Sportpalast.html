@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 1) Security: Strikte CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; font-src 'none'; object-src 'none'; media-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
+    <meta name="referrer" content="no-referrer">
+    <title>Q2 Quellenlabor: Sportpalast 1933 (Pro Edition)</title>
+    <style>
+        :root {
+            --bg-color: #f4f4f2;
+            --text-color: #2c3e50;
+            --accent-color: #8e44ad;
+            --highlight-color: #e74c3c;
+            --success-color: #27ae60;
+            --ui-panel: #ffffff;
+            --border-color: #bdc3c7;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Header --- */
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .status-bar { font-size: 0.9rem; display: flex; gap: 15px; align-items: center; }
+        .badge { background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; }
+        .reset-btn { font-size: 0.8rem; background: #c0392b; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; margin-left: 10px; }
+
+        /* --- Main Layout --- */
+        main {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            position: relative;
+        }
+
+        .view-container {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            padding: 2rem;
+            display: none;
+            max-width: 1100px;
+            margin: 0 auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .view-container.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Components --- */
+        h1, h2, h3 { color: #2c3e50; margin-top: 0; }
+        
+        .card {
+            background: var(--ui-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .btn {
+            background: #34495e; color: white; border: none; padding: 12px 20px;
+            border-radius: 4px; cursor: pointer; font-size: 1rem; transition: background 0.2s; margin-top: 10px;
+            min-height: 44px;
+        }
+        .btn:hover { background: #2c3e50; }
+        .btn-primary { background: #2980b9; }
+        .btn-primary:hover { background: #2471a3; }
+        .btn-success { background: var(--success-color); }
+        .btn-success:hover { background: #219150; }
+        .btn:disabled { background: #bdc3c7; cursor: not-allowed; opacity: 0.7; }
+
+        /* --- Analysis View --- */
+        .split-screen { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        @media (max-width: 768px) { .split-screen { grid-template-columns: 1fr; } }
+
+        .source-text { background: #fff; padding: 2rem; border-radius: 4px; border-left: 5px solid #bdc3c7; font-family: 'Georgia', serif; font-size: 1.1rem; }
+        
+        /* Marker Styles */
+        .text-id { 
+            font-family: var(--font-main); font-size: 0.7em; color: #95a5a6; vertical-align: super; margin-right: 2px; user-select: none;
+        }
+
+        .analyzable { cursor: pointer; border-bottom: 2px dashed #bdc3c7; padding-bottom: 2px; transition: background 0.2s; }
+        .analyzable:hover { background-color: rgba(255, 230, 0, 0.2); }
+        .analyzable.selected { background-color: rgba(255, 230, 0, 0.4); border-bottom: 2px solid #f39c12; }
+        .analyzable.solved { border-bottom: none; color: var(--accent-color); font-weight: bold; cursor: default; pointer-events: none; }
+        .analyzable.solved::after { content: ' ✓'; color: green; font-size: 0.8em; font-weight: bold; }
+        
+        .tool-panel { background: #ecf0f1; padding: 1rem; border-radius: 8px; position: sticky; top: 0; }
+        .category-btn { display: block; width: 100%; text-align: left; margin-bottom: 8px; padding: 12px; background: white; border: 1px solid #bdc3c7; border-radius: 4px; cursor: pointer; }
+        .category-btn:hover { border-color: #3498db; color: #3498db; }
+
+        /* --- Concept Check --- */
+        .concept-option { border: 2px solid #bdc3c7; padding: 15px; margin: 10px 0; border-radius: 6px; cursor: pointer; }
+        .concept-option:hover { background: #eaf2f8; }
+        .concept-option.correct { border-color: #27ae60; background: #e8f8f5; pointer-events: none; }
+        .concept-option.wrong { border-color: #c0392b; background: #fadbd8; opacity: 0.6; }
+
+        /* --- Logic & Theology --- */
+        .logic-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+        .logic-column { background: #f8f9fa; border: 2px solid #bdc3c7; border-radius: 8px; padding: 10px; min-height: 200px; }
+        .logic-column h4 { text-align: center; border-bottom: 1px solid #ddd; padding-bottom: 5px; font-size: 0.95rem; }
+        
+        .draggable-item { background: white; border: 1px solid #34495e; padding: 10px; margin-bottom: 8px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; user-select: none; }
+        .draggable-item.selected { border: 2px solid #e67e22; background: #fdf2e9; }
+        .draggable-item.correct { border-color: var(--success-color); background: #e8f8f5; cursor: default; pointer-events: none; }
+
+        .comparison-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .comparison-table td, .comparison-table th { padding: 10px; border: 1px solid #bdc3c7; vertical-align: top; width: 50%; }
+        .comparison-table th { background: #ecf0f1; }
+        
+        .distortion-option { padding: 12px; border: 1px solid #ccc; margin: 8px 0; border-radius: 4px; cursor: pointer; }
+        .distortion-option:hover { background: #f0f0f0; }
+        .distortion-option.correct-mark { background: #e8f8f5; border-color: #27ae60; pointer-events: none; }
+        .distortion-option.wrong { background: #fadbd8; border-color: #c0392b; }
+
+        /* --- Context & Decision --- */
+        .context-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .context-card { border: 1px solid #ccc; padding: 15px; border-radius: 6px; cursor: pointer; position: relative; transition: all 0.2s; }
+        .context-card.active { border: 2px solid #2980b9; background: #f4f6f7; }
+
+        .decision-option { border: 1px solid #bdc3c7; padding: 1rem; margin-bottom: 1rem; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
+        .decision-option.chosen { background: #d4e6f1; border-color: #2980b9; border-left: 5px solid #2980b9; font-weight: bold; }
+
+        /* --- Logs --- */
+        .log-list { font-family: monospace; font-size: 0.85rem; max-height: 300px; overflow-y: auto; background: #f8f9fa; padding: 10px; border: 1px solid #ddd; }
+        .log-item { margin-bottom: 5px; border-bottom: 1px solid #eee; }
+        .feedback-success { color: #27ae60; font-weight: bold; }
+        .feedback-error { color: #c0392b; font-weight: bold; }
+
+        @media print {
+            body { background: white; display: block; height: auto; }
+            header, .btn, .tool-panel, .status-bar, .reset-btn { display: none !important; }
+            .view-container { display: none; }
+            #view-finish { display: block !important; }
+            .card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="font-weight: bold; font-size: 1.2rem;">⛪ Q2 Quellenlabor: Sportpalast</div>
+    <div class="status-bar">
+        <span id="progress-display">Briefing</span>
+        <span class="badge">Fortschritt: <span id="progress-percent">0</span>%</span>
+        <button id="btn-reset" class="reset-btn">↺ Reset</button>
+    </div>
+</header>
+
+<main>
+    <!-- 1. BRIEFING -->
+    <div id="view-intro" class="view-container active">
+        <div class="card" style="border-left: 5px solid #2c3e50;">
+            <h2>🏛️ Szenario: Historische Ausstellung</h2>
+            <div style="background: #eaf2f8; padding: 15px; border-radius: 4px; margin: 15px 0; border: 1px solid #a9cce3;">
+                <h3>ℹ️ Arbeitsauftrag</h3>
+                <p>Analysieren Sie die Sportpalastrede von Reinhold Krause (13.11.1933). Ziel ist es, die <strong>antijüdische und antisemitische Logik</strong> in theologischer Sprache zu entlarven.</p>
+                <ul>
+                    <li><strong>Scanner:</strong> Identifizieren Sie ideologische Sprachmuster.</li>
+                    <li><strong>Begriffs-Check:</strong> Unterscheiden Sie präzise zwischen theologischer und rassistischer Ausgrenzung.</li>
+                    <li><strong>Theologie:</strong> Prüfen Sie die Umdeutung von Jesus, Paulus und AT.</li>
+                </ul>
+            </div>
+            <div style="background: #fadbd8; padding: 10px; border-radius: 4px; margin-top: 20px; border: 1px solid #e6b0aa;">
+                <strong>⚠️ Warnung:</strong> Enthält Originalzitate rassistischer NS-Propaganda.
+            </div>
+            <button id="btn-start" class="btn btn-primary">Analyse starten</button>
+        </div>
+    </div>
+
+    <!-- 2. RHETORIK SCANNER -->
+    <div id="view-analysis" class="view-container">
+        <h3>🔎 Modul 1: Rhetorik-Scanner</h3>
+        <p class="small">Markieren Sie die 5 gefärbten Textstellen und ordnen Sie die Kategorie zu. (IDs dienen der späteren Zitierpflicht).</p>
+        
+        <div class="split-screen">
+            <div class="source-text">
+                <p><strong>Auszug: Reinhold Krause (1933)</strong></p>
+                <p>Wir als Deutsche Christen fordern <span class="text-id">(ID 1)</span> <span class="analyzable" data-id="1">eine Vollendung der Reformation im Dritten Reich</span>.</p>
+                <p>Unser Ziel: <span class="text-id">(ID 2)</span> <span class="analyzable" data-id="2">Befreiung von allem Undeutschen im Gottesdienst</span>. Wir wollen eine Kirche, die dem deutschen Blut und Wesen entspricht.</p>
+                <p>Das bedeutet vor allem: <span class="text-id">(ID 3)</span> <span class="analyzable" data-id="3">Abkehr vom Alten Testament mit seiner jüdischen Lohnmoral</span> und seinen Viehhändler- und Zuhältergeschichten.</p>
+                <p>Wir brauchen keinen verweichlichten Gott, sondern einen <span class="text-id">(ID 4)</span> <span class="analyzable" data-id="4">heldischen Jesus</span>, der als Arier den Kampf gegen den jüdischen Geist führte.</p>
+                <p>Ein volksfremdes Christentum hat keinen Platz. <span class="text-id">(ID 5)</span> <span class="analyzable" data-id="5">Wer nicht für unser Volkstum ist, versündigt sich am Schöpfer</span>.</p>
+            </div>
+            <div class="analysis-tools">
+                <div class="card tool-panel">
+                    <div id="category-buttons" style="opacity: 0.5; pointer-events: none;">
+                        <button class="category-btn" data-type="entjudung"><strong>Entjudung (Rassistisch)</strong><br><small>Ablehnung des AT als "undeutsch" / rassistisch motiviert</small></button>
+                        <button class="category-btn" data-type="völkisch"><strong>Völkische Ideologie</strong><br><small>Blut & Rasse als göttliche Ordnung (Schöpfung)</small></button>
+                        <button class="category-btn" data-type="heldisch"><strong>Arisierung Jesu</strong><br><small>Jesus als Arier/Kämpfer, nicht Leidender</small></button>
+                        <button class="category-btn" data-type="politisierung"><strong>Politisierung</strong><br><small>Gleichsetzung Reich Gottes = NS-Staat</small></button>
+                    </div>
+                    <div id="analysis-feedback" style="margin-top: 15px; min-height: 40px;">Wählen Sie links einen Textteil.</div>
+                    <button id="btn-finish-analysis" class="btn btn-primary" style="display: none; width:100%;">Weiter zum Begriffs-Check →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2b. BEGRIFFS-CHECK (NEU) -->
+    <div id="view-concept" class="view-container">
+        <h3>🧠 Modul 2: Begriffs-Schärfung</h3>
+        <p>Bevor wir weitermachen: Krauses Forderung nach "Entjudung" nutzt christliche Traditionen, aber mit welchem Kern?</p>
+        
+        <div class="card">
+            <h4>Frage: Wie ist Krauses Haltung zum Judentum einzuordnen?</h4>
+            <div class="concept-option" data-ans="A"><strong>A) Klassischer Antijudaismus:</strong> Er kritisiert die jüdische Religion theologisch, akzeptiert aber getaufte Juden.</div>
+            <div class="concept-option" data-ans="B"><strong>B) Rassistischer Antisemitismus:</strong> Er nutzt theologische Begriffe ("Lohnmoral"), meint aber eine unveränderliche "Rasse" ("Blut").</div>
+            <div class="concept-option" data-ans="C"><strong>C) Marcionismus:</strong> Er will lediglich wie Marcion (2. Jh.) das AT streichen, ohne politische Absicht.</div>
+            
+            <div id="concept-feedback" style="margin-top:15px; font-weight:bold;"></div>
+            <button id="btn-finish-concept" class="btn btn-primary" style="display:none; margin-top:10px;">Weiter zur Logik →</button>
+        </div>
+    </div>
+
+    <!-- 3. LOGIK LABOR -->
+    <div id="view-logic" class="view-container">
+        <h3>🧩 Modul 3: Die Argumentationskette</h3>
+        <p>Rekonstruieren Sie die ideologische Logik. Klicken Sie auf eine Aussage (unten) und dann auf die Spalte (oben).</p>
+
+        <div class="logic-board">
+            <div class="logic-column" data-col="problem">
+                <h4>1. Behauptetes Problem</h4>
+                <div id="target-problem"></div>
+            </div>
+            <div class="logic-column" data-col="cause">
+                <h4>2. Identifizierte Ursache</h4>
+                <div id="target-cause"></div>
+            </div>
+            <div class="logic-column" data-col="solution">
+                <h4>3. Geforderte Lösung</h4>
+                <div id="target-solution"></div>
+            </div>
+        </div>
+
+        <div class="card" id="logic-pool">
+            <p><strong>Aussagen-Pool (Gemischt):</strong></p>
+            <div id="pool-container" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
+        </div>
+        <div id="logic-feedback" style="font-weight: bold; min-height: 20px; margin-top: 10px;"></div>
+        <button id="btn-finish-logic" class="btn btn-primary" style="display:none;">Weiter zum Theologie-Check →</button>
+    </div>
+
+    <!-- 4. THEOLOGIE CHECK -->
+    <div id="view-distortion" class="view-container">
+        <h3>✝️ Modul 4: Der Theologie-Check</h3>
+        <p>Prüfen Sie, wie biblische Figuren für die Ideologie missbraucht werden.</p>
+        
+        <!-- Jesus -->
+        <div class="card">
+            <h4>Begriff 1: "Jesus Christus"</h4>
+            <table class="comparison-table">
+                <tr><th>Biblischer Befund</th><th>Krauses Umdeutung</th></tr>
+                <tr>
+                    <td>Jude aus Galiläa; leidender Gottesknecht; Gewaltverzicht.</td>
+                    <td id="distort-1-target">
+                        <div class="distortion-option" data-qid="1" data-val="A">A: Arischer Held, der mit der Peitsche den jüdischen Geist bekämpft.</div>
+                        <div class="distortion-option" data-qid="1" data-val="B">B: Versöhner zwischen Judentum und Heidentum.</div>
+                        <div class="distortion-option" data-qid="1" data-val="C">C: Unpolitischer Wanderprediger der Nächstenliebe.</div>
+                    </td>
+                </tr>
+            </table>
+            <div id="distort-feedback-1" style="margin-top:5px; font-style:italic;"></div>
+        </div>
+
+        <!-- AT -->
+        <div class="card">
+            <h4>Begriff 2: "Das Alte Testament"</h4>
+            <table class="comparison-table">
+                <tr><th>Biblischer Befund</th><th>Krauses Umdeutung</th></tr>
+                <tr>
+                    <td>Urkunde des Glaubens; Jesus beruft sich darauf.</td>
+                    <td id="distort-2-target">
+                        <div class="distortion-option" data-qid="2" data-val="A">A: Historisches Dokument, kritisch zu lesen.</div>
+                        <div class="distortion-option" data-qid="2" data-val="B">B: "Viehhändlergeschichten" mit "jüdischer Lohnmoral" (rassistisch abgewertet).</div>
+                        <div class="distortion-option" data-qid="2" data-val="C">C: Grundlage für deutsche Gesetzgebung.</div>
+                    </td>
+                </tr>
+            </table>
+            <div id="distort-feedback-2" style="margin-top:5px; font-style:italic;"></div>
+        </div>
+
+        <!-- Paulus (NEU) -->
+        <div class="card">
+            <h4>Begriff 3: "Paulus"</h4>
+            <table class="comparison-table">
+                <tr><th>Biblischer Befund</th><th>Krauses Umdeutung</th></tr>
+                <tr>
+                    <td>Völkerapostel; verbindet Glaube und Gnade (Römerbrief).</td>
+                    <td id="distort-3-target">
+                        <div class="distortion-option" data-qid="3" data-val="A">A: Der eigentliche Gründer der Kirche.</div>
+                        <div class="distortion-option" data-qid="3" data-val="B">B: Verfälscher Jesu, der "jüdische Theologie" (Rabbinismus) einschleuste.</div>
+                        <div class="distortion-option" data-qid="3" data-val="C">C: Vorbild für den heldischen Kampf.</div>
+                    </td>
+                </tr>
+            </table>
+            <div id="distort-feedback-3" style="margin-top:5px; font-style:italic;"></div>
+        </div>
+        
+        <button id="btn-finish-distortion" class="btn btn-primary" style="display:none;">Weiter zur Resonanz-Analyse →</button>
+    </div>
+
+    <!-- 5. RESONANZ RAUM -->
+    <div id="view-context" class="view-container">
+        <h3>📣 Modul 5: Warum der Beifall?</h3>
+        <p>Die Rede erhielt tobenden Applaus. Welche <strong>zwei Motive</strong> machten die Rede für Kirchenmitglieder 1933 attraktiv (ohne sie zu entschuldigen)?</p>
+
+        <div class="context-grid">
+            <div class="context-card" data-type="unity">
+                <strong>Sehnsucht nach Einheit</strong>
+                <p>Der Wunsch, den innerkirchlichen Streit zu beenden und eine geeinte, starke "Reichskirche" zu schaffen.</p>
+            </div>
+            <div class="context-card" data-type="authority">
+                <strong>Autoritätsgläubigkeit</strong>
+                <p>Das Bedürfnis nach klarer Führung, Ordnung und Anpassung an den neuen, starken Staat.</p>
+            </div>
+            <div class="context-card" data-type="money">
+                <strong>Finanzielle Vorteile</strong>
+                <p>Die Hoffnung, dass die Nazis die Kirchensteuer erhöhen (historisch kaum relevant).</p>
+            </div>
+            <div class="context-card" data-type="theology">
+                <strong>Bibeltreue</strong>
+                <p>Die Überzeugung, dass Krause die Bibel endlich "richtig" auslegt (faktisch falsch, da er sie verfälschte).</p>
+            </div>
+        </div>
+        <div id="context-feedback" style="margin-top: 15px; min-height: 24px;"></div>
+        <button id="btn-finish-context" class="btn btn-primary" style="display:none;">Zum Finale: Entscheidung →</button>
+    </div>
+
+    <!-- 6. ENTSCHEIDUNG -->
+    <div id="view-decision" class="view-container">
+        <h3>⚖️ Finale: Kuratorische Entscheidung</h3>
+        
+        <div class="card">
+            <h4>Das Exponat: "Sportpalast-Rede 1933"</h4>
+            <p>Wie präsentieren wir das Dokument in der Ausstellung?</p>
+            <div class="decision-option" data-opt="A">
+                <strong>Option A: Unkommentiert zeigen</strong><br>
+                <span style="font-size:0.9em; color:#c0392b;">⚠️ Didaktisch riskant: Gefahr der Normalisierung oder Überwältigung durch NS-Sprache.</span>
+            </div>
+            <div class="decision-option" data-opt="B">
+                <strong>Option B: Kritisch gerahmt (Dekonstruktion)</strong><br>
+                Zitate zeigen, aber direkt mit der theologischen Widerlegung (Theologie-Modul) konfrontieren.
+            </div>
+            <div class="decision-option" data-opt="C">
+                <strong>Option C: Nur Paraphrase</strong><br>
+                Inhalt zusammenfassen, um die Sprache nicht zu reproduzieren (verliert aber die Möglichkeit zur Analyse).
+            </div>
+        </div>
+
+        <div class="card" id="justification-panel" style="display:none;">
+            <h4>Begründung (Pflichtfeld)</h4>
+            
+            <!-- NEU: Referenz-Box für IDs -->
+            <div style="background: #f4f6f7; border: 1px solid #bdc3c7; padding: 10px; margin-bottom: 15px; border-radius: 4px; font-size: 0.9rem;">
+                <strong>🔍 Text-Referenz für Ihre Begründung:</strong>
+                <ul style="margin: 5px 0; padding-left: 20px; color: #555;">
+                    <li><strong>(ID 1)</strong> „...Vollendung der Reformation im Dritten Reich.“</li>
+                    <li><strong>(ID 2)</strong> „...Befreiung von allem Undeutschen im Gottesdienst.“</li>
+                    <li><strong>(ID 3)</strong> „...Abkehr vom Alten Testament mit seiner jüdischen Lohnmoral...“</li>
+                    <li><strong>(ID 4)</strong> „...heldischen Jesus, der als Arier den Kampf gegen den jüdischen Geist führte.“</li>
+                    <li><strong>(ID 5)</strong> „Wer nicht für unser Volkstum ist, versündigt sich am Schöpfer.“</li>
+                </ul>
+            </div>
+
+            <p><strong>Anforderung:</strong> Belegen Sie Ihre Entscheidung mit mindestens einer Textstelle (z.B. "ID 1") und beziehen Sie sich auf ein Analyse-Modul (Logik, Theologie, Resonanz).</p>
+            <textarea id="reflection-text" maxlength="1000" style="width:100%; height:120px; padding:10px; border:1px solid #bdc3c7;" placeholder="Ich entscheide mich für Option ..., weil in (ID X) deutlich wird, dass..."></textarea>
+            <br>
+            <button id="btn-finish-sim" class="btn btn-primary">✅ Analyse abschließen</button>
+        </div>
+    </div>
+
+    <!-- 7. ABSCHLUSS -->
+    <div id="view-finish" class="view-container">
+        <h1>Abschlussbericht</h1>
+        <div class="card">
+            <h3>Protokoll</h3>
+            <div class="log-list" id="visible-logs"></div>
+        </div>
+        <div class="card" style="border-left: 5px solid #27ae60;">
+            <h4>📥 Dokumentation sichern</h4>
+            <button id="btn-download" class="btn btn-success" style="width:100%;">📄 Bericht herunterladen</button>
+        </div>
+    </div>
+</main>
+
+<script>
+    const CONSTANTS = {
+        analysis: {
+            '1': { type: 'politisierung', text: 'Politisierung: Gleichsetzung von NS-Staat (Drittes Reich) und Heilsgeschichte.' },
+            '2': { type: 'völkisch', text: 'Völkisch: Rasse ("Blut") ersetzt Taufe als Kriterium der Kirche.' },
+            '3': { type: 'entjudung', text: 'Entjudung: Rassistisch motivierte Ablehnung des AT, nicht nur theologisch (wie bei Marcion).' },
+            '4': { type: 'heldisch', text: 'Arisierung: Jesus wird vom Juden zum arischen Kämpfer umgedeutet.' },
+            '5': { type: 'völkisch', text: 'Völkisch: Politischer Ungehorsam wird zur religiösen Sünde erklärt.' }
+        },
+        logicItems: [
+            { id: 'l1', text: "Die Kirche ist dem Volk fremd geworden.", type: 'problem' },
+            { id: 'l2', text: "Jüdische Lohnmoral & das Alte Testament.", type: 'cause' },
+            { id: 'l3', text: "Entfernung des AT & arischer Jesus.", type: 'solution' },
+            { id: 'l4', text: "Zu wenig Bibellesen in den Familien.", type: 'distractor' },
+            { id: 'l5', text: "Rückbesinnung auf jüdische Wurzeln.", type: 'distractor' },
+            { id: 'l6', text: "Die Zersplitterung der Landeskirchen.", type: 'distractor' },
+            { id: 'l7', text: "Einfluss des Marxismus auf die Jugend.", type: 'distractor' },
+            { id: 'l8', text: "Mangelnde staatliche Finanzierung.", type: 'distractor' }
+        ],
+        views: ['view-intro', 'view-analysis', 'view-concept', 'view-logic', 'view-distortion', 'view-context', 'view-decision', 'view-finish']
+    };
+
+    (function() {
+        const $ = {
+            get: (id) => document.getElementById(id),
+            getAll: (sel) => document.querySelectorAll(sel),
+            text: (id, txt) => { const el = document.getElementById(id); if(el) el.textContent = txt; },
+            show: (id) => { const el = document.getElementById(id); if(el) el.style.display = 'block'; },
+            hide: (id) => { const el = document.getElementById(id); if(el) el.style.display = 'none'; },
+            on: (sel, event, cb) => {
+                document.querySelectorAll(sel).forEach(el => el.addEventListener(event, cb));
+            },
+            click: (id, cb) => {
+                const el = document.getElementById(id);
+                if(el) el.addEventListener('click', cb);
+            },
+            resetClass: (sel, cls) => document.querySelectorAll(sel).forEach(el => el.classList.remove(cls)),
+            create: (tag, cls, text) => {
+                const el = document.createElement(tag);
+                if(cls) el.className = cls;
+                if(text) el.textContent = text;
+                return el;
+            }
+        };
+
+        let state = {};
+
+        function init() {
+            resetState();
+            initListeners();
+            $.text('progress-display', 'Briefing');
+        }
+
+        function resetState() {
+            state = {
+                foundPatterns: [],
+                selectedTextId: null,
+                conceptSolved: false,
+                logicPlaced: { problem: null, cause: null, solution: null },
+                selectedLogicItem: null,
+                logicPoolItems: [], // New state for shuffled items
+                distortionStatus: { 1: false, 2: false, 3: false },
+                contextSelection: [],
+                decision: null,
+                logs: []
+            };
+            
+            // Create shuffled logic items
+            state.logicPoolItems = [...CONSTANTS.logicItems].sort(() => Math.random() - 0.5);
+
+            // UI Reset
+            $.resetClass('.analyzable', 'selected');
+            $.resetClass('.analyzable', 'solved');
+            $.resetClass('.distortion-option', 'selected');
+            $.resetClass('.distortion-option', 'wrong');
+            $.resetClass('.distortion-option', 'correct-mark');
+            $.resetClass('.context-card', 'active');
+            $.resetClass('.decision-option', 'chosen');
+            $.resetClass('.concept-option', 'correct');
+            $.resetClass('.concept-option', 'wrong');
+            
+            ['target-problem', 'target-cause', 'target-solution', 'visible-logs', 'pool-container'].forEach(id => {
+                const el = $.get(id);
+                if(el) el.textContent = '';
+            });
+
+            const txt = $.get('reflection-text');
+            if(txt) txt.value = '';
+
+            ['btn-finish-analysis', 'btn-finish-concept', 'btn-finish-logic', 'btn-finish-distortion', 'btn-finish-context', 'justification-panel'].forEach(id => $.hide(id));
+            
+            $.text('analysis-feedback', 'Wählen Sie links einen Textteil.');
+            $.text('concept-feedback', '');
+            $.text('logic-feedback', '');
+            $.text('distort-feedback-1', '');
+            $.text('distort-feedback-2', '');
+            $.text('distort-feedback-3', '');
+            $.text('context-feedback', '');
+            
+            const cats = $.get('category-buttons');
+            if(cats) { cats.style.opacity = '0.5'; cats.style.pointerEvents = 'none'; }
+
+            renderLogicPool();
+            navigate('view-intro');
+        }
+
+        function initListeners() {
+            $.click('btn-reset', () => { if(confirm('Neustart?')) resetState(); });
+            $.click('btn-start', () => navigate('view-analysis'));
+            $.click('btn-finish-analysis', () => navigate('view-concept'));
+            $.click('btn-finish-concept', () => navigate('view-logic'));
+            $.click('btn-finish-logic', () => navigate('view-distortion'));
+            $.click('btn-finish-distortion', () => navigate('view-context'));
+            $.click('btn-finish-context', () => navigate('view-decision'));
+            $.click('btn-finish-sim', finishSimulation);
+            $.click('btn-download', downloadReport);
+
+            // Modul 1
+            $.on('.analyzable', 'click', (e) => {
+                const id = e.target.getAttribute('data-id');
+                if(state.foundPatterns.includes(id)) return;
+                $.resetClass('.analyzable', 'selected');
+                e.target.classList.add('selected');
+                state.selectedTextId = id;
+                const cats = $.get('category-buttons');
+                cats.style.opacity = '1';
+                cats.style.pointerEvents = 'auto';
+                $.text('analysis-feedback', 'Kategorie wählen.');
+                setFeedbackColor('analysis-feedback', 'neutral');
+            });
+
+            $.on('.category-btn', 'click', (e) => {
+                const btn = e.target.closest('.category-btn');
+                checkAnalysis(btn.getAttribute('data-type'));
+            });
+
+            // Modul 2b (Concept)
+            $.on('.concept-option', 'click', (e) => {
+                checkConcept(e.target.closest('.concept-option'));
+            });
+
+            // Modul 3 (Logic)
+            const pool = $.get('logic-pool');
+            if(pool) {
+                pool.addEventListener('click', (e) => {
+                    if(e.target.classList.contains('draggable-item')) {
+                        const txt = e.target.textContent;
+                        const item = CONSTANTS.logicItems.find(i => i.text === txt);
+                        if(item) {
+                            state.selectedLogicItem = item;
+                            renderLogicPool();
+                        }
+                    }
+                });
+            }
+
+            $.on('.logic-column', 'click', (e) => {
+                const col = e.target.closest('.logic-column');
+                placeLogicItem(col.getAttribute('data-col'));
+            });
+
+            // Modul 4 (Theology)
+            $.on('.distortion-option', 'click', (e) => {
+                checkDistortion(e.target.closest('.distortion-option'));
+            });
+
+            // Modul 5 (Context)
+            $.on('.context-card', 'click', (e) => {
+                toggleContext(e.target.closest('.context-card'));
+            });
+
+            // Modul 6 (Decision)
+            $.on('.decision-option', 'click', (e) => {
+                selectDecision(e.target.closest('.decision-option'));
+            });
+        }
+
+        function navigate(viewId) {
+            CONSTANTS.views.forEach(v => {
+                const el = $.get(v);
+                if(el) {
+                    el.classList.remove('active');
+                    if(v === viewId) el.classList.add('active');
+                }
+            });
+            const idx = CONSTANTS.views.indexOf(viewId);
+            const pct = Math.round((idx / (CONSTANTS.views.length - 1)) * 100);
+            $.text('progress-percent', pct);
+            $.text('progress-display', viewId.replace('view-', '').toUpperCase());
+            window.scrollTo(0,0);
+        }
+
+        function log(mod, msg, type='info') {
+            const time = new Date().toLocaleTimeString();
+            state.logs.push({ time, mod, msg, type });
+        }
+
+        function setFeedbackColor(id, type) {
+            const el = $.get(id);
+            if(!el) return;
+            el.className = '';
+            if(type === 'success') el.classList.add('feedback-success');
+            if(type === 'error') el.classList.add('feedback-error');
+        }
+
+        // --- Logic Handlers ---
+
+        function checkAnalysis(type) {
+            const id = state.selectedTextId;
+            if(!id) return;
+            const correct = CONSTANTS.analysis[id];
+            
+            if(correct.type === type) {
+                const el = document.querySelector(`.analyzable[data-id="${id}"]`);
+                el.classList.remove('selected');
+                el.classList.add('solved');
+                
+                if(!state.foundPatterns.includes(id)) {
+                    state.foundPatterns.push(id);
+                    log('Rhetorik', `Korrekt: ${id} (${type})`, 'success');
+                }
+                $.text('analysis-feedback', `Richtig! ${correct.text}`);
+                setFeedbackColor('analysis-feedback', 'success');
+
+                if(state.foundPatterns.length >= 5) {
+                    $.show('btn-finish-analysis');
+                }
+                state.selectedTextId = null;
+                const cats = $.get('category-buttons');
+                cats.style.opacity = '0.5';
+                cats.style.pointerEvents = 'none';
+            } else {
+                $.text('analysis-feedback', 'Präziser lesen! Krause argumentiert hier spezifischer.');
+                setFeedbackColor('analysis-feedback', 'error');
+                log('Rhetorik', `Fehler bei ID ${id}`, 'error');
+            }
+        }
+
+        function checkConcept(el) {
+            const ans = el.getAttribute('data-ans');
+            if(ans === 'B') {
+                el.classList.add('correct');
+                $.text('concept-feedback', 'Exakt. Krause nutzt theologische Begriffe als Tarnung für Rassismus.');
+                setFeedbackColor('concept-feedback', 'success');
+                state.conceptSolved = true;
+                log('Begriffs-Check', 'Korrekt gelöst', 'success');
+                $.show('btn-finish-concept');
+            } else {
+                el.classList.add('wrong');
+                let msg = (ans === 'A') ? "Zu harmlos. Antijudaismus kennt die Taufe als Ausweg, Krause nicht." : "Falsch. Marcion war Theologe, Krause ist Rassist.";
+                $.text('concept-feedback', msg);
+                setFeedbackColor('concept-feedback', 'error');
+                log('Begriffs-Check', 'Fehler', 'error');
+            }
+        }
+
+        function renderLogicPool() {
+            const container = $.get('pool-container');
+            container.textContent = '';
+            state.logicPoolItems.forEach(item => {
+                const isPlaced = Object.values(state.logicPlaced).includes(item);
+                if(!isPlaced) {
+                    const div = $.create('div', 'draggable-item', item.text);
+                    if(state.selectedLogicItem === item) div.classList.add('selected');
+                    container.appendChild(div);
+                }
+            });
+        }
+
+        function placeLogicItem(colType) {
+            if(!state.selectedLogicItem) return;
+            const item = state.selectedLogicItem;
+            
+            if(item.type === colType) {
+                state.logicPlaced[colType] = item;
+                const target = $.get(`target-${colType}`);
+                target.textContent = '';
+                const placedDiv = $.create('div', 'draggable-item correct', item.text);
+                target.appendChild(placedDiv);
+                
+                $.text('logic-feedback', 'Korrekt zugeordnet.');
+                setFeedbackColor('logic-feedback', 'success');
+                log('Logik', `Platziert: ${colType}`, 'success');
+                
+                state.selectedLogicItem = null;
+                renderLogicPool();
+
+                if(state.logicPlaced.problem && state.logicPlaced.cause && state.logicPlaced.solution) {
+                    $.show('btn-finish-logic');
+                }
+            } else if (item.type === 'distractor') {
+                $.text('logic-feedback', 'Diese Aussage ist im Text nicht zentral oder faktisch falsch.');
+                setFeedbackColor('logic-feedback', 'error');
+            } else {
+                $.text('logic-feedback', 'Falsche Spalte in der Argumentationskette.');
+                setFeedbackColor('logic-feedback', 'error');
+            }
+        }
+
+        function checkDistortion(optEl) {
+            const qid = optEl.getAttribute('data-qid');
+            const val = optEl.getAttribute('data-val');
+            // Q1: Jesus(A), Q2: AT(B), Q3: Paulus(B)
+            const correct = { '1': 'A', '2': 'B', '3': 'B' };
+            
+            const parent = $.get(`distort-${qid}-target`);
+            parent.querySelectorAll('.distortion-option').forEach(el => el.classList.remove('selected', 'wrong'));
+            
+            if(val === correct[qid]) {
+                optEl.classList.add('correct-mark');
+                $.text(`distort-feedback-${qid}`, 'Korrekt analysiert.');
+                setFeedbackColor(`distort-feedback-${qid}`, 'success');
+                state.distortionStatus[qid] = true;
+                log('Theologie', `Frage ${qid} gelöst`, 'success');
+            } else {
+                optEl.classList.add('wrong');
+                $.text(`distort-feedback-${qid}`, 'Nein. Achten Sie auf die rassistische oder abwertende Nuance.');
+                setFeedbackColor(`distort-feedback-${qid}`, 'error');
+            }
+
+            if(state.distortionStatus[1] && state.distortionStatus[2] && state.distortionStatus[3]) {
+                $.show('btn-finish-distortion');
+            }
+        }
+
+        function toggleContext(cardEl) {
+            const type = cardEl.getAttribute('data-type');
+            
+            if(state.contextSelection.includes(type)) {
+                state.contextSelection = state.contextSelection.filter(t => t !== type);
+                cardEl.classList.remove('active');
+            } else {
+                if(state.contextSelection.length < 2) {
+                    state.contextSelection.push(type);
+                    cardEl.classList.add('active');
+                }
+            }
+            
+            // Correct: unity, authority
+            const correct = ['unity', 'authority'];
+            
+            if(state.contextSelection.length === 2) {
+                const isWin = correct.every(c => state.contextSelection.includes(c));
+                if(isWin) {
+                    $.text('context-feedback', 'Treffer! Einheit und Autoritätssehnsucht waren entscheidend.');
+                    setFeedbackColor('context-feedback', 'success');
+                    $.show('btn-finish-context');
+                    log('Resonanz', 'Korrekt gelöst', 'success');
+                } else {
+                    $.text('context-feedback', 'Prüfen Sie: Welche Motive waren 1933 massenwirksam? Geld eher weniger.');
+                    setFeedbackColor('context-feedback', 'error');
+                    $.hide('btn-finish-context');
+                }
+            } else {
+                $.text('context-feedback', '');
+            }
+        }
+
+        function selectDecision(optEl) {
+            $.resetClass('.decision-option', 'chosen');
+            optEl.classList.add('chosen');
+            $.show('justification-panel');
+            
+            const map = { 'A': 'Unkommentiert (Riskant)', 'B': 'Kommentiert (Empfohlen)', 'C': 'Paraphrase' };
+            state.decision = map[optEl.getAttribute('data-opt')];
+        }
+
+        function finishSimulation() {
+            const txtEl = $.get('reflection-text');
+            let raw = txtEl.value || "";
+            let clean = raw.replace(/\s+/g, ' ').trim(); 
+            
+            // Validierung: Länge + ID-Referenz + Keyword
+            const hasID = /\(ID\s?[1-5]\)/i.test(clean) || /ID\s?[1-5]/i.test(clean) || /Stelle/i.test(clean);
+            
+            if(clean.length < 30) {
+                alert("Bitte begründen Sie ausführlicher (mind. 30 Zeichen).");
+                return;
+            }
+            if(!hasID) {
+                alert("Bitte beziehen Sie sich konkret auf eine Textstelle (z.B. 'ID 3').");
+                return;
+            }
+
+            log('Finale', `Entscheidung: ${state.decision}`, 'success');
+            navigate('view-finish');
+            
+            const logContainer = $.get('visible-logs');
+            logContainer.textContent = '';
+            state.logs.forEach(l => {
+                const row = $.create('div', 'log-item');
+                const t = $.create('span', 'log-timestamp', l.time);
+                const m = $.create('span', 'log-module', `[${l.mod}]`);
+                const msg = $.create('span', null, l.msg);
+                if(l.type === 'error') msg.style.color = '#c0392b';
+                if(l.type === 'success') msg.style.color = '#27ae60';
+                
+                row.appendChild(t);
+                row.appendChild(m);
+                row.appendChild(msg);
+                logContainer.appendChild(row);
+            });
+        }
+
+        function downloadReport() {
+            const txtEl = $.get('reflection-text');
+            const reflection = txtEl ? txtEl.value.replace(/[<>]/g, '') : "";
+            
+            let content = `ANALYSEBERICHT: SPORTPALASTREDE 1933
+===================================================
+Datum: ${new Date().toLocaleString()}
+
+1. ENTSCHEIDUNG
+Gewählte Präsentationsform: ${state.decision || '-'}
+
+Begründung des Kurators:
+${reflection}
+
+2. PROTOKOLL DER ANALYSE
+`;
+            state.logs.forEach(l => {
+                const mark = l.type === 'error' ? '[!]' : '[OK]';
+                content += `${l.time} | ${mark} [${l.mod}] ${l.msg}\n`;
+            });
+            
+            content += "\n===================================================";
+            
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Analyse_${Date.now()}.txt`;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        init();
+    })();
+</script>
+
+</body>
+</html>
