@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarifkonflikt Simulator (Schul-Edition | Secure)</title>
+    <!-- CSP: Erlaubt nur lokale Skripte und Styles (unsafe-inline ist für Single-File nötig) -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
+    
+    <style>
+        /* --- CSS VARIABLEN & RESET --- */
+        :root {
+            --primary: #4f46e5;       /* Indigo */
+            --primary-dark: #312e81;
+            --success: #10b981;       /* Emerald */
+            --success-bg: #d1fae5;
+            --danger: #ef4444;        /* Red */
+            --danger-bg: #fee2e2;
+            --warning: #f59e0b;       /* Amber */
+            --warning-bg: #fffbeb;
+            --bg-body: #f8fafc;       /* Slate 50 */
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 8px;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        /* --- LAYOUT --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            flex: 1;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            min-height: 600px;
+        }
+
+        @media (min-width: 1024px) {
+            .grid-layout {
+                grid-template-columns: 1fr 300px;
+            }
+        }
+
+        /* --- KOMPONENTEN --- */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Progress Bars */
+        .progress-container {
+            width: 50%;
+            text-align: right;
+        }
+        .progress-track {
+            height: 6px;
+            background: #f1f5f9;
+            border-radius: 99px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            font-size: 1rem;
+            gap: 0.5rem;
+        }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(100%); }
+        .btn:active { transform: scale(0.98); }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-success { background: var(--success-bg); color: #047857; border-color: var(--success); }
+        .btn-success:hover { background: #a7f3d0; }
+        .btn-danger { background: var(--danger-bg); color: #b91c1c; border-color: var(--danger); }
+        .btn-danger:hover { background: #fecaca; }
+        .btn-outline { background: white; border: 1px solid var(--border); color: var(--text-muted); }
+        .btn-outline:hover { background: #f8fafc; }
+
+        /* Inputs */
+        input[type=range] { width: 100%; margin: 10px 0; }
+        
+        /* Modal (Glossar) */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            display: none; justify-content: center; align-items: center; z-index: 100;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: white; padding: 2rem; border-radius: var(--radius);
+            max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;
+        }
+
+        /* Utilities */
+        .text-bold { font-weight: 700; }
+        .text-mono { font-family: monospace; }
+        .text-sm { font-size: 0.875rem; }
+        .text-xs { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .text-primary { color: var(--primary); }
+        .text-danger { color: var(--danger); }
+        .hidden { display: none !important; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        
+        /* Animationen */
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Ticker */
+        .ticker-wrap {
+            background: #1e1b4b; color: white; overflow: hidden; white-space: nowrap;
+            padding: 0.5rem; border-bottom: 4px solid var(--primary);
+        }
+        .ticker-move { display: inline-block; animation: ticker 30s linear infinite; padding-left: 100%; }
+        @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
+
+        /* Warnhinweis Betriebsebene */
+        .alert-box {
+            background: var(--warning-bg); border: 1px solid var(--warning);
+            color: #b45309; padding: 1rem; border-radius: var(--radius); margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- UI: Ticker -->
+    <div class="ticker-wrap">
+        <div id="ticker-content" class="ticker-move">+++ Simulation wird geladen +++</div>
+    </div>
+
+    <div class="container">
+        <!-- UI: Header -->
+        <header class="card header">
+            <div>
+                <h1 style="margin:0; font-size:1.5rem; color:var(--primary);">Tarif-Simulator</h1>
+                <p id="scenario-display" class="text-sm text-muted" style="margin:0;">Szenario: Wird geladen...</p>
+            </div>
+            <div style="display:flex; gap:1rem; align-items:center;">
+                <div id="timer-display" class="text-mono text-bold" style="color:var(--primary);">00:00</div>
+                <button id="btn-glossary" class="btn btn-outline" style="width:auto; padding:0.5rem 1rem;">Lexikon</button>
+                <div style="text-align:right; border-left:1px solid var(--border); padding-left:1rem;">
+                    <span class="text-xs text-muted">PHASE</span>
+                    <div id="phase-display" class="text-bold text-primary">1 / 12</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- UI: Statistics -->
+        <div id="stats-container" class="stats-grid">
+            <!-- Wird per JS befüllt -->
+        </div>
+
+        <div class="grid-layout">
+            <!-- UI: Main Interaction Area -->
+            <main id="main-content" class="card" style="display:flex; flex-direction:column; justify-content:center;">
+                <!-- Inhalt wird per JS gerendert -->
+            </main>
+
+            <!-- UI: Sidebar Info -->
+            <aside class="card" style="background:var(--bg-body);">
+                <div style="margin-bottom:1.5rem;">
+                    <h4 class="text-xs text-muted" style="margin-bottom:0.5rem;">Rahmendaten</h4>
+                    <div style="background:white; padding:0.5rem; border:1px solid var(--border); border-radius:4px; font-size:0.85rem;">
+                        <div style="display:flex; justify-content:space-between;"><span>Inflation:</span> <strong>4.5%</strong></div>
+                        <div style="display:flex; justify-content:space-between;"><span>Produktivität:</span> <strong>0.5%</strong></div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:1.5rem;">
+                    <h4 class="text-xs text-muted" style="margin-bottom:0.5rem;">Insider-Infos</h4>
+                    <div id="insider-container" style="display:flex; flex-direction:column; gap:0.5rem;"></div>
+                </div>
+
+                <div>
+                    <h4 class="text-xs text-muted" style="margin-bottom:0.5rem;">Verlauf</h4>
+                    <div id="history-container" style="font-size:0.8rem; display:flex; flex-direction:column; gap:0.5rem;"></div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- UI: Modal (Glossar) -->
+    <div id="modal-glossary" class="modal-overlay">
+        <div class="modal">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:1rem;">
+                <h2 style="margin:0;">Fachbegriffe</h2>
+                <button id="btn-close-modal" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+            </div>
+            <div id="glossary-content"></div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * ZENTRALER STATE (DATENMODELL)
+         */
+        const INITIAL_DECISIONS = {
+            angebot1: null, KIangebot1: null,
+            angebot2: null, KIangebot2: null,
+            angebot3: null, KIangebot3: null,
+            massnahme: null,
+            betriebsrat: null,
+            final: null
+        };
+
+        const INITIAL_STATS = { 
+            wirtschaft: 70, 
+            basis: 50, 
+            oeffentlichkeit: 50, 
+            konflikt: 10 
+        };
+
+        const KONFIG = {
+            rollen: {
+                union: "Gewerkschaft",
+                employer: "Arbeitgeberverband"
+            },
+            insider: {
+                union: [
+                    { t: "Auftragsbücher", d: "Voll. Stillstand kostet Vertragsstrafen." },
+                    { t: "Konkurrenz", d: "Benchmark liegt bei 4,5% Lohnerhöhung." },
+                    { t: "Vorstand", d: "Limit ist max. 6% Kostensteigerung." }
+                ],
+                employer: [
+                    { t: "Streikkasse", d: "Gefüllt für 3 Wochen Vollstreik." },
+                    { t: "Basis", d: "Erwartet mind. 4%, sonst Aufstand." },
+                    { t: "Personal", d: "Fachkräftemangel droht bei schlechtem Abschluss." }
+                ]
+            },
+            glossar: {
+                "Friedenspflicht": "Streikverbot. Gilt absolut für den Betriebsrat (BetrVG). Für Gewerkschaften gilt sie nur, solange ein Tarifvertrag läuft.",
+                "Einigungsstelle": "Betriebliches Schlichtungsorgan (§ 76 BetrVG). Entscheidet verbindlich, wenn sich Arbeitgeber und Betriebsrat nicht einigen.",
+                "Warnstreik": "Kurze Arbeitsniederlegung der Gewerkschaft, um Druck auszuüben.",
+                "Urabstimmung": "Abstimmung der Gewerkschaftsmitglieder (meist 75% Hürde) für einen unbefristeten Streik.",
+                "Tarifautonomie": "Staat hält sich raus (Art. 9 GG). Koalitionen regeln Löhne selbst."
+            }
+        };
+
+        let spielstand = {
+            phase: 1,
+            runde: 1,
+            rolle: 'union',
+            timer: 0,
+            timerInterval: null,
+            sperre: false,
+            stats: { ...INITIAL_STATS },
+            entscheidungen: JSON.parse(JSON.stringify(INITIAL_DECISIONS)),
+            protokoll: [],
+            infosOffen: []
+        };
+
+        // --- HELPER FUNKTIONEN (Sicher DOM statt innerHTML) ---
+
+        // Element Builder: Erstellt ein DOM-Element
+        // content kann String oder Array von Nodes sein
+        function el(tag, classes, content) {
+            const e = document.createElement(tag);
+            if (classes) e.className = classes;
+            if (content) {
+                if (Array.isArray(content)) {
+                    content.forEach(child => e.appendChild(typeof child === 'string' ? document.createTextNode(child) : child));
+                } else if (typeof content === 'string' || typeof content === 'number') {
+                    e.textContent = content;
+                } else if (content instanceof Node) {
+                    e.appendChild(content);
+                }
+            }
+            return e;
+        }
+
+        // SVG Icon Helper
+        function icon(emoji) {
+            const span = document.createElement('span');
+            span.textContent = emoji;
+            span.style.marginRight = "0.5rem";
+            return span;
+        }
+
+        function formatZeit(sekunden) {
+            const m = Math.floor(sekunden / 60).toString().padStart(2, '0');
+            const s = (sekunden % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function log(aktion, details) {
+            const zeit = formatZeit(spielstand.timer);
+            const eintrag = `[${zeit}] Phase ${spielstand.phase}: ${aktion} (${details || ''})`;
+            spielstand.protokoll.push(eintrag);
+        }
+
+        // Stats aktualisieren mit Clamping (0-100)
+        function updateStats(delta) {
+            for (let key in delta) {
+                if (spielstand.stats.hasOwnProperty(key)) {
+                    spielstand.stats[key] = Math.max(0, Math.min(100, spielstand.stats[key] + delta[key]));
+                }
+            }
+            renderStats(); // Sofort-Update der Anzeige
+        }
+
+        // --- CORE LOGIC ---
+
+        function starteSpiel() {
+            // Vollständiger Reset
+            spielstand.phase = 1;
+            spielstand.timer = 0;
+            spielstand.sperre = false;
+            spielstand.protokoll = [];
+            spielstand.infosOffen = [];
+            spielstand.entscheidungen = JSON.parse(JSON.stringify(INITIAL_DECISIONS));
+            spielstand.stats = { ...INITIAL_STATS };
+            
+            spielstand.rolle = spielstand.runde === 1 ? 'union' : 'employer';
+
+            if (spielstand.timerInterval) clearInterval(spielstand.timerInterval);
+            spielstand.timerInterval = setInterval(() => {
+                spielstand.timer++;
+                document.getElementById('timer-display').textContent = formatZeit(spielstand.timer);
+            }, 1000);
+
+            aktualisiereUI();
+        }
+
+        function naechstePhase(p) {
+            if (spielstand.sperre) return;
+            spielstand.sperre = true;
+            
+            // Buttons visuell deaktivieren (Klick-Feedback)
+            document.querySelectorAll('button').forEach(b => b.disabled = true);
+
+            setTimeout(() => {
+                spielstand.phase = p;
+                spielstand.sperre = false;
+                aktualisiereUI();
+            }, 300);
+        }
+
+        // --- RENDER FUNKTIONEN ---
+
+        function aktualisiereUI() {
+            document.getElementById('scenario-display').textContent = `Szenario: ${KONFIG.rollen[spielstand.rolle]}`;
+            document.getElementById('phase-display').textContent = `${spielstand.phase} / 12`;
+            renderStats();
+            renderSidebar();
+            
+            const main = document.getElementById('main-content');
+            // Cleanup Main
+            while(main.firstChild) main.removeChild(main.firstChild);
+            main.className = "card fade-in"; 
+
+            switch(spielstand.phase) {
+                case 1: renderPhaseAnalyse(main); break;
+                case 2: renderPhaseAuftakt(main); break;
+                case 3: renderPhaseBetrieb(main); break;
+                case 4: renderPhaseVerhandlung1(main); break;
+                case 5: renderPhaseReaktion(main); break;
+                case 6: renderPhaseVerhandlung2(main); break;
+                case 7: renderPhaseScheitern(main); break;
+                case 8: renderPhaseArbeitskampf(main); break;
+                case 9: renderPhaseSchlichtung(main); break;
+                case 10: renderPhaseSpitze(main); break;
+                case 11: renderPhaseErgebnis(main); break;
+                case 12: renderPhaseAuswertung(main); break;
+                default: main.textContent = "Fehler: Unbekannte Phase";
+            }
+        }
+
+        function renderStats() {
+            const container = document.getElementById('stats-container');
+            // Effizientes Update oder Neuzeichnen. Hier einfach Neuzeichnen für Code-Klarheit.
+            container.innerHTML = '';
+            
+            const map = [
+                { l: "Wirtschaft", v: spielstand.stats.wirtschaft, c: "var(--success)" },
+                { l: "Basis-Rückhalt", v: spielstand.stats.basis, c: "var(--primary)" },
+                { l: "Öffentlichkeit", v: spielstand.stats.oeffentlichkeit, c: "var(--primary)" },
+                { l: "Konflikt-Index", v: spielstand.stats.konflikt, c: "var(--danger)" }
+            ];
+
+            map.forEach(s => {
+                const div = el('div', 'stat-item');
+                const label = el('span', 'text-xs text-muted', s.l);
+                const valWrap = el('div', 'progress-container');
+                const valTxt = el('div', 'text-bold text-mono', s.v);
+                valTxt.style.color = s.c;
+                const track = el('div', 'progress-track');
+                const fill = el('div', 'progress-fill');
+                fill.style.width = s.v + '%';
+                fill.style.backgroundColor = s.c;
+                track.appendChild(fill);
+                valWrap.append(valTxt, track);
+                div.append(label, valWrap);
+                container.appendChild(div);
+            });
+        }
+
+        function renderSidebar() {
+            // Insider Infos - OHNE innerHTML
+            const container = document.getElementById('insider-container');
+            container.innerHTML = '';
+            const infos = KONFIG.insider[spielstand.rolle];
+
+            infos.forEach((info, idx) => {
+                const btn = el('div', '', '');
+                btn.style.padding = '0.5rem';
+                btn.style.border = '1px solid var(--border)';
+                btn.style.borderRadius = '4px';
+                btn.style.fontSize = '0.8rem';
+                btn.style.cursor = 'pointer';
+
+                if (spielstand.infosOffen.includes(idx)) {
+                    btn.style.backgroundColor = '#e0e7ff'; // primary-light
+                    const strong = el('strong', '', info.t + ": ");
+                    btn.appendChild(strong);
+                    btn.appendChild(document.createTextNode(info.d));
+                } else {
+                    btn.style.backgroundColor = '#fff';
+                    btn.style.color = 'var(--text-muted)';
+                    btn.textContent = `🔒 Info ${idx+1} aufdecken`;
+                    btn.onclick = () => {
+                        // Spam Schutz: Nur hinzufügen wenn noch nicht da
+                        if (!spielstand.infosOffen.includes(idx)) {
+                            spielstand.infosOffen.push(idx);
+                            log("Info aufgedeckt", info.t);
+                            renderSidebar();
+                        }
+                    };
+                }
+                container.appendChild(btn);
+            });
+
+            // Verlauf
+            const hist = document.getElementById('history-container');
+            hist.innerHTML = '';
+            const ents = spielstand.entscheidungen;
+            if (ents.angebot1) hist.appendChild(el('div', '', `Auftakt: ${ents.angebot1.lohn}%`));
+            if (ents.betriebsrat) hist.appendChild(el('div', '', `Betrieb: ${ents.betriebsrat}`));
+            if (ents.massnahme) hist.appendChild(el('div', '', `Aktion: ${ents.massnahme}`));
+        }
+
+        // --- PHASEN-RENDERER ---
+
+        function renderPhaseAnalyse(parent) {
+            parent.append(
+                el('h2', 'text-bold', '1. Analyse der Ausgangslage'),
+                el('p', '', 'Bitte analysieren Sie die wirtschaftlichen Rahmendaten und nutzen Sie Ihre Insider-Informationen (rechte Leiste), bevor Sie in die Verhandlung gehen.')
+            );
+            const btn = el('button', 'btn btn-primary', 'Verhandlung vorbereiten');
+            btn.onclick = () => naechstePhase(2);
+            parent.appendChild(btn);
+        }
+
+        function renderPhaseAuftakt(parent) {
+            parent.append(
+                el('h2', 'text-bold', '2. Auftakt: Forderung definieren'),
+                el('p', 'text-muted', 'Setzen Sie einen Anker. Die erste Forderung bestimmt das Spielfeld.')
+            );
+            
+            const wrap = el('div');
+            wrap.style.margin = '2rem 0';
+            const label = el('label', 'text-bold', 'Lohnforderung: 5.0%');
+            const slider = el('input');
+            slider.type = 'range'; slider.min = 0; slider.max = 12; slider.step = 0.5; slider.value = 5;
+            slider.oninput = (e) => label.textContent = `Lohnforderung: ${e.target.value}%`;
+
+            const btn = el('button', 'btn btn-primary', 'Forderung übergeben');
+            btn.onclick = () => {
+                if(spielstand.sperre) return;
+                spielstand.sperre = true; // Sofort sperren
+                const val = parseFloat(slider.value);
+                spielstand.entscheidungen.angebot1 = { lohn: val };
+                // KI Defensiv
+                spielstand.entscheidungen.KIangebot1 = { lohn: spielstand.rolle === 'union' ? 1.5 : 9.0 };
+                updateStats({ approval: 5 });
+                log("Auftakt", `Forderung: ${val}%`);
+                naechstePhase(3);
+            };
+
+            wrap.append(label, slider);
+            parent.append(wrap, btn);
+        }
+
+        function renderPhaseBetrieb(parent) {
+            // Warnbox bauen (Kein innerHTML)
+            const alert = el('div', 'alert-box'); // Klasse in CSS definiert? Nein, inline style unten genutzt, besser hier
+            alert.style.cssText = "background:var(--warning-bg); border:1px solid var(--warning); padding:1rem; border-radius:var(--radius); margin-bottom:1.5rem; color:#b45309;";
+            
+            const strong = el('strong', '', 'Achtung Ebenenwechsel: ');
+            alert.append(strong, document.createTextNode('Wir sind nun im Betrieb. Hier gilt das Betriebsverfassungsgesetz (BetrVG). Es herrscht Friedenspflicht (kein Streik!).'));
+
+            const h2 = el('h2', 'text-bold', '3. Intermezzo: Betriebliche Mitbestimmung');
+            const p = el('p', '', 'Der Arbeitgeber beantragt Überstunden wegen Produktionsrückstand. Der Betriebsrat muss nach § 87 BetrVG zustimmen.');
+
+            const btnBox = el('div');
+            btnBox.style.cssText = "display:flex; gap:1rem; margin-top:2rem;";
+
+            const btnOk = el('button', 'btn btn-success', 'Zustimmen (Produktion sichern)');
+            btnOk.onclick = () => {
+                if(spielstand.sperre) return;
+                updateStats({ wirtschaft: 10, konflikt: -5 });
+                spielstand.entscheidungen.betriebsrat = "Zustimmung";
+                log("Betriebsrat", "Zustimmung erteilt");
+                naechstePhase(4);
+            };
+
+            const btnNo = el('button', 'btn btn-danger', 'Ablehnen (Einigungsstelle anrufen)');
+            btnNo.onclick = () => {
+                if(spielstand.sperre) return;
+                spielstand.sperre = true; // Sperren für Animation
+                updateStats({ wirtschaft: -5, konflikt: 5 });
+                spielstand.entscheidungen.betriebsrat = "Einigungsstelle";
+                log("Betriebsrat", "Ablehnung -> Einigungsstelle");
+                
+                // Simuliere Wartezeit
+                parent.innerHTML = ''; // Safe here, clearing UI
+                const waitDiv = el('div', '', '');
+                waitDiv.style.textAlign = 'center';
+                waitDiv.style.padding = '2rem';
+                waitDiv.append(
+                    el('h3', '', 'Einigungsstelle tagt...'),
+                    el('p', '', 'Ein Richter entscheidet nun verbindlich.')
+                );
+                parent.appendChild(waitDiv);
+                
+                setTimeout(() => {
+                    spielstand.sperre = false; // Entsperren für naechstePhase Aufruf
+                    naechstePhase(4);
+                }, 1500);
+            };
+
+            parent.append(alert, h2, p, btnBox);
+            btnBox.append(btnOk, btnNo);
+        }
+
+        function renderPhaseVerhandlung1(parent) {
+            const h2 = el('h2', 'text-bold', '4. Erste Verhandlungsrunde (Sondierung)');
+            // Null-Check / Fallback
+            const kiGebot = spielstand.entscheidungen.KIangebot1?.lohn || 0;
+            const p = el('p', '', `Die Gegenseite bietet ${kiGebot}%. Das ist weit entfernt von Ihrer Forderung.`);
+            
+            const slider = el('input');
+            slider.type = 'range'; slider.min = 0; slider.max = 12; slider.step = 0.5;
+            slider.value = spielstand.entscheidungen.angebot1?.lohn || 5;
+
+            const label = el('label', 'text-bold', `Ihr neues Angebot: ${slider.value}%`);
+            slider.oninput = (e) => label.textContent = `Ihr neues Angebot: ${e.target.value}%`;
+
+            const btn = el('button', 'btn btn-primary', 'Angebot nachbessern');
+            btn.onclick = () => {
+                if(spielstand.sperre) return;
+                const val = parseFloat(slider.value);
+                const alt = spielstand.entscheidungen.angebot1?.lohn || 0;
+                const bewegung = Math.abs(val - alt);
+                
+                spielstand.entscheidungen.angebot2 = { lohn: val };
+                
+                if (bewegung < 0.5) {
+                    updateStats({ konflikt: 10 });
+                    spielstand.entscheidungen.KIangebot2 = { lohn: kiGebot };
+                } else {
+                    updateStats({ konflikt: -5 });
+                    spielstand.entscheidungen.KIangebot2 = { lohn: kiGebot + (spielstand.rolle === 'union' ? 0.5 : -0.5) };
+                }
+                log("Runde 1", `Angebot: ${val}%`);
+                naechstePhase(5);
+            };
+            parent.append(h2, p, label, slider, btn);
+        }
+
+        function renderPhaseReaktion(parent) {
+            const h2 = el('h2', 'text-bold', '5. Reaktion & Warnstreiks');
+            const p = el('p', '', 'Die Verhandlungen stocken. Wie erhöhen Sie den Druck?');
+            
+            const grid = el('div', 'grid-layout'); // Grid Layout helper class existiert in CSS nicht mehr, nutze inline
+            grid.style.cssText = "display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:2rem;";
+
+            const createOption = (titel, desc, action) => {
+                const btn = el('button', 'card');
+                btn.style.textAlign = 'left';
+                btn.style.cursor = 'pointer';
+                const h3 = el('h3', '', titel);
+                const txt = el('p', 'text-sm text-muted', desc);
+                btn.append(h3, txt);
+                btn.onclick = action;
+                return btn;
+            };
+
+            const opt1 = createOption('⚡ Warnstreik', 'Kostet Wirtschaftskraft, zeigt aber Handlungsfähigkeit.', () => {
+                if(spielstand.sperre) return;
+                updateStats({ wirtschaft: -10, basis: 10, konflikt: 15 });
+                spielstand.entscheidungen.massnahme = "Warnstreik";
+                log("Maßnahme", "Warnstreik");
+                naechstePhase(6);
+            });
+
+            const opt2 = createOption('📢 Pressearbeit', 'Kampf um die öffentliche Meinung.', () => {
+                if(spielstand.sperre) return;
+                updateStats({ oeffentlichkeit: 15 });
+                spielstand.entscheidungen.massnahme = "Presse";
+                log("Maßnahme", "Presse");
+                naechstePhase(6);
+            });
+
+            grid.append(opt1, opt2);
+            parent.append(h2, p, grid);
+        }
+
+        function renderPhaseVerhandlung2(parent) {
+            parent.append(
+                el('h2', 'text-bold', '6. Zweite Verhandlungsrunde'),
+                el('p', '', 'Der Druck hat gewirkt, aber eine Einigung fehlt noch. Die Fronten verhärten sich.')
+            );
+            const btn = el('button', 'btn btn-primary', 'Weiter (Verhandlung scheitert)');
+            btn.onclick = () => { log("Runde 2", "Keine Einigung"); naechstePhase(7); };
+            parent.appendChild(btn);
+        }
+
+        function renderPhaseScheitern(parent) {
+            const h2 = el('h2', 'text-bold', '7. Das Scheitern');
+            const p = el('p', '', 'Nichts geht mehr. Totale Eskalation oder externe Hilfe?');
+            
+            const b1 = el('button', 'btn btn-danger', 'Urabstimmung (Erzwingungsstreik)');
+            b1.style.marginBottom = '1rem';
+            b1.onclick = () => {
+                spielstand.stats.konflikt = 100;
+                updateStats({ wirtschaft: -20 });
+                log("Scheitern", "Urabstimmung eingeleitet");
+                naechstePhase(8);
+            };
+            const b2 = el('button', 'btn btn-primary', 'Schlichtung anrufen');
+            b2.onclick = () => {
+                log("Scheitern", "Schlichtung angerufen");
+                naechstePhase(9);
+            };
+            parent.append(h2, p, b1, b2);
+        }
+
+        function renderPhaseArbeitskampf(parent) {
+            parent.append(
+                el('h2', 'text-bold', '8. Arbeitskampf'),
+                el('p', '', 'Der Konflikt tobt. Der Schaden ist immens. Irgendwann müssen Sie zurück an den Tisch.')
+            );
+            const btn = el('button', 'btn btn-outline', 'Schlichtung akzeptieren');
+            btn.onclick = () => naechstePhase(9);
+            parent.appendChild(btn);
+        }
+
+        function renderPhaseSchlichtung(parent) {
+            const h2 = el('h2', 'text-bold', '9. Schlichtung');
+            const ang = spielstand.entscheidungen.angebot2?.lohn || 5;
+            const ki = spielstand.entscheidungen.KIangebot2?.lohn || 2;
+            const kompromiss = ((ang + ki) / 2).toFixed(1);
+
+            const p = el('p', '', `Ein unabhängiger Schlichter schlägt vor: ${kompromiss}% Lohnerhöhung.`);
+            
+            const b1 = el('button', 'btn btn-success', 'Annehmen');
+            b1.style.marginBottom = '1rem';
+            b1.onclick = () => {
+                spielstand.entscheidungen.final = kompromiss;
+                log("Schlichtung", "Angenommen");
+                naechstePhase(11);
+            };
+            const b2 = el('button', 'btn btn-danger', 'Ablehnen (Spitzengespräch)');
+            b2.onclick = () => {
+                log("Schlichtung", "Abgelehnt");
+                naechstePhase(10);
+            };
+            parent.append(h2, p, b1, b2);
+        }
+
+        function renderPhaseSpitze(parent) {
+            parent.append(
+                el('h2', 'text-bold', '10. Spitzengespräch'),
+                el('p', '', 'Die Nacht der Entscheidung (03:15 Uhr). Einigung um jeden Preis.')
+            );
+            const btn = el('button', 'btn btn-primary', 'Vertrag unterzeichnen (4.0%)');
+            btn.onclick = () => {
+                spielstand.entscheidungen.final = 4.0;
+                log("Spitze", "Einigung 4.0%");
+                naechstePhase(11);
+            };
+            parent.appendChild(btn);
+        }
+
+        function renderPhaseErgebnis(parent) {
+            const h2 = el('h2', 'text-bold', '11. Einigung erzielt!');
+            const div = el('div', '', `${spielstand.entscheidungen.final}% Lohnplus`);
+            div.style.cssText = "font-size:3rem; text-align:center; color:var(--success); margin:2rem 0;";
+            
+            const btn = el('button', 'btn btn-primary', 'Zur detaillierten Auswertung');
+            btn.onclick = () => {
+                clearInterval(spielstand.timerInterval);
+                naechstePhase(12);
+            };
+            parent.append(h2, div, btn);
+        }
+
+        function renderPhaseAuswertung(parent) {
+            const h2 = el('h2', 'text-bold', '12. Auswertung & Protokoll');
+            const p = el('p', '', `Dauer: ${formatZeit(spielstand.timer)} Min.`);
+            
+            const logBox = el('div', '', spielstand.protokoll.join('\n'));
+            logBox.style.cssText = "background:#f1f5f9; padding:1rem; height:300px; overflow-y:auto; font-family:monospace; margin-bottom:1rem; white-space:pre-wrap;";
+
+            const btnDl = el('button', 'btn btn-primary', 'Protokoll herunterladen (.txt)');
+            btnDl.style.marginBottom = '1rem';
+            btnDl.onclick = () => {
+                const blob = new Blob([spielstand.protokoll.join('\n')], {type: "text/plain"});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `tarif_protokoll_${new Date().toISOString().slice(0,10)}.txt`;
+                document.body.appendChild(a); // Im DOM einhängen
+                a.click();
+                document.body.removeChild(a); // Cleanup
+                URL.revokeObjectURL(url); // Cleanup Memory
+            };
+
+            const btnNew = el('button', 'btn btn-outline', 'Neues Szenario (Rollenwechsel)');
+            btnNew.onclick = () => {
+                spielstand.runde = spielstand.runde === 1 ? 2 : 1;
+                starteSpiel();
+            };
+
+            parent.append(h2, p, logBox, btnDl, btnNew);
+        }
+
+        // --- GLOSSAR LOGIK (DOM statt innerHTML) ---
+        function setupGlossar() {
+            const modal = document.getElementById('modal-glossary');
+            const content = document.getElementById('glossary-content');
+            
+            document.getElementById('btn-glossary').onclick = () => modal.classList.add('open');
+            document.getElementById('btn-close-modal').onclick = () => modal.classList.remove('open');
+
+            // Glossar Inhalt rendern
+            for (const [term, def] of Object.entries(KONFIG.glossar)) {
+                const item = el('div', '', '');
+                item.style.marginBottom = '1rem';
+                item.style.borderBottom = '1px solid var(--border)';
+                item.style.paddingBottom = '0.5rem';
+                
+                const t = el('strong', '', term);
+                const br = document.createElement('br');
+                const d = el('span', 'text-sm text-muted', def);
+                
+                item.append(t, br, d);
+                content.appendChild(item);
+            }
+        }
+
+        // --- START ---
+        setupGlossar();
+        starteSpiel();
+
+        // Ticker Text Loop
+        const tickerTexts = ["Tarifrunde startet", "Friedenspflicht endet bald", "Experten erwarten harte Runde", "Inflation bei 4,5%"];
+        let tickerIdx = 0;
+        setInterval(() => {
+            tickerIdx = (tickerIdx + 1) % tickerTexts.length;
+            document.getElementById('ticker-content').textContent = `+++ ${tickerTexts[tickerIdx]} +++`;
+        }, 5000);
+
+    </script>
+</body>
+</html>
