@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tarifkonflikt Simulator (Schul-Edition | Secure)</title>
-    <!-- CSP: Erlaubt nur lokale Skripte und Styles (unsafe-inline ist für Single-File nötig) -->
+    
+    <!-- CSP: Erlaubt nur lokale Skripte und Styles -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
     
     <style>
@@ -317,8 +318,6 @@
 
         // --- HELPER FUNKTIONEN (Sicher DOM statt innerHTML) ---
 
-        // Element Builder: Erstellt ein DOM-Element
-        // content kann String oder Array von Nodes sein
         function el(tag, classes, content) {
             const e = document.createElement(tag);
             if (classes) e.className = classes;
@@ -354,20 +353,18 @@
             spielstand.protokoll.push(eintrag);
         }
 
-        // Stats aktualisieren mit Clamping (0-100)
         function updateStats(delta) {
             for (let key in delta) {
                 if (spielstand.stats.hasOwnProperty(key)) {
                     spielstand.stats[key] = Math.max(0, Math.min(100, spielstand.stats[key] + delta[key]));
                 }
             }
-            renderStats(); // Sofort-Update der Anzeige
+            renderStats(); 
         }
 
         // --- CORE LOGIC ---
 
         function starteSpiel() {
-            // Vollständiger Reset
             spielstand.phase = 1;
             spielstand.timer = 0;
             spielstand.sperre = false;
@@ -375,7 +372,6 @@
             spielstand.infosOffen = [];
             spielstand.entscheidungen = JSON.parse(JSON.stringify(INITIAL_DECISIONS));
             spielstand.stats = { ...INITIAL_STATS };
-            
             spielstand.rolle = spielstand.runde === 1 ? 'union' : 'employer';
 
             if (spielstand.timerInterval) clearInterval(spielstand.timerInterval);
@@ -391,7 +387,7 @@
             if (spielstand.sperre) return;
             spielstand.sperre = true;
             
-            // Buttons visuell deaktivieren (Klick-Feedback)
+            // Buttons deaktivieren
             document.querySelectorAll('button').forEach(b => b.disabled = true);
 
             setTimeout(() => {
@@ -410,7 +406,6 @@
             renderSidebar();
             
             const main = document.getElementById('main-content');
-            // Cleanup Main
             while(main.firstChild) main.removeChild(main.firstChild);
             main.className = "card fade-in"; 
 
@@ -433,7 +428,6 @@
 
         function renderStats() {
             const container = document.getElementById('stats-container');
-            // Effizientes Update oder Neuzeichnen. Hier einfach Neuzeichnen für Code-Klarheit.
             container.innerHTML = '';
             
             const map = [
@@ -461,7 +455,6 @@
         }
 
         function renderSidebar() {
-            // Insider Infos - OHNE innerHTML
             const container = document.getElementById('insider-container');
             container.innerHTML = '';
             const infos = KONFIG.insider[spielstand.rolle];
@@ -475,7 +468,7 @@
                 btn.style.cursor = 'pointer';
 
                 if (spielstand.infosOffen.includes(idx)) {
-                    btn.style.backgroundColor = '#e0e7ff'; // primary-light
+                    btn.style.backgroundColor = '#e0e7ff';
                     const strong = el('strong', '', info.t + ": ");
                     btn.appendChild(strong);
                     btn.appendChild(document.createTextNode(info.d));
@@ -484,7 +477,6 @@
                     btn.style.color = 'var(--text-muted)';
                     btn.textContent = `🔒 Info ${idx+1} aufdecken`;
                     btn.onclick = () => {
-                        // Spam Schutz: Nur hinzufügen wenn noch nicht da
                         if (!spielstand.infosOffen.includes(idx)) {
                             spielstand.infosOffen.push(idx);
                             log("Info aufgedeckt", info.t);
@@ -495,7 +487,6 @@
                 container.appendChild(btn);
             });
 
-            // Verlauf
             const hist = document.getElementById('history-container');
             hist.innerHTML = '';
             const ents = spielstand.entscheidungen;
@@ -532,12 +523,12 @@
             const btn = el('button', 'btn btn-primary', 'Forderung übergeben');
             btn.onclick = () => {
                 if(spielstand.sperre) return;
-                spielstand.sperre = true; // Sofort sperren
                 const val = parseFloat(slider.value);
                 spielstand.entscheidungen.angebot1 = { lohn: val };
                 // KI Defensiv
                 spielstand.entscheidungen.KIangebot1 = { lohn: spielstand.rolle === 'union' ? 1.5 : 9.0 };
-                updateStats({ approval: 5 });
+                // FIX: Korrekter Property-Name "basis" statt "approval"
+                updateStats({ basis: 5 }); 
                 log("Auftakt", `Forderung: ${val}%`);
                 naechstePhase(3);
             };
@@ -547,10 +538,8 @@
         }
 
         function renderPhaseBetrieb(parent) {
-            // Warnbox bauen (Kein innerHTML)
-            const alert = el('div', 'alert-box'); // Klasse in CSS definiert? Nein, inline style unten genutzt, besser hier
+            const alert = el('div', 'alert-box'); 
             alert.style.cssText = "background:var(--warning-bg); border:1px solid var(--warning); padding:1rem; border-radius:var(--radius); margin-bottom:1.5rem; color:#b45309;";
-            
             const strong = el('strong', '', 'Achtung Ebenenwechsel: ');
             alert.append(strong, document.createTextNode('Wir sind nun im Betrieb. Hier gilt das Betriebsverfassungsgesetz (BetrVG). Es herrscht Friedenspflicht (kein Streik!).'));
 
@@ -572,13 +561,12 @@
             const btnNo = el('button', 'btn btn-danger', 'Ablehnen (Einigungsstelle anrufen)');
             btnNo.onclick = () => {
                 if(spielstand.sperre) return;
-                spielstand.sperre = true; // Sperren für Animation
+                spielstand.sperre = true; // Manuell sperren für Animation
                 updateStats({ wirtschaft: -5, konflikt: 5 });
                 spielstand.entscheidungen.betriebsrat = "Einigungsstelle";
                 log("Betriebsrat", "Ablehnung -> Einigungsstelle");
                 
-                // Simuliere Wartezeit
-                parent.innerHTML = ''; // Safe here, clearing UI
+                parent.innerHTML = ''; 
                 const waitDiv = el('div', '', '');
                 waitDiv.style.textAlign = 'center';
                 waitDiv.style.padding = '2rem';
@@ -589,7 +577,7 @@
                 parent.appendChild(waitDiv);
                 
                 setTimeout(() => {
-                    spielstand.sperre = false; // Entsperren für naechstePhase Aufruf
+                    spielstand.sperre = false; // Manuell entsperren
                     naechstePhase(4);
                 }, 1500);
             };
@@ -600,7 +588,6 @@
 
         function renderPhaseVerhandlung1(parent) {
             const h2 = el('h2', 'text-bold', '4. Erste Verhandlungsrunde (Sondierung)');
-            // Null-Check / Fallback
             const kiGebot = spielstand.entscheidungen.KIangebot1?.lohn || 0;
             const p = el('p', '', `Die Gegenseite bietet ${kiGebot}%. Das ist weit entfernt von Ihrer Forderung.`);
             
@@ -637,7 +624,7 @@
             const h2 = el('h2', 'text-bold', '5. Reaktion & Warnstreiks');
             const p = el('p', '', 'Die Verhandlungen stocken. Wie erhöhen Sie den Druck?');
             
-            const grid = el('div', 'grid-layout'); // Grid Layout helper class existiert in CSS nicht mehr, nutze inline
+            const grid = el('div', 'grid-layout'); 
             grid.style.cssText = "display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:2rem;";
 
             const createOption = (titel, desc, action) => {
@@ -688,6 +675,7 @@
             const b1 = el('button', 'btn btn-danger', 'Urabstimmung (Erzwingungsstreik)');
             b1.style.marginBottom = '1rem';
             b1.onclick = () => {
+                if(spielstand.sperre) return;
                 spielstand.stats.konflikt = 100;
                 updateStats({ wirtschaft: -20 });
                 log("Scheitern", "Urabstimmung eingeleitet");
@@ -695,6 +683,7 @@
             };
             const b2 = el('button', 'btn btn-primary', 'Schlichtung anrufen');
             b2.onclick = () => {
+                if(spielstand.sperre) return;
                 log("Scheitern", "Schlichtung angerufen");
                 naechstePhase(9);
             };
@@ -722,12 +711,14 @@
             const b1 = el('button', 'btn btn-success', 'Annehmen');
             b1.style.marginBottom = '1rem';
             b1.onclick = () => {
+                if(spielstand.sperre) return;
                 spielstand.entscheidungen.final = kompromiss;
                 log("Schlichtung", "Angenommen");
                 naechstePhase(11);
             };
             const b2 = el('button', 'btn btn-danger', 'Ablehnen (Spitzengespräch)');
             b2.onclick = () => {
+                if(spielstand.sperre) return;
                 log("Schlichtung", "Abgelehnt");
                 naechstePhase(10);
             };
@@ -741,6 +732,7 @@
             );
             const btn = el('button', 'btn btn-primary', 'Vertrag unterzeichnen (4.0%)');
             btn.onclick = () => {
+                if(spielstand.sperre) return;
                 spielstand.entscheidungen.final = 4.0;
                 log("Spitze", "Einigung 4.0%");
                 naechstePhase(11);
@@ -755,6 +747,7 @@
             
             const btn = el('button', 'btn btn-primary', 'Zur detaillierten Auswertung');
             btn.onclick = () => {
+                if(spielstand.sperre) return;
                 clearInterval(spielstand.timerInterval);
                 naechstePhase(12);
             };
@@ -776,10 +769,10 @@
                 const a = document.createElement("a");
                 a.href = url;
                 a.download = `tarif_protokoll_${new Date().toISOString().slice(0,10)}.txt`;
-                document.body.appendChild(a); // Im DOM einhängen
+                document.body.appendChild(a); 
                 a.click();
-                document.body.removeChild(a); // Cleanup
-                URL.revokeObjectURL(url); // Cleanup Memory
+                document.body.removeChild(a); 
+                URL.revokeObjectURL(url); 
             };
 
             const btnNew = el('button', 'btn btn-outline', 'Neues Szenario (Rollenwechsel)');
@@ -791,7 +784,7 @@
             parent.append(h2, p, logBox, btnDl, btnNew);
         }
 
-        // --- GLOSSAR LOGIK (DOM statt innerHTML) ---
+        // --- GLOSSAR LOGIK ---
         function setupGlossar() {
             const modal = document.getElementById('modal-glossary');
             const content = document.getElementById('glossary-content');
@@ -799,7 +792,6 @@
             document.getElementById('btn-glossary').onclick = () => modal.classList.add('open');
             document.getElementById('btn-close-modal').onclick = () => modal.classList.remove('open');
 
-            // Glossar Inhalt rendern
             for (const [term, def] of Object.entries(KONFIG.glossar)) {
                 const item = el('div', '', '');
                 item.style.marginBottom = '1rem';
@@ -819,7 +811,6 @@
         setupGlossar();
         starteSpiel();
 
-        // Ticker Text Loop
         const tickerTexts = ["Tarifrunde startet", "Friedenspflicht endet bald", "Experten erwarten harte Runde", "Inflation bei 4,5%"];
         let tickerIdx = 0;
         setInterval(() => {
