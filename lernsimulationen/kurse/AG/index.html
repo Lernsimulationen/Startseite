@@ -1,1 +1,275 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <title>AG – Lernsimulationen</title>
+
+  <style>
+    :root{
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: rgba(17,24,39,0.12);
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --shadow: 0 10px 30px rgba(0,0,0,0.08);
+      --radius: 18px;
+    }
+
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg: #0b1220;
+        --card: #0f172a;
+        --text: #e5e7eb;
+        --muted: #94a3b8;
+        --border: rgba(226,232,240,0.12);
+        --primary: #60a5fa;
+        --primary-dark: #3b82f6;
+        --shadow: 0 10px 30px rgba(0,0,0,0.35);
+      }
+    }
+
+    *{ box-sizing: border-box; }
+    body{
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 20% 0%, rgba(37,99,235,0.15), transparent 60%),
+                  radial-gradient(900px 500px at 90% 20%, rgba(16,185,129,0.12), transparent 55%),
+                  var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 28px 18px 10px;
+    }
+
+    .badge{
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(8px);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (prefers-color-scheme: dark){
+      .badge{ background: rgba(15,23,42,0.65); }
+    }
+
+    h1{
+      margin: 14px 0 6px;
+      font-size: clamp(22px, 3.5vw, 34px);
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle{
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+      max-width: 70ch;
+    }
+
+    main{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 18px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      margin-top: 8px;
+    }
+
+    .card{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      display: grid;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before{
+      content: "";
+      position: absolute;
+      inset: -2px;
+      background: linear-gradient(120deg, rgba(37,99,235,0.16), rgba(16,185,129,0.12), rgba(37,99,235,0.08));
+      opacity: 0.35;
+      filter: blur(18px);
+      z-index: 0;
+    }
+
+    .card > *{ position: relative; z-index: 1; }
+
+    .title{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .icon{
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: rgba(37,99,235,0.12);
+      border: 1px solid rgba(37,99,235,0.18);
+      flex: 0 0 auto;
+    }
+
+    .desc{
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 14px;
+    }
+
+    .actions{
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 2px;
+    }
+
+    a.btn{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      background: rgba(255,255,255,0.55);
+      transition: transform 0.08s ease, background 0.15s ease, border-color 0.15s ease;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    @media (prefers-color-scheme: dark){
+      a.btn{ background: rgba(15,23,42,0.65); }
+    }
+
+    a.btn.primary{
+      background: var(--primary);
+      color: white;
+      border-color: rgba(255,255,255,0.18);
+    }
+
+    a.btn.primary:hover{
+      background: var(--primary-dark);
+    }
+
+    a.btn:hover{
+      transform: translateY(-1px);
+      border-color: rgba(37,99,235,0.35);
+    }
+
+    footer{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 14px 18px 26px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .hint{
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      background: rgba(255,255,255,0.4);
+    }
+
+    @media (prefers-color-scheme: dark){
+      .hint{ background: rgba(15,23,42,0.55); }
+    }
+
+    code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12.5px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="badge">📚 Lernsimulationen · Kursbereich · <strong>AG</strong></div>
+    <h1>AG – Lernsimulationen</h1>
+    <p class="subtitle">
+      Startseite für den Kursbereich <strong>AG</strong>. Von hier aus öffnen die Lernenden die Simulationen.
+    </p>
+  </header>
+
+  <main>
+    <section class="grid">
+
+      <article class="card">
+        <div class="title">
+          <div class="icon">🏛️</div>
+          <div>Olymp – Simulation</div>
+        </div>
+
+        <p class="desc">
+          Interaktive Lernsimulation (Datei: <code>Olymp.html</code>).
+        </p>
+
+        <div class="actions">
+          <a class="btn primary" href="./Olymp.html">Starten</a>
+          <a class="btn" href="../">Zurück zu „kurse“</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="title">
+          <div class="icon">ℹ️</div>
+          <div>Hinweis</div>
+        </div>
+
+        <p class="desc">
+          Wenn du weitere Simulationen hinzufügst, kannst du sie hier als zusätzliche Karten verlinken.
+        </p>
+
+        <div class="hint">
+          Beispiel: <code>&lt;a href="./DATEI.html"&gt;Starten&lt;/a&gt;</code>
+        </div>
+      </article>
+
+    </section>
+  </main>
+
+  <footer>
+    Stand: <span id="date"></span> · Lokale Startseite (kein Tracking)
+  </footer>
+
+  <script>
+    // kleines Detail: Datum automatisch setzen (rein lokal)
+    const d = new Date();
+    const el = document.getElementById("date");
+    if (el) {
+      el.textContent = d.toLocaleDateString("de-DE", { year: "numeric", month: "2-digit", day: "2-digit" });
+    }
+  </script>
+</body>
+</html>
 
