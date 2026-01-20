@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kurse – Lernsimulationen</title>
+
+  <meta name="description" content="Übersicht aller Kurse und Lernsimulationen." />
+
+  <style>
+    :root{
+      --bg: #0b1020;
+      --card: rgba(255,255,255,0.06);
+      --card2: rgba(255,255,255,0.10);
+      --text: #e7ecff;
+      --muted: rgba(231,236,255,0.75);
+      --border: rgba(255,255,255,0.14);
+      --accent: #7c3aed;
+      --accent2: #22c55e;
+      --shadow: 0 18px 50px rgba(0,0,0,0.35);
+    }
+
+    *{ box-sizing: border-box; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background:
+        radial-gradient(1000px 600px at 20% 10%, rgba(124,58,237,0.35), transparent 60%),
+        radial-gradient(900px 550px at 85% 15%, rgba(34,197,94,0.25), transparent 55%),
+        radial-gradient(1200px 700px at 50% 100%, rgba(59,130,246,0.18), transparent 60%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header{
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 42px 18px 18px;
+    }
+
+    .topline{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    h1{
+      margin:0;
+      font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+      letter-spacing: 0.2px;
+    }
+
+    .subtitle{
+      margin: 10px 0 0;
+      color: var(--muted);
+      line-height: 1.4;
+      max-width: 70ch;
+    }
+
+    main{
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .card{
+      background: linear-gradient(180deg, var(--card), rgba(255,255,255,0.03));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+    }
+
+    .card:hover{
+      transform: translateY(-2px);
+      border-color: rgba(255,255,255,0.22);
+      background: linear-gradient(180deg, var(--card2), rgba(255,255,255,0.04));
+    }
+
+    .card h2{
+      margin: 0 0 6px;
+      font-size: 1.1rem;
+    }
+
+    .card p{
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.35;
+    }
+
+    .links{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    a.btn{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      text-decoration:none;
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.06);
+      padding: 9px 12px;
+      border-radius: 12px;
+      font-size: 0.92rem;
+      transition: background 0.12s ease, border-color 0.12s ease;
+    }
+
+    a.btn:hover{
+      background: rgba(255,255,255,0.10);
+      border-color: rgba(255,255,255,0.24);
+    }
+
+    .dot{
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 3px rgba(124,58,237,0.18);
+      flex: 0 0 auto;
+    }
+
+    .dot.green{
+      background: var(--accent2);
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.18);
+    }
+
+    footer{
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 22px 18px 40px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .hint{
+      margin-top: 14px;
+      border: 1px dashed rgba(255,255,255,0.18);
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.04);
+      line-height: 1.35;
+    }
+
+    code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.92em;
+      background: rgba(255,255,255,0.06);
+      padding: 2px 6px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.10);
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="topline">
+      <h1>Kurse – Lernsimulationen</h1>
+    </div>
+    <p class="subtitle">
+      Übersicht aller Kursbereiche. Wählen Sie einen Kursordner aus, um zu den jeweiligen Simulationen und Materialien zu gelangen.
+    </p>
+  </header>
+
+  <main>
+    <section class="grid">
+      <!-- 5g -->
+      <article class="card">
+        <h2>5g</h2>
+        <p>Materialien und Lernsimulationen für die Klasse 5g.</p>
+        <div class="links">
+          <a class="btn" href="./5g/">
+            <span class="dot"></span>
+            Ordner öffnen
+          </a>
+        </div>
+      </article>
+
+      <!-- AG -->
+      <article class="card">
+        <h2>AG</h2>
+        <p>Arbeitsgemeinschaften / Projekte.</p>
+        <div class="links">
+          <a class="btn" href="./AG/">
+            <span class="dot green"></span>
+            Ordner öffnen
+          </a>
+          <a class="btn" href="./AG/index.html">
+            <span class="dot"></span>
+            Startseite (AG)
+          </a>
+          <a class="btn" href="./AG/Olymp.html">
+            <span class="dot"></span>
+            Olymp
+          </a>
+        </div>
+      </article>
+
+      <!-- Q1 -->
+      <article class="card">
+        <h2>Q1</h2>
+        <p>Lernsimulationen und Inhalte für die Qualifikationsphase 1.</p>
+        <div class="links">
+          <a class="btn" href="./q1/">
+            <span class="dot"></span>
+            Ordner öffnen
+          </a>
+        </div>
+      </article>
+
+      <!-- Q2 -->
+      <article class="card">
+        <h2>Q2</h2>
+        <p>Lernsimulationen und Inhalte für die Qualifikationsphase 2.</p>
+        <div class="links">
+          <a class="btn" href="./q2/">
+            <span class="dot"></span>
+            Ordner öffnen
+          </a>
+        </div>
+      </article>
+    </section>
+
+    <div class="hint">
+      Hinweis: Damit ein Klick auf <code>./q1/</code> oder <code>./q2/</code> sinnvoll funktioniert, sollte im jeweiligen Ordner eine <code>index.html</code> liegen.
+      Falls nicht, wird GitHub Pages ggf. nur den Ordnerinhalt nicht anzeigen.
+    </div>
+  </main>
+
+  <footer>
+    © Lernsimulationen – Kursübersicht
+  </footer>
+</body>
+</html>
