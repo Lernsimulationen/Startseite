@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hiob: Wenn Gott fragt – Grenzen, Staunen, Antwort</title>
+    
+    <!-- 
+      SECURITY HEADERS (CSP) - GEHÄRTET
+      1. default-src 'none': Blockiert alles standardmäßig.
+      2. script-src 'nonce-SchulSec2025': KEIN 'unsafe-eval' mehr erlaubt.
+      3. style-src 'unsafe-inline': Für dynamische Animationen im Single-File-Kontext (CSS-in-JS).
+      4. img-src 'self' data:: Erlaubt lokale Bilder und Data-URIs.
+      5. font-src 'none': Keine Schriftarten-Downloads erlaubt (nutzt System-Fonts).
+      6. connect-src 'none', base-uri 'none', form-action 'none': Maximale Isolation.
+      
+      Hinweis zu Google Sites Embed: 'frame-ancestors' muss im HTTP-Header gesetzt werden, 
+      nicht im Meta-Tag. Diese CSP blockiert die Einbettung nicht, schützt aber den Inhalt im Frame.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'none'; 
+        script-src 'nonce-SchulSec2025'; 
+        style-src 'unsafe-inline'; 
+        img-src 'self' data:; 
+        font-src 'none'; 
+        connect-src 'none'; 
+        base-uri 'none'; 
+        form-action 'none';
+    ">
+
+    <style>
+        /* --- NATIVES CSS (OFFLINE & DSGVO-KONFORM) --- */
+        
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: rgba(255, 255, 255, 0.08);
+            --border-color: rgba(255, 255, 255, 0.15);
+            --primary: #0ea5e9; /* Sky-500 */
+            --primary-hover: #0284c7;
+            --accent: #eab308; /* Yellow-500 */
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --danger: #ef4444;
+            --success: #22c55e;
+            --font-stack: system-ui, -apple-system, sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-stack);
+            background: linear-gradient(135deg, #1e293b 0%, #020617 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            transition: background 1s ease;
+        }
+
+        /* Utility Classes */
+        .container { max-width: 800px; margin: 0 auto; padding: 1rem; width: 100%; }
+        .flex-col { display: flex; flex-direction: column; }
+        .flex-center { display: flex; justify-content: center; align-items: center; }
+        .text-center { text-align: center; }
+        .hidden { display: none !important; }
+        .w-full { width: 100%; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mt-4 { margin-top: 1rem; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-4 { gap: 1rem; }
+
+        /* Typography */
+        h1 { font-size: 1.25rem; font-weight: 700; color: var(--primary); margin: 0; }
+        h2 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .subtitle { font-size: 0.75rem; color: var(--text-muted); }
+        .font-serif { font-family: 'Georgia', serif; font-style: italic; }
+
+        /* Components */
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        .btn:hover:not(:disabled) { background: rgba(255,255,255,0.15); transform: translateY(-1px); }
+        .btn:active:not(:disabled) { transform: translateY(0); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-primary { background: var(--primary); border-color: var(--primary); color: white; }
+        .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+
+        input[type="checkbox"] { width: 1.25rem; height: 1.25rem; accent-color: var(--primary); }
+        select { width: 100%; padding: 0.75rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid var(--border-color); border-radius: 0.5rem; }
+
+        /* Header & Progress */
+        header { 
+            background: rgba(15, 23, 42, 0.9); 
+            border-bottom: 1px solid var(--border-color); 
+            padding: 1rem; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            position: sticky; top: 0; z-index: 50;
+        }
+
+        .progress-container { width: 100px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 99px; overflow: hidden; margin-top: 4px; }
+        .progress-bar { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s ease; }
+        .score-badge { font-family: monospace; color: var(--accent); border: 1px solid rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 99px; font-size: 0.85rem; }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .shake { animation: shake 0.3s ease-in-out; }
+
+        /* Particles */
+        #particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; overflow: hidden; }
+        .particle { position: absolute; background: rgba(255,255,255,0.05); border-radius: 50%; }
+
+        /* Mobile Adjustments */
+        @media (max-width: 600px) {
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            h1 { font-size: 1rem; }
+            .btn { padding: 1rem; } 
+            .hidden-mobile { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="particles"></div>
+
+    <header>
+        <div>
+            <h1>HIOB: GOTTESREDE</h1>
+            <div class="subtitle">Grenzen & Staunen</div>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <div class="text-right hidden-mobile">
+                <div class="subtitle">Fortschritt</div>
+                <div class="progress-container"><div id="global-progress" class="progress-bar"></div></div>
+            </div>
+            <div id="score-display" class="score-badge hidden">0 Pkt</div>
+        </div>
+    </header>
+
+    <main id="app-container" class="container flex-col flex-center" style="min-height: 80vh;">
+        <div class="text-center" style="opacity: 0.7;">Lade Modul...</div>
+    </main>
+
+    <footer>
+        <p class="subtitle">&copy; Digitales Lernmodul Religion | Offline, DSGVO-konform & Secure</p>
+    </footer>
+
+    <!-- WICHTIG: Das 'nonce' Attribut muss mit dem CSP Header übereinstimmen -->
+    <script nonce="SchulSec2025">
+        
+        // --- SICHERHEITS-HELPER (DOM statt innerHTML) ---
+        const DOM = {
+            create: (tag, classes = '', text = '') => {
+                const el = document.createElement(tag);
+                if (classes) el.className = classes;
+                if (text) el.textContent = text; // AUTOMATISCHES ESCAPING (Kein XSS)
+                return el;
+            },
+            add: (parent, child) => parent.appendChild(child),
+            clear: (el) => { while(el.firstChild) el.removeChild(el.firstChild); },
+            // FIX: Valider DOM-Helper (createElement statt invalider Object-Syntax)
+            div: (classes = '') => {
+                const el = document.createElement('div');
+                if(classes) el.className = classes;
+                return el;
+            }
+        };
+
+        // --- DATEN ---
+        const moduleData = {
+            station1: {
+                quote: "„Wo warst du, als ich die Erde gründete? Sag es doch, wenn du so klug bist!“ (Hiob 38,4)",
+                options: [
+                    { id: 'fear', label: 'Eingeschüchtert', style: 'border-color: #ef4444; color: #fca5a5;' },
+                    { id: 'wonder', label: 'Staunen', style: 'border-color: #3b82f6; color: #93c5fd;' },
+                    { id: 'angry', label: 'Verärgert / Empört', style: 'border-color: #f97316; color: #fdba74;' },
+                    { id: 'comfort', label: 'Getröstet', style: 'border-color: #22c55e; color: #86efac;' }
+                ]
+            },
+            station2: {
+                questions: [
+                    { text: "Wer hat das Meer mit Toren verschlossen?", category: "kosmos" },
+                    { text: "Kannst du dem Pferd Stärke verleihen?", category: "natur" },
+                    { text: "Wer hat der Weisheit ihren Platz zugewiesen?", category: "grenzen" },
+                    { text: "Hast du dem Morgen jemals befohlen?", category: "kosmos" },
+                    { text: "Weißt du, wann die Steinböcke werfen?", category: "natur" },
+                    { text: "Kannst du die Sternbilder des Tierkreises herausführen?", category: "kosmos" },
+                    { text: "Wer bereitet dem Raben sein Futter?", category: "natur" },
+                    { text: "Wo ist der Weg zu dem Ort, an dem das Licht wohnt?", category: "grenzen" }
+                ],
+                categories: [
+                    { id: 'kosmos', label: 'Schöpfung & Kosmos', icon: '🌌' },
+                    { id: 'natur', label: 'Tierwelt & Natur', icon: '🦅' },
+                    { id: 'grenzen', label: 'Menschliche Grenzen', icon: '✋' }
+                ]
+            },
+            station3: {
+                meanings: [
+                    { 
+                        q: "„Gürte deine Lenden wie ein Mann!“", 
+                        icon: "🥋", 
+                        options: ["Zieh dich warm an.", "Mach dich bereit zur Begegnung.", "Geh mir aus den Augen."], 
+                        correct: 1 
+                    },
+                    { 
+                        q: "Wer sind Leviathan & Behemoth?", 
+                        icon: "🐉",
+                        text_hint: "Das Chaos-Ungeheuer",
+                        options: ["Gewöhnliche Zootiere", "Chaosmächte, die Gott bändigt", "Harmlose Fabelwesen"], 
+                        correct: 1 
+                    },
+                    {
+                        q: "Warum fragt Gott nach dem „Schneespeicher“?",
+                        icon: "❄️",
+                        options: ["Um Wetterkunde abzufragen.", "Um zu zeigen: Die Welt ist größer als dein Garten.", "Er will Schnee bestellen."],
+                        correct: 1
+                    }
+                ],
+                parts: {
+                    starts: [
+                        { text: "Wer hat...", type: "perfekt" },
+                        { text: "Hast du jemals...", type: "perfekt" },
+                        { text: "Kannst du...", type: "infinitiv" },
+                        { text: "Vermagst du...", type: "infinitiv" }
+                    ],
+                    objects: [
+                        { text: "das tosende Meer" },
+                        { text: "die Pforten des Todes" },
+                        { text: "den wilden Leviathan" },
+                        { text: "die Morgenröte" },
+                        { text: "die Lager des Schnees" }
+                    ],
+                    actions: [
+                        { text: "mit Toren verschlossen", type: "perfekt" },
+                        { text: "wirklich gesehen", type: "perfekt" },
+                        { text: "in Schranken gewiesen", type: "perfekt" },
+                        { text: "begründet", type: "perfekt" },
+                        { text: "an die Leine legen", type: "infinitiv" },
+                        { text: "herbeirufen", type: "infinitiv" },
+                        { text: "das Gesetz vorschreiben", type: "infinitiv" },
+                        { text: "bändigen", type: "infinitiv" }
+                    ],
+                    ends: [
+                        { text: "damit der Stolz verstummt?" },
+                        { text: "dass du es wagen könntest?" },
+                        { text: "um meine Größe zu fassen?" },
+                        { text: "sag es mir, wenn du es weißt!" },
+                        { text: "damit du deine Grenzen kennst?" }
+                    ]
+                }
+            },
+            station4: {
+                statements: [
+                    { id: 1, text: "Gott erklärt Hiob genau, warum er leiden musste.", correct: false, feedback: "Nein, keine Leiderklärung." },
+                    { id: 2, text: "Gott verschiebt den Fokus: weg vom Leid, hin zur Welt.", correct: true, feedback: "Richtig! Perspektivwechsel." },
+                    { id: 3, text: "Hiob soll sich schämen und schweigen.", correct: false, feedback: "Nein, Beziehung bleibt." },
+                    { id: 4, text: "Die Rede nutzt Überforderung als Methode.", correct: true, feedback: "Genau. Rhetorik." },
+                    { id: 5, text: "Am Ende entschuldigt sich Gott.", correct: false, feedback: "Nein." },
+                    { id: 6, text: "Hiob erkennt, dass Leid Strafe ist.", correct: false, feedback: "Falsch." }
+                ]
+            },
+            station5: {
+                intro: "Lies Hiob 42, 1-6.",
+                segments: [
+                    {
+                        text: "„Ich erkenne, dass du alles vermagst; nichts, was du planst, ist dir unmöglich.“ (42,2)",
+                        question: "Wie klingt dieser erste Satz?",
+                        options: [
+                            { text: "Wie eine Niederlage.", score: 0 },
+                            { text: "Wie ehrfürchtiges Staunen.", score: 10 }
+                        ]
+                    },
+                    {
+                        text: "„Darum habe ich geredet, was ich nicht begriff... Dinge, die mir zu wunderbar waren.“ (42,3)",
+                        question: "Was gibt Hiob hier zu?",
+                        options: [
+                            { text: "Dass er dumm war.", score: 0 },
+                            { text: "Dass sein Wissen begrenzt ist.", score: 10 }
+                        ]
+                    }
+                ],
+                theses: [
+                    { id: 'A', text: "Hiob gibt auf (Resignation).", correct: false, feedback: "Möglich, wenn man 42,6 als reine Unterwerfung liest. Aber der Text betont auch die neue Gottesschau (42,5), was über bloßes Aufgeben hinausgeht." },
+                    { id: 'B', text: "Hiob erkennt Grenzen und bleibt im Gespräch.", correct: true, feedback: "Das ist der Kern: Er widerruft seine Anklage, weil er Gott neu erfahren hat – Vertrauen trotz Unverständnis." },
+                    { id: 'C', text: "Hiob bekommt endlich eine Erklärung.", correct: false, feedback: "Leider nein. Gott nennt keinen Grund für das Leid. Das Rätsel bleibt, aber die Beziehung trägt." }
+                ]
+            }
+        };
+
+        // --- STATE & ROBUST STORAGE ---
+        const initialState = {
+            currentStation: 0,
+            score: 0,
+            answers: { station1: null, station3_metaphor: "", station5_thesis: null },
+            station2: { index: 0, correctCount: 0, timer: null, startTime: 0, initialDuration: 10000 },
+            station5_index: 0,
+            station3_quizIndex: 0
+        };
+
+        let gameState = JSON.parse(JSON.stringify(initialState));
+        let isLocked = false;
+
+        // --- DEFENSIVE STORAGE HANDLING ---
+        function saveState() {
+            try {
+                // sessionStorage ist session-basiert (Schuldatenschutz-freundlich, da bei Tab-Close weg)
+                sessionStorage.setItem('hiob_module_data', JSON.stringify(gameState));
+            } catch (e) {
+                console.warn("Storage nicht verfügbar (Private Mode?)");
+            }
+        }
+
+        function loadState() {
+            try {
+                const raw = sessionStorage.getItem('hiob_module_data');
+                if (!raw) return;
+
+                const loaded = JSON.parse(raw);
+                
+                // TYPE CHECKING (Robustheit gegen Manipulation)
+                if (typeof loaded.currentStation === 'number' && loaded.currentStation >= 0 && loaded.currentStation <= 6) {
+                    gameState.currentStation = loaded.currentStation;
+                }
+                if (typeof loaded.score === 'number') {
+                    gameState.score = loaded.score;
+                }
+                if (loaded.answers && typeof loaded.answers === 'object') {
+                    gameState.answers = { ...gameState.answers, ...loaded.answers };
+                }
+                if (typeof loaded.station5_index === 'number') gameState.station5_index = loaded.station5_index;
+                if (typeof loaded.station3_quizIndex === 'number') gameState.station3_quizIndex = loaded.station3_quizIndex;
+
+            } catch (e) {
+                console.warn("Fehlerhafter Speicherstand verworfen.");
+                sessionStorage.removeItem('hiob_module_data');
+            }
+        }
+
+        // --- DOM REFERENCES ---
+        const container = document.getElementById('app-container');
+        const progressBar = document.getElementById('global-progress');
+        const scoreDisplay = document.getElementById('score-display');
+
+        // --- CORE FUNCTIONS ---
+
+        function updateProgress() {
+            const pct = ((gameState.currentStation) / 6) * 100;
+            progressBar.style.width = `${pct}%`;
+        }
+
+        function updateScore(points) {
+            gameState.score += points;
+            scoreDisplay.textContent = `${Math.floor(gameState.score)} Pkt`;
+            scoreDisplay.classList.remove('hidden');
+            saveState(); // Auto-Save
+        }
+
+        function nextStation() {
+            gameState.currentStation++;
+            saveState();
+            renderStation();
+        }
+
+        // --- PARTIKEL SYSTEM ---
+        function initParticles() {
+            const pContainer = document.getElementById('particles');
+            const count = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 15;
+            
+            for(let i=0; i<count; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                const size = Math.random() * 4 + 2;
+                p.style.width = size + 'px';
+                p.style.height = size + 'px';
+                p.style.left = Math.random() * 100 + 'vw';
+                p.style.top = Math.random() * 100 + 'vh';
+                p.style.opacity = Math.random() * 0.5;
+                p.style.animation = `float ${10 + Math.random() * 10}s infinite linear`;
+                pContainer.appendChild(p);
+            }
+        }
+
+        // --- RENDER ENGINE (NO INNERHTML) ---
+
+        function renderStation() {
+            updateProgress();
+            DOM.clear(container);
+            window.scrollTo(0,0);
+            isLocked = false;
+
+            if (gameState.station2.timer) clearInterval(gameState.station2.timer);
+
+            switch(gameState.currentStation) {
+                case 0: renderStation1(); break;
+                case 1: renderStation2(); break;
+                case 2: renderStation3(); break;
+                case 3: renderStation4(); break;
+                case 4: renderStation5(); break;
+                case 5: renderStation6(); break;
+                default: renderStation6();
+            }
+        }
+
+        // STATION 1
+        function renderStation1() {
+            const wrapper = DOM.create('div', 'glass-card fade-in text-center');
+            const h2 = DOM.create('h2', '', 'Station 1: Sturmstart');
+            const quote = DOM.create('p', 'font-serif mb-4', moduleData.station1.quote);
+            quote.style.fontSize = "1.2rem";
+            quote.style.lineHeight = "1.6";
+            
+            const sub = DOM.create('p', 'subtitle mb-4', 'Gott erscheint im Sturm. Nicht nett. Nicht leise. Gewaltig.');
+            const btnGrid = DOM.create('div', 'grid-2');
+            
+            moduleData.station1.options.forEach(opt => {
+                const btn = DOM.create('button', 'btn', opt.label);
+                btn.style.cssText = opt.style; 
+                
+                btn.addEventListener('click', () => {
+                    if(isLocked) return;
+                    isLocked = true;
+                    gameState.answers.station1 = opt.id;
+                    saveState();
+                    
+                    const fb = DOM.create('div', 'mt-4 fade-in');
+                    fb.style.borderTop = "1px solid var(--border-color)";
+                    fb.style.paddingTop = "1rem";
+                    
+                    const h3 = DOM.create('h3', '', 'Danke für deine Ehrlichkeit.');
+                    h3.style.color = "var(--success)";
+                    DOM.add(fb, h3);
+                    DOM.add(fb, DOM.create('p', 'mb-4', 'Es ist völlig okay, sich hier klein, wütend oder fasziniert zu fühlen. Hiob ging es genauso.'));
+                    
+                    const nextBtn = DOM.create('button', 'btn btn-primary', 'Weiter');
+                    nextBtn.addEventListener('click', nextStation);
+                    fb.appendChild(nextBtn);
+                    
+                    wrapper.appendChild(fb);
+                    Array.from(btnGrid.children).forEach(b => b.disabled = true);
+                });
+                btnGrid.appendChild(btn);
+            });
+
+            DOM.add(wrapper, h2);
+            DOM.add(wrapper, quote);
+            DOM.add(wrapper, sub);
+            DOM.add(wrapper, btnGrid);
+            DOM.add(container, wrapper);
+        }
+
+        // STATION 2 - Mit Robustem Timer & Timeout-Handler
+        function renderStation2() {
+            const s2 = gameState.station2;
+            const questions = moduleData.station2.questions;
+            
+            if (s2.index >= questions.length) {
+                const wrapper = DOM.create('div', 'glass-card text-center fade-in');
+                const ratio = s2.correctCount / questions.length;
+                
+                DOM.add(wrapper, DOM.create('h2', '', ratio > 0.6 ? 'Muster erkannt! 🔥' : 'Das war knifflig 🌪️'));
+                DOM.add(wrapper, DOM.create('p', 'mb-4', `Ergebnis: ${s2.correctCount} von ${questions.length} richtig.`));
+                DOM.add(wrapper, DOM.create('p', 'mb-4 subtitle', 'Gott argumentiert nicht logisch, sondern malt Bilder vom ganzen Kosmos.'));
+                
+                const nextBtn = DOM.create('button', 'btn btn-primary', 'Weiter zum Metaphern-Check');
+                nextBtn.addEventListener('click', nextStation);
+                DOM.add(wrapper, nextBtn);
+                DOM.add(container, wrapper);
+                return;
+            }
+
+            const currentQ = questions[s2.index];
+            const wrapper = DOM.create('div', 'w-full fade-in');
+            
+            // Header
+            const header = DOM.create('div', 'flex-center mb-2');
+            header.style.justifyContent = 'space-between';
+            DOM.add(header, DOM.create('span', '', `Frage ${s2.index + 1}/${questions.length}`));
+            const pointsDisplay = DOM.create('span', 'subtitle', '100 Pkt');
+            DOM.add(header, pointsDisplay);
+            DOM.add(wrapper, header);
+
+            // Timer Bar
+            const barContainer = DOM.create('div', 'progress-container w-full mb-4');
+            const bar = DOM.create('div', 'progress-bar');
+            bar.style.backgroundColor = 'var(--accent)';
+            bar.style.width = '100%';
+            DOM.add(barContainer, bar);
+            DOM.add(wrapper, barContainer);
+
+            // Question Card
+            const card = DOM.create('div', 'glass-card text-center mb-4');
+            card.style.minHeight = '120px';
+            card.style.display = 'flex';
+            card.style.alignItems = 'center';
+            card.style.justifyContent = 'center';
+            
+            const qText = DOM.create('h3', '', `"${currentQ.text}"`); 
+            card.appendChild(qText);
+            DOM.add(wrapper, card);
+
+            // Buttons
+            const grid = DOM.create('div', 'grid-3');
+            moduleData.station2.categories.forEach(cat => {
+                const btn = DOM.create('button', 'btn flex-col flex-center');
+                const icon = DOM.create('span', '', cat.icon);
+                icon.style.fontSize = '2rem';
+                DOM.add(btn, icon);
+                DOM.add(btn, DOM.create('span', 'subtitle', cat.label));
+                
+                btn.addEventListener('click', () => {
+                    if(isLocked) return;
+                    isLocked = true;
+                    clearInterval(s2.timer);
+
+                    const isCorrect = cat.id === currentQ.category;
+                    card.style.borderColor = isCorrect ? 'var(--success)' : 'var(--danger)';
+                    card.style.boxShadow = isCorrect ? '0 0 15px var(--success)' : '0 0 15px var(--danger)';
+                    
+                    if (isCorrect) {
+                        s2.correctCount++;
+                        const elapsed = Date.now() - s2.startTime;
+                        const remainingPct = Math.max(0, 1 - (elapsed / s2.initialDuration));
+                        updateScore(Math.floor(100 * remainingPct));
+                    } else {
+                        card.classList.add('shake');
+                    }
+
+                    setTimeout(() => {
+                        s2.index++;
+                        saveState();
+                        renderStation();
+                    }, 1200);
+                });
+                DOM.add(grid, btn);
+            });
+            DOM.add(wrapper, grid);
+            DOM.add(container, wrapper);
+
+            // Timer Logik (Robust Time-Delta + Auto-Fail)
+            s2.startTime = Date.now();
+            s2.timer = setInterval(() => {
+                const elapsed = Date.now() - s2.startTime;
+                const pct = Math.max(0, 100 - (elapsed / s2.initialDuration * 100));
+                
+                bar.style.width = `${pct}%`;
+                pointsDisplay.textContent = `${Math.floor(pct)} Pkt`;
+
+                if (pct <= 0) {
+                    clearInterval(s2.timer);
+                    if (!isLocked) {
+                        isLocked = true;
+                        // Visual Timeout Feedback
+                        card.style.borderColor = 'var(--danger)';
+                        card.classList.add('shake');
+                        pointsDisplay.textContent = "Zeit abgelaufen!";
+                        
+                        // Buttons sperren
+                        const buttons = grid.querySelectorAll('button');
+                        buttons.forEach(b => b.disabled = true);
+
+                        // Weiterleiten (0 Punkte)
+                        setTimeout(() => {
+                            s2.index++;
+                            saveState();
+                            renderStation();
+                        }, 1500);
+                    }
+                }
+            }, 50);
+        }
+
+        // STATION 3
+        function renderStation3() {
+            const wrapper = DOM.create('div', 'glass-card w-full fade-in');
+            
+            // Phase 1: Quiz
+            if (gameState.station3_quizIndex < moduleData.station3.meanings.length) {
+                const qData = moduleData.station3.meanings[gameState.station3_quizIndex];
+                
+                DOM.add(wrapper, DOM.create('div', 'subtitle mb-2', `Metaphern-Check (${gameState.station3_quizIndex + 1}/3)`));
+                
+                const visual = DOM.create('div', 'mb-4 flex-center');
+                visual.style.height = "100px";
+                visual.style.background = "rgba(0,0,0,0.3)";
+                visual.style.borderRadius = "0.5rem";
+                visual.style.fontSize = "3rem";
+                visual.textContent = qData.icon;
+                DOM.add(wrapper, visual);
+
+                DOM.add(wrapper, DOM.create('h3', 'mb-4', qData.q));
+
+                const optsDiv = DOM.create('div', 'flex-col gap-2');
+                qData.options.forEach((opt, idx) => {
+                    const btn = DOM.create('button', 'btn', opt);
+                    btn.addEventListener('click', () => {
+                        Array.from(optsDiv.children).forEach(b => b.disabled = true);
+                        if(idx === qData.correct) {
+                            btn.style.borderColor = "var(--success)";
+                            updateScore(50);
+                        } else {
+                            btn.style.borderColor = "var(--danger)";
+                        }
+                        setTimeout(() => {
+                            gameState.station3_quizIndex++;
+                            saveState();
+                            renderStation();
+                        }, 1000);
+                    });
+                    DOM.add(optsDiv, btn);
+                });
+                DOM.add(wrapper, optsDiv);
+            } else {
+                // Phase 2: Builder
+                DOM.add(wrapper, DOM.create('h2', '', 'Dein Baukasten'));
+                DOM.add(wrapper, DOM.create('p', 'subtitle mb-4', 'Baue einen mächtigen Satz. Achte auf die Grammatik.'));
+                
+                const preview = DOM.create('div', 'glass-card mb-4 text-center font-serif');
+                preview.style.background = "rgba(0,0,0,0.4)";
+                
+                const sSpan = DOM.create('span', '', '...');
+                const oSpan = DOM.create('span', 'text-muted', ' ...');
+                const vSpan = DOM.create('span', 'text-muted', ' ...');
+                const eSpan = DOM.create('span', 'text-muted', ' ...');
+                
+                [sSpan, oSpan, vSpan, eSpan].forEach(s => DOM.add(preview, s));
+                DOM.add(wrapper, preview);
+
+                // Controls
+                const controls = DOM.create('div', 'flex-col gap-2');
+                
+                const createSelect = (opts, disabled=false) => {
+                    const s = DOM.create('select');
+                    s.disabled = disabled;
+                    s.appendChild(DOM.create('option', '', '...'));
+                    opts.forEach(o => {
+                        const opt = DOM.create('option', '', o.text);
+                        if(o.type) opt.value = o.type;
+                        s.appendChild(opt);
+                    });
+                    return s;
+                };
+
+                const sel1 = createSelect(moduleData.station3.parts.starts);
+                const sel2 = createSelect(moduleData.station3.parts.objects, true);
+                const sel3 = DOM.create('select'); sel3.disabled = true; 
+                const sel4 = createSelect(moduleData.station3.parts.ends, true);
+
+                sel1.addEventListener('change', () => {
+                    sSpan.textContent = sel1.options[sel1.selectedIndex].text;
+                    const type = sel1.value;
+                    
+                    DOM.clear(sel3);
+                    sel3.appendChild(DOM.create('option', '', '...'));
+                    moduleData.station3.parts.actions.filter(a => a.type === type).forEach(a => {
+                        sel3.appendChild(DOM.create('option', '', a.text));
+                    });
+
+                    sel2.disabled = false;
+                    sel3.disabled = true; sel4.disabled = true;
+                    oSpan.className = 'text-muted';
+                });
+
+                sel2.addEventListener('change', () => {
+                    oSpan.textContent = " " + sel2.options[sel2.selectedIndex].text;
+                    oSpan.className = '';
+                    sel3.disabled = false;
+                });
+
+                sel3.addEventListener('change', () => {
+                    vSpan.textContent = " " + sel3.options[sel3.selectedIndex].text;
+                    vSpan.className = '';
+                    sel4.disabled = false;
+                });
+
+                sel4.addEventListener('change', () => {
+                    eSpan.textContent = ", " + sel4.options[sel4.selectedIndex].text;
+                    eSpan.className = '';
+                    saveBtn.disabled = false;
+                });
+
+                [sel1, sel2, sel3, sel4].forEach(s => controls.appendChild(s));
+                DOM.add(wrapper, controls);
+
+                const saveBtn = DOM.create('button', 'btn btn-primary mt-4', 'Satz speichern');
+                saveBtn.disabled = true;
+                saveBtn.addEventListener('click', () => {
+                    gameState.answers.station3_metaphor = preview.textContent;
+                    updateScore(150);
+                    nextStation();
+                });
+                DOM.add(wrapper, saveBtn);
+            }
+            DOM.add(container, wrapper);
+        }
+
+        // STATION 4
+        function renderStation4() {
+            const wrapper = DOM.create('div', 'glass-card fade-in');
+            DOM.add(wrapper, DOM.create('h2', '', 'Grenzen-Scanner'));
+            DOM.add(wrapper, DOM.create('p', 'mb-4', 'Wähle genau 2 Aussagen.'));
+            
+            const list = DOM.create('div', 'flex-col gap-2');
+            const checkboxes = [];
+
+            moduleData.station4.statements.forEach(stmt => {
+                const label = DOM.create('label', 'btn text-left');
+                label.style.display = 'flex';
+                label.style.gap = '10px';
+                label.style.alignItems = 'center';
+
+                const box = DOM.create('input');
+                box.type = 'checkbox';
+                box.value = stmt.id;
+                
+                box.addEventListener('change', () => {
+                    const checkedCount = checkboxes.filter(c => c.checked).length;
+                    checkBtn.disabled = checkedCount !== 2;
+                });
+
+                checkboxes.push(box);
+                label.appendChild(box);
+                label.appendChild(document.createTextNode(stmt.text));
+                list.appendChild(label);
+            });
+            DOM.add(wrapper, list);
+
+            const checkBtn = DOM.create('button', 'btn btn-primary mt-4', 'Überprüfen');
+            checkBtn.disabled = true;
+            checkBtn.addEventListener('click', () => {
+                checkBtn.style.display = 'none';
+                let correct = 0;
+                
+                checkboxes.forEach(box => {
+                    const stmt = moduleData.station4.statements.find(s => s.id == box.value);
+                    const parent = box.parentElement;
+                    
+                    if(box.checked) {
+                        if(stmt.correct) {
+                            parent.style.borderColor = 'var(--success)';
+                            correct++;
+                        } else {
+                            parent.style.borderColor = 'var(--danger)';
+                        }
+                        const fb = DOM.create('div', 'subtitle', stmt.feedback);
+                        fb.style.marginLeft = "1.8rem";
+                        fb.style.color = stmt.correct ? 'var(--success)' : 'var(--danger)';
+                        parent.after(fb);
+                    }
+                    box.disabled = true;
+                });
+
+                if(correct === 2) updateScore(200);
+                else if(correct === 1) updateScore(50);
+
+                const next = DOM.create('button', 'btn mt-4', 'Weiter');
+                next.addEventListener('click', nextStation);
+                DOM.add(wrapper, next);
+            });
+            DOM.add(wrapper, checkBtn);
+            DOM.add(container, wrapper);
+        }
+
+        // STATION 5
+        function renderStation5() {
+            const wrapper = DOM.create('div', 'glass-card fade-in');
+            
+            // Phase 1: Dialog
+            if (gameState.station5_index < moduleData.station5.segments.length) {
+                const seg = moduleData.station5.segments[gameState.station5_index];
+                
+                DOM.add(wrapper, DOM.create('h2', 'text-center', 'Der Wendepunkt'));
+                const quoteBox = DOM.create('div', 'glass-card mb-4 font-serif text-center');
+                quoteBox.style.background = 'rgba(234, 179, 8, 0.1)'; 
+                quoteBox.textContent = seg.text;
+                DOM.add(wrapper, quoteBox);
+                
+                DOM.add(wrapper, DOM.create('p', 'mb-2 text-center', seg.question));
+                
+                const opts = DOM.create('div', 'flex-col gap-2');
+                seg.options.forEach(opt => {
+                    const btn = DOM.create('button', 'btn', opt.text);
+                    btn.addEventListener('click', () => {
+                        updateScore(opt.score);
+                        gameState.station5_index++;
+                        saveState();
+                        renderStation();
+                    });
+                    DOM.add(opts, btn);
+                });
+                DOM.add(wrapper, opts);
+            } 
+            // Phase 2: Thesis
+            else {
+                DOM.add(wrapper, DOM.create('h2', 'text-center', 'Das Fazit'));
+                DOM.add(wrapper, DOM.create('p', 'mb-4 text-center', 'Wie deutest du das Ende?'));
+                
+                const opts = DOM.create('div', 'flex-col gap-2');
+                moduleData.station5.theses.forEach(t => {
+                    const btn = DOM.create('button', 'btn', t.text);
+                    btn.addEventListener('click', () => {
+                        gameState.answers.station5_thesis = t;
+                        if(t.correct) updateScore(150);
+                        
+                        const modal = DOM.create('div', 'glass-card fade-in');
+                        modal.style.position = 'fixed';
+                        modal.style.top = '20%'; modal.style.left = '5%'; modal.style.right = '5%';
+                        modal.style.zIndex = '100';
+                        modal.style.background = '#1e293b';
+                        modal.style.border = '2px solid var(--accent)';
+                        modal.style.maxWidth = '600px';
+                        modal.style.margin = '0 auto';
+                        
+                        DOM.add(modal, DOM.create('h3', 'text-center mb-2', t.correct ? 'Exzellent!' : 'Interessante Sicht.'));
+                        DOM.add(modal, DOM.create('p', 'mb-4', t.feedback));
+                        
+                        const close = DOM.create('button', 'btn btn-primary', 'Zum Portfolio');
+                        close.addEventListener('click', () => {
+                            modal.remove();
+                            nextStation();
+                        });
+                        DOM.add(modal, close);
+                        document.body.appendChild(modal);
+                    });
+                    DOM.add(opts, btn);
+                });
+                DOM.add(wrapper, opts);
+            }
+            DOM.add(container, wrapper);
+        }
+
+        // STATION 6: PORTFOLIO & DOWNLOAD
+        function renderStation6() {
+            const wrapper = DOM.create('div', 'glass-card fade-in');
+            
+            DOM.add(wrapper, DOM.create('h2', 'text-center', 'Dein Hiob-Portfolio'));
+            
+            const stats = DOM.create('div', 'glass-card mb-4 grid-2');
+            
+            const leftStat = DOM.create('div');
+            DOM.add(leftStat, DOM.create('div', 'subtitle', 'Punkte'));
+            const pVal = DOM.create('div', '', Math.floor(gameState.score).toString());
+            pVal.style.fontSize = "2rem"; pVal.style.color = "var(--accent)";
+            DOM.add(leftStat, pVal);
+            
+            const rightStat = DOM.create('div');
+            DOM.add(rightStat, DOM.create('div', 'subtitle', 'Titel'));
+            DOM.add(rightStat, DOM.create('div', '', gameState.score > 400 ? 'Theologie-Profi' : 'Hiob-Entdecker'));
+            
+            DOM.add(stats, leftStat);
+            DOM.add(stats, rightStat);
+            DOM.add(wrapper, stats);
+
+            const content = DOM.create('div', 'flex-col gap-4 mb-4');
+            
+            const box1 = DOM.create('div');
+            DOM.add(box1, DOM.create('div', 'subtitle', 'Gottes-Frage'));
+            const b1t = DOM.create('div', 'font-serif', `"${gameState.answers.station3_metaphor}"`);
+            DOM.add(box1, b1t);
+            
+            const box2 = DOM.create('div');
+            DOM.add(box2, DOM.create('div', 'subtitle', 'Deutung'));
+            const thesisText = gameState.answers.station5_thesis ? gameState.answers.station5_thesis.text : "-";
+            DOM.add(box2, DOM.create('div', '', thesisText));
+
+            DOM.add(content, box1);
+            DOM.add(content, box2);
+            DOM.add(wrapper, content);
+
+            // Action Buttons
+            const actions = DOM.create('div', 'grid-2');
+
+            // 1. Download File
+            const dlBtn = DOM.create('button', 'btn btn-primary', '💾 Speichern (.txt)');
+            dlBtn.addEventListener('click', () => {
+                const text = `MEIN HIOB-PORTFOLIO\n-------------------\nDatum: ${new Date().toLocaleDateString()}\nPunkte: ${Math.floor(gameState.score)}\n\nMEINE GOTTESFRAGE:\n"${gameState.answers.station3_metaphor}"\n\nMEINE DEUTUNG:\n${thesisText}`;
+                
+                const blob = new Blob(["\uFEFF" + text], { type: "text/plain;charset=utf-8" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "Hiob_Portfolio.txt";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            });
+
+            // 2. Restart
+            const restartBtn = DOM.create('button', 'btn', 'Neustart');
+            restartBtn.addEventListener('click', () => {
+                sessionStorage.removeItem('hiob_module_data');
+                location.reload();
+            });
+
+            DOM.add(actions, dlBtn);
+            DOM.add(actions, restartBtn);
+            DOM.add(wrapper, actions);
+            
+            DOM.add(container, wrapper);
+        }
+
+        // --- BOOTSTRAP ---
+        loadState();
+        initParticles();
+        renderStation();
+
+    </script>
+</body>
+</html>
