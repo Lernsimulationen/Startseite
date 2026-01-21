@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Q2 – Sozialwissenschaften</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Konjunktur – Q2 Sozialwissenschaften</title>
 
   <style>
     body{
@@ -25,23 +25,42 @@
       max-width:720px;
     }
 
+    .grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:12px;
+      max-width:560px;
+      margin-top:1.5rem;
+    }
+
+    @media(min-width:700px){
+      .grid{ grid-template-columns:1fr 1fr; }
+    }
+
     a.card{
       display:block;
-      max-width:520px;
       padding:14px 16px;
-      margin-top:1rem;
       background:#ffffff;
       border:1px solid #d1d5db;
       border-radius:8px;
       text-decoration:none;
       color:#111827;
-      font-weight:600;
-      transition:background .15s, border-color .15s;
+      font-weight:700;
+      transition:background .15s, border-color .15s, transform .08s;
     }
 
     a.card:hover{
       background:#eff6ff;
       border-color:#2563eb;
+      transform: translateY(-1px);
+    }
+
+    .muted{
+      font-weight:500;
+      color:#6b7280;
+      font-size:.9rem;
+      margin-top:4px;
+      line-height:1.35;
     }
 
     footer{
@@ -50,31 +69,40 @@
       padding-top:1rem;
       font-size:.85rem;
       color:#6b7280;
+      max-width:720px;
+    }
+
+    footer a{
+      color:#2563eb;
+      text-decoration:none;
+      font-weight:600;
+    }
+
+    footer a:hover{
+      text-decoration:underline;
     }
   </style>
 </head>
 
 <body>
 
-  <h1>Q2 – Sozialwissenschaften</h1>
+  <h1>Konjunktur – Q2 (Sozialwissenschaften)</h1>
 
   <p>
-    Übersicht der Lernmodule und Materialien im Fach Sozialwissenschaften
-    für die Jahrgangsstufe Q2.
+    Übersicht der Lernmodule zum Themenbereich <strong>Konjunktur</strong>.
+    Bitte wählen Sie ein Modul aus.
   </p>
 
-  <a class="card" href="ZKSchülerfirma.html">
-    ZK Schülerfirma
-  </a>
-
-    <a class="card" href="Tarifsimulation.html">
-    ZK Tarifsimulation
-  </a>
+  <div class="grid">
+    <a class="card" href="konjunktur.html">
+      Konjunktur – Lernsimulation
+      <div class="muted">Konjunkturphasen, Indikatoren, wirtschaftspolitische Maßnahmen</div>
+    </a>
+  </div>
 
   <footer>
-    <a href="../index.html">← Zurück zur Q2-Übersicht</a>
+    <a href="index.html">← Zurück zur SW-Übersicht</a>
   </footer>
 
 </body>
 </html>
-
