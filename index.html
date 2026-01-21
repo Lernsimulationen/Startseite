@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lernstudio – Startseite</title>
 
   <style>
@@ -45,13 +45,14 @@
       border-radius:8px;
       text-decoration:none;
       color:#111827;
-      font-weight:600;
-      transition:background .15s, border-color .15s;
+      font-weight:700;
+      transition:background .15s, border-color .15s, transform .08s;
     }
 
     a.card:hover{
       background:#eff6ff;
       border-color:#2563eb;
+      transform: translateY(-1px);
     }
 
     .muted{
@@ -69,6 +70,16 @@
       color:#6b7280;
       max-width:720px;
     }
+
+    footer a{
+      color:#2563eb;
+      text-decoration:none;
+      font-weight:600;
+    }
+
+    footer a:hover{
+      text-decoration:underline;
+    }
   </style>
 </head>
 
@@ -78,29 +89,31 @@
 
   <p>
     Zentrale Übersicht der digitalen Lernangebote.
-    Bitte wähle deine Jahrgangsstufe.
+    Bitte wähle deinen Bereich.
   </p>
 
   <div class="grid">
-    <a class="card" href="lernsimulationen/kurse/5g/">
+    <a class="card" href="lernsimulationen/kurse/5g/index.html">
       5G
       <div class="muted">Sekundarstufe I</div>
     </a>
 
-        <a class="card" href="lernsimulationen/kurse/AG/">
-      <div class="muted">5. Jahrgang AG</div>
+    <a class="card" href="lernsimulationen/kurse/AG/index.html">
+      AG
+      <div class="muted">5. Jahrgang – Arbeitsgemeinschaft</div>
     </a>
 
-     <a class="card" href="lernsimulationen/kurse/Vertretung/">
-      <div class="muted">Vertretungsstunden</div>
+    <a class="card" href="lernsimulationen/kurse/Vertretung/index.html">
+      Vertretung
+      <div class="muted">Vertretungsstunden (z. B. Demokratie)</div>
     </a>
 
-    <a class="card" href="lernsimulationen/kurse/q1/">
+    <a class="card" href="lernsimulationen/kurse/q1/index.html">
       Q1
       <div class="muted">Sekundarstufe II</div>
     </a>
 
-    <a class="card" href="lernsimulationen/kurse/q2/">
+    <a class="card" href="lernsimulationen/kurse/q2/index.html">
       Q2
       <div class="muted">Sekundarstufe II</div>
     </a>
@@ -108,8 +121,6 @@
 
   <footer>
     <a href="Datenschutz.html">Datenschutzhinweis</a>
-
-
   </footer>
 
 </body>
