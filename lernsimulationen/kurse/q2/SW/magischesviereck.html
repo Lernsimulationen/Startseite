@@ -1,0 +1,577 @@
+<!-- 
+================================================================================
+LEHRKRAFT-INFO (SECURE EDITION)
+================================================================================
+
+TITEL: Magisches Viereck - Die Wirtschafts-Waage (Refactored)
+ZIELGRUPPE: Einsteiger (Klasse 8-10)
+DAUER: 15-20 Minuten
+
+TECHNISCHE UPGRADES (SECURITY & PERFORMANCE):
+- Content-Security-Policy (CSP): Strikte Whitelist für Code-Ausführung.
+- No-Inline-Handlers: Trennung von HTML und JavaScript Logik.
+- Throttling: Performante Updates via requestAnimationFrame.
+- Defensive Coding: Schutz vor Laufzeitfehlern bei DOM-Manipulation.
+- Accessibility: Respektiert "Reduced Motion" Einstellungen.
+- Datenschutz: 100% Offline, kein Tracking, keine externen Requests.
+
+DAS KONZEPT (Inhaltlich identisch):
+Links: Stagnation/Stabilität (Harmonie Preise/Handel).
+Mitte-Rechts: Aufschwung (Harmonie Wachstum/Jobs).
+Ganz Rechts: Boom (Konflikt Jobs/Preise).
+================================================================================
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wirtschafts-Waage (Secure)</title>
+    
+    <!-- SECURITY: Content Security Policy -->
+    <!-- Erlaubt CSS inline (für dynamische Styles nötig), verbietet aber unsicheres JS. 
+         Script nur erlaubt, wenn Nonce übereinstimmt. Keine externen Verbindungen. -->
+    <meta http-equiv="Content-Security-Policy" 
+          content="default-src 'none'; 
+                   style-src 'unsafe-inline'; 
+                   script-src 'nonce-r4nd0mZuf4llsW3rt!'; 
+                   img-src data:; 
+                   base-uri 'none'; 
+                   object-src 'none'; 
+                   frame-ancestors 'none'; 
+                   form-action 'none'; 
+                   connect-src 'none';">
+
+    <style>
+        :root {
+            --bg: #eef2f3;
+            --card-bg: #ffffff;
+            --primary: #34495e;
+            --accent: #3498db;
+            --theory-bg: #fff8e1;
+            --theory-border: #f1c40f;
+            --conflict-color: #e74c3c;
+            --harmony-color: #27ae60;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            color: #333;
+            margin: 0; padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* --- HEADER --- */
+        header {
+            background: white;
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        h1 { margin: 0; font-size: 1.5rem; color: var(--primary); }
+        p { margin: 5px 0 0; color: #666; font-size: 0.9rem; }
+
+        /* --- MAIN CONTAINER --- */
+        .container {
+            width: 95%;
+            max-width: 800px;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        /* --- SLIDER --- */
+        .slider-container {
+            margin: 30px 0 10px 0;
+            position: relative;
+            padding: 0 20px;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        .label-left { color: #c0392b; }
+        .label-right { color: #27ae60; }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 15px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #c0392b 0%, #f1c40f 50%, #27ae60 100%);
+            outline: none;
+            transition: opacity .2s;
+            cursor: pointer;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #fff;
+            border: 4px solid var(--primary);
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* --- ALERT BAR --- */
+        #rel-alert {
+            margin: 20px 0 10px 0;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            min-height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s ease;
+            opacity: 0;
+        }
+        #rel-alert.show { opacity: 1; }
+        .rel-conflict { background-color: #fadbd8; color: #c0392b; border: 1px solid #e6b0aa; }
+        .rel-harmony { background-color: #d5f5e3; color: #27ae60; border: 1px solid #abebc6; }
+
+        /* --- GRID & CARDS --- */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            border: 3px solid transparent;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .card.happy { border-color: #2ecc71; background: #eafff0; }
+        .card.neutral { border-color: #f1c40f; background: #fffdf0; }
+        .card.sad { border-color: #e74c3c; background: #fff0f0; }
+
+        /* ANIMATIONS */
+        @keyframes pulse-conflict {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+        @keyframes pulse-harmony {
+            0% { box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(39, 174, 96, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(39, 174, 96, 0); }
+        }
+
+        .highlight-conflict {
+            animation: pulse-conflict 1.5s infinite;
+            border-color: var(--conflict-color) !important;
+            transform: scale(1.02);
+            z-index: 10;
+        }
+        .highlight-harmony {
+            animation: pulse-harmony 1.5s infinite;
+            border-color: var(--harmony-color) !important;
+            transform: scale(1.02);
+            z-index: 10;
+        }
+
+        .emoji { font-size: 3rem; display: block; margin-bottom: 10px; }
+        .card-title { font-weight: bold; font-size: 1.1rem; color: #444; }
+        .card-val { font-family: monospace; color: #666; font-size: 0.9rem; margin-top: 5px; display: block; }
+        .card-desc { font-size: 0.85rem; color: #777; margin-top: 8px; min-height: 2.5em;}
+
+        /* --- THEORY --- */
+        .theory-section {
+            margin-top: 40px;
+            text-align: left;
+            border-top: 2px dashed #eee;
+            padding-top: 20px;
+        }
+        .theory-header {
+            font-size: 1.1rem; margin-bottom: 15px; color: var(--primary); text-align: center;
+        }
+        
+        .theory-card {
+            background: var(--theory-bg);
+            border-left: 5px solid var(--theory-border);
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+            /* Animation controlled via JS/CSS classes, prefers-reduced-motion handled below */
+        }
+        
+        .theory-title { font-weight: bold; display: block; margin-bottom: 5px; color: #d35400; }
+        .theory-text { font-size: 0.9rem; line-height: 1.4; color: #555; }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- ACCESSIBILITY: REDUCED MOTION --- */
+        @media (prefers-reduced-motion: reduce) {
+            *, ::before, ::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+            .highlight-conflict, .highlight-harmony {
+                animation: none !important;
+                /* Static fallback for emphasis */
+                box-shadow: 0 0 0 4px rgba(0,0,0,0.1); 
+                transform: none !important;
+            }
+        }
+
+        /* --- TASK BAR --- */
+        .task-bar {
+            margin-top: 20px;
+            padding: 10px;
+            border-top: 1px solid #eee;
+            color: #555;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>⚖️ Die Wirtschafts-Waage</h1>
+        <p>Ein vereinfachtes Modell: Harmonien & Konflikte</p>
+    </header>
+
+    <div class="container">
+        
+        <!-- DER REGLER (Clean HTML, no inline JS) -->
+        <div class="slider-container">
+            <div class="slider-labels">
+                <span class="label-left">📉 SPARPOLITIK<br><small>(Wenig Geld)</small></span>
+                <span class="label-right">📈 BOOM-POLITIK<br><small>(Viel Geld)</small></span>
+            </div>
+            <input type="range" id="main-slider" min="0" max="100" value="50">
+            <div style="margin-top:10px; color:#888; font-size:0.8rem;">Schiebe den Regler langsam von links nach rechts</div>
+        </div>
+
+        <div id="rel-alert" role="alert" aria-live="polite"></div>
+
+        <div class="grid">
+            <!-- 1. WACHSTUM -->
+            <div class="card" id="card-growth">
+                <span class="emoji" id="icon-growth">🌱</span>
+                <span class="card-title">Wachstum</span>
+                <span class="card-val" id="val-growth">2.0 %</span>
+                <div class="card-desc" id="desc-growth">Wirtschaft wächst normal.</div>
+            </div>
+
+            <!-- 2. PREISE -->
+            <div class="card" id="card-prices">
+                <span class="emoji" id="icon-prices">🏷️</span>
+                <span class="card-title">Preise</span>
+                <span class="card-val" id="val-prices">2.0 %</span>
+                <div class="card-desc" id="desc-prices">Preise sind stabil.</div>
+            </div>
+
+            <!-- 3. JOBS -->
+            <div class="card" id="card-jobs">
+                <span class="emoji" id="icon-jobs">👷</span>
+                <span class="card-title">Jobs</span>
+                <span class="card-val" id="val-jobs">Arbeitslose: 5.0%</span>
+                <div class="card-desc" id="desc-jobs">Normale Arbeitslosigkeit.</div>
+            </div>
+
+            <!-- 4. AUSSENHANDEL -->
+            <div class="card" id="card-trade">
+                <span class="emoji" id="icon-trade">🚢</span>
+                <span class="card-title">Außenhandel</span>
+                <span class="card-val" id="val-trade">Balance: OK</span>
+                <div class="card-desc" id="desc-trade">Exporte und Importe im Gleichgewicht.</div>
+            </div>
+        </div>
+
+        <!-- THEORIE BEREICH -->
+        <div class="theory-section">
+            <div class="theory-header">🔍 Erklärungen (Automatisch)</div>
+            
+            <div class="theory-card" id="theory-okun" style="border-left-color: #27ae60;">
+                <span class="theory-title" style="color:#27ae60">🤝 Harmonie: Aufschwung</span>
+                <div class="theory-text">
+                    Eine klassische Zielharmonie! Wenn die Wirtschaft wächst (🌱), brauchen Firmen mehr Personal (👷).<br>
+                    <strong>Wachstum schafft Jobs!</strong>
+                </div>
+            </div>
+
+            <div class="theory-card" id="theory-stability" style="border-left-color: #27ae60;">
+                <span class="theory-title" style="color:#27ae60">🤝 Harmonie: Stabilität</span>
+                <div class="theory-text">
+                    In ruhigen Zeiten (wenig Nachfrage) bleiben die Preise sehr stabil (🏷️) und wir importieren nicht zu viel (🚢).<br>
+                    <strong>Stabilität schützt den Geldwert und die Handelsbilanz.</strong>
+                </div>
+            </div>
+
+            <div class="theory-card" id="theory-phillips" style="border-left-color: #c0392b;">
+                <span class="theory-title" style="color:#c0392b">⚔️ Konflikt: Phillips-Kurve</span>
+                <div class="theory-text">
+                    Wir haben Vollbeschäftigung (Jobs 😎), aber Arbeitskräfte werden knapp und teuer. Das treibt die Preise (Inflation 💸).<br>
+                    <strong>Wahl: Jobs oder stabile Preise?</strong>
+                </div>
+            </div>
+
+             <div class="theory-card" id="theory-recession" style="border-left-color: #c0392b;">
+                <span class="theory-title" style="color:#c0392b">⚔️ Konflikt: Rezession</span>
+                <div class="theory-text">
+                    Zwar sind die Preise billig, aber die Wirtschaft schrumpft und Jobs gehen verloren.<br>
+                    <strong>Stabilität nützt nichts, wenn keiner Arbeit hat.</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="task-bar">
+            <strong>Aufgabe:</strong> Finde den grünen Bereich (Regler ca. 55-75), wo Wachstum und Jobs harmonieren!
+        </div>
+
+    </div>
+
+    <!-- SECURITY: Script nur mit Nonce ausführbar -->
+    <script nonce="r4nd0mZuf4llsW3rt!">
+        (function() {
+            'use strict';
+
+            // --- DEFENSIVE DOM ACCESS HELPER ---
+            // Verhindert Abstürze, wenn IDs manipuliert wurden
+            const getEl = (id) => {
+                const el = document.getElementById(id);
+                if (!el) {
+                    console.error(`Kritischer Fehler: DOM-Element #${id} nicht gefunden.`);
+                    return null;
+                }
+                return el;
+            };
+
+            // Status-Variable für RequestAnimationFrame Throttling
+            let isTicking = false;
+
+            // Haupteinstiegspunkt
+            const init = () => {
+                const slider = getEl('main-slider');
+                if (!slider) return;
+
+                // Event Listener statt Inline-Handler
+                slider.addEventListener('input', handleInput);
+                
+                // Initialer Render
+                updateSimulation(50);
+            };
+
+            // Input Handler mit Throttling
+            const handleInput = (e) => {
+                if (!isTicking) {
+                    window.requestAnimationFrame(() => {
+                        // Input Validierung & Sanitization
+                        let rawVal = parseFloat(e.target.value);
+                        
+                        // Sicherheits-Clamp: Sicherstellen, dass Wert number, finite und in Bounds ist
+                        if (!Number.isFinite(rawVal)) rawVal = 50;
+                        const safeVal = Math.max(0, Math.min(100, rawVal));
+                        
+                        updateSimulation(safeVal);
+                        isTicking = false;
+                    });
+                    isTicking = true;
+                }
+            };
+
+            // Kernlogik der Simulation
+            const updateSimulation = (val) => {
+                // --- DAS MODELL ---
+                // Mapping Regler (0-100) -> 4 Ziele
+                const growth = -2 + (val / 100) * 8;
+                const inf = (val * val) / 1000;
+                const unemp = 12 - (val / 100) * 10;
+                const balance = 4 - (val / 100) * 8;
+
+                // --- UI UPDATES ---
+                updateCard('growth', growth, 'growth');
+                updateCard('prices', inf, 'inf');
+                updateCard('jobs', unemp, 'unemp');
+                updateCard('trade', balance, 'trade');
+
+                // --- LIVE BEZIEHUNGEN ---
+                checkRelationships(val, growth, inf, unemp, balance);
+            };
+
+            // UI Update Helper
+            const updateCard = (id, val, type) => {
+                const el = getEl('card-' + id);
+                const icon = getEl('icon-' + id);
+                const desc = getEl('desc-' + id);
+                const valDisplay = getEl('val-' + id);
+
+                if (!el || !icon || !desc || !valDisplay) return;
+
+                // Clean CSS Classes
+                el.classList.remove('highlight-conflict', 'highlight-harmony', 'happy', 'neutral', 'sad');
+
+                let state = 'neutral';
+                let iconText = '';
+                let descText = '';
+                let valText = '';
+
+                // LOGIK FÜR INHALTE
+                if (type === 'growth') {
+                    valText = val.toFixed(1) + " %";
+                    if (val >= 2.0) {
+                        state = 'happy'; iconText = '😎'; descText = "Die Wirtschaft brummt!";
+                    } else if (val > 0) {
+                        state = 'neutral'; iconText = '😐'; descText = "Wachstum ist okay.";
+                    } else {
+                        state = 'sad'; iconText = '📉'; descText = "Rezession!";
+                    }
+                } else if (type === 'inf') {
+                    valText = val.toFixed(1) + " %";
+                    if (val <= 2.5 && val >= 0.5) {
+                        state = 'happy'; iconText = '😎'; descText = "Preise sind stabil.";
+                    } else if (val < 4.0) {
+                        state = 'neutral'; iconText = '😐'; descText = "Preise steigen spürbar.";
+                    } else {
+                        state = 'sad'; iconText = '💸'; descText = "Alles wird teurer!";
+                    }
+                } else if (type === 'unemp') {
+                    valText = val.toFixed(1) + " %";
+                    if (val <= 4.0) {
+                        state = 'happy'; iconText = '😎'; descText = "Fast alle haben Jobs!";
+                    } else if (val <= 7.0) {
+                        state = 'neutral'; iconText = '😐'; descText = "Arbeitsmarkt stabil.";
+                    } else {
+                        state = 'sad'; iconText = '😟'; descText = "Viele Arbeitslose.";
+                    }
+                } else if (type === 'trade') {
+                    valText = "Saldo: " + val.toFixed(1);
+                    if (val >= -1 && val <= 2) {
+                        state = 'happy'; iconText = '⚖️'; descText = "Balance ist gut.";
+                    } else if (val > 2) {
+                        state = 'neutral'; iconText = '📦'; descText = "Export-Überschuss.";
+                    } else {
+                        state = 'sad'; iconText = '📥'; descText = "Defizit (Import-Sog).";
+                    }
+                }
+
+                // Apply Updates
+                el.classList.add(state);
+                icon.textContent = iconText;
+                desc.textContent = descText;
+                valDisplay.textContent = valText;
+            };
+
+            // Relationship Checker
+            const checkRelationships = (sliderVal, g, i, u, b) => {
+                const alertBox = getEl('rel-alert');
+                
+                const tPhillips = getEl('theory-phillips');
+                const tOkun = getEl('theory-okun');
+                const tStability = getEl('theory-stability');
+                const tRecession = getEl('theory-recession');
+                
+                const cardGrowth = getEl('card-growth');
+                const cardJobs = getEl('card-jobs');
+                const cardPrices = getEl('card-prices');
+                const cardTrade = getEl('card-trade');
+
+                if (!alertBox) return;
+
+                // Reset Visuals
+                alertBox.className = '';
+                alertBox.textContent = '';
+                
+                // Helper to safely hide elements
+                const hide = (el) => { if(el) { el.style.display = 'none'; el.classList.remove('fade-in'); }};
+                const show = (el) => { if(el) { el.style.display = 'block'; el.classList.add('fade-in'); }};
+
+                [tPhillips, tOkun, tStability, tRecession].forEach(hide);
+
+                let active = false;
+
+                // 1. HARMONIE: Wachstum & Jobs (Mitte Rechts)
+                if (sliderVal >= 50 && sliderVal <= 75) {
+                    alertBox.textContent = "🤝 HARMONIE: Aufschwung (Wachstum & Jobs)";
+                    alertBox.classList.add('rel-harmony', 'show');
+                    
+                    if(cardGrowth) cardGrowth.classList.add('highlight-harmony');
+                    if(cardJobs) cardJobs.classList.add('highlight-harmony');
+                    
+                    show(tOkun);
+                    active = true;
+                }
+                // 2. HARMONIE: Stabilität (Links)
+                else if (sliderVal >= 20 && sliderVal < 45) {
+                    alertBox.textContent = "🤝 HARMONIE: Stabilität (Preise & Handel)";
+                    alertBox.classList.add('rel-harmony', 'show');
+                    
+                    if(cardPrices) cardPrices.classList.add('highlight-harmony');
+                    if(cardTrade) cardTrade.classList.add('highlight-harmony');
+                    
+                    show(tStability);
+                    active = true;
+                }
+                // 3. KONFLIKT: Phillips (Ganz Rechts)
+                else if (sliderVal > 75) {
+                    alertBox.textContent = "⚔️ ZIELKONFLIKT: Phillips-Kurve (Jobs vs. Preise)";
+                    alertBox.classList.add('rel-conflict', 'show');
+                    
+                    if(cardJobs) cardJobs.classList.add('highlight-conflict');
+                    if(cardPrices) cardPrices.classList.add('highlight-conflict');
+                    
+                    show(tPhillips);
+                    active = true;
+                }
+                // 4. KONFLIKT: Rezession (Ganz Links)
+                else if (sliderVal < 20) {
+                    alertBox.textContent = "⚔️ KONFLIKT: Rezession (Jobs & Wachstum weg)";
+                    alertBox.classList.add('rel-conflict', 'show');
+
+                    if(cardGrowth) cardGrowth.classList.add('highlight-conflict');
+                    if(cardJobs) cardJobs.classList.add('highlight-conflict');
+
+                    show(tRecession);
+                    active = true;
+                }
+
+                if (!active) {
+                    alertBox.classList.remove('show');
+                }
+            };
+
+            // Start wenn DOM bereit
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+
+        })();
+    </script>
+</body>
+</html>
