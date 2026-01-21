@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- HARDENED CSP: Maximale Einschränkung für Offline-Sicherheit. 
+         Hinweis: 'unsafe-inline' ist in dieser Single-File-Version für Styles/Scripts nötig. 
+         Siehe Migrationspfad unten für Entfernung. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'none'; frame-ancestors 'none'; form-action 'none'; object-src 'none'; base-uri 'none';">
+    <title>Lernmodul: Konjunkturzyklus (Offline)</title>
+    <style>
+        /* --- LOKALES CSS (Ersatz für Tailwind) --- */
+        :root {
+            --color-bg: #f8fafc;
+            --color-text: #1e293b;
+            --color-primary: #4f46e5; /* Indigo 600 */
+            --color-primary-hover: #4338ca;
+            --color-success: #16a34a;
+            --color-success-bg: #dcfce7;
+            --color-error: #dc2626;
+            --color-error-bg: #fee2e2;
+            --color-surface: #ffffff;
+            --color-border: #e2e8f0;
+            --color-accent: #3b82f6; /* Blue 500 */
+            --radius: 0.75rem;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1rem;
+            line-height: 1.5;
+        }
+
+        /* Utility Classes */
+        .hidden { display: none !important; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-4 { gap: 1rem; }
+        .w-full { width: 100%; }
+        .text-center { text-align: center; }
+        .font-bold { font-weight: 700; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mt-4 { margin-top: 1rem; }
+        .p-4 { padding: 1rem; }
+        .opacity-50 { opacity: 0.5; } /* Fixed: Missing utility class */
+        
+        /* Components */
+        .card {
+            background: var(--color-surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--color-border);
+            max-width: 64rem; /* max-w-5xl approx */
+            width: 100%;
+            overflow: hidden;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .btn {
+            background-color: var(--color-primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s, opacity 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .btn:hover:not(:disabled) { background-color: var(--color-primary-hover); }
+        .btn:active:not(:disabled) { transform: scale(0.98); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; background-color: #94a3b8; transform: none; }
+        .btn-success { background-color: var(--color-success); }
+        .btn-success:hover:not(:disabled) { background-color: #15803d; }
+        .btn-outline { background: white; color: var(--color-text); border: 1px solid var(--color-border); }
+        .btn-outline:hover:not(:disabled) { background: #f1f5f9; }
+
+        .icon { width: 1.25em; height: 1.25em; fill: currentColor; }
+
+        /* Typography */
+        h1 { font-size: 2rem; margin: 0 0 1rem 0; color: #0f172a; }
+        h2 { font-size: 1.5rem; margin: 0; }
+        h3 { font-size: 1.125rem; font-weight: 600; margin: 0 0 0.5rem 0; }
+        p { margin: 0 0 1rem 0; }
+
+        /* Timer */
+        #timer-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--color-border);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* SVG Graph Styles */
+        .cycle-path {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawLine 2s forwards;
+        }
+        @keyframes drawLine { to { stroke-dashoffset: 0; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } }
+
+        .hotspot { cursor: pointer; transition: all 0.3s; transform-origin: center; }
+        .hotspot:hover { r: 9; stroke-width: 3px; }
+        .hotspot.completed { fill: var(--color-success); stroke: #064e3b; }
+        .hotspot.locked { fill: #94a3b8; cursor: not-allowed; }
+        .hotspot.current { fill: var(--color-accent); stroke: #1e3a8a; animation: pulse 2s infinite; }
+
+        /* Drag & Drop Areas */
+        .drop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .drop-zone {
+            border: 2px dashed var(--color-border);
+            border-radius: var(--radius);
+            padding: 1rem;
+            min-height: 160px;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+        .drop-zone.drag-over, .drop-zone.highlight-target {
+            background-color: #eff6ff;
+            border-color: var(--color-accent);
+            transform: scale(1.02);
+        }
+        .draggable-item {
+            background: white;
+            border: 1px solid var(--color-primary);
+            color: var(--color-primary);
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: grab;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            user-select: none;
+        }
+        .draggable-item.selected {
+            background-color: var(--color-primary);
+            color: white;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
+        }
+        .draggable-item.success {
+            background-color: var(--color-success-bg);
+            border-color: var(--color-success);
+            color: #14532d;
+        }
+        .draggable-item.error {
+            background-color: var(--color-error-bg);
+            border-color: var(--color-error);
+            color: #7f1d1d;
+            animation: shake 0.5s;
+        }
+
+        /* Labeling Level specific */
+        .label-drop-zone {
+            border: 2px dashed #94a3b8;
+            background-color: rgba(255, 255, 255, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: #64748b;
+            text-align: center;
+            cursor: pointer;
+            position: absolute;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-radius: 0.25rem;
+        }
+        .label-drop-zone.drag-over, .label-drop-zone.highlight-target {
+            background-color: #dbeafe;
+            border-color: var(--color-accent);
+            z-index: 10;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Quiz Styles */
+        .quiz-option {
+            width: 100%;
+            text-align: left;
+            padding: 1rem;
+            background: white;
+            border: 1px solid var(--color-border);
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        .quiz-option:hover:not(:disabled) { background: #f1f5f9; }
+        .quiz-option.correct { background: var(--color-success-bg); border-color: var(--color-success); color: #14532d; }
+        .quiz-option.wrong { background: var(--color-error-bg); border-color: var(--color-error); }
+        .quiz-option-letter { font-weight: bold; margin-right: 0.75rem; color: #94a3b8; }
+
+        /* Responsive Fixes */
+        @media (max-width: 768px) {
+            .flex-responsive { flex-direction: column; }
+            .w-half-responsive { width: 100%; }
+            .h-auto-responsive { height: auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TIMER -->
+    <div id="timer-container" class="hidden">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+        <span id="global-timer">00:00</span>
+    </div>
+
+    <!-- SCREEN 0: EXPLANATION -->
+    <div id="screen-explanation" class="card p-4">
+        <div class="p-4">
+            <h1 class="text-center">Theoretische Grundlagen</h1>
+            <div style="max-width: 600px; margin: 0 auto;">
+                <p>Die Wirtschaft entwickelt sich nicht linear, sondern in Wellenbewegungen. Diese Schwankungen der gesamtwirtschaftlichen Aktivität nennen wir <strong>Konjunkturzyklus</strong>.</p>
+                <p>Ein vollständiger Zyklus besteht typischerweise aus vier Phasen, die sich um einen langfristigen Wachstumstrend (das <strong>Produktionspotenzial</strong>) bewegen.</p>
+                
+                <div style="background: #e0e7ff; padding: 1rem; border-radius: 0.5rem; margin: 1.5rem 0; border: 1px solid #c7d2fe;">
+                    <h3 style="color: #312e81;">Warum schwankt die Wirtschaft?</h3>
+                    <p style="font-size: 0.9rem; color: #3730a3; margin: 0;">Wirtschaftliche Ungleichgewichte entstehen durch Schwankungen in der Nachfrage, Investitionsentscheidungen oder externe Schocks. Der Abstand zwischen der tatsächlichen Leistung (BIP) und dem Potenzial wird als <em>Output-Gap</em> bezeichnet.</p>
+                </div>
+                
+                <p>In diesem Modul werden Sie die vier Phasen analysieren, die Bestandteile der Grafik benennen und Ihr Wissen überprüfen.</p>
+                
+                <div class="text-center mt-4">
+                    <button id="btn-to-intro" class="btn">Weiter zur Übersicht</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 1: INTRO -->
+    <div id="screen-intro" class="card hidden p-4 text-center">
+        <div style="padding: 2rem;">
+            <svg style="width: 64px; height: 64px; margin-bottom: 1rem; fill: var(--color-primary);" viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
+            <h1>Das Konjunktur-Labor</h1>
+            <p>Ein interaktives Lernmodul für die Oberstufe (SoWi).</p>
+            
+            <div style="background: #eff6ff; padding: 1.5rem; border-radius: 0.5rem; text-align: left; margin: 1.5rem auto; max-width: 400px; border: 1px solid #dbeafe;">
+                <h3>Ablauf:</h3>
+                <ul style="margin: 0; padding-left: 1.2rem; color: #1e3a8a;">
+                    <li><strong>Level 1:</strong> Interaktive Analyse der vier Phasen.</li>
+                    <li><strong>Level 2:</strong> Beschriftung des Konjunkturmodells.</li>
+                    <li><strong>Level 3:</strong> Zuordnung von Fachbegriffen.</li>
+                    <li><strong>Abschluss:</strong> Dokumentation.</li>
+                </ul>
+            </div>
+            
+            <p style="font-style: italic; color: #64748b; font-size: 0.9rem;">Zeit läuft ab Start</p>
+            <button id="btn-start-game" class="btn">Modul starten</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 2: LEVEL 1 (ANALYSE) -->
+    <div id="screen-learn" class="card hidden">
+        <div style="background: #0f172a; color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
+            <h2>Level 1: Analyse</h2>
+            <div style="font-size: 0.9rem; color: #94a3b8;">Schritt <span id="progress-step">1</span> von 4</div>
+        </div>
+
+        <div class="flex flex-responsive">
+            <!-- Grafik -->
+            <div style="flex: 1; padding: 1.5rem; background: #f8fafc; display: flex; justify-content: center; align-items: center; border-bottom: 1px solid #e2e8f0;">
+                <svg viewBox="0 0 400 250" style="width: 100%; height: auto; max-width: 500px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">
+                    <!-- Achsen -->
+                    <defs>
+                        <marker id="arrow" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto" markerUnits="strokeWidth">
+                          <path d="M0,0 L0,6 L9,3 z" fill="#94a3b8" />
+                        </marker>
+                    </defs>
+                    <line x1="20" y1="20" x2="20" y2="230" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />
+                    <line x1="20" y1="230" x2="380" y2="230" stroke="#94a3b8" stroke-width="2" />
+                    <text x="360" y="245" font-size="10" fill="#64748b" font-weight="bold">Zeit t</text>
+                    <text x="10" y="20" font-size="10" fill="#64748b" style="writing-mode: vertical-rl; text-orientation: mixed;" font-weight="bold">BIP (real)</text>
+                    
+                    <!-- Trend -->
+                    <line x1="20" y1="180" x2="380" y2="70" stroke="#16a34a" stroke-width="2" stroke-dasharray="6,4" /> 
+                    <text x="280" y="90" font-size="9" fill="#166534" font-weight="bold" transform="rotate(-17 280,90)">Produktionspotenzial</text>
+
+                    <!-- Kurve -->
+                    <path class="cycle-path" d="M 20 200 C 60 210, 80 170, 110 160 C 140 140, 160 20, 200 40 C 240 60, 260 160, 290 170 C 320 180, 340 160, 380 120" 
+                          fill="none" stroke="#3b82f6" stroke-width="4" stroke-linecap="round" />
+
+                    <!-- Hotspots (Events werden via JS gebunden) -->
+                    <circle id="spot-1" cx="110" cy="160" r="8" fill="white" stroke="#3b82f6" stroke-width="2" class="hotspot current" data-phase="1"></circle>
+                    <circle id="spot-2" cx="200" cy="40" r="8" fill="white" stroke="#3b82f6" stroke-width="2" class="hotspot locked" data-phase="2"></circle>
+                    <circle id="spot-3" cx="255" cy="120" r="8" fill="white" stroke="#3b82f6" stroke-width="2" class="hotspot locked" data-phase="3"></circle>
+                    <circle id="spot-4" cx="290" cy="170" r="8" fill="white" stroke="#3b82f6" stroke-width="2" class="hotspot locked" data-phase="4"></circle>
+                </svg>
+            </div>
+
+            <!-- Content Panel -->
+            <div id="info-panel" style="flex: 1.2; padding: 2rem; max-height: 80vh; overflow-y: auto;">
+                <div style="margin-bottom: 1rem;">
+                    <span id="phase-badge" style="background: #dbeafe; color: #1e40af; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.5rem; border-radius: 0.25rem; text-transform: uppercase;">Phase 1</span>
+                </div>
+                <h2 id="phase-title" style="margin-bottom: 1rem;">Aufschwung (Expansion)</h2>
+                
+                <div id="phase-content" style="color: #475569; margin-bottom: 2rem;">
+                    <p>Klicken Sie links auf den blinkenden Punkt, um die Analyse zu starten.</p>
+                </div>
+
+                <!-- Quiz -->
+                <div id="mini-quiz" class="hidden" style="background: #f8fafc; padding: 1.5rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; position: relative;">
+                    <div style="background: #e2e8f0; height: 4px; width: 100%; position: absolute; top: 0; left: 0; border-radius: 0.5rem 0.5rem 0 0; overflow: hidden;">
+                        <div id="quiz-progress-bar" style="background: var(--color-accent); width: 0%; height: 100%; transition: width 0.3s;"></div>
+                    </div>
+                    
+                    <div class="flex justify-between mb-4">
+                        <span class="font-bold text-sm">Wissens-Check</span>
+                        <span id="quiz-counter" class="text-sm text-gray-500 font-bold bg-gray-100 px-2 rounded">Frage 1/3</span>
+                    </div>
+
+                    <p id="quiz-question" class="font-bold mb-4">...</p>
+                    
+                    <div id="quiz-options-container" class="flex-col gap-2"></div>
+
+                    <button id="btn-next-question" class="btn hidden w-full mt-4">Nächste Frage</button>
+                </div>
+
+                <div id="continue-btn-container" class="hidden mt-4">
+                    <button id="btn-next-phase" class="btn btn-success w-full">Phase abgeschlossen - Weiter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 2.5: LABELING (LEVEL 2) -->
+    <div id="screen-labeling" class="card hidden">
+        <div style="background: var(--color-primary); color: white; padding: 1rem; display: flex; justify-content: space-between;">
+            <h2>Level 2: Beschriftung</h2>
+            <span style="font-size: 0.9rem; opacity: 0.8;">Labels zuordnen</span>
+        </div>
+
+        <div class="p-4 flex-col items-center text-center">
+            <p style="max-width: 600px; margin: 0 auto 2rem auto; color: #475569;">
+                Ziehen Sie die orangen Begriffe auf die korrekten Felder in der Grafik (oder tippen Sie erst auf den Begriff, dann auf das Ziel).
+            </p>
+
+            <div class="flex flex-responsive justify-center gap-4">
+                <!-- Grafik Container -->
+                <div style="position: relative; width: 450px; height: 300px; max-width: 100%; border: 1px solid #e2e8f0; border-radius: 0.5rem; background: #f8fafc;">
+                    <svg viewBox="0 0 400 250" style="width: 100%; height: 100%; opacity: 0.6;">
+                         <line x1="30" y1="20" x2="30" y2="230" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />
+                         <line x1="30" y1="230" x2="380" y2="230" stroke="#94a3b8" stroke-width="2" />
+                         <line x1="30" y1="180" x2="380" y2="70" stroke="#16a34a" stroke-width="2" stroke-dasharray="6,4" /> 
+                         <path d="M 30 200 C 70 210, 90 170, 120 160 C 150 140, 170 20, 210 40 C 250 60, 270 160, 300 170 C 330 180, 350 160, 390 120" 
+                               fill="none" stroke="#3b82f6" stroke-width="3" stroke-linecap="round" />
+                    </svg>
+
+                    <!-- Drop Zones - Positionen optimiert -->
+                    <!-- Achsen -->
+                    <div class="label-drop-zone absolute" style="top: 40px; left: 5px; width: 30px; height: 120px; writing-mode: vertical-rl; transform: rotate(180deg);" data-target="l-bip">?</div>
+                    <div class="label-drop-zone absolute" style="bottom: 10px; right: 20px; width: 80px; height: 30px;" data-target="l-zeit">?</div>
+                    <!-- Trend -->
+                    <div class="label-drop-zone absolute" style="top: 80px; left: 280px; width: 120px; height: 40px;" data-target="l-trend">?</div>
+                    
+                    <!-- Die 4 Phasen (Positionen auf dem Graphen) -->
+                    <!-- Aufschwung (steigend, unter Trend) -->
+                    <div class="label-drop-zone absolute" style="bottom: 120px; left: 100px; width: 90px; height: 30px;" data-target="l-ph1">?</div>
+                    <!-- Boom (Spitze) -->
+                    <div class="label-drop-zone absolute" style="top: 20px; left: 170px; width: 80px; height: 30px;" data-target="l-ph2">?</div>
+                    <!-- Rezession (fallend) -->
+                    <div class="label-drop-zone absolute" style="top: 130px; left: 230px; width: 90px; height: 30px;" data-target="l-ph3">?</div>
+                    <!-- Depression (Tal) -->
+                    <div class="label-drop-zone absolute" style="bottom: 60px; left: 300px; width: 90px; height: 30px;" data-target="l-ph4">?</div>
+                </div>
+
+                <!-- Draggables -->
+                <div class="flex-col gap-2 justify-center" id="label-source-container">
+                    <div class="font-bold text-sm text-gray-500 mb-2">BEGRIFFE:</div>
+                    <!-- Items generated via JS -->
+                </div>
+            </div>
+
+            <div class="mt-4 flex gap-2 justify-center">
+                <button id="btn-reset-labels" class="btn btn-outline">Zurücksetzen</button>
+                <button id="btn-check-labels" class="btn">Überprüfen & Weiter</button>
+            </div>
+            <p id="label-error-msg" class="hidden text-center" style="color: var(--color-error); font-weight: bold; margin-top: 0.5rem;">Nicht korrekt. Bitte überprüfen.</p>
+        </div>
+    </div>
+
+    <!-- SCREEN 3: LEVEL 3 (CHALLENGE) -->
+    <div id="screen-challenge" class="card hidden">
+        <div style="background: #1e1b4b; color: white; padding: 1rem; display: flex; justify-content: space-between;">
+            <h2>Level 3: Wissensnachweis</h2>
+            <span style="font-size: 0.9rem; opacity: 0.8;">Begriffe zuordnen</span>
+        </div>
+        
+        <div class="p-4">
+            <div class="drop-grid">
+                <div class="drop-zone" data-phase="1">
+                    <div class="text-center font-bold text-gray-500" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">Aufschwung</div>
+                </div>
+                <div class="drop-zone" data-phase="2">
+                    <div class="text-center font-bold text-gray-500" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">Hochkonjunktur</div>
+                </div>
+                <div class="drop-zone" data-phase="3">
+                    <div class="text-center font-bold text-gray-500" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">Abschwung</div>
+                </div>
+                <div class="drop-zone" data-phase="4">
+                    <div class="text-center font-bold text-gray-500" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">Depression</div>
+                </div>
+            </div>
+
+            <div style="background: #eef2ff; padding: 1rem; border-radius: 0.5rem; border: 1px solid #c7d2fe;">
+                <p class="font-bold text-sm text-center mb-2" style="color: #3730a3;">BEGRIFFE (Tippen zum Auswählen):</p>
+                <div id="drag-source" class="flex" style="flex-wrap: wrap; gap: 0.5rem; justify-content: center;"></div>
+            </div>
+
+            <div class="text-center mt-4 flex gap-2 justify-center">
+                <button id="btn-reset-challenge" class="btn btn-outline">Zurücksetzen</button>
+                <button id="btn-check-challenge" class="btn">Überprüfen & Beenden</button>
+            </div>
+            <p id="challenge-error-msg" class="hidden text-center" style="color: var(--color-error); font-weight: bold; margin-top: 0.5rem;"></p>
+        </div>
+    </div>
+
+    <!-- SCREEN 4: DOCUMENTATION -->
+    <div id="screen-doc" class="card hidden p-4 text-center">
+        <div style="padding: 2rem; border: 8px double #e2e8f0; border-radius: 0.5rem; background: radial-gradient(#f8fafc 1px, transparent 1px) 0 0 / 20px 20px;">
+            <svg style="width: 80px; height: 80px; fill: #1d4ed8; margin-bottom: 1rem;" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+            <h1>DOKUMENTATION</h1>
+            <p class="text-sm uppercase" style="letter-spacing: 2px; color: #64748b;">Lernmodul-Abschluss</p>
+            
+            <p style="margin: 2rem 0; font-size: 1.1rem;">Das Modul <strong>"Wirtschaftspolitik: Konjunkturanalyse"</strong> wurde absolviert.</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; text-align: left; max-width: 500px; margin: 0 auto; font-size: 0.9rem;">
+                <div>
+                    <h3 style="border-bottom: 1px solid #cbd5e1;">Kompetenzen:</h3>
+                    <ul style="padding-left: 1.2rem; color: #475569;">
+                        <li>Indikatoren-Analyse</li>
+                        <li>Verhältnis zum Potenzial</li>
+                        <li>Modell-Verständnis</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="border-bottom: 1px solid #cbd5e1;">Details:</h3>
+                    <p>Datum: <span id="doc-date"></span></p>
+                    <p>Zeit: <span id="doc-time" style="font-weight: bold; color: var(--color-primary);"></span></p>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4">
+            <button id="btn-save-txt" class="btn" style="background: #1e293b;">
+                Als Text speichern (Protokoll)
+            </button>
+            <br>
+            <button id="btn-restart" class="btn btn-outline mt-4" style="border: none; text-decoration: underline;">Neustart</button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- STATE & DATA ---
+            const state = {
+                phase: 0,
+                timerInterval: null,
+                seconds: 0,
+                quizIndex: 0,
+                quizErrors: 0,
+                labelErrors: 0,
+                challengeErrors: 0,
+                selectedDraggable: null, // For tap-to-move support
+                log: [] // Activity Log
+            };
+
+            function addLog(text) {
+                const time = new Date().toLocaleTimeString('de-DE');
+                // Missbrauchsschutz: Log-Limit
+                if (state.log.length > 200) {
+                    state.log.shift();
+                }
+                state.log.push(`[${time}] ${text}`);
+            }
+
+            const PHASES_DATA = {
+                1: {
+                    title: "Aufschwung (Expansion)",
+                    text: "<strong>Die Erholungsphase.</strong> Nach der Talsohle wächst die Wirtschaft wieder. Entscheidend ist das Verhältnis zum <em>Produktionspotenzial</em>: Die Wirtschaft nähert sich dem Trend von unten an.",
+                    indicators: [
+                        { text: "BIP-Wachstum: Steigt an" },
+                        { text: "Beschäftigung: Sinkt langsam (Time-Lag)" },
+                        { text: "Preise: Noch stabil" }
+                    ],
+                    questions: [
+                        { q: "Wie verhält sich das reale BIP zum Produktionspotenzial?", options: [{t: "Liegt darunter, holt auf", c: true}, {t: "Liegt weit darüber", c: false}] },
+                        { q: "Warum sinkt die Arbeitslosigkeit verzögert?", options: [{t: "Abbau von Überstunden vor Neueinstellungen", c: true}, {t: "Sofortige Masseneinstellungen", c: false}] },
+                        { q: "Stimmung der Marktteilnehmer?", options: [{t: "Pessimistisch", c: false}, {t: "Vorsichtig optimistisch", c: true}] }
+                    ]
+                },
+                2: {
+                    title: "Hochkonjunktur (Boom)",
+                    text: "<strong>Die Überhitzung.</strong> Produktion über dem Potenzial. Vollbeschäftigung. Preise steigen stark (Inflationsgefahr).",
+                    indicators: [],
+                    questions: [
+                        { q: "Hauptgefahr im Boom?", options: [{t: "Deflation", c: false}, {t: "Inflation", c: true}] },
+                        { q: "Reaktion der Zentralbank?", options: [{t: "Zinsen senken", c: false}, {t: "Zinsen erhöhen", c: true}] },
+                        { q: "Lohn-Preis-Spirale?", options: [{t: "Löhne/Preise treiben sich hoch", c: true}, {t: "Preise fallen", c: false}] }
+                    ]
+                },
+                3: {
+                    title: "Abschwung (Rezession)",
+                    text: "<strong>Der Wendepunkt.</strong> Wachstum bricht ein. Technische Rezession bei zwei Quartalen Negativwachstum.",
+                    indicators: [],
+                    questions: [
+                        { q: "Definition technische Rezession?", options: [{t: "2 Quartale BIP-Schrumpfung", c: true}, {t: "Börsencrash", c: false}] },
+                        { q: "Lagerbestände?", options: [{t: "Leer", c: false}, {t: "Ungewollt voll", c: true}] },
+                        { q: "Automatische Stabilisatoren?", options: [{t: "Stützen Nachfrage (z.B. ALG)", c: true}, {t: "Erhöhen Steuern", c: false}] }
+                    ]
+                },
+                4: {
+                    title: "Tiefphase (Depression)",
+                    text: "<strong>Die Krise.</strong> Weit unter Potenzial. Hohe Arbeitslosigkeit, Deflationsgefahr.",
+                    indicators: [],
+                    questions: [
+                        { q: "Output-Gap in Depression?", options: [{t: "Negativ (Unterauslastung)", c: true}, {t: "Positiv", c: false}] },
+                        { q: "Gefahr bei Deflation?", options: [{t: "Kaufaufschub der Konsumenten", c: true}, {t: "Geldentwertung", c: false}] },
+                        { q: "Keynesianische Empfehlung?", options: [{t: "Sparen", c: false}, {t: "Deficit Spending", c: true}] }
+                    ]
+                }
+            };
+
+            const CHALLENGE_ITEMS = [
+                { id: "c1", text: "Lücke schließt sich", phase: "1" },
+                { id: "c2", text: "Optimismus", phase: "1" },
+                { id: "c3", text: "Überlastung", phase: "2" },
+                { id: "c4", text: "Lohn-Preis-Spirale", phase: "2" },
+                { id: "c5", text: "Volle Lager", phase: "3" },
+                { id: "c6", text: "Investitionsstopp", phase: "3" },
+                { id: "c7", text: "Großes neg. Output-Gap", phase: "4" },
+                { id: "c8", text: "Deflationsgefahr", phase: "4" }
+            ];
+
+            const LABEL_ITEMS = [
+                { id: "l-zeit", text: "Zeit t" },
+                { id: "l-bip", text: "BIP (real)", style: "writing-mode: vertical-rl; height:80px" },
+                { id: "l-trend", text: "Potenzial" },
+                { id: "l-ph1", text: "Aufschwung" },
+                { id: "l-ph2", text: "Boom" },
+                { id: "l-ph3", text: "Rezession" },
+                { id: "l-ph4", text: "Depression" }
+            ];
+
+            // --- DOM UTILS (Safe Content) ---
+            function setSafeHTML(elementId, htmlString) {
+                const el = document.getElementById(elementId);
+                if (!el) return;
+                el.replaceChildren(); // Safe clear
+                
+                // Whitelist-Parser für strong und em
+                const parts = htmlString.split(/(<\/?(?:strong|em)>)/g);
+                let currentTag = null;
+                parts.forEach(part => {
+                    if (part === '<strong>' || part === '<em>') {
+                        currentTag = part.replace(/[<>]/g, '');
+                    } else if (part === '</strong>' || part === '</em>') {
+                        currentTag = null;
+                    } else if (part.trim() !== '') {
+                        if (currentTag) {
+                            const span = document.createElement(currentTag);
+                            span.textContent = part;
+                            el.appendChild(span);
+                        } else {
+                            el.appendChild(document.createTextNode(part));
+                        }
+                    }
+                });
+            }
+
+            function switchScreen(screenId) {
+                document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
+                document.getElementById(screenId).classList.remove('hidden');
+                window.scrollTo(0,0);
+            }
+
+            function debounce(func, timeout = 300) {
+                let timer;
+                return (...args) => {
+                    clearTimeout(timer);
+                    timer = setTimeout(() => { func.apply(this, args); }, timeout);
+                };
+            }
+
+            // --- TIMER ---
+            function startTimer() {
+                document.getElementById('timer-container').classList.remove('hidden');
+                clearInterval(state.timerInterval);
+                state.seconds = 0;
+                updateTimer();
+                state.timerInterval = setInterval(() => {
+                    state.seconds++;
+                    updateTimer();
+                }, 1000);
+            }
+
+            function updateTimer() {
+                const m = Math.floor(state.seconds / 60).toString().padStart(2, '0');
+                const s = (state.seconds % 60).toString().padStart(2, '0');
+                document.getElementById('global-timer').textContent = `${m}:${s}`;
+            }
+
+            // --- DRAG & DROP & TAP SYSTEM (Scoped) ---
+            // Fix: Globaler Listener nur einmal binden
+            document.body.addEventListener('click', (e) => {
+                if (state.selectedDraggable) {
+                    const isItem = e.target.closest('.draggable-item');
+                    const isZone = e.target.closest('.drop-zone') || e.target.closest('.label-drop-zone');
+                    
+                    if (!isItem && !isZone) {
+                        state.selectedDraggable.classList.remove('selected');
+                        state.selectedDraggable = null;
+                        document.querySelectorAll('.highlight-target').forEach(z => z.classList.remove('highlight-target'));
+                    }
+                }
+            });
+
+            function initDragSystem(containerId, itemClass, dropZoneClass, dropCallback) {
+                const container = document.getElementById(containerId);
+                const items = container.querySelectorAll(itemClass);
+                const zones = container.querySelectorAll(dropZoneClass);
+
+                // Mouse/Touch Handlers for Items
+                items.forEach(item => {
+                    item.setAttribute('draggable', 'true');
+                    
+                    // Drag Start
+                    item.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('text/plain', item.id);
+                        e.dataTransfer.effectAllowed = 'move';
+                        item.classList.add('opacity-50');
+                    });
+
+                    item.addEventListener('dragend', () => {
+                        item.classList.remove('opacity-50');
+                        zones.forEach(z => z.classList.remove('drag-over'));
+                    });
+
+                    // Click/Tap Selection
+                    item.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        items.forEach(i => i.classList.remove('selected'));
+                        
+                        if (state.selectedDraggable === item) {
+                            state.selectedDraggable = null;
+                        } else {
+                            state.selectedDraggable = item;
+                            item.classList.add('selected');
+                            zones.forEach(z => z.classList.add('highlight-target'));
+                        }
+                    });
+                });
+
+                // Zone Handlers
+                zones.forEach(zone => {
+                    zone.addEventListener('dragover', (e) => {
+                        e.preventDefault(); 
+                        e.dataTransfer.dropEffect = 'move';
+                        zone.classList.add('drag-over');
+                    });
+
+                    zone.addEventListener('dragleave', () => {
+                        zone.classList.remove('drag-over');
+                    });
+
+                    zone.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        zone.classList.remove('drag-over');
+                        const id = e.dataTransfer.getData('text/plain');
+                        const item = document.getElementById(id);
+                        if (item) dropCallback(item, zone);
+                    });
+
+                    // Click handler for Tap-to-Move
+                    zone.addEventListener('click', () => {
+                        if (state.selectedDraggable) {
+                            dropCallback(state.selectedDraggable, zone);
+                            // Reset selection
+                            state.selectedDraggable.classList.remove('selected');
+                            state.selectedDraggable = null;
+                            zones.forEach(z => z.classList.remove('highlight-target'));
+                        }
+                    });
+                });
+            }
+
+            // --- GAME LOGIC: LEVEL 1 (ANALYSIS) ---
+            function initLevel1() {
+                switchScreen('screen-learn');
+                loadPhase(1);
+                addLog('Start Level 1: Analyse der Phasen.');
+                
+                // Hotspot clicks
+                document.querySelectorAll('.hotspot').forEach(spot => {
+                    // Safe cleanup old listeners by cloning or just ensure logic is idempotent
+                    // Better: check if we should process
+                    spot.addEventListener('click', () => {
+                        // Robustheit: Nur klicken, wenn nicht locked und nicht completed
+                        if (spot.classList.contains('locked')) return;
+                        
+                        const p = parseInt(spot.getAttribute('data-phase'));
+                        if (p === state.phase || p === state.phase + 1) {
+                            // Valid transition handled in logic
+                        }
+                    });
+                });
+            }
+
+            function loadPhase(num) {
+                if (num > state.phase + 1) return; // Prevent skipping
+                
+                state.quizIndex = 0;
+                const data = PHASES_DATA[num];
+                
+                // Update UI
+                document.getElementById('phase-badge').textContent = `PHASE ${num}`;
+                document.getElementById('phase-title').textContent = data.title;
+                setSafeHTML('phase-content', data.text);
+                document.getElementById('progress-step').textContent = num;
+
+                // Visual Graph State
+                document.querySelectorAll('.hotspot').forEach(spot => {
+                    const id = parseInt(spot.getAttribute('data-phase'));
+                    spot.classList.remove('current', 'completed', 'locked');
+                    if (id < num) spot.classList.add('completed');
+                    else if (id === num) spot.classList.add('current');
+                    else spot.classList.add('locked');
+                });
+
+                renderQuiz(num);
+            }
+
+            function renderQuiz(phaseNum) {
+                const quizData = PHASES_DATA[phaseNum].questions[state.quizIndex];
+                const quizContainer = document.getElementById('mini-quiz');
+                const optionsContainer = document.getElementById('quiz-options-container');
+                const nextBtn = document.getElementById('btn-next-question');
+                const contContainer = document.getElementById('continue-btn-container');
+
+                quizContainer.classList.remove('hidden');
+                contContainer.classList.add('hidden');
+                nextBtn.classList.add('hidden');
+                optionsContainer.replaceChildren(); // Safe clear
+
+                document.getElementById('quiz-question').textContent = quizData.q;
+                document.getElementById('quiz-counter').textContent = `Frage ${state.quizIndex + 1}/3`;
+                document.getElementById('quiz-progress-bar').style.width = `${(state.quizIndex/3)*100}%`;
+
+                const opts = [...quizData.options].sort(() => Math.random() - 0.5);
+                
+                opts.forEach((opt, idx) => {
+                    const btn = document.createElement('div');
+                    btn.className = 'quiz-option';
+                    
+                    const letter = document.createElement('span');
+                    letter.className = 'quiz-option-letter';
+                    letter.textContent = String.fromCharCode(65 + idx);
+                    
+                    const text = document.createElement('span');
+                    text.textContent = opt.t;
+
+                    btn.appendChild(letter);
+                    btn.appendChild(text);
+
+                    btn.addEventListener('click', () => {
+                        if (btn.classList.contains('correct') || btn.classList.contains('wrong')) return;
+                        
+                        addLog(`Level 1 - Quiz Phase ${phaseNum}, Frage ${state.quizIndex+1}: Antwort "${opt.t}" gewählt. Ergebnis: ${opt.c ? 'Korrekt' : 'Falsch'}`);
+
+                        if (opt.c) {
+                            btn.classList.add('correct');
+                            Array.from(optionsContainer.children).forEach(c => c.style.pointerEvents = 'none');
+                            
+                            if (state.quizIndex < 2) {
+                                nextBtn.classList.remove('hidden');
+                            } else {
+                                document.getElementById('quiz-progress-bar').style.width = '100%';
+                                contContainer.classList.remove('hidden');
+                                state.phase = phaseNum;
+                            }
+                        } else {
+                            btn.classList.add('wrong');
+                            state.quizErrors++;
+                        }
+                    });
+                    
+                    optionsContainer.appendChild(btn);
+                });
+            }
+
+            document.getElementById('btn-next-question').addEventListener('click', () => {
+                state.quizIndex++;
+                const phaseNum = parseInt(document.getElementById('phase-badge').textContent.split(' ')[1]);
+                renderQuiz(phaseNum);
+            });
+
+            document.getElementById('btn-next-phase').addEventListener('click', () => {
+                if (state.phase < 4) {
+                    loadPhase(state.phase + 1);
+                } else {
+                    initLevel2();
+                }
+            });
+
+            // --- LEVEL 2: LABELING ---
+            function initLevel2() {
+                switchScreen('screen-labeling');
+                addLog('Start Level 2: Beschriftung.');
+                const container = document.getElementById('label-source-container');
+                container.replaceChildren();
+                
+                LABEL_ITEMS.forEach(item => {
+                    const div = document.createElement('div');
+                    div.id = item.id;
+                    div.className = 'draggable-item';
+                    const styleStr = item.style || '';
+                    div.setAttribute('style', styleStr);
+                    div.setAttribute('data-orig-style', styleStr); // Save for restore
+                    div.textContent = item.text;
+                    container.appendChild(div);
+                });
+
+                initDragSystem('screen-labeling', '.draggable-item', '.label-drop-zone', (item, zone) => {
+                    // Logic to swap items if zone is occupied
+                    if (zone.children.length > 0) {
+                        const existingItem = zone.children[0];
+                        if (existingItem !== item) {
+                            // Move existing item back to source
+                            const sourceContainer = document.getElementById('label-source-container');
+                            sourceContainer.appendChild(existingItem);
+                            // Restore its original style
+                            const origStyle = existingItem.getAttribute('data-orig-style');
+                            existingItem.setAttribute('style', origStyle || '');
+                        }
+                    }
+
+                    // Move new item to zone
+                    zone.appendChild(item);
+                    
+                    // Reset style to fit zone
+                    item.style.writingMode = 'horizontal-tb';
+                    item.style.height = '100%';
+                    item.style.width = '100%';
+                    item.style.margin = '0';
+                    item.style.display = 'flex';
+                    item.style.alignItems = 'center';
+                    item.style.justifyContent = 'center';
+                });
+            }
+
+            // RESET LEVEL 2 with SPAM LOCK
+            const resetLabelsBtn = document.getElementById('btn-reset-labels');
+            resetLabelsBtn.addEventListener('click', debounce(() => {
+                resetLabelsBtn.disabled = true;
+                const container = document.getElementById('label-source-container');
+                const zones = document.querySelectorAll('.label-drop-zone');
+                
+                zones.forEach(zone => {
+                    Array.from(zone.children).forEach(item => {
+                        const origStyle = item.getAttribute('data-orig-style');
+                        item.setAttribute('style', origStyle || '');
+                        container.appendChild(item);
+                    });
+                    zone.replaceChildren(); 
+                });
+                
+                document.getElementById('label-error-msg').classList.add('hidden');
+                addLog('Level 2 zurückgesetzt.');
+                setTimeout(() => resetLabelsBtn.disabled = false, 500); // Unlock
+            }));
+
+            const checkLabelsBtn = document.getElementById('btn-check-labels');
+            checkLabelsBtn.addEventListener('click', debounce(() => {
+                checkLabelsBtn.disabled = true;
+                const zones = document.querySelectorAll('.label-drop-zone');
+                let correct = 0;
+                let logDetails = [];
+
+                zones.forEach(z => {
+                    let itemName = "Leer";
+                    let isCorrect = false;
+                    if (z.children.length > 0) {
+                        const item = z.children[0];
+                        itemName = item.textContent;
+                        if (item.id === z.getAttribute('data-target')) {
+                            correct++;
+                            isCorrect = true;
+                        }
+                    }
+                    const zoneName = z.getAttribute('data-target'); // simplified logging name
+                    logDetails.push(`${zoneName}: ${itemName} (${isCorrect ? 'OK' : 'Falsch'})`);
+                });
+
+                addLog(`Level 2 Überprüfung: ${logDetails.join(', ')}`);
+
+                if (correct === 7) {
+                    initLevel3();
+                } else {
+                    state.labelErrors++;
+                    const msg = document.getElementById('label-error-msg');
+                    msg.classList.remove('hidden');
+                    setTimeout(() => {
+                        msg.classList.add('hidden');
+                        checkLabelsBtn.disabled = false; // Unlock
+                    }, 2000);
+                }
+            }));
+
+            // --- LEVEL 3: CHALLENGE ---
+            function initLevel3() {
+                switchScreen('screen-challenge');
+                addLog('Start Level 3: Zuordnung.');
+                const source = document.getElementById('drag-source');
+                source.replaceChildren();
+                
+                const items = [...CHALLENGE_ITEMS].sort(() => Math.random() - 0.5);
+                items.forEach(i => {
+                    const div = document.createElement('div');
+                    div.id = i.id;
+                    div.className = 'draggable-item';
+                    div.textContent = i.text;
+                    div.setAttribute('data-target-phase', i.phase);
+                    source.appendChild(div);
+                });
+
+                initDragSystem('screen-challenge', '.draggable-item', '.drop-zone', (item, zone) => {
+                    zone.appendChild(item);
+                    item.style.width = '100%';
+                });
+            }
+
+            // RESET LEVEL 3 with SPAM LOCK
+            const resetChallengeBtn = document.getElementById('btn-reset-challenge');
+            resetChallengeBtn.addEventListener('click', debounce(() => {
+                resetChallengeBtn.disabled = true;
+                const source = document.getElementById('drag-source');
+                const zones = document.querySelectorAll('#screen-challenge .drop-zone');
+                
+                zones.forEach(zone => {
+                    const items = zone.querySelectorAll('.draggable-item');
+                    items.forEach(item => {
+                        item.classList.remove('success', 'error');
+                        source.appendChild(item);
+                    });
+                });
+                
+                document.getElementById('challenge-error-msg').classList.add('hidden');
+                addLog('Level 3 zurückgesetzt.');
+                setTimeout(() => resetChallengeBtn.disabled = false, 500); // Unlock
+            }));
+
+            const checkChallengeBtn = document.getElementById('btn-check-challenge');
+            checkChallengeBtn.addEventListener('click', debounce(() => {
+                checkChallengeBtn.disabled = true;
+                let allCorrect = true;
+                let placed = 0;
+                let logDetails = [];
+                
+                document.querySelectorAll('#screen-challenge .drop-zone .draggable-item').forEach(item => {
+                    placed++;
+                    const zone = item.closest('.drop-zone');
+                    const targetPhase = item.getAttribute('data-target-phase');
+                    const actualPhase = zone.getAttribute('data-phase');
+                    const isCorrect = targetPhase === actualPhase;
+                    
+                    logDetails.push(`Begriff "${item.textContent}" in Phase ${actualPhase} (${isCorrect ? 'OK' : 'Falsch'})`);
+
+                    if (isCorrect) {
+                        item.classList.add('success');
+                        item.classList.remove('error');
+                    } else {
+                        item.classList.add('error');
+                        item.classList.remove('success');
+                        allCorrect = false;
+                    }
+                });
+
+                addLog(`Level 3 Überprüfung: ${logDetails.join('; ')}`);
+
+                const msg = document.getElementById('challenge-error-msg');
+                if (placed === CHALLENGE_ITEMS.length && allCorrect) {
+                    finishGame();
+                } else {
+                    if (!allCorrect) state.challengeErrors++;
+                    msg.textContent = placed < CHALLENGE_ITEMS.length ? "Bitte alle Begriffe zuordnen." : "Einige Zuordnungen sind falsch.";
+                    msg.classList.remove('hidden');
+                    setTimeout(() => checkChallengeBtn.disabled = false, 1500); // Unlock
+                }
+            }));
+
+            // --- FINISH ---
+            function finishGame() {
+                clearInterval(state.timerInterval);
+                addLog('Modul absolviert.');
+                switchScreen('screen-doc');
+                
+                const now = new Date();
+                document.getElementById('doc-date').textContent = now.toLocaleDateString('de-DE');
+                document.getElementById('doc-time').textContent = document.getElementById('global-timer').textContent;
+            }
+
+            // --- NAVIGATION HANDLERS ---
+            document.getElementById('btn-to-intro').addEventListener('click', () => switchScreen('screen-intro'));
+            
+            document.getElementById('btn-start-game').addEventListener('click', (e) => {
+                e.target.disabled = true; // Spam-Schutz
+                e.target.textContent = "Lädt...";
+                startTimer();
+                initLevel1();
+            });
+
+            document.getElementById('btn-restart').addEventListener('click', () => location.reload());
+
+            document.getElementById('btn-save-txt').addEventListener('click', () => {
+                const date = document.getElementById('doc-date').textContent;
+                const time = document.getElementById('doc-time').textContent;
+                
+                // Generiere Transkript aus state.log
+                const transcript = state.log.join('\n');
+
+                const text = `
+DOKUMENTATION: KONJUNKTUR-LABOR
+===============================
+Datum: ${date}
+Benötigte Zeit: ${time} Min
+
+STATUS:
+-------
+Das Lernmodul wurde absolviert.
+
+PROTOKOLL DER ENTSCHEIDUNGEN (LOG):
+-----------------------------------
+${transcript}
+
+FEHLERANALYSE (Zusammenfassung):
+--------------------------------
+- Level 1 (Wissenscheck): ${state.quizErrors} Fehler
+- Level 2 (Beschriftung): ${state.labelErrors} Fehlversuche
+- Level 3 (Zuordnung): ${state.challengeErrors} Fehlversuche
+
+__________________________________
+Erstellt via Offline-Lernmodul
+                `;
+                
+                const blob = new Blob([text], {type: 'text/plain'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'Lernprotokoll_Konjunktur.txt';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+        });
+    </script>
+</body>
+</html>
