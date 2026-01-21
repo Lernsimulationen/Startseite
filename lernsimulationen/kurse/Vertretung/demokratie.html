@@ -1,1 +1,680 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <!-- SECURITY: Strict Content Security Policy (CSP) -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
+    
+    <title>Demokratie-Check 2.0: Die Stadt der Entscheidung</title>
+    
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary: #64748b;
+            --bg-color: #f0f9ff;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --radius: 1rem;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --header-bg: #0f172a;
+        }
 
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        /* --- UTILITIES --- */
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            box-shadow: 0 0 40px rgba(0,0,0,0.05);
+        }
+
+        /* Fehlende Helper-Klassen ergänzt */
+        .p-4 { padding: 1.5rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mb-8 { margin-bottom: 2rem; }
+        
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+        
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        
+        .grid { display: grid; }
+        .w-full { width: 100%; }
+        .w-1-2 { width: 50%; }
+        
+        .font-bold { font-weight: 700; }
+        .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+        .text-sm { font-size: 0.875rem; }
+        .text-lg { font-size: 1.125rem; }
+        .text-xl { font-size: 1.25rem; }
+        .text-2xl { font-size: 1.5rem; }
+        .text-3xl { font-size: 1.875rem; }
+        .text-4xl { font-size: 2.25rem; }
+
+        /* Farben */
+        .text-white { color: #ffffff !important; }
+        .text-muted { color: var(--text-muted); }
+        .text-success { color: var(--success); }
+        .text-danger { color: var(--danger); }
+        .bg-slate-900 { background-color: var(--header-bg); }
+
+        /* --- ANIMATIONS --- */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .slide-up { animation: slideUp 0.3s ease-out; }
+
+        /* --- COMPONENTS --- */
+        button {
+            cursor: pointer;
+            font-family: inherit;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+        }
+        
+        button:focus-visible {
+            outline: 3px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            border-bottom: 4px solid rgba(0,0,0,0.1);
+        }
+        .btn:active:not(:disabled) {
+            transform: translateY(2px);
+            border-bottom-width: 0;
+            margin-bottom: 4px;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-bottom-width: 0;
+            background-color: #e2e8f0;
+            color: #94a3b8;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+        
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-neutral { background: white; border: 1px solid #e2e8f0; border-bottom: 4px solid #cbd5e1; color: var(--text-main); }
+        .btn-neutral:hover:not(:disabled) { background: #f8fafc; }
+
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid #e2e8f0;
+            padding: 1.5rem;
+        }
+
+        /* --- MAP STYLES --- */
+        .city-map {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1/1;
+            background-color: #e5e7eb;
+            background-image: url('background.jpg'); 
+            background-size: cover;
+            background-position: center;
+            border-radius: 1rem;
+            border: 4px solid #cbd5e1;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        .map-node {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            width: 4rem;
+            height: 4rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+            border: 3px solid white;
+            z-index: 10;
+        }
+        .map-node:hover:not(:disabled) { transform: translate(-50%, -50%) scale(1.1); }
+        .map-node.locked { background: #94a3b8; cursor: not-allowed; filter: grayscale(1); }
+        .map-node.active { background: var(--primary); color: white; animation: pulse 2s infinite; }
+        .map-node.done { background: var(--success); color: white; }
+        .map-node.boss { background: var(--danger); }
+        
+        .node-label {
+            position: absolute;
+            top: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.9);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            white-space: nowrap;
+            pointer-events: none;
+            color: #1e293b;
+        }
+
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); } }
+
+        .icon { width: 24px; height: 24px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+</head>
+<body>
+
+    <div id="app" class="container"></div>
+
+    <script>
+        // --- GAME STATE & CONFIGURATION ---
+        const STATE = {
+            view: 'intro',
+            score: 0,
+            completedMissions: [],
+            currentMissionId: null,
+            missionData: null
+        };
+
+        const LOCATIONS = [
+            { id: 'school', title: 'Schule', icon: 'school', x: 20, y: 20, req: [], desc: 'Quiz: Grundlagen' },
+            { id: 'news', title: 'Medienhaus', icon: 'newspaper', x: 80, y: 20, req: ['school'], desc: 'Fakt oder Fake?' },
+            { id: 'court', title: 'Gericht', icon: 'scale', x: 20, y: 80, req: ['school'], desc: 'Gewaltenteilung' },
+            { id: 'townhall', title: 'Rathaus', icon: 'building', x: 80, y: 80, req: ['news', 'court'], desc: 'Kompromiss finden' },
+            { id: 'arena', title: 'Arena', icon: 'swords', x: 50, y: 50, req: ['townhall'], desc: 'Der Bestimmer', isBoss: true }
+        ];
+
+        const ICONS = {
+            shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+            star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+            school: '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+            newspaper: '<path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/>',
+            scale: '<path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>',
+            building: '<rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M16 10h.01"/><path d="M8 14h.01"/><path d="M16 14h.01"/>',
+            swords: '<polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/><polyline points="14.5 6.5 18 3 21 3 21 6 17.5 9.5"/><line x1="5" y1="14" x2="9" y2="18"/><line x1="7" y1="17" x2="4" y2="20"/><line x1="3" y1="19" x2="5" y2="21"/>',
+            lock: '<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+            check: '<polyline points="20 6 9 17 4 12"/>',
+            alert: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+            x: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+            back: '<path d="m15 18-6-6 6-6"/>'
+        };
+
+        function getIcon(name, size=24) {
+            return `<svg class="icon" width="${size}" height="${size}" viewBox="0 0 24 24">${ICONS[name] || ''}</svg>`;
+        }
+
+        // --- RENDER ENGINE ---
+        function render() {
+            const app = document.getElementById('app');
+            app.innerHTML = '';
+            
+            if (STATE.view !== 'intro') {
+                app.appendChild(createHeader());
+            }
+
+            const main = document.createElement('main');
+            main.className = 'flex-1 p-4 w-full slide-up';
+            
+            if (STATE.view === 'intro') main.appendChild(createIntro());
+            else if (STATE.view === 'map') main.appendChild(createMap());
+            else if (STATE.view === 'mission') main.appendChild(createMission(STATE.currentMissionId));
+            else if (STATE.view === 'outro') main.appendChild(createOutro());
+            
+            app.appendChild(main);
+        }
+
+        function createHeader() {
+            const el = document.createElement('header');
+            // Hier greift jetzt die Klasse .text-white und .bg-slate-900
+            el.className = 'bg-slate-900 p-4 flex justify-between items-center text-white';
+            el.innerHTML = `
+                <div class="flex items-center gap-2">
+                    ${getIcon('shield')}
+                    <span class="font-bold">Stadt der Entscheidung</span>
+                </div>
+                <div class="flex items-center gap-2 py-1 px-3 rounded-full" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2)">
+                    ${getIcon('star')}
+                    <span class="font-bold font-mono">${STATE.score}</span>
+                </div>
+            `;
+            return el;
+        }
+
+        function createIntro() {
+            const div = document.createElement('div');
+            div.className = 'flex flex-col items-center justify-center h-full text-center fade-in';
+            div.style.marginTop = 'auto'; div.style.marginBottom = 'auto';
+            div.innerHTML = `
+                <div style="background:#dbeafe; padding:2rem; border-radius:50%; margin-bottom:1.5rem; color:var(--primary);">
+                    ${getIcon('building', 64)}
+                </div>
+                <h1 class="text-2xl font-bold mb-4">Rette die Demokratie!</h1>
+                <p class="mb-8 text-muted" style="max-width:300px; margin: 0 auto 2rem auto;">
+                    Ein <strong>"Bestimmer"</strong> (Demagoge) will die Macht an sich reißen. Er behauptet, alleine entscheiden sei schneller und besser.
+                    <br><br>
+                    Zeige ihm, dass Mitbestimmung stärker ist!
+                </p>
+                <button class="btn btn-primary w-full" onclick="changeView('map')">Spiel Starten</button>
+            `;
+            return div;
+        }
+
+        function createMap() {
+            const div = document.createElement('div');
+            div.className = 'fade-in w-full';
+            
+            div.innerHTML = `
+                <div class="text-center mb-4">
+                    <h2 class="text-xl font-bold">Stadtkarte</h2>
+                    <p class="text-muted text-sm">Wähle den nächsten Ort.</p>
+                </div>
+            `;
+
+            const mapContainer = document.createElement('div');
+            mapContainer.className = 'city-map';
+
+            LOCATIONS.forEach(loc => {
+                const locked = !loc.req.every(r => STATE.completedMissions.includes(r));
+                const done = STATE.completedMissions.includes(loc.id);
+                const active = !locked && !done;
+                
+                let btnClass = 'map-node';
+                if (locked) btnClass += ' locked';
+                else if (done) btnClass += ' done';
+                else if (active) btnClass += ' active';
+                if (loc.isBoss) btnClass += ' boss';
+
+                const btn = document.createElement('button');
+                btn.className = btnClass;
+                btn.style.left = loc.x + '%';
+                btn.style.top = loc.y + '%';
+                btn.disabled = locked || done;
+                btn.setAttribute('aria-label', `${loc.title} ${locked ? 'gesperrt' : ''} ${done ? 'erledigt' : ''}`);
+                
+                let iconName = loc.icon;
+                if (locked) iconName = 'lock';
+                if (done) iconName = 'check';
+
+                btn.innerHTML = `
+                    ${getIcon(iconName, active ? 32 : 24)}
+                    <span class="node-label">${loc.title}</span>
+                `;
+                
+                btn.onclick = () => startMission(loc.id);
+                mapContainer.appendChild(btn);
+            });
+
+            div.appendChild(mapContainer);
+            
+            const progress = (STATE.completedMissions.length / LOCATIONS.length) * 100;
+            const footer = document.createElement('div');
+            footer.className = 'mt-6 card p-4';
+            footer.style.backgroundColor = '#eff6ff';
+            footer.innerHTML = `
+                <div class="flex justify-between mb-2 text-sm font-bold" style="color:#1e40af">
+                    <span>Fortschritt</span>
+                    <span>${STATE.completedMissions.length} / 5</span>
+                </div>
+                <div style="background:#dbeafe; height:10px; border-radius:5px; overflow:hidden">
+                    <div style="width:${progress}%; background:var(--primary); height:100%; transition:width 0.5s"></div>
+                </div>
+            `;
+            div.appendChild(footer);
+
+            return div;
+        }
+
+        function createMission(id) {
+            const container = document.createElement('div');
+            container.className = 'fade-in';
+            
+            const backBtn = document.createElement('button');
+            backBtn.className = 'mb-4 text-sm flex items-center gap-2 text-muted';
+            backBtn.innerHTML = `${getIcon('back', 16)} Zurück zur Karte`;
+            backBtn.onclick = () => changeView('map');
+            container.appendChild(backBtn);
+
+            const missionDiv = document.createElement('div');
+            if (id === 'school') renderSchool(missionDiv);
+            else if (id === 'news') renderNews(missionDiv);
+            else if (id === 'court') renderCourt(missionDiv);
+            else if (id === 'townhall') renderTownhall(missionDiv);
+            else if (id === 'arena') renderArena(missionDiv);
+            
+            container.appendChild(missionDiv);
+            return container;
+        }
+
+        // --- MISSIONS ---
+
+        function renderSchool(target) {
+            if (!STATE.missionData) STATE.missionData = { qIdx: 0, score: 0, feedback: null };
+            const data = STATE.missionData;
+            
+            const questions = [
+                { t: "Wer darf in einer Demokratie wählen?", opts: [{txt: "Alle Staatsbürger (ab best. Alter)", correct: true}, {txt: "Nur wer viel Geld hat", correct: false}] },
+                { t: "Was bedeutet Meinungsfreiheit?", opts: [{txt: "Man darf lügen und beleidigen.", correct: false}, {txt: "Man darf seine Meinung sagen, ohne Angst.", correct: true}] },
+                { t: "Was macht die Opposition?", opts: [{txt: "Sie kontrolliert die Regierung.", correct: true}, {txt: "Sie bestimmt alles.", correct: false}] }
+            ];
+
+            const q = questions[data.qIdx];
+
+            target.innerHTML = `
+                <h2 class="text-xl font-bold mb-4" style="color:var(--primary)">Mission: Schule</h2>
+                <div class="card mb-4 text-center p-4 flex flex-col items-center justify-center min-h-[150px]">
+                    ${data.feedback ? 
+                        `<div class="${data.feedback.isCorrect ? 'text-success' : 'text-danger'}">
+                            <h3 class="text-2xl font-bold mb-2">${data.feedback.isCorrect ? 'Richtig!' : 'Leider falsch'}</h3>
+                            ${data.feedback.isCorrect ? getIcon('check', 48) : getIcon('x', 48)}
+                        </div>` 
+                        : `<p class="text-xl font-bold">${q.t}</p>`
+                    }
+                </div>
+            `;
+
+            const btnContainer = document.createElement('div');
+            btnContainer.className = 'grid gap-4';
+            
+            q.opts.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-neutral w-full text-left';
+                btn.innerText = opt.txt;
+                if (data.feedback) btn.disabled = true;
+                
+                btn.onclick = () => {
+                    const isCorrect = opt.correct;
+                    if (isCorrect) data.score += 10;
+                    data.feedback = { isCorrect };
+                    render();
+                    setTimeout(() => {
+                        data.feedback = null;
+                        if (data.qIdx < questions.length - 1) { data.qIdx++; render(); }
+                        else finishMission(data.score + (isCorrect ? 10 : 0));
+                    }, 1500);
+                };
+                btnContainer.appendChild(btn);
+            });
+            target.appendChild(btnContainer);
+        }
+
+        function renderNews(target) {
+            if (!STATE.missionData) STATE.missionData = { idx: 0, score: 0, feedback: null };
+            const data = STATE.missionData;
+            
+            const headlines = [
+                { t: "Regierung verbietet Hausaufgaben für immer!", type: "fake", r: "Keine Quelle, zu schön um wahr zu sein." },
+                { t: "Bundestag beschließt neues Gesetz.", type: "real", r: "Realistische Meldung, seriöse Quelle." },
+                { t: "Kanzler ist in Wahrheit ein Alien!", type: "fake", r: "Verschwörungstheorie ohne Beweise." }
+            ];
+
+            if (data.idx >= headlines.length) { finishMission(data.score); return; }
+            const item = headlines[data.idx];
+
+            target.innerHTML = `
+                <h2 class="text-xl font-bold mb-2 text-center" style="color:#7e22ce">Fakt oder Fake?</h2>
+                <p class="text-center mb-4 text-sm text-muted">Prüfe die Nachricht.</p>
+            `;
+
+            const card = document.createElement('div');
+            card.className = 'card mb-6 text-center flex flex-col items-center justify-center';
+            card.style.minHeight = '200px';
+
+            if (data.feedback) {
+                card.style.backgroundColor = data.feedback.correct ? '#dcfce7' : '#fee2e2';
+                card.innerHTML = `
+                    <h3 class="font-bold text-xl mb-2">${data.feedback.correct ? "Gut erkannt!" : "Vorsicht!"}</h3>
+                    <p class="mb-4">${item.r}</p>
+                    <button id="nextBtn" class="btn btn-neutral">Weiter</button>
+                `;
+            } else {
+                card.innerHTML = `
+                    <div class="text-4xl mb-4">📰</div>
+                    <p class="font-bold text-lg">"${item.t}"</p>
+                `;
+            }
+            target.appendChild(card);
+
+            if (!data.feedback) {
+                const controls = document.createElement('div');
+                controls.className = 'flex gap-4';
+                const btnFake = document.createElement('button');
+                btnFake.className = 'btn btn-danger w-full';
+                btnFake.innerHTML = 'FAKE 🗑️';
+                btnFake.onclick = () => { check(item.type === 'fake'); };
+                const btnReal = document.createElement('button');
+                btnReal.className = 'btn btn-success w-full';
+                btnReal.innerHTML = 'FAKT ✅';
+                btnReal.onclick = () => { check(item.type === 'real'); };
+                controls.append(btnFake, btnReal);
+                target.appendChild(controls);
+            } else {
+                setTimeout(() => {
+                    document.getElementById('nextBtn').onclick = () => {
+                        data.feedback = null;
+                        if (data.idx < headlines.length - 1) { data.idx++; render(); }
+                        else finishMission(data.score);
+                    };
+                }, 0);
+            }
+            function check(correct) {
+                if (correct) data.score += 10;
+                data.feedback = { correct };
+                render();
+            }
+        }
+
+        function renderCourt(target) {
+            if (!STATE.missionData) STATE.missionData = { idx: 0, score: 0, finished: false };
+            const data = STATE.missionData;
+            
+            const tasks = [
+                { t: "Beschließt Gesetze", cat: "leg" },
+                { t: "Verhaftet Verbrecher", cat: "exe" },
+                { t: "Bestraft Gesetzesbrecher", cat: "jud" }
+            ];
+
+            if (data.idx >= tasks.length) return;
+            const item = tasks[data.idx];
+
+            target.innerHTML = `
+                <h2 class="text-xl font-bold mb-4 text-center">Gewaltenteilung</h2>
+                <div class="card mb-4 text-center p-4" style="background:#f1f5f9; border:2px dashed #cbd5e1">
+                    <p class="font-bold text-lg">${item.t}</p>
+                </div>
+            `;
+
+            const container = document.createElement('div');
+            container.className = 'flex flex-col gap-3';
+            const opts = [ { l: "Legislative (Gesetze)", id: "leg" }, { l: "Exekutive (Polizei/Amt)", id: "exe" }, { l: "Judikative (Gericht)", id: "jud" } ];
+
+            opts.forEach(o => {
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-neutral w-full justify-between';
+                btn.innerHTML = `<span>${o.l}</span>`;
+                btn.onclick = () => {
+                    const correct = o.id === item.cat;
+                    if (correct) data.score += 10;
+                    btn.style.background = correct ? 'var(--success)' : 'var(--danger)';
+                    btn.style.color = 'white';
+                    setTimeout(() => {
+                        if (data.idx < tasks.length - 1) { data.idx++; render(); }
+                        else if (!data.finished) { data.finished = true; finishMission(data.score + (correct?10:0)); }
+                    }, 400);
+                };
+                container.appendChild(btn);
+            });
+            target.appendChild(container);
+        }
+
+        function renderTownhall(target) {
+            if (!STATE.missionData) STATE.missionData = { selected: [] };
+            const data = STATE.missionData;
+            const opts = [ { id: 1, t: "Skatepark bauen (+Kinder, -Anwohner)" }, { id: 2, t: "Ruheraum Schule (+Lehrer, +Schüler)" }, { id: 3, t: "Schuluniformen (-Schüler, +Eltern)" }, { id: 4, t: "Gratis Frühstück (+Alle)" } ];
+
+            target.innerHTML = `
+                <h2 class="text-xl font-bold mb-2 text-center" style="color:#b45309">Der Kompromiss</h2>
+                <p class="text-sm mb-4 text-center">Wähle genau 2 Projekte.</p>
+            `;
+            const list = document.createElement('div');
+            list.className = 'flex flex-col gap-2 mb-4';
+
+            opts.forEach(o => {
+                const isSel = data.selected.includes(o.id);
+                const btn = document.createElement('button');
+                btn.className = `btn w-full text-left justify-between ${isSel ? 'btn-primary' : 'btn-neutral'}`;
+                btn.innerHTML = `<span>${o.t}</span> ${isSel ? getIcon('check', 18) : ''}`;
+                btn.onclick = () => {
+                    if (isSel) data.selected = data.selected.filter(x => x !== o.id);
+                    else if (data.selected.length < 2) data.selected.push(o.id);
+                    render();
+                };
+                list.appendChild(btn);
+            });
+            target.appendChild(list);
+
+            const submit = document.createElement('button');
+            submit.className = 'btn btn-success w-full';
+            submit.innerText = 'Abstimmen';
+            submit.disabled = data.selected.length !== 2;
+            submit.onclick = () => finishMission(40);
+            target.appendChild(submit);
+        }
+
+        function renderArena(target) {
+            if (!STATE.missionData) STATE.missionData = { pHealth: 100, bHealth: 100, turn: 0, log: "Der Bestimmer will alle Regeln abschaffen!" };
+            const data = STATE.missionData;
+
+            target.innerHTML = `
+                <div class="flex justify-between mb-4 text-sm font-bold">
+                    <div class="w-1-2 text-center" style="padding-right:0.5rem">
+                        <span style="color:var(--primary)">DU</span>
+                        <div style="background:#e2e8f0; height:8px; border-radius:4px; overflow:hidden">
+                            <div style="width:${data.pHealth}%; background:var(--primary); height:100%; transition:width 0.3s"></div>
+                        </div>
+                    </div>
+                    <div class="w-1-2 text-center" style="padding-left:0.5rem">
+                        <span style="color:var(--danger)">BESTIMMER</span>
+                        <div style="background:#e2e8f0; height:8px; border-radius:4px; overflow:hidden">
+                            <div style="width:${data.bHealth}%; background:var(--danger); height:100%; transition:width 0.3s"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mb-4 p-3 bg-slate-900 text-white text-sm font-mono min-h-[60px]">
+                    > ${data.log}
+                </div>
+            `;
+
+            const rounds = [
+                { boss: "Diskutieren dauert zu lang! Ich entscheide ab jetzt sofort!", opts: [ { t: "Zeit ist Geld, du hast recht.", dmg: 0, self: 30, msg: "Du gibst auf. Die Demokratie leidet." }, { t: "Schnelle Fehler sind schlimmer als langsame, richtige Lösungen.", dmg: 40, self: 0, msg: "Guter Punkt! Der Bestimmer kommt ins Straucheln." } ] },
+                { boss: "Wer gegen mich ist, fliegt aus der Stadt!", opts: [ { t: "Das ist unfair! Alle dürfen hier leben.", dmg: 40, self: 0, msg: "Genau! Grundrechte gelten für alle." }, { t: "Okay, ich bin still.", dmg: 0, self: 40, msg: "Deine Angst macht ihn stärker." } ] },
+                { boss: "Zeitungen lügen eh nur. Ich sage euch die Wahrheit!", opts: [ { t: "Pressefreiheit kontrolliert die Mächtigen.", dmg: 100, self: 0, msg: "Volltreffer! Ohne Lügen hat er keine Macht." }, { t: "Stimmt, weg mit den News.", dmg: 0, self: 100, msg: "Oh nein..." } ] }
+            ];
+            const round = rounds[Math.min(data.turn, rounds.length - 1)];
+
+            const bubble = document.createElement('div');
+            bubble.className = 'mb-4 p-4 rounded-xl relative';
+            bubble.style.background = '#fecaca';
+            bubble.style.color = '#7f1d1d';
+            bubble.innerHTML = `<strong class="block mb-1">Der Bestimmer:</strong> "${round.boss}"`;
+            target.appendChild(bubble);
+
+            const actions = document.createElement('div');
+            actions.className = 'grid gap-2';
+            round.opts.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-neutral text-left h-auto';
+                btn.innerText = `💬 ${opt.t}`;
+                btn.onclick = () => {
+                    data.bHealth = Math.max(0, data.bHealth - opt.dmg);
+                    data.pHealth = Math.max(0, data.pHealth - opt.self);
+                    data.log = opt.msg;
+                    render();
+                    setTimeout(() => {
+                        if (data.bHealth <= 0) finishMission(100);
+                        else if (data.pHealth <= 0) { data.log = "Nicht aufgeben! Versuch es nochmal."; data.pHealth = 50; render(); }
+                        else { data.turn++; render(); }
+                    }, 1500);
+                };
+                actions.appendChild(btn);
+            });
+            target.appendChild(actions);
+        }
+
+        function createOutro() {
+            const div = document.createElement('div');
+            div.className = 'flex flex-col items-center justify-center h-full text-center fade-in';
+            div.style.marginTop = 'auto'; div.style.marginBottom = 'auto';
+            div.innerHTML = `
+                <div style="background:#fef08a; padding:2rem; border-radius:50%; margin-bottom:1.5rem; color:#a16207;">
+                    ${getIcon('star', 64)}
+                </div>
+                <h1 class="text-3xl font-bold mb-2">Gewonnen!</h1>
+                <p class="text-lg mb-6 text-muted">Die Stadt ist wieder frei.</p>
+                <div class="card mb-8 w-full">
+                    <div class="text-4xl font-bold font-mono" style="color:var(--primary)">${STATE.score}</div>
+                    <div class="text-xs uppercase font-bold text-muted">Punkte</div>
+                </div>
+                <p class="mb-8 text-sm italic text-muted">"Demokratie ist anstrengend, aber sie ist die einzige Staatsform, die Fehler korrigieren kann."</p>
+                <button class="btn btn-primary" onclick="window.location.reload()">Neustart</button>
+            `;
+            return div;
+        }
+
+        // --- CORE ---
+        function changeView(v) { STATE.view = v; render(); }
+        function startMission(id) { STATE.currentMissionId = id; STATE.missionData = null; changeView('mission'); }
+        function finishMission(pts) {
+            if (!STATE.completedMissions.includes(STATE.currentMissionId)) {
+                STATE.score += pts;
+                STATE.completedMissions.push(STATE.currentMissionId);
+            }
+            if (STATE.currentMissionId === 'arena') changeView('outro');
+            else changeView('map');
+            STATE.currentMissionId = null;
+        }
+
+        window.addEventListener('DOMContentLoaded', render);
+    </script>
+</body>
+</html>
