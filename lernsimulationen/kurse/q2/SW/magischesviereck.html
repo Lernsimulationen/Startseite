@@ -1,24 +1,22 @@
 <!-- 
 ================================================================================
-LEHRKRAFT-INFO (SECURE EDITION)
+LEHRKRAFT-INFO (SECURE EDITION - FIXED)
 ================================================================================
 
-TITEL: Magisches Viereck - Die Wirtschafts-Waage (Refactored)
+TITEL: Magisches Viereck - Die Wirtschafts-Waage
 ZIELGRUPPE: Einsteiger (Klasse 8-10)
 DAUER: 15-20 Minuten
 
-TECHNISCHE UPGRADES (SECURITY & PERFORMANCE):
-- Content-Security-Policy (CSP): Strikte Whitelist für Code-Ausführung.
-- No-Inline-Handlers: Trennung von HTML und JavaScript Logik.
-- Throttling: Performante Updates via requestAnimationFrame.
-- Defensive Coding: Schutz vor Laufzeitfehlern bei DOM-Manipulation.
-- Accessibility: Respektiert "Reduced Motion" Einstellungen.
-- Datenschutz: 100% Offline, kein Tracking, keine externen Requests.
+FIXES & UPGRADES:
+- CSP Nonce: Korrigiert auf valides Base64 (keine Sonderzeichen), damit Browser das Skript ausführen.
+- CSP Regeln: frame-ancestors entfernt (im Meta-Tag wirkungslos), img-src explizit gesetzt.
+- Code-Cleanup: Ungenutzte Variablen in checkRelationships entfernt.
+- Funktion: Slider reagiert nun zuverlässig.
 
-DAS KONZEPT (Inhaltlich identisch):
-Links: Stagnation/Stabilität (Harmonie Preise/Handel).
-Mitte-Rechts: Aufschwung (Harmonie Wachstum/Jobs).
-Ganz Rechts: Boom (Konflikt Jobs/Preise).
+KONZEPT:
+- Links: Stagnation/Stabilität.
+- Mitte-Rechts: Aufschwung (Harmonie).
+- Ganz Rechts: Boom (Konflikt).
 ================================================================================
 -->
 <!DOCTYPE html>
@@ -28,17 +26,17 @@ Ganz Rechts: Boom (Konflikt Jobs/Preise).
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wirtschafts-Waage (Secure)</title>
     
-    <!-- SECURITY: Content Security Policy -->
-    <!-- Erlaubt CSS inline (für dynamische Styles nötig), verbietet aber unsicheres JS. 
-         Script nur erlaubt, wenn Nonce übereinstimmt. Keine externen Verbindungen. -->
+    <!-- SECURITY: Content Security Policy (Gehärtet & Korrigiert) -->
+    <!-- script-src nutzt nun einen validen Base64-Nonce ohne Sonderzeichen -->
     <meta http-equiv="Content-Security-Policy" 
           content="default-src 'none'; 
                    style-src 'unsafe-inline'; 
-                   script-src 'nonce-r4nd0mZuf4llsW3rt!'; 
-                   img-src data:; 
+                   script-src 'nonce-UmFuZG9tV2VydEZ1ZXJTY2h1bGVuMjAyNA=='; 
+                   img-src 'self' data:; 
+                   font-src 'none'; 
+                   media-src 'none'; 
                    base-uri 'none'; 
                    object-src 'none'; 
-                   frame-ancestors 'none'; 
                    form-action 'none'; 
                    connect-src 'none';">
 
@@ -219,7 +217,6 @@ Ganz Rechts: Boom (Konflikt Jobs/Preise).
             border-radius: 6px;
             margin-bottom: 15px;
             display: none;
-            /* Animation controlled via JS/CSS classes, prefers-reduced-motion handled below */
         }
         
         .theory-title { font-weight: bold; display: block; margin-bottom: 5px; color: #d35400; }
@@ -241,7 +238,6 @@ Ganz Rechts: Boom (Konflikt Jobs/Preise).
             }
             .highlight-conflict, .highlight-harmony {
                 animation: none !important;
-                /* Static fallback for emphasis */
                 box-shadow: 0 0 0 4px rgba(0,0,0,0.1); 
                 transform: none !important;
             }
@@ -266,7 +262,7 @@ Ganz Rechts: Boom (Konflikt Jobs/Preise).
 
     <div class="container">
         
-        <!-- DER REGLER (Clean HTML, no inline JS) -->
+        <!-- DER REGLER -->
         <div class="slider-container">
             <div class="slider-labels">
                 <span class="label-left">📉 SPARPOLITIK<br><small>(Wenig Geld)</small></span>
@@ -355,13 +351,11 @@ Ganz Rechts: Boom (Konflikt Jobs/Preise).
 
     </div>
 
-    <!-- SECURITY: Script nur mit Nonce ausführbar -->
-    <script nonce="r4nd0mZuf4llsW3rt!">
+    <!-- SECURITY: Script nur mit validem Base64-Nonce ausführbar -->
+    <script nonce="UmFuZG9tV2VydEZ1ZXJTY2h1bGVuMjAyNA==">
         (function() {
             'use strict';
 
-            // --- DEFENSIVE DOM ACCESS HELPER ---
-            // Verhindert Abstürze, wenn IDs manipuliert wurden
             const getEl = (id) => {
                 const el = document.getElementById(id);
                 if (!el) {
@@ -371,29 +365,22 @@ Ganz Rechts: Boom (Konflikt Jobs/Preise).
                 return el;
             };
 
-            // Status-Variable für RequestAnimationFrame Throttling
             let isTicking = false;
 
-            // Haupteinstiegspunkt
             const init = () => {
                 const slider = getEl('main-slider');
                 if (!slider) return;
 
-                // Event Listener statt Inline-Handler
                 slider.addEventListener('input', handleInput);
                 
                 // Initialer Render
                 updateSimulation(50);
             };
 
-            // Input Handler mit Throttling
             const handleInput = (e) => {
                 if (!isTicking) {
                     window.requestAnimationFrame(() => {
-                        // Input Validierung & Sanitization
                         let rawVal = parseFloat(e.target.value);
-                        
-                        // Sicherheits-Clamp: Sicherstellen, dass Wert number, finite und in Bounds ist
                         if (!Number.isFinite(rawVal)) rawVal = 50;
                         const safeVal = Math.max(0, Math.min(100, rawVal));
                         
@@ -404,10 +391,8 @@ Ganz Rechts: Boom (Konflikt Jobs/Preise).
                 }
             };
 
-            // Kernlogik der Simulation
             const updateSimulation = (val) => {
                 // --- DAS MODELL ---
-                // Mapping Regler (0-100) -> 4 Ziele
                 const growth = -2 + (val / 100) * 8;
                 const inf = (val * val) / 1000;
                 const unemp = 12 - (val / 100) * 10;
@@ -420,10 +405,9 @@ Ganz Rechts: Boom (Konflikt Jobs/Preise).
                 updateCard('trade', balance, 'trade');
 
                 // --- LIVE BEZIEHUNGEN ---
-                checkRelationships(val, growth, inf, unemp, balance);
+                checkRelationships(val);
             };
 
-            // UI Update Helper
             const updateCard = (id, val, type) => {
                 const el = getEl('card-' + id);
                 const icon = getEl('icon-' + id);
@@ -432,7 +416,6 @@ Ganz Rechts: Boom (Konflikt Jobs/Preise).
 
                 if (!el || !icon || !desc || !valDisplay) return;
 
-                // Clean CSS Classes
                 el.classList.remove('highlight-conflict', 'highlight-harmony', 'happy', 'neutral', 'sad');
 
                 let state = 'neutral';
@@ -440,7 +423,6 @@ Ganz Rechts: Boom (Konflikt Jobs/Preise).
                 let descText = '';
                 let valText = '';
 
-                // LOGIK FÜR INHALTE
                 if (type === 'growth') {
                     valText = val.toFixed(1) + " %";
                     if (val >= 2.0) {
@@ -479,15 +461,13 @@ Ganz Rechts: Boom (Konflikt Jobs/Preise).
                     }
                 }
 
-                // Apply Updates
                 el.classList.add(state);
                 icon.textContent = iconText;
                 desc.textContent = descText;
                 valDisplay.textContent = valText;
             };
 
-            // Relationship Checker
-            const checkRelationships = (sliderVal, g, i, u, b) => {
+            const checkRelationships = (sliderVal) => {
                 const alertBox = getEl('rel-alert');
                 
                 const tPhillips = getEl('theory-phillips');
@@ -502,11 +482,9 @@ Ganz Rechts: Boom (Konflikt Jobs/Preise).
 
                 if (!alertBox) return;
 
-                // Reset Visuals
                 alertBox.className = '';
                 alertBox.textContent = '';
                 
-                // Helper to safely hide elements
                 const hide = (el) => { if(el) { el.style.display = 'none'; el.classList.remove('fade-in'); }};
                 const show = (el) => { if(el) { el.style.display = 'block'; el.classList.add('fade-in'); }};
 
@@ -564,7 +542,6 @@ Ganz Rechts: Boom (Konflikt Jobs/Preise).
                 }
             };
 
-            // Start wenn DOM bereit
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', init);
             } else {
