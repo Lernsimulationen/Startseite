@@ -1,1 +1,767 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>WER HILFT? – Der Samariter-Run</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --hud-bg: rgba(0, 0, 0, 0.85);
+            --text: #f8fafc;
+            --primary: #3b82f6;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --guilt: #a855f7;
+            --gold: #fbbf24;
+        }
 
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            touch-action: none;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- HUD (DOM) --- */
+        #hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--hud-bg);
+            padding: 8px 16px;
+            height: 70px;
+            border-bottom: 2px solid #334155;
+            z-index: 100;
+        }
+
+        .hud-group { display: flex; gap: 15px; align-items: center; }
+        .stat { display: flex; flex-direction: column; align-items: center; min-width: 60px; }
+        .stat-label { font-size: 10px; color: #94a3b8; text-transform: uppercase; font-weight: bold; }
+        .stat-val { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; }
+        
+        #timer.pulse { animation: timer-pulse 1s infinite; color: var(--danger); }
+        @keyframes timer-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+        .inventory { display: flex; gap: 6px; }
+        .slot { width: 45px; height: 45px; background: #1e293b; border: 2px solid #475569; border-radius: 8px; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .slot img { max-width: 80%; max-height: 80%; object-fit: contain; }
+        .slot span { font-size: 20px; }
+
+        .combo-badge { background: var(--success); padding: 4px 10px; border-radius: 20px; font-weight: 900; font-size: 14px; box-shadow: 0 0 10px var(--success); }
+
+        /* --- GAME CANVAS --- */
+        #canvas-wrapper {
+            flex: 1;
+            position: relative;
+            background: #1e293b;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* --- OVERLAYS --- */
+        .overlay {
+            position: absolute;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.9);
+            z-index: 50;
+            padding: 20px;
+            text-align: center;
+        }
+        .overlay.active { display: flex; }
+
+        #loading-screen { z-index: 200; background: var(--bg); color: white; display: flex; }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 20px;
+            box-shadow: 0 4px 0 #1d4ed8;
+        }
+        .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #1d4ed8; }
+
+        #guilt-flash {
+            position: fixed;
+            inset: 0;
+            background: rgba(168, 85, 247, 0.3);
+            pointer-events: none;
+            display: none;
+            z-index: 200;
+        }
+
+        #portrait-warning {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        @media (orientation: portrait) { #portrait-warning { display: flex; } }
+    </style>
+</head>
+<body>
+
+<div id="portrait-warning">
+    <h1>Querformat nutzen</h1>
+    <p>Bitte drehe dein iPad für den Samariter-Run.</p>
+</div>
+
+<!-- Ladebildschirm -->
+<div id="loading-screen" class="overlay active">
+    <h1 style="color: var(--gold)">Lade Assets...</h1>
+    <div id="loading-bar-container" style="width: 200px; height: 10px; background: #334155; border-radius: 5px; margin-top: 10px;">
+        <div id="loading-bar" style="width: 0%; height: 100%; background: var(--success); border-radius: 5px; transition: width 0.3s;"></div>
+    </div>
+</div>
+
+<div id="hud">
+    <div class="hud-group">
+        <div class="stat"><span class="stat-label">Zeit</span><span id="timer" class="stat-val">45:00</span></div>
+        <div class="stat"><span class="stat-label">Herzen</span><span id="hearts" class="stat-val"></span></div>
+    </div>
+    <div class="hud-group">
+        <div class="stat"><span class="stat-label">Sterne</span><span id="humanity" class="stat-val" style="color:var(--gold)">0</span></div>
+        <div class="stat"><span class="stat-label">Schuld</span><span id="guilt" class="stat-val" style="color:var(--guilt)">0</span></div>
+        <div id="combo" class="combo-badge">x1</div>
+    </div>
+    <div class="hud-group">
+        <div class="inventory">
+            <div id="slot-0" class="slot"></div>
+            <div id="slot-1" class="slot"></div>
+            <div id="slot-2" class="slot"></div>
+        </div>
+        <div class="stat"><span class="stat-label">Weg</span><span id="progress" class="stat-val">0/12</span></div>
+    </div>
+</div>
+
+<div id="canvas-wrapper">
+    <canvas id="gameCanvas"></canvas>
+    <div id="guilt-flash"></div>
+
+    <!-- UI SCREENS -->
+    <div id="screen-start" class="overlay">
+        <h1 style="font-size: 48px; color: var(--gold);">SAMARITER RUN</h1>
+        <p style="font-size: 20px; max-width: 500px;">Hilf denen, die in Not sind. Aber beeile dich – die Zeit in Jerusalem läuft ab.</p>
+        <button class="btn" onclick="Game.start()">Lauf starten</button>
+    </div>
+
+    <div id="screen-summary" class="overlay">
+        <h1 id="summary-title">RUNDE BEENDET</h1>
+        <div id="summary-stats" style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; text-align: left; min-width: 300px; margin: 15px 0;"></div>
+        <p>Wer war heute dein "Nächster"?</p>
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <button class="btn" style="padding:10px 15px; font-size:14px;" onclick="Game.finish('Der Verletzte')">Der Verletzte</button>
+            <button class="btn" style="padding:10px 15px; font-size:14px;" onclick="Game.finish('Der Wirt')">Der Wirt</button>
+            <button class="btn" style="padding:10px 15px; font-size:14px;" onclick="Game.finish('Ich selbst')">Ich selbst</button>
+        </div>
+        <button class="btn" style="background: var(--success); box-shadow: 0 4px 0 #15803d;" onclick="Game.export()">Log exportieren (.txt)</button>
+    </div>
+</div>
+
+<script>
+/**
+ * ASSET DEFINITION
+ */
+const ASSET_PATHS = {
+    bg_road: 'assets/bg/road.png',
+    player: 'assets/chars/player.png',
+    wounded: 'assets/chars/npc_wounded.png',
+    bandage: 'assets/items/bandage.png',
+    coin: 'assets/items/coin.png',
+    heart: 'assets/ui/heart.png'
+};
+
+const Game = {
+    cfg: {
+        maxNodes: 12,
+        initialTime: 2700,
+        itemIcons: { bandage: "🩹", coin: "🪙" },
+        nodeTypes: ["HELP", "DANGER", "DISTRACTION", "INN", "FIND_ITEM"]
+    },
+
+    state: {
+        scene: "LOADING",
+        timeLeft: 2700,
+        hearts: 3,
+        humanity: 0,
+        guilt: 0,
+        combo: 1,
+        bestCombo: 1,
+        inventory: [null, null, null],
+        map: [],
+        nodeIndex: 0,
+        stats: { helped: 0, skipped: 0, mgWon: 0, mgLost: 0, guiltPeak: 0 },
+        log: [],
+        lastTick: 0,
+        shake: 0,
+        particles: [],
+        assets: {},
+        loggedMissing: {}, // Um fehlende Assets nur einmal zu loggen
+        input: { down: false, x: 0, y: 0, startX: 0, startY: 0, activeID: null }
+    },
+
+    init() {
+        this.canvas = document.getElementById('gameCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+
+        this.initInput();
+        
+        // AssetLoader starten
+        this.loadAssets().then(() => {
+            document.getElementById('loading-screen').classList.remove('active');
+            document.getElementById('screen-start').classList.add('active');
+            this.state.scene = "START";
+            requestAnimationFrame((t) => this.loop(t));
+        });
+
+        this.logAction("SYSTEM", "INIT", "SUCCESS", "Engine geladen");
+    },
+
+    /**
+     * ASSET LOADER (Pflicht)
+     */
+    async loadAssets() {
+        const keys = Object.keys(ASSET_PATHS);
+        let loadedCount = 0;
+        const bar = document.getElementById('loading-bar');
+
+        const loadPromises = keys.map(key => {
+            return new Promise(resolve => {
+                const img = new Image();
+                img.src = ASSET_PATHS[key];
+                img.onload = () => {
+                    this.state.assets[key] = img;
+                    loadedCount++;
+                    bar.style.width = (loadedCount / keys.length * 100) + "%";
+                    this.logAction("ASSET", "LOAD", "SUCCESS", `${key};${ASSET_PATHS[key]}`);
+                    resolve();
+                };
+                img.onerror = () => {
+                    this.state.assets[key] = null;
+                    loadedCount++;
+                    bar.style.width = (loadedCount / keys.length * 100) + "%";
+                    this.logAction("ASSET", "LOAD", "FAIL", `${key};${ASSET_PATHS[key]}`);
+                    resolve();
+                };
+            });
+        });
+
+        await Promise.all(loadPromises);
+    },
+
+    resize() {
+        this.canvas.width = this.canvas.offsetWidth * window.devicePixelRatio;
+        this.canvas.height = this.canvas.offsetHeight * window.devicePixelRatio;
+        this.ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        this.vw = this.canvas.width / window.devicePixelRatio;
+        this.vh = this.canvas.height / window.devicePixelRatio;
+    },
+
+    // --- GAME LOOP ---
+    loop(now) {
+        if(!this.state.lastTick) this.state.lastTick = now;
+        const dt = (now - this.state.lastTick) / 1000;
+        this.state.lastTick = now;
+
+        if(this.state.scene !== "START" && this.state.scene !== "SUMMARY" && this.state.scene !== "LOADING") {
+            this.state.timeLeft -= dt;
+            if(this.state.timeLeft <= 0) this.gameOver("Zeit abgelaufen");
+        }
+
+        this.update(dt);
+        this.draw();
+        this.updateDOM();
+
+        requestAnimationFrame((t) => this.loop(t));
+    },
+
+    update(dt) {
+        if(this.state.shake > 0) this.state.shake -= dt * 10;
+        this.state.particles = this.state.particles.filter(p => p.life > 0);
+        this.state.particles.forEach(p => {
+            p.x += p.vx * dt;
+            p.y += p.vy * dt;
+            p.life -= dt;
+        });
+
+        if(this.state.scene === "MG_RUNNER") this.updateRunner(dt);
+        if(this.state.scene === "MG_TIMING") this.updateTiming(dt);
+    },
+
+    // --- RENDERING PIPELINE ---
+    draw() {
+        const ctx = this.ctx;
+        ctx.clearRect(0, 0, this.vw, this.vh);
+
+        if(this.state.shake > 0) {
+            ctx.save();
+            ctx.translate((Math.random()-0.5)*this.state.shake, (Math.random()-0.5)*this.state.shake);
+        }
+
+        /**
+         * A) HINTERGRUND
+         */
+        this.drawBackground();
+
+        switch(this.state.scene) {
+            case "MAP": this.drawMap(); break;
+            case "MG_WOUND": this.drawMGWound(); break;
+            case "MG_RUNNER": this.drawMGRunner(); break;
+            case "MG_TIMING": this.drawMGTiming(); break;
+        }
+
+        // Partikel
+        this.state.particles.forEach(p => {
+            ctx.globalAlpha = p.life;
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+            ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+
+        if(this.state.shake > 0) ctx.restore();
+
+        // Zeit-Warnung
+        if(this.state.timeLeft < 20) {
+            ctx.strokeStyle = `rgba(239, 68, 68, ${0.3 + Math.sin(Date.now()/100)*0.2})`;
+            ctx.lineWidth = 15;
+            ctx.strokeRect(0, 0, this.vw, this.vh);
+        }
+    },
+
+    /**
+     * HILFSFUNKTION: drawBackground
+     */
+    drawBackground() {
+        const img = this.state.assets.bg_road;
+        if (img) {
+            this.ctx.drawImage(img, 0, 0, this.vw, this.vh);
+        } else {
+            this.ctx.fillStyle = "#1e293b";
+            this.ctx.fillRect(0, 0, this.vw, this.vh);
+            this.logMissingAsset("bg_road");
+        }
+    },
+
+    /**
+     * HILFSFUNKTION: drawSprite (Generic Helper)
+     */
+    drawSprite(assetKey, x, y, w, h, fallbackEmoji) {
+        const img = this.state.assets[assetKey];
+        const ctx = this.ctx;
+        if (img) {
+            ctx.drawImage(img, x - w/2, y - h/2, w, h);
+        } else {
+            ctx.font = `${h * 0.8}px Arial`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(fallbackEmoji, x, y);
+            this.logMissingAsset(assetKey);
+        }
+    },
+
+    logMissingAsset(key) {
+        if (!this.state.loggedMissing[key]) {
+            this.logAction("ASSET", "MISSING", key, "fallback_used");
+            this.state.loggedMissing[key] = true;
+        }
+    },
+
+    drawMap() {
+        const ctx = this.ctx;
+        const spacing = 140;
+        const startX = 100;
+        
+        ctx.beginPath();
+        ctx.setLineDash([10, 10]);
+        ctx.strokeStyle = "rgba(255,255,255,0.3)";
+        ctx.lineWidth = 4;
+        this.state.map.forEach((n, i) => {
+            const x = startX + i * spacing;
+            const y = this.vh/2 + (n.branch * 60);
+            if(i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        this.state.map.forEach((n, i) => {
+            const x = startX + i * spacing;
+            const y = this.vh/2 + (n.branch * 60);
+            const active = i === this.state.nodeIndex;
+            const done = i < this.state.nodeIndex;
+
+            if (active) {
+                this.drawSprite('player', x, y, 80, 80, "🏃");
+            } else {
+                ctx.fillStyle = done ? "rgba(34, 197, 94, 0.8)" : "rgba(51, 65, 85, 0.8)";
+                ctx.beginPath();
+                ctx.arc(x, y, 25, 0, Math.PI*2);
+                ctx.fill();
+                ctx.fillStyle = "white";
+                ctx.font = "20px sans-serif";
+                ctx.fillText(n.icon, x, y + 8);
+            }
+        });
+    },
+
+    // --- MINI GAMES ---
+
+    initMGWound() {
+        this.mgWound = {
+            target: { x: this.vw/2 + 50, y: this.vh/2 - 20, r: 40 },
+            item: { x: this.vw/2, y: this.vh - 100, dragging: false },
+            timer: 12
+        };
+    },
+
+    drawMGWound() {
+        const ctx = this.ctx;
+        this.mgWound.timer -= 0.016;
+        if(this.mgWound.timer <= 0) this.resolveMG("WOUND", false);
+
+        /**
+         * C) VERLETZTE PERSON
+         */
+        this.drawSprite('wounded', this.vw/2, this.vh/2, 300, 400, "👤");
+
+        // Wunde Overlay
+        ctx.fillStyle = "rgba(239, 68, 68, 0.5)";
+        ctx.beginPath();
+        ctx.arc(this.mgWound.target.x, this.mgWound.target.y, this.mgWound.target.r, 0, Math.PI*2);
+        ctx.fill();
+
+        /**
+         * D) ITEM DRAG & DROP
+         */
+        if(this.state.input.down) {
+            const d = Math.hypot(this.state.input.x - this.mgWound.item.x, this.state.input.y - this.mgWound.item.y);
+            if(d < 60) this.mgWound.item.dragging = true;
+        } else {
+            this.mgWound.item.dragging = false;
+        }
+
+        if(this.mgWound.item.dragging) {
+            this.mgWound.item.x = this.state.input.x;
+            this.mgWound.item.y = this.state.input.y;
+            if(Math.hypot(this.mgWound.item.x - this.mgWound.target.x, this.mgWound.item.y - this.mgWound.target.y) < 40) {
+                this.resolveMG("WOUND", true);
+            }
+        }
+
+        this.drawSprite('bandage', this.mgWound.item.x, this.mgWound.item.y, 80, 80, "🩹");
+    },
+
+    initMGRunner() {
+        this.runnerLane = 1;
+        this.runnerTimer = 15;
+        this.hazards = [];
+        this.hazardSpawn = 0;
+    },
+
+    updateRunner(dt) {
+        this.runnerTimer -= dt;
+        if(this.runnerTimer <= 0) this.resolveMG("RUNNER", true);
+        this.hazardSpawn += dt;
+        const speed = 400 + (this.state.guilt * 50);
+        if(this.hazardSpawn > (1.0 - this.state.guilt * 0.1)) {
+            this.hazards.push({ lane: Math.floor(Math.random()*3), y: -100 });
+            this.hazardSpawn = 0;
+        }
+        this.hazards.forEach((h, i) => {
+            h.y += dt * speed;
+            if(h.y > this.vh - 150 && h.y < this.vh - 50 && h.lane === this.runnerLane) {
+                this.hazards.splice(i, 1);
+                this.hit();
+            }
+            if(h.y > this.vh) this.hazards.splice(i, 1);
+        });
+    },
+
+    drawMGRunner() {
+        const ctx = this.ctx;
+        ctx.strokeStyle = "rgba(255,255,255,0.1)";
+        for(let i=1; i<3; i++) {
+            ctx.beginPath(); ctx.moveTo(this.vw/3 * i, 0); ctx.lineTo(this.vw/3 * i, this.vh); ctx.stroke();
+        }
+
+        // Hindernisse
+        this.hazards.forEach(h => {
+            const hX = (this.vw/3 * h.lane) + this.vw/6;
+            ctx.font = "50px Arial";
+            ctx.fillText("🪨", hX, h.y); // Hazard-Asset wäre optional erweiterbar
+        });
+
+        // Player Sprite
+        const pX = (this.vw/3 * this.runnerLane) + this.vw/6;
+        this.drawSprite('player', pX, this.vh - 100, 100, 100, "🏃");
+    },
+
+    initMGTiming() {
+        this.timing = { pos: 100, dir: 1, speed: 300 + (this.state.guilt * 100) };
+    },
+
+    updateTiming(dt) {
+        this.timing.pos += this.timing.speed * this.timing.dir * dt;
+        if(this.timing.pos > this.vw - 100 || this.timing.pos < 100) this.timing.dir *= -1;
+    },
+
+    drawMGTiming() {
+        const ctx = this.ctx;
+        ctx.fillStyle = "#334155";
+        ctx.fillRect(100, this.vh/2 - 10, this.vw - 200, 20);
+        ctx.fillStyle = "#22c55e";
+        ctx.fillRect(this.vw/2 - 50, this.vh/2 - 20, 100, 40);
+
+        this.drawSprite('coin', this.timing.pos, this.vh/2, 60, 60, "🪙");
+    },
+
+    resolveTiming() {
+        const success = Math.abs(this.timing.pos - this.vw/2) < 60;
+        this.resolveMG("TIMING", success);
+    },
+
+    // --- GAMEPLAY LOGIK ---
+
+    start() {
+        this.state.scene = "MAP";
+        this.state.nodeIndex = 0;
+        this.state.timeLeft = this.cfg.initialTime;
+        this.state.hearts = 3;
+        this.state.humanity = 0;
+        this.state.guilt = 0;
+        this.state.combo = 1;
+        this.state.inventory = [null, null, null];
+        this.generateMap();
+        document.getElementById('screen-start').classList.remove('active');
+        this.logAction("GAME", "RUN_START", this.state.seed, "Karte generiert");
+    },
+
+    generateMap() {
+        this.state.seed = Math.floor(Math.random()*999999);
+        this.state.map = [];
+        for(let i=0; i<this.cfg.maxNodes; i++) {
+            const type = this.cfg.nodeTypes[Math.floor(Math.random()*this.cfg.nodeTypes.length)];
+            this.state.map.push({
+                type: type,
+                icon: this.getNodeIcon(type),
+                branch: (i > 3 && i < 10) ? (Math.random() > 0.5 ? 1 : -1) : 0
+            });
+        }
+    },
+
+    getNodeIcon(t) {
+        if(t === "HELP") return "🩹";
+        if(t === "DANGER") return "🪨";
+        if(t === "INN") return "🏠";
+        if(t === "FIND_ITEM") return "🎁";
+        return "⚖️";
+    },
+
+    initInput() {
+        const el = this.canvas;
+        el.addEventListener('pointerdown', e => {
+            el.setPointerCapture(e.pointerId);
+            const rect = el.getBoundingClientRect();
+            this.state.input.down = true;
+            this.state.input.x = e.clientX - rect.left;
+            this.state.input.y = e.clientY - rect.top;
+            this.state.input.startX = this.state.input.x;
+            this.state.input.startY = this.state.input.y;
+            this.handlePointerDown();
+        });
+        el.addEventListener('pointermove', e => {
+            if(!this.state.input.down) return;
+            const rect = el.getBoundingClientRect();
+            this.state.input.x = e.clientX - rect.left;
+            this.state.input.y = e.clientY - rect.top;
+        });
+        el.addEventListener('pointerup', e => {
+            if(!this.state.input.down) return;
+            const dx = this.state.input.x - this.state.input.startX;
+            this.handlePointerUp(dx);
+            this.state.input.down = false;
+        });
+    },
+
+    handlePointerDown() {
+        if(this.state.scene === "MAP") {
+            const node = this.state.map[this.state.nodeIndex];
+            const spacing = 140;
+            const x = 100 + this.state.nodeIndex * spacing;
+            const y = this.vh/2 + (node.branch * 60);
+            if(Math.hypot(this.state.input.x - x, this.state.input.y - y) < 60) this.triggerNode(node);
+        }
+        if(this.state.scene === "MG_TIMING") this.resolveTiming();
+    },
+
+    handlePointerUp(dx) {
+        if(this.state.scene === "MG_RUNNER" && Math.abs(dx) > 30) {
+            this.runnerLane = dx > 0 ? Math.min(2, this.runnerLane+1) : Math.max(0, this.runnerLane-1);
+        }
+    },
+
+    triggerNode(node) {
+        if(this.state.guilt >= 2 && Math.random() > 0.7) this.flashGuilt();
+        this.logAction("MAP", "ENTER_NODE", this.state.nodeIndex, node.type);
+        switch(node.type) {
+            case "HELP": this.state.scene = "MG_WOUND"; this.initMGWound(); break;
+            case "DANGER": this.state.scene = "MG_RUNNER"; this.initMGRunner(); break;
+            case "INN": this.state.scene = "MG_TIMING"; this.initMGTiming(); break;
+            default: this.advance(); break; 
+        }
+    },
+
+    advance() {
+        this.state.nodeIndex++;
+        if(this.state.nodeIndex >= this.cfg.maxNodes) this.gameOver("Ziel erreicht");
+        else this.state.scene = "MAP";
+    },
+
+    resolveMG(type, success) {
+        if(success) {
+            this.state.humanity += (20 * this.state.combo);
+            this.state.combo = Math.min(5, this.state.combo + 1);
+            if(type === "WOUND") this.state.guilt = Math.max(0, this.state.guilt - 1);
+            if(type === "TIMING") this.addItem("coin");
+            this.spawnParticles(this.vw/2, this.vh/2, "#22c55e");
+        } else {
+            this.state.combo = 1;
+            this.state.guilt++;
+            this.hit();
+        }
+        this.advance();
+    },
+
+    hit() {
+        this.state.hearts--;
+        this.state.shake = 15;
+        this.spawnParticles(this.vw/2, this.vh/2, "#ef4444");
+        if(this.state.hearts <= 0) this.gameOver("Keine Herzen mehr");
+    },
+
+    addItem(type) {
+        const idx = this.state.inventory.indexOf(null);
+        if(idx !== -1) this.state.inventory[idx] = type;
+    },
+
+    flashGuilt() {
+        const flash = document.getElementById('guilt-flash');
+        flash.style.display = 'block';
+        setTimeout(() => flash.style.display = 'none', 500);
+        this.state.timeLeft -= 120;
+    },
+
+    spawnParticles(x, y, color) {
+        for(let i=0; i<15; i++) {
+            this.state.particles.push({
+                x, y, vx: (Math.random()-0.5)*300, vy: (Math.random()-0.5)*300,
+                life: 1.0, size: 4 + Math.random()*4, color
+            });
+        }
+    },
+
+    updateDOM() {
+        const m = Math.floor(this.state.timeLeft / 60);
+        const s = Math.floor(this.state.timeLeft % 60);
+        const timerEl = document.getElementById('timer');
+        timerEl.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+        
+        /**
+         * E) HUD-HERZEN & ITEMS
+         */
+        const heartEl = document.getElementById('hearts');
+        heartEl.innerHTML = "";
+        for(let i=0; i<Math.max(0, this.state.hearts); i++) {
+            const h = this.state.assets.heart;
+            if(h) heartEl.innerHTML += `<img src="${ASSET_PATHS.heart}" style="width:25px; margin: 0 2px;">`;
+            else heartEl.innerHTML += "❤️";
+        }
+
+        document.getElementById('humanity').innerText = this.state.humanity;
+        document.getElementById('guilt').innerText = this.state.guilt;
+        document.getElementById('combo').innerText = `x${this.state.combo}`;
+        document.getElementById('progress').innerText = `${this.state.nodeIndex}/${this.cfg.maxNodes}`;
+
+        this.state.inventory.forEach((item, i) => {
+            const slot = document.getElementById(`slot-${i}`);
+            slot.innerHTML = "";
+            if(item && this.state.assets[item]) {
+                slot.innerHTML = `<img src="${ASSET_PATHS[item]}" alt="${item}">`;
+            } else if(item) {
+                slot.innerHTML = `<span>${this.cfg.itemIcons[item]}</span>`;
+            }
+        });
+    },
+
+    gameOver(reason) {
+        this.state.scene = "SUMMARY";
+        document.getElementById('screen-summary').classList.add('active');
+        document.getElementById('summary-title').innerText = reason.toUpperCase();
+        const stats = document.getElementById('summary-stats');
+        stats.innerHTML = `⭐ Punkte: ${this.state.humanity}<br>⚫ Schuld-Peak: ${this.state.guilt}<br>🔥 Kette: x${this.state.combo}`;
+        this.logAction("GAME", "END", reason, `Score: ${this.state.humanity}`);
+    },
+
+    finish(ans) { location.reload(); },
+
+    logAction(scene, action, decision, result) {
+        this.state.log.push({
+            t: new Date().toISOString(),
+            scene, action, dec: decision, res: result,
+            pts: this.state.humanity, h: this.state.hearts, g: this.state.guilt, cb: this.state.combo,
+            time: Math.floor(this.state.timeLeft), node: this.state.nodeIndex
+        });
+    },
+
+    export() {
+        let txt = "SAMARITER RUN - BILDUNGSLOG V1.1 (ASSETS)\n";
+        txt += `Seed: ${this.state.seed} | Device: ${navigator.userAgent}\n`;
+        txt += "Timestamp;Scene;Action;Decision;Result;Humanity;Hearts;Guilt;Combo;Time;Node\n";
+        this.state.log.forEach(l => {
+            txt += `${l.t};${l.scene};${l.action};${l.dec};${l.res};${l.pts};${l.h};${l.g};${l.cb};${l.time};${l.node}\n`;
+        });
+        const blob = new Blob([txt], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `samariter_run_log_${this.state.seed}.txt`;
+        a.click();
+    }
+};
+
+window.onload = () => Game.init();
+</script>
+</body>
+</html>
