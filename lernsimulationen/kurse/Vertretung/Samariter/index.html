@@ -81,7 +81,7 @@
         .overlay {
             position: absolute;
             inset: 0;
-            display: none;
+            display: none; /* Standardmäßig unsichtbar */
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -90,9 +90,14 @@
             padding: 20px;
             text-align: center;
         }
-        .overlay.active { display: flex; }
+        .overlay.active { display: flex; } /* Sichtbar via Klasse */
 
-        #loading-screen { z-index: 200; background: var(--bg); color: white; display: flex; }
+        /* FIX: display:flex entfernt, damit .overlay-Logik greift */
+        #loading-screen { 
+            z-index: 200; 
+            background: var(--bg); 
+            color: white; 
+        }
 
         .btn {
             background: var(--primary);
@@ -255,6 +260,7 @@ const Game = {
             const totalCount = this.state.assetLoadReport.length;
             document.getElementById('asset-debug-info').innerText = `Assets: ${loadedCount}/${totalCount} geladen`;
 
+            // FIX: Loading Screen wird nun korrekt versteckt, da display:flex aus der ID-Regel entfernt wurde
             document.getElementById('loading-screen').classList.remove('active');
             document.getElementById('screen-start').classList.add('active');
             this.state.scene = "START";
