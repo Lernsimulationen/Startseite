@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finanzielle Selbstständigkeit - Designer Edition</title>
+    
+    <!-- 
+        SECURITY AUDIT CSP:
+        - default-src 'none': Maximale Einschränkung.
+        - img-src 'self' data:: Erlaubt lokale Bilder.
+        - style-src/script-src: Für diese Single-File-Demo ist 'unsafe-inline' technisch notwendig. 
+          Im Produktivbetrieb (Option B) sollten JS/CSS in externe Dateien ausgelagert 
+          und 'unsafe-inline' entfernt werden.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none';">
+
+    <style>
+        /* --- DESIGN TOKENS --- */
+        :root {
+            --primary: #3b82f6; 
+            --primary-dark: #2563eb;
+            --primary-soft: #eff6ff;
+            
+            --accent: #8b5cf6; 
+            
+            --success: #10b981;
+            --success-soft: #d1fae5;
+            --success-text: #065f46;
+            
+            --danger: #ef4444;
+            --danger-soft: #fee2e2;
+            --danger-text: #991b1b;
+            
+            --warning: #f59e0b;
+            --warning-soft: #fef3c7;
+            
+            --neutral-900: #111827;
+            --neutral-600: #4b5563;
+            --neutral-100: #f3f4f6;
+            --white: #ffffff;
+            --disabled-bg: #9ca3af;
+
+            --radius-xl: 1.5rem;
+            --radius-lg: 1rem;
+            --radius-md: 0.75rem;
+            
+            --shadow-card: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+            --shadow-float: 0 10px 15px -3px rgba(59, 130, 246, 0.2);
+            --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.02);
+        }
+
+        /* --- GLOBAL RESET & TYPO --- */
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f8fafc;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--neutral-900);
+            min-height: 100vh;
+            line-height: 1.6;
+            margin: 0;
+            padding: 2rem 1rem;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes slideUpFade {
+            0% { opacity: 0; transform: translateY(20px) scale(0.98); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        .animate-in {
+            animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* --- CARD SYSTEM --- */
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px); 
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-card);
+            border: 1px solid rgba(255,255,255,0.6);
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .card-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        /* --- TYPOGRAPHY --- */
+        h1, h2, h3 { 
+            margin: 0; 
+            letter-spacing: -0.03em; 
+            color: var(--neutral-900); 
+        }
+
+        h1 {
+            font-size: 2.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--neutral-900) 0%, var(--neutral-600) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        h2 { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.25rem; }
+        
+        p { color: var(--neutral-600); margin-top: 0; }
+        
+        .text-xl { font-size: 1.25rem; }
+        .text-sm { font-size: 0.875rem; }
+        .text-xs { font-size: 0.75rem; }
+        .text-muted { color: var(--neutral-600); }
+        .font-bold { font-weight: 700; }
+        .text-center { text-align: center; }
+
+        .currency { font-feature-settings: "tnum"; font-variant-numeric: tabular-nums; }
+        .text-green { color: var(--success); }
+        .text-red { color: var(--danger); }
+        .text-blue { color: var(--primary); }
+
+        /* --- BUTTONS --- */
+        .btn {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 1.25rem;
+            background: var(--neutral-900);
+            color: var(--white);
+            border: none;
+            border-radius: var(--radius-lg);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+            background: #000;
+        }
+
+        .btn:disabled, .btn-disabled-state {
+            background: var(--disabled-bg) !important;
+            color: var(--white) !important;
+            cursor: not-allowed !important;
+            transform: none !important;
+            box-shadow: none !important;
+            opacity: 0.7;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            box-shadow: var(--shadow-float);
+        }
+        .btn-primary:hover {
+            filter: brightness(1.1);
+            box-shadow: 0 15px 20px -3px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn-small-danger {
+            background: var(--danger-soft);
+            color: var(--danger-text);
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            border-radius: var(--radius-md);
+            width: auto;
+            box-shadow: none;
+        }
+        .btn-small-danger:hover {
+            background: var(--danger);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.3);
+        }
+        .btn-small-danger:disabled {
+            background: var(--disabled-bg);
+            color: white;
+            cursor: not-allowed;
+        }
+
+        .btn-option {
+            background: var(--white);
+            color: var(--neutral-900);
+            border: 2px solid var(--neutral-100);
+            padding: 1.5rem;
+            justify-content: flex-start;
+            text-align: left;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .btn-option:hover {
+            border-color: var(--primary);
+            background: var(--primary-soft);
+            transform: translateY(-2px);
+        }
+
+        /* --- UI ELEMENTS --- */
+        .icon-circle {
+            width: 4rem; height: 4rem;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.75rem;
+            margin: 0 auto 1.5rem auto;
+            background: var(--white);
+            box-shadow: var(--shadow-card);
+            color: var(--primary);
+        }
+
+        .icon-circle.small { width: 2.5rem; height: 2.5rem; font-size: 1.25rem; margin: 0; box-shadow: none; }
+        .bg-blue-soft { background: var(--primary-soft); color: var(--primary); }
+        .bg-green-soft { background: var(--success-soft); color: var(--success-text); }
+        .bg-red-soft { background: var(--danger-soft); color: var(--danger-text); }
+        .bg-yellow-soft { background: var(--warning-soft); color: #92400e; }
+
+        /* Lists & Data */
+        .data-group {
+            background: var(--neutral-100);
+            border-radius: var(--radius-lg);
+            padding: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.875rem 1.25rem;
+            background: var(--white);
+            border-radius: var(--radius-md);
+            transition: transform 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+        .data-row:hover { transform: translateX(2px); }
+        
+        .data-row.total { 
+            background: transparent; 
+            font-weight: 700; 
+            border-top: 1px dashed #cbd5e1;
+            margin-top: 0.5rem;
+            border-radius: 0;
+            box-shadow: none;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+        .data-row.total:hover { transform: none; }
+        
+        .decision-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        .decision-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .delta {
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+            padding: 0.1rem 0.3rem;
+            border-radius: 4px;
+        }
+        .delta-bad { color: var(--danger-text); background: var(--danger-soft); }
+        .delta-good { color: var(--success-text); background: var(--success-soft); }
+
+        /* Alerts */
+        .alert {
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            border-left: 4px solid;
+        }
+        .alert-info { background: var(--primary-soft); border-color: var(--primary); }
+        .alert-warn { background: var(--warning-soft); border-color: var(--warning); }
+        .alert-success { background: var(--success-soft); border-color: var(--success); }
+        .alert-error { background: var(--danger-soft); border-color: var(--danger); }
+
+        /* Receipt Style */
+        .receipt {
+            background: #fff;
+            padding: 1.5rem;
+            border: 1px solid #e5e7eb;
+            border-bottom: 2px dashed #cbd5e1;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            font-family: 'Courier New', Courier, monospace;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        .receipt-line {
+            border-bottom: 1px dashed #9ca3af;
+            margin: 1rem 0;
+        }
+        .receipt-total {
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Grid */
+        .grid { display: grid; gap: 1.5rem; }
+        .grid-2 { grid-template-columns: 1fr; }
+        @media(min-width: 768px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
+
+        /* Utilities */
+        .flex { display: flex; }
+        .justify-between { justify-content: space-between; }
+        .items-center { align-items: center; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mt-4 { margin-top: 1rem; }
+        .w-full { width: 100%; }
+        
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .summary-bar-container {
+            display: flex;
+            height: 24px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+        .summary-bar-segment {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="container"></div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // --- CONFIG ---
+            const CONFIG = { transitionDelay: 3500, eventProbability: 0.45 };
+
+            // --- STATE & DATA ---
+            const initialState = {
+                gamePhase: 'intro', 
+                selectedPath: null,
+                month: 1,
+                savings: 0,
+                events: [],
+                decisions: [],
+                currentDecision: null,
+                uiLocked: false,
+                history: [],
+                monthSummary: null 
+            };
+            let state = JSON.parse(JSON.stringify(initialState)); 
+
+            const scenarios = {
+                ausbildung: {
+                    title: "Ausbildung",
+                    income: { salary: 800, kindergeld: 250, total: 1050 },
+                    expenses: { warmmiete: 480, strom: 50, lebensmittel: 220, mobilitaet: 60, kleidung: 60, freizeit: 80 },
+                    description: "Der Start ins Berufsleben. Du verdienst direkt Geld, musst aber gut haushalten.",
+                    characteristics: "Solidität & Disziplin"
+                },
+                duales_studium: {
+                    title: "Duales Studium",
+                    income: { salary: 1200, kindergeld: 250, total: 1450 },
+                    expenses: { warmmiete: 550, strom: 60, lebensmittel: 240, mobilitaet: 70, freizeit: 150 },
+                    description: "Theorie und Praxis kombiniert. Höheres Einkommen, aber wenig Freizeit.",
+                    characteristics: "Karrierefokus & Belastbarkeit"
+                },
+                studium: {
+                    title: "Vollzeitstudium",
+                    income: { bafoeg: 700, kindergeld: 250, total: 950 },
+                    expenses: { warmmiete: 450, strom: 50, lebensmittel: 220, krankenversicherung: 130, semester: 30, freizeit: 70 },
+                    description: "Fokus auf Bildung. Finanziell eng, BAföG-Schulden entstehen.",
+                    characteristics: "Verzicht & Investition"
+                },
+                studium_minijob: {
+                    title: "Studium & Job",
+                    income: { bafoeg: 650, kindergeld: 250, minijob: 520, total: 1420 },
+                    expenses: { warmmiete: 550, strom: 60, lebensmittel: 240, krankenversicherung: 130, semester: 30, freizeit: 120 },
+                    description: "Der Jongleur-Akt. Gutes Geld, aber Studium und Arbeit stressen.",
+                    characteristics: "Balance & Management"
+                }
+            };
+
+            const decisionPoints = [
+                {
+                    month: 1,
+                    title: "Januar: Der Start",
+                    question: "Welche Verträge schließt du für deine neue Wohnung ab?",
+                    options: [
+                        { text: "High-Speed & Neuestes Handy", impact: { strom: 30 }, learning: "Komfort ist schön, aber monatliche Fixkosten läppern sich." },
+                        { text: "Standard-Tarife", impact: { strom: 0 }, learning: "Solide Basisversorgung reicht meistens völlig aus." },
+                        { text: "Discount & Prepaid", impact: { strom: -15 }, learning: "Vergleichen und Wechseln spart jedes Jahr hunderte Euro." }
+                    ]
+                },
+                {
+                    month: 2,
+                    title: "Februar: Wohnungssuche",
+                    question: "Wo möchtest du wohnen?",
+                    options: [
+                        { text: "Außerhalb (Günstig)", impact: { warmmiete: -50, mobilitaet: 30 }, learning: "Niedrige Miete, aber höhere Fahrtkosten und Zeitverlust." },
+                        { text: "Zentrum (Teuer)", impact: { warmmiete: 50, mobilitaet: -20 }, learning: "Du sparst Zeit, zahlst aber deutlich mehr für die Lage." },
+                        { text: "WG-Zimmer (Smart)", impact: { warmmiete: -70, strom: -20 }, learning: "Die günstigste Option durch geteilte Kosten." }
+                    ]
+                },
+                // ... (weitere Decisions wie oben, verkürzt für Übersichtlichkeit, Logik bleibt identisch)
+                { month: 3, title: "März: Abos & Streaming", question: "Netflix, Gym, Spotify... was gönnst du dir?", options: [{ text: "Das volle Programm", impact: { freizeit: 40 }, learning: "Viele kleine Abos werden schnell zu einer großen Belastung." }, { text: "Nur das Wichtigste", impact: { freizeit: 10 }, learning: "Bewusster Konsum schont den Geldbeutel." }, { text: "Kostenlose Alternativen", impact: { freizeit: -10 }, learning: "Joggen statt Gym, Mediatheken statt Netflix." }] },
+                { month: 4, title: "April: Ernährung", question: "Wie verpflegst du dich im Alltag?", options: [{ text: "Bio & Markenprodukte", impact: { lebensmittel: 50 }, learning: "Qualität hat ihren Preis." }, { text: "Discounter & Angebote", impact: { lebensmittel: -30 }, learning: "Der größte Hebel zum Sparen im Alltag ist der Supermarkt." }, { text: "Oft Lieferdienst", impact: { lebensmittel: 80 }, learning: "Bequemlichkeit ('Convenience') ist der teuerste Luxus." }] },
+                { month: 5, title: "Mai: Mobilität", question: "Wie kommst du zur Uni/Arbeit?", options: [{ text: "E-Scooter / Carsharing", impact: { mobilitaet: 40 }, learning: "Spontane Mobilität geht ins Geld." }, { text: "Fahrrad & Öffis", impact: { mobilitaet: -10 }, learning: "Gesund, günstig und oft genauso schnell." }, { text: "Eigenes Auto (Finanzierung)", impact: { mobilitaet: 150 }, learning: "Ein Auto ist der größte Kostenfaktor junger Menschen." }] },
+                { month: 6, title: "Juni: Halbzeit-Belohnung", question: "Ein neues Gadget ist auf dem Markt. Gönnst du es dir?", options: [{ text: "Sofort kaufen!", impact: { oneTime: 200 }, learning: "Impulskäufe gefährden deine Sparziele." }, { text: "Gebraucht kaufen", impact: { oneTime: 100 }, learning: "Second-Hand spart Ressourcen und Geld." }, { text: "Verzichten / Sparen", impact: { oneTime: 0 }, learning: "Verzicht heute ermöglicht Freiheit morgen." }] },
+                { month: 7, title: "Juli: Sommerurlaub", question: "Alle fahren weg. Was machst du?", options: [{ text: "Fernreise (Flug)", impact: { oneTime: 400 }, learning: "Reisen bildet, reißt aber riesige Löcher ins Budget." }, { text: "Camping/Städtetrip", impact: { oneTime: 150 }, learning: "Abenteuer muss nicht teuer sein." }, { text: "Balkonien & Baggersee", impact: { oneTime: 30 }, learning: "Erholung hängt nicht von der Entfernung ab." }] },
+                { month: 8, title: "August: Energie-Check", question: "Die Energiepreise steigen. Wie reagierst du?", options: [{ text: "Nicht einschränken", impact: { warmmiete: 30 }, learning: "Wer nicht aufpasst, zahlt bei der Abrechnung drauf." }, { text: "Bewusster Konsum", impact: { warmmiete: -10 }, learning: "Kleine Verhaltensänderungen senken die Nebenkosten." }, { text: "Extrem sparen", impact: { warmmiete: -30 }, learning: "Komfortverzicht spart maximal, ist aber ungemütlich." }] },
+                { month: 9, title: "September: Versicherungen", question: "Ein Vertreter will dir Versicherungen verkaufen.", options: [{ text: "Rundum-Sorglos-Paket", impact: { oneTime: 0, warmmiete: 40 }, learning: "Deutsche sind oft überversichert. Prüfe, was du wirklich brauchst." }, { text: "Nur Haftpflicht", impact: { oneTime: 0, warmmiete: 5 }, learning: "Die wichtigste Versicherung, die jeder haben muss." }, { text: "Brauche ich nicht", impact: { oneTime: 0 }, learning: "Risiko! Ein Schaden kann dich finanziell ruinieren." }] },
+                { month: 10, title: "Oktober: Technik-Panne", question: "Dein Laptop streikt. Reparatur kostet 200€.", options: [{ text: "Profi-Reparatur", impact: { oneTime: 200 }, learning: "Qualität hat ihren Preis." }, { text: "Aussitzen", impact: { oneTime: 0 }, learning: "Ohne Werkzeug leidet oft das Studium/Arbeit." }, { text: "Gebrauchtgerät", impact: { oneTime: 120 }, learning: "Second-Hand ist oft die smarteste Lösung." }] },
+                { month: 11, title: "November: Zukunftspläne", question: "Wie bereitest du dich auf das nächste Jahr vor?", options: [{ text: "Geld anlegen (ETF)", impact: { oneTime: 50 }, learning: "Früh anfangen zu investieren zahlt sich durch Zinseszins aus." }, { text: "Weiterbildung buchen", impact: { oneTime: 100 }, learning: "In sich selbst zu investieren bringt oft die höchste Rendite." }, { text: "Notgroschen füllen", impact: { oneTime: 50 }, learning: "Sicherheit gibt dir Ruhe für wichtige Entscheidungen." }] },
+                { month: 12, title: "Dezember: Jahresabschluss", question: "Weihnachten steht vor der Tür!", options: [{ text: "Teure Geschenke für alle", impact: { oneTime: 250 }, learning: "Großzügigkeit ist schön, aber Januar ist oft ein harter Monat." }, { text: "Kleine Aufmerksamkeiten", impact: { oneTime: 80 }, learning: "Geste zählt mehr als der Preis." }, { text: "DIY & Zeit schenken", impact: { oneTime: 20 }, learning: "Persönliche Geschenke sind oft die wertvollsten." }] }
+            ];
+
+            const eventsBySeason = {
+                winter: [ 
+                    { text: "Heizkostenabrechnung Nachzahlung", cost: 120, category: "Wohnen" },
+                    { text: "Erkältungswelle (Apotheke)", cost: 35, category: "Gesundheit" },
+                    { text: "Winterstiefel kaputt", cost: 80, category: "Kleidung" }
+                ],
+                spring: [ 
+                    { text: "Semesterbeitrag / Verwaltungskosten", cost: 150, category: "Bildung" },
+                    { text: "Fahrrad fit machen (Reparatur)", cost: 50, category: "Mobilität" },
+                    { text: "Einladung zur Hochzeit (Geschenk)", cost: 70, category: "Soziales" },
+                    { text: "Muttertag/Vatertag vergessen (Last Minute)", cost: 40, category: "Soziales" }
+                ],
+                summer: [ 
+                    { text: "Festival-Ticket", cost: 120, category: "Freizeit" },
+                    { text: "Badesee & Eis essen (Summe)", cost: 60, category: "Freizeit" },
+                    { text: "Ventilator für Dachgeschoss", cost: 40, category: "Wohnen" }
+                ],
+                autumn: [ 
+                    { text: "Semesterbeitrag / Materialgeld", cost: 150, category: "Bildung" },
+                    { text: "Neue Regenjacke notwendig", cost: 70, category: "Kleidung" },
+                    { text: "Versicherungsbeitrag fällig", cost: 90, category: "Fixkosten" }
+                ]
+            };
+            
+            const genericEvents = [
+                { text: "Smartphone Displaybruch", cost: 150, category: "Technik" },
+                { text: "Zahnzusatzkosten", cost: 80, category: "Gesundheit" },
+                { text: "Verkehrsticket / Bußgeld", cost: 60, category: "Mobilität" },
+                { text: "Vergessene Abo-Falle", cost: 30, category: "Sonstiges" }
+            ];
+
+            const LABELS = {
+                income: { salary: 'Gehalt', bafoeg: 'BAföG', kindergeld: 'Kindergeld', minijob: 'Minijob', total: 'Gesamt' },
+                expenses: { warmmiete: 'Miete (warm)', strom: 'Strom & Web', lebensmittel: 'Essen/Trinken', mobilitaet: 'Bus & Bahn', krankenversicherung: 'Krankenkasse', semester: 'Uni-Gebühren', kleidung: 'Kleidung', freizeit: 'Spaß & Hobby' }
+            };
+
+            // --- SECURE ICONS (No innerHTML) ---
+            const ICONS_DATA = {
+                target: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z',
+                check: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z',
+                alert: 'M12 2L1 21h22L12 2zm1 15h-2v-2h2v2zm0-4h-2v-4h2v4z',
+                wallet: 'M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z',
+                chart: 'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z',
+                receipt: 'M18 17H6v-2h12v2zm0-4H6v-2h12v2zm0-4H6V7h12v2zM3 22l1.5-1.5L6 22l1.5-1.5L9 22l1.5-1.5L12 22l1.5-1.5L15 22l1.5-1.5L18 22l1.5-1.5L21 22V2l-1.5 1.5L18 2l-1.5 1.5L15 2l-1.5 1.5L12 2 10.5 3.5 9 2 7.5 3.5 6 2 4.5 3.5 3 2v20z'
+            };
+
+            // --- HELPER ---
+            const el = (tag, cls, content) => {
+                const e = document.createElement(tag);
+                if (cls) e.className = cls;
+                if (content) {
+                    if (Array.isArray(content)) content.forEach(c => c && e.appendChild(c));
+                    else if (content instanceof Node) e.appendChild(content);
+                    else e.textContent = content;
+                }
+                return e;
+            };
+
+            const icon = (type) => {
+                const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                s.setAttribute("viewBox", "0 0 24 24");
+                s.setAttribute("width", "1em");
+                s.setAttribute("height", "1em");
+                s.setAttribute("fill", "currentColor");
+                
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                path.setAttribute("d", ICONS_DATA[type] || '');
+                s.appendChild(path);
+                return s;
+            };
+
+            // --- LOGIC ---
+            function calculateStats(scenario, adjustments = {}) {
+                if (!scenario) return { balance: 0, totalExp: 0, income: 0 };
+                let totalExp = 0;
+                for (const k in scenario.expenses) {
+                    let val = scenario.expenses[k];
+                    // Robust check: key in adjustments
+                    if (k in adjustments) val += adjustments[k];
+                    totalExp += Math.max(0, val);
+                }
+                return { 
+                    balance: scenario.income.total - totalExp,
+                    totalExp,
+                    income: scenario.income.total
+                };
+            }
+
+            function getAdjustments() {
+                const adj = {};
+                state.decisions.forEach(d => {
+                    if (d.impact && d.impact.oneTime === undefined) {
+                        Object.keys(d.impact).forEach(k => adj[k] = (adj[k] || 0) + d.impact[k]);
+                    }
+                });
+                return adj;
+            }
+
+            function getCurrentFinancials() {
+                // Guard check performed in caller or early return here
+                const s = scenarios[state.selectedPath];
+                if (!s) return null;
+                
+                const adj = getAdjustments();
+                const exp = { ...s.expenses };
+                Object.keys(adj).forEach(k => {
+                    if (exp[k] !== undefined) exp[k] = Math.max(0, exp[k] + adj[k]);
+                });
+                return { 
+                    expenses: exp, 
+                    ...calculateStats(s, adj)
+                };
+            }
+
+            function calculateMonthOutcome(extraOneTimeCost = 0) {
+                if (state.uiLocked) return; // Central Lock Check
+                const fin = getCurrentFinancials();
+                if (!fin) return resetGame();
+
+                // 1. Determine Event
+                let currentEvent = null;
+                let randomEventCost = 0;
+                let eventPool = [];
+                
+                const m = state.month;
+                if (m === 12 || m === 1 || m === 2) eventPool = eventsBySeason.winter;
+                else if (m >= 3 && m <= 5) eventPool = eventsBySeason.spring;
+                else if (m >= 6 && m <= 8) eventPool = eventsBySeason.summer;
+                else eventPool = eventsBySeason.autumn;
+                
+                eventPool = [...eventPool, ...genericEvents];
+
+                let prob = CONFIG.eventProbability;
+                if (m === 12 || m === 1) prob += 0.2;
+
+                if (Math.random() < prob) {
+                     const eData = eventPool[Math.floor(Math.random() * eventPool.length)];
+                     const recent = state.events.filter(e => e.month >= state.month - 2);
+                     if (!recent.find(r => r.text === eData.text)) {
+                         currentEvent = { month: state.month, ...eData };
+                         state.events.push(currentEvent);
+                         randomEventCost = eData.cost;
+                     }
+                }
+
+                const monthlyBalance = fin.income - fin.totalExp - extraOneTimeCost - randomEventCost;
+                
+                state.monthSummary = {
+                    month: state.month,
+                    income: fin.income,
+                    fixedExpenses: fin.totalExp,
+                    decisionCost: extraOneTimeCost,
+                    eventCost: randomEventCost,
+                    event: currentEvent,
+                    balance: monthlyBalance,
+                    newTotal: state.savings + monthlyBalance
+                };
+
+                state.savings += monthlyBalance;
+                
+                state.history.push({
+                    month: state.month,
+                    income: fin.income,
+                    expenses: fin.totalExp,
+                    oneTime: extraOneTimeCost + randomEventCost,
+                    balance: monthlyBalance,
+                    totalSavings: state.savings
+                });
+
+                state.gamePhase = 'summary';
+                render();
+            }
+
+            function advanceMonth() {
+                if (state.uiLocked) return;
+                
+                if (state.month >= 12) {
+                    state.gamePhase = 'reflection';
+                } else {
+                    state.month++;
+                    const nextD = decisionPoints.find(dp => dp.month === state.month);
+                    if (nextD) state.currentDecision = nextD;
+                    state.gamePhase = 'playing';
+                }
+                render();
+            }
+
+            function resetGame() {
+                state = JSON.parse(JSON.stringify(initialState));
+                render();
+            }
+
+            // --- RENDERERS ---
+
+            function renderIntro() {
+                const card = el('div', 'card animate-in');
+                const header = el('div', 'card-header');
+                
+                const iconWrap = el('div', 'icon-circle bg-blue-soft');
+                iconWrap.appendChild(icon('target'));
+                header.appendChild(iconWrap);
+                header.appendChild(el('h1', '', 'Finanzielle Freiheit'));
+                header.appendChild(el('p', 'text-xl', 'Deine Reise in die finanzielle Unabhängigkeit beginnt hier.'));
+                card.appendChild(header);
+
+                const alert = el('div', 'alert alert-info');
+                const alertText = el('div', '');
+                alertText.appendChild(el('h3', 'text-blue', 'Deine Mission'));
+                alertText.appendChild(el('p', 'text-sm', 'Wähle einen Lebensweg, manage dein Budget durch 12 Monate. Nach jedem Monat erhältst du eine Abrechnung.'));
+                alert.appendChild(alertText);
+                card.appendChild(alert);
+
+                const btn = el('button', 'btn btn-primary', 'Simulation starten');
+                if (state.uiLocked) btn.classList.add('btn-disabled-state');
+                btn.addEventListener('click', () => { 
+                    if(state.uiLocked) return;
+                    state.gamePhase = 'selection'; render(); 
+                });
+                card.appendChild(btn);
+                return card;
+            }
+
+            function renderSelection() {
+                const wrap = el('div', 'animate-in');
+                const h = el('div', 'text-center mb-4');
+                h.appendChild(el('h1', '', 'Wähle deinen Weg'));
+                h.appendChild(el('p', 'text-xl', 'Jeder Weg hat andere finanzielle Herausforderungen.'));
+                wrap.appendChild(h);
+
+                const grid = el('div', 'grid grid-2');
+                for (const key in scenarios) {
+                    const s = scenarios[key];
+                    const stats = calculateStats(s);
+                    const item = el('div', 'card');
+                    
+                    item.appendChild(el('h3', 'text-blue', s.title));
+                    item.appendChild(el('p', 'text-sm mb-4', s.description));
+                    
+                    const data = el('div', 'data-group mb-4');
+                    data.appendChild(el('div', 'data-row', [el('span','','Einnahmen'), el('span','text-green currency', `+${stats.income}€`)]));
+                    data.appendChild(el('div', 'data-row', [el('span','','Ausgaben'), el('span','text-red currency', `-${stats.totalExp}€`)]));
+                    data.appendChild(el('div', 'data-row total', [
+                        el('span','','Verfügbar'), 
+                        el('span', `currency font-bold ${stats.balance >= 0 ? 'text-green' : 'text-red'}`, `${stats.balance}€`)
+                    ]));
+                    item.appendChild(data);
+
+                    const btn = el('button', 'btn', 'Auswählen');
+                    if (state.uiLocked) btn.classList.add('btn-disabled-state');
+                    btn.addEventListener('click', () => { 
+                        if(state.uiLocked) return;
+                        state.selectedPath = key; state.gamePhase = 'planning'; render(); 
+                    });
+                    item.appendChild(btn);
+                    grid.appendChild(item);
+                }
+                wrap.appendChild(grid);
+                return wrap;
+            }
+
+            function renderPlanning() {
+                // Guard
+                if (!state.selectedPath || !scenarios[state.selectedPath]) {
+                    resetGame();
+                    return el('div');
+                }
+
+                const s = scenarios[state.selectedPath];
+                const card = el('div', 'card animate-in');
+                
+                const head = el('div', 'card-header');
+                head.appendChild(el('h2', '', s.title));
+                head.appendChild(el('p', '', 'Dein Start-Budget. Prüfe die Details.'));
+                card.appendChild(head);
+
+                const grid = el('div', 'grid grid-2 mb-4');
+                
+                const colIn = el('div', '');
+                colIn.appendChild(el('h3', 'text-green mb-4', 'Einnahmen'));
+                const listIn = el('div', 'data-group');
+                for (const k in s.income) {
+                    if (k !== 'total') listIn.appendChild(el('div', 'data-row', [el('span','', LABELS.income[k]), el('span','text-green currency', `${s.income[k]}€`)]));
+                }
+                colIn.appendChild(listIn);
+                
+                const colOut = el('div', '');
+                colOut.appendChild(el('h3', 'text-red mb-4', 'Fixkosten'));
+                const listOut = el('div', 'data-group');
+                for (const k in s.expenses) {
+                    listOut.appendChild(el('div', 'data-row', [el('span','', LABELS.expenses[k]), el('span','text-red currency', `${s.expenses[k]}€`)]));
+                }
+                colOut.appendChild(listOut);
+                
+                grid.appendChild(colIn);
+                grid.appendChild(colOut);
+                card.appendChild(grid);
+
+                const btn = el('button', 'btn btn-primary mt-4', 'Plan bestätigen & Starten');
+                if (state.uiLocked) btn.classList.add('btn-disabled-state');
+                btn.addEventListener('click', () => { 
+                    if (state.uiLocked) return;
+                    const firstDecision = decisionPoints.find(d => d.month === state.month);
+                    if (firstDecision) state.currentDecision = firstDecision;
+                    state.gamePhase = 'playing'; 
+                    render(); 
+                });
+                card.appendChild(btn);
+                return card;
+            }
+
+            function renderPlaying() {
+                // Guard
+                if (!state.selectedPath || !scenarios[state.selectedPath]) {
+                    resetGame();
+                    return el('div');
+                }
+
+                const s = scenarios[state.selectedPath];
+                
+                // 1. LEARNING SCREEN
+                if (state.currentDecision && state.currentDecision.showLearning) {
+                    const card = el('div', 'card animate-in text-center');
+                    const iconWrap = el('div', 'icon-circle bg-green-soft');
+                    iconWrap.appendChild(icon('check'));
+                    card.appendChild(iconWrap);
+                    card.appendChild(el('h2', '', state.currentDecision.title));
+                    
+                    const box = el('div', 'alert alert-success flex-col items-center text-center mt-4');
+                    box.appendChild(el('h3', 'text-green', 'Konsequenz & Learning'));
+                    box.appendChild(el('p', 'text-xl font-bold', state.currentDecision.learning));
+                    card.appendChild(box);
+                    return card;
+                }
+
+                // 2. DECISION SCREEN
+                if (state.currentDecision) {
+                    const card = el('div', 'card animate-in');
+                    const iconWrap = el('div', 'icon-circle bg-blue-soft');
+                    iconWrap.appendChild(icon('alert'));
+                    card.appendChild(iconWrap);
+                    
+                    const head = el('div', 'text-center mb-4');
+                    head.appendChild(el('h2', '', state.currentDecision.title));
+                    head.appendChild(el('p', 'text-xl', state.currentDecision.question));
+                    card.appendChild(head);
+
+                    const opts = el('div', 'grid gap-4');
+                    state.currentDecision.options.forEach(opt => {
+                        const btn = el('button', 'btn btn-option', '');
+                        btn.appendChild(el('span', 'font-bold text-xl mb-2', opt.text));
+                        
+                        if (state.uiLocked) btn.classList.add('btn-disabled-state');
+                        
+                        btn.addEventListener('click', () => {
+                            if (state.uiLocked) return;
+                            state.uiLocked = true; // LOCK
+                            render(); // Re-render to show disabled state
+                            
+                            // Save decision
+                            const d = { ...state.currentDecision, choice: opt.text, impact: opt.impact, learning: opt.learning };
+                            state.decisions.push({ month: state.month, ...d });
+                            state.currentDecision = { ...d, showLearning: true };
+                            render();
+                            
+                            // Auto-advance
+                            setTimeout(() => {
+                                state.currentDecision = null;
+                                state.uiLocked = false; // UNLOCK
+                                calculateMonthOutcome(opt.impact.oneTime || 0);
+                            }, CONFIG.transitionDelay);
+                        });
+                        opts.appendChild(btn);
+                    });
+                    card.appendChild(opts);
+                    return card;
+                }
+
+                return el('div', 'card', 'Lade...');
+            }
+
+            function renderSummary() {
+                // Guard
+                if (!state.monthSummary) {
+                    // Fallback if summary data missing but path selected
+                    if (state.selectedPath) {
+                        advanceMonth(); 
+                        return el('div');
+                    }
+                    resetGame();
+                    return el('div');
+                }
+
+                const summ = state.monthSummary;
+                const card = el('div', 'card animate-in');
+                const head = el('div', 'card-header');
+                const i = el('div', 'icon-circle bg-blue-soft');
+                i.appendChild(icon('receipt'));
+                head.appendChild(i);
+                head.appendChild(el('h2', '', `Abrechnung Monat ${summ.month}`));
+                head.appendChild(el('p', 'text-muted', 'Hier ist deine Monatsbilanz.'));
+                card.appendChild(head);
+
+                const receipt = el('div', 'receipt');
+                receipt.appendChild(el('div', 'receipt-row', [el('span','','Einnahmen'), el('span','text-green', `+${summ.income}€`)]));
+                receipt.appendChild(el('div', 'receipt-row', [el('span','','Fixkosten & Abos'), el('span','text-red', `-${summ.fixedExpenses}€`)]));
+                
+                if (summ.decisionCost !== 0) {
+                     receipt.appendChild(el('div', 'receipt-row', [el('span','','Variable Ausgaben (Entscheidung)'), el('span','text-red', `-${summ.decisionCost}€`)]));
+                }
+
+                if (summ.event) {
+                    const evtRow = el('div', 'receipt-row text-red', [el('span','', `! ${summ.event.text}`), el('span','', `-${summ.eventCost}€`)]);
+                    evtRow.style.fontWeight = 'bold';
+                    receipt.appendChild(evtRow);
+                }
+
+                receipt.appendChild(el('div', 'receipt-line'));
+
+                const balClass = summ.balance >= 0 ? 'text-green' : 'text-red';
+                const balSign = summ.balance >= 0 ? '+' : '';
+                receipt.appendChild(el('div', 'receipt-total', [el('span','','Monatsergebnis'), el('span', balClass, `${balSign}${summ.balance}€`)]));
+
+                card.appendChild(receipt);
+
+                const totalBox = el('div', 'alert alert-info flex justify-between items-center');
+                totalBox.appendChild(el('span', 'font-bold', 'Neuer Kontostand:'));
+                const totalClass = summ.newTotal >= 0 ? 'text-green text-xl font-bold' : 'text-red text-xl font-bold';
+                totalBox.appendChild(el('span', totalClass, `${summ.newTotal.toFixed(0)}€`));
+                card.appendChild(totalBox);
+
+                const activeDecisions = state.decisions.filter((d) => {
+                    return d.impact && d.impact.oneTime === undefined;
+                });
+
+                if (activeDecisions.length > 0) {
+                    const decSection = el('div', 'mt-4');
+                    decSection.appendChild(el('h3', 'text-center mb-2 text-sm', 'Aktive monatliche Belastungen'));
+                    
+                    const decList = el('div', 'data-group');
+                    activeDecisions.forEach(d => {
+                        const row = el('div', 'data-row decision-item');
+                        const header = el('div', 'decision-header');
+                        header.appendChild(el('div', 'font-bold text-sm', d.choice));
+                        
+                        const impacts = [];
+                        for(const k in d.impact) {
+                            impacts.push(`${LABELS.expenses[k] || k}: ${d.impact[k] > 0 ? '+' : ''}${d.impact[k]}€`);
+                        }
+                        const sub = el('div', 'text-xs text-muted', impacts.join(', '));
+                        
+                        const btnRemove = el('button', 'btn-small-danger', 'Kündigen');
+                        if (state.uiLocked) btnRemove.classList.add('btn-disabled-state');
+                        
+                        btnRemove.addEventListener('click', (e) => {
+                            if (state.uiLocked) return;
+                            const idx = state.decisions.indexOf(d);
+                            if (idx > -1) {
+                                state.decisions.splice(idx, 1);
+                                e.target.textContent = "Gekündigt";
+                                e.target.disabled = true;
+                                e.target.classList.add('btn-disabled-state');
+                            }
+                        });
+
+                        row.appendChild(header);
+                        row.appendChild(sub);
+                        row.appendChild(el('div', 'w-full flex justify-between items-center mt-2', [
+                            el('span', 'text-xs italic text-muted', `Seit Monat ${d.month}`),
+                            btnRemove
+                        ]));
+                        decList.appendChild(row);
+                    });
+                    decSection.appendChild(decList);
+                    card.appendChild(decSection);
+                }
+
+                const btn = el('button', 'btn btn-primary mt-4', 'Nächsten Monat starten');
+                if (state.uiLocked) btn.classList.add('btn-disabled-state');
+                btn.addEventListener('click', () => {
+                    if (state.uiLocked) return;
+                    advanceMonth();
+                });
+                card.appendChild(btn);
+
+                return card;
+            }
+
+            function renderReflection() {
+                const card = el('div', 'card animate-in');
+                const head = el('div', 'card-header');
+                const i = el('div', 'icon-circle bg-blue-soft');
+                i.appendChild(icon('chart'));
+                head.appendChild(i);
+                head.appendChild(el('h1', '', 'Jahresabschluss'));
+                head.appendChild(el('p', 'text-xl', 'Lass uns auf dein Finanzjahr zurückblicken.'));
+                card.appendChild(head);
+
+                const totalIncome = state.history.reduce((sum, h) => sum + h.income, 0);
+                const totalRegularExpenses = state.history.reduce((sum, h) => sum + h.expenses, 0);
+                const totalOneTimeCosts = state.history.reduce((sum, h) => sum + h.oneTime, 0);
+                const totalExpenses = totalRegularExpenses + totalOneTimeCosts;
+                const finalBalance = state.savings;
+                const savingsRate = Math.round((finalBalance / totalIncome) * 100);
+
+                const expPct = Math.min(100, Math.round((totalExpenses / totalIncome) * 100));
+                
+                const summaryContainer = el('div', 'mb-6');
+                const bar = el('div', 'summary-bar-container bg-gray-200');
+                const expBar = el('div', 'summary-bar-segment bg-red-500');
+                expBar.style.width = `${expPct}%`;
+                expBar.textContent = `Ausgaben ${expPct}%`;
+                
+                const savBar = el('div', 'summary-bar-segment bg-green-500');
+                if (finalBalance > 0) {
+                    const savPct = 100 - expPct;
+                    savBar.style.width = `${savPct}%`;
+                    savBar.textContent = `Spar ${savPct}%`;
+                }
+                
+                bar.appendChild(expBar);
+                if (finalBalance > 0) bar.appendChild(savBar);
+                summaryContainer.appendChild(bar);
+                card.appendChild(summaryContainer);
+
+                const grid = el('div', 'grid grid-2 mb-6');
+                
+                const posCol = el('div', 'data-group');
+                posCol.appendChild(el('div', 'data-row', [el('span','','Gesamteinnahmen'), el('span','text-green font-bold', `${totalIncome}€`)]));
+                posCol.appendChild(el('div', 'data-row', [el('span','','Endkontostand'), el('span', `font-bold ${finalBalance>=0?'text-green':'text-red'}`, `${finalBalance.toFixed(0)}€`)]));
+                
+                const negCol = el('div', 'data-group');
+                negCol.appendChild(el('div', 'data-row', [el('span','','Fixkosten (12 Mon.)'), el('span','text-red', `-${totalRegularExpenses}€`)]));
+                negCol.appendChild(el('div', 'data-row', [el('span','','Variable/Events'), el('span','text-red', `-${totalOneTimeCosts}€`)]));
+
+                grid.appendChild(posCol);
+                grid.appendChild(negCol);
+                card.appendChild(grid);
+
+                const resBox = el('div', `alert ${finalBalance >= 0 ? 'alert-success' : 'alert-error'} flex-col items-center p-6 text-center`);
+                let feedback = "";
+                if (finalBalance < 0) feedback = "Du bist im Minus gelandet. Das ist riskant! Versuche im nächsten Durchlauf, Fixkosten (Miete/Abo) früher zu senken.";
+                else if (savingsRate < 5) feedback = "Du hast das Jahr überstanden, aber kaum Rücklagen gebildet. Ein kaputtes Auto könnte dich jetzt ruinieren.";
+                else if (savingsRate < 15) feedback = "Solide Leistung! Du hast einen kleinen Puffer. Versuche, deine Sparquote weiter zu steigern.";
+                else feedback = "Exzellentes Finanzmanagement! Mit dieser Sparquote baust du echtes Vermögen auf.";
+                
+                resBox.appendChild(el('h3', '', finalBalance >= 0 ? 'Geschafft!' : 'Achtung!'));
+                resBox.appendChild(el('p', '', feedback));
+                card.appendChild(resBox);
+
+                const btn = el('button', 'btn btn-primary', 'Neues Szenario starten');
+                if (state.uiLocked) btn.classList.add('btn-disabled-state');
+                btn.addEventListener('click', () => { 
+                    if(state.uiLocked) return;
+                    resetGame();
+                });
+                card.appendChild(btn);
+                return card;
+            }
+
+            // --- MAIN ---
+            function render() {
+                const app = document.getElementById('app');
+                app.textContent = '';
+                let view;
+                switch (state.gamePhase) {
+                    case 'intro': view = renderIntro(); break;
+                    case 'selection': view = renderSelection(); break;
+                    case 'planning': view = renderPlanning(); break;
+                    case 'playing': view = renderPlaying(); break;
+                    case 'summary': view = renderSummary(); break;
+                    case 'reflection': view = renderReflection(); break;
+                    default: view = renderIntro();
+                }
+                app.appendChild(view);
+            }
+
+            document.addEventListener('DOMContentLoaded', render);
+        })();
+    </script>
+</body>
+</html>
