@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Q1 Historik-Simulation: Judäa 30 n. Chr.</title>
+    <!-- Tailwind CDN entfernt für DSGVO-Konformität. Lokale Styles implementiert. -->
+    <style>
+        /* Basis-Styles zur Ersetzung von Tailwind */
+        body { 
+            margin: 0; overflow: hidden; background-color: #0c0c0c; 
+            font-family: 'Georgia', serif; user-select: none; touch-action: none;
+            display: flex; height: 100vh; width: 100vw; color: #fef3c7;
+        }
+        #game-area {
+            position: relative; flex: 1; height: 100%; overflow: hidden;
+            background: #1a1a1a;
+        }
+        #sidebar-dashboard {
+            width: 350px; background: #231810; border-left: 4px solid #854d0e;
+            display: flex; flex-direction: column; padding: 20px;
+            overflow-y: auto; z-index: 10; box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+        }
+        canvas { background: #1a1a1a; display: block; width: 100%; height: 100%; }
+        .overlay { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            display: flex; flex-direction: column; justify-content: center; 
+            align-items: center; background: rgba(0, 0, 0, 0.96); color: white; z-index: 100; 
+        }
+        .info-card { 
+            background: #f4ece0; color: #1a1a1a; padding: 2.5rem; 
+            border-radius: 8px; max-width: 90%; width: 750px;
+            border: 3px solid #854d0e; box-shadow: 0 0 50px rgba(0,0,0,1);
+            max-height: 90vh; overflow-y: auto; text-align: left;
+        }
+        .btn { 
+            background: #5d4037; color: #fef3c7; padding: 1.2rem 2rem; 
+            border-radius: 4px; font-weight: bold; font-size: 1.2rem;
+            cursor: pointer; border: 1px solid #854d0e; transition: all 0.3s;
+            text-align: center; box-shadow: 0 4px 0 #3e2723; text-transform: uppercase;
+        }
+        .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #3e2723; background: #3e2723; }
+        #touch-controls {
+            position: absolute; bottom: 30px; left: 0; width: 100%;
+            display: flex; justify-content: space-between; padding: 0 30px;
+            pointer-events: none; z-index: 80;
+        }
+        .control-group { display: flex; gap: 20px; pointer-events: auto; }
+        .touch-btn {
+            width: 90px; height: 90px; background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 20px;
+            display: flex; justify-content: center; align-items: center;
+            color: white; font-size: 3rem; backdrop-filter: blur(10px);
+        }
+        #hud { 
+            position: absolute; top: 15px; left: 15px; right: 15px;
+            display: flex; justify-content: space-between; align-items: flex-start;
+            pointer-events: none; z-index: 90;
+        }
+        .hud-panel {
+            background: rgba(45, 30, 20, 0.95); color: #fef3c7;
+            padding: 12px 20px; border-radius: 8px; border-left: 5px solid #d97706;
+            min-width: 220px; pointer-events: auto;
+        }
+        .hp-bar-bg { height: 12px; background: #1a1a1a; width: 100%; border-radius: 6px; border: 1px solid #333; overflow: hidden; margin-top: 5px; }
+        #hp-bar { height: 100%; background: linear-gradient(90deg, #ef4444, #f97316); transition: width 0.3s; }
+        .quiz-option { 
+            display: block; width: 100%; text-align: left; padding: 18px; 
+            margin: 10px 0; background: #fff; border: 2px solid #bc9d7a;
+            border-radius: 6px; font-size: 1.1rem; cursor: pointer; color: #1a1a1a;
+        }
+        .dashboard-item {
+            margin-bottom: 20px; padding: 15px; background: rgba(255,255,255,0.03);
+            border: 1px solid #854d0e; border-radius: 8px; opacity: 0.25; transition: all 0.5s;
+        }
+        .dashboard-item.unlocked { opacity: 1; background: rgba(255,255,255,0.08); border-color: #fbbf24; }
+        .floating-score { position: absolute; font-weight: 900; pointer-events: none; animation: float-up 1.5s forwards; }
+        @keyframes float-up { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-60px); } }
+        .hidden { display: none !important; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .text-left { text-align: left; }
+        .uppercase { text-transform: uppercase; }
+        .italic { font-style: italic; }
+        .font-black { font-weight: 900; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mt-4 { margin-top: 1rem; }
+    </style>
+</head>
+<body>
+
+<div id="game-area">
+    <canvas id="gameCanvas"></canvas>
+    <div id="hud">
+        <div class="hud-panel relative">
+            <div class="font-bold uppercase tracking-tighter text-amber-400" style="font-size: 1.2rem;">Score: <span id="score">0</span></div>
+            <div class="hp-bar-bg"><div id="hp-bar" style="width: 100%"></div></div>
+            <div id="floating-score-container" style="position: absolute; width: 200px; height: 100px; top: 0; left: 100%; margin-left: 20px;"></div>
+        </div>
+        <div class="hud-panel text-left" style="text-align: right;">
+            <div id="level-name" class="font-black text-amber-500 uppercase">Jerusalem</div>
+            <div class="text-xs text-white/60 tracking-widest mt-1 uppercase">Fortschritt: <span id="progress-dots"></span></div>
+        </div>
+    </div>
+
+    <div id="start-screen" class="overlay">
+        <h1 style="font-size: 3.5rem;" class="font-black mb-4 text-amber-600 tracking-tighter uppercase">Judäa Expedition</h1>
+        <p class="mb-4" style="max-width: 500px; line-height: 1.6; color: #ccc; border-left: 4px solid #854d0e; padding-left: 20px;">
+            Analysieren Sie die sozio-religiösen Gruppen Palästinas zur Zeit Jesu. Sammeln Sie Quellen und bestehen Sie den mehrstufigen wissenschaftlichen Check.
+        </p>
+        <button class="btn" style="font-size: 1.5rem; padding: 1.5rem 3rem;" onclick="startGame()">Expedition Starten</button>
+    </div>
+
+    <div id="info-popup" class="overlay hidden">
+        <div class="info-card">
+            <div style="display: flex; align-items: center; gap: 20px; border-bottom: 2px solid #bc9d7a; padding-bottom: 15px; margin-bottom: 20px;">
+                <div id="group-icon" style="font-size: 3.5rem; background: #eee; padding: 10px; border-radius: 50%;"></div>
+                <div>
+                    <h2 id="info-title" style="font-size: 1.8rem; margin: 0;" class="font-black text-amber-900"></h2>
+                    <p id="quiz-step-indicator" style="font-size: 0.7rem;" class="uppercase font-bold text-amber-700 tracking-widest">Primärquelle Gefunden</p>
+                </div>
+            </div>
+            <div id="info-content" class="italic mb-4" style="font-size: 1.1rem; line-height: 1.5;"></div>
+            <div id="success-feedback" class="hidden text-center" style="background: #dcfce7; border: 2px solid #22c55e; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                <p class="font-black text-green-900 uppercase">Validierung Erfolgreich</p>
+                <div id="step-score-breakdown" class="text-green-800"></div>
+            </div>
+            <div id="mini-quiz-section" class="hidden">
+                <p class="font-bold text-amber-900 uppercase" style="font-size: 0.8rem; border-left: 4px solid #854d0e; padding-left: 10px; margin-bottom: 15px;">Schritt <span id="current-q-num">1</span>/3:</p>
+                <div id="quiz-options"></div>
+            </div>
+            <button id="start-quiz-btn" class="btn w-full mt-4" onclick="startQuiz()">Quellen-Analyse Starten</button>
+            <button id="close-info-btn" class="btn w-full hidden mt-4" onclick="closeInfo()">Forschungsreise Fortsetzen</button>
+        </div>
+    </div>
+
+    <div id="victory-screen" class="overlay hidden">
+        <div class="info-card" style="max-width: 900px;">
+            <h1 class="font-black text-amber-800 uppercase mb-4" style="font-size: 2.5rem;">Expeditions-Abschlussbericht</h1>
+            <div class="grid-2">
+                <div>
+                    <h3 class="font-bold text-amber-700 uppercase" style="font-size: 0.8rem; margin-bottom: 10px;">Archivierte Erkenntnisse:</h3>
+                    <div id="final-archive-list" style="max-height: 350px; overflow-y: auto; background: white; border: 1px solid #ddd; padding: 15px; border-radius: 5px;"></div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <div style="background: #fffbeb; border: 2px solid #fde68a; padding: 20px; border-radius: 8px;">
+                        <p class="uppercase font-bold text-amber-800" style="font-size: 0.7rem; margin-bottom: 10px;">Akademische Bilanz</p>
+                        <div id="score-breakdown-final" style="font-size: 0.9rem; line-height: 1.8;"></div>
+                        <div style="border-top: 2px solid #fde68a; margin-top: 15px; padding-top: 10px;">
+                            <span class="uppercase font-bold text-amber-800" style="font-size: 0.7rem;">Gesamt-Score:</span>
+                            <div id="final-score" style="font-size: 3rem;" class="font-black text-amber-900">0</div>
+                        </div>
+                    </div>
+                    <button class="btn" style="background: #065f46; color: white;" onclick="downloadProtocol()">Bericht exportieren (.txt)</button>
+                    <button class="btn" onclick="location.reload()">Neustart</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="touch-controls">
+        <div class="control-group">
+            <div class="touch-btn" id="ctrl-left">←</div>
+            <div class="touch-btn" id="ctrl-right">→</div>
+        </div>
+        <div class="control-group">
+            <div class="touch-btn" id="ctrl-jump">↑</div>
+        </div>
+    </div>
+</div>
+
+<div id="sidebar-dashboard">
+    <h3 style="font-size: 1.2rem;" class="font-black border-bottom pb-2 mb-4 uppercase tracking-tight">Forschungs-Archiv</h3>
+    <div id="dashboard-grid"></div>
+</div>
+
+<script>
+(function() { // Kapselung in IIFE zum Schutz vor Manipulation per Konsole
+    const WORLD_WIDTH = 3000;
+    const ASSET_PATH = 'assets/';
+    const LEVEL_BACKGROUNDS = {
+        1: ASSET_PATH + 'bg-level-1-jerusalem.jpg', 
+        2: ASSET_PATH + 'bg-level-2-wueste.jpg', 
+        3: ASSET_PATH + 'bg-level-3-tempelberg.jpg'  
+    };
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('score');
+    const hpBar = document.getElementById('hp-bar');
+    const levelNameEl = document.getElementById('level-name');
+
+    let CANVAS_WIDTH, CANVAS_HEIGHT, GROUND_Y;
+    const GRAVITY = 0.55;
+    const JUMP_FORCE = -17.5; 
+    const SPEED = 8;
+    const CLIMB_SPEED = 6;
+
+    const bgImages = {};
+    function loadImages() {
+        Object.keys(LEVEL_BACKGROUNDS).forEach(lvl => {
+            const img = new Image();
+            img.onload = () => { bgImages[lvl].loaded = true; };
+            img.onerror = () => { bgImages[lvl].error = true; };
+            img.src = LEVEL_BACKGROUNDS[lvl];
+            bgImages[lvl] = { img, loaded: false, error: false };
+        });
+    }
+    loadImages();
+
+    let gameRunning = false;
+    let currentLevel = 1;
+    let totalScore = 0;
+    let scoreCategories = { discovery: 0, quiz: 0, survival: 0 };
+    let cameraX = 0;
+    let player;
+    let platforms = [];
+    let ladders = [];
+    let scrolls = [];
+    let enemies = [];
+    let inputState = { left: false, right: false, jump: false };
+    let actionLog = [];
+    let discoveredGroups = new Set();
+    let activeQuizKey = null;
+    let activeQuizStep = 0;
+    let currentQuizErrors = 0;
+    let isProcessing = false;
+
+    const contentData = {
+        'Pharisäer': {
+            title: 'Die Pharisäer', symbol: '📜', discoveryPoints: 100,
+            text: 'Die Pharisäer bildeten eine einflussreiche Laienbewegung, die die <b>mündliche Tora</b> als ebenso verbindlich ansah wie die schriftliche. Ihr Ziel war die „Heiligung des Alltags“. Sie glaubten an die Auferstehung der Toten und das Kommen eines Messias.',
+            questions: [
+                { q: 'Welchen Stellenwert hatte die mündliche Überlieferung?', a: ['Gleichberechtigt mit dem Gesetz.', 'Nur zweitrangige Bedeutung.', 'Völlige Ablehnung.'], correct: 0 },
+                { q: 'Was bedeutet „Heiligung des Alltags“?', a: ['Reinheitsgebote für alle Juden.', 'Totaler Rückzug in die Wüste.', 'Keine rituellen Gebete mehr.'], correct: 0 },
+                { q: 'Worauf hofften die Pharisäer primär?', a: ['Auferstehung und Messias.', 'Römische Reformen.', 'Das ewige Vergessen.'], correct: 0 }
+            ]
+        },
+        'Sadduzäer': {
+            title: 'Die Sadduzäer', symbol: '🏛️', discoveryPoints: 100,
+            text: 'Die Sadduzäer stellten die Priesteraristokratie Jerusalems. Sie erkannten nur die <b>fünf Bücher Mose</b> an. Jenseitsvorstellungen wie Auferstehung lehnten sie ab. Politisch kooperierten sie mit Rom zur Sicherung des Tempels.',
+            questions: [
+                { q: 'Was war die Basis ihrer religiösen Autorität?', a: ['Nur die fünf Bücher Mose.', 'Sämtliche Schriften Israels.', 'Römische Götterlehren.'], correct: 0 },
+                { q: 'Wie standen sie zur Auferstehung?', a: ['Ablehnung als Neuerung.', 'Zentrum ihres Glaubens.', 'Interesse an griechischen Mythen.'], correct: 0 },
+                { q: 'Welche Schicht bildete diese Gruppe?', a: ['Der wohlhabende Priesteradel.', 'Einfache Tagelöhner.', 'Bewaffnete Freiheitskämpfer.'], correct: 0 }
+            ]
+        },
+        'Essener': {
+            title: 'Die Essener', symbol: '🏺', discoveryPoints: 100,
+            text: 'Zogen sich aus Protest gegen den korrupten Tempel in die Wüste zurück (Qumran). Ihr Weltbild war <b>dualistisch</b> geprägt: Kampf zwischen Licht und Finsternis.',
+            questions: [
+                { q: 'Warum verließen sie Jerusalem?', a: ['Protest gegen Tempel-Korruption.', 'Suche nach neuen Märkten.', 'Angst vor römischen Steuern.'], correct: 0 },
+                { q: 'Was charakterisierte ihren Dualismus?', a: ['Kampf von Licht gegen Finsternis.', 'Glaube an zwei Götter.', 'Zusammenarbeit zweier Könige.'], correct: 0 },
+                { q: 'Wie lebten sie vorwiegend?', a: ['In mönchischen Gemeinschaften.', 'Als Händler in den Häfen.', 'Im Dienste des Kaisers.'], correct: 0 }
+            ]
+        },
+        'Zeloten': {
+            title: 'Widerstandskreise', symbol: '⚔️', discoveryPoints: 100,
+            text: 'Forderten die <b>Theokratie</b> (Gottesherrschaft). Sie lehnten die Steuerzahlung an den Kaiser als Glaubensverrat ab und nutzten Gewalt zur Befreiung Israels.',
+            questions: [
+                { q: 'Was war ihr politisch-religiöses Ideal?', a: ['Theokratie (Gottesherrschaft).', 'Römische Demokratie.', 'Griechische Tyrannis.'], correct: 0 },
+                { q: 'Wie beurteilten sie die Steuern an Rom?', a: ['Als Verrat an Gott.', 'Als notwendiges Übel.', 'Als legitime Gebühr.'], correct: 0 },
+                { q: 'Mit welchen Mitteln wollten sie die Freiheit?', a: ['Gewalt und bewaffneter Kampf.', 'Pazifistischer Ungehorsam.', 'Überzeugung durch Dialog.'], correct: 0 }
+            ]
+        },
+        'Römer': {
+            title: 'Römische Herrschaft', symbol: '🦅', discoveryPoints: 100,
+            text: 'Rom sicherte die Macht durch Statthalter und das <b>Ius Gladii</b> (Schwertrecht). Nur Rom durfte Todesurteile vollstrecken. Hohe Tribute belasteten das Volk massiv.',
+            questions: [
+                { q: 'Was bedeutet das „Ius Gladii“?', a: ['Das Recht über Leben und Tod.', 'Das Vorrecht auf Steuerfreiheit.', 'Die Hoheit über den Handel.'], correct: 0 },
+                { q: 'Wer vertrat die römische Macht vor Ort?', a: ['Präfekten/Statthalter.', 'Pharisäische Priester.', 'Gewählte Volksräte.'], correct: 0 },
+                { q: 'Was war eine Folge des ökonomischen Drucks?', a: ['Radikale Messias-Erwartungen.', 'Allgemeine Zufriedenheit.', 'Abwanderung nach Rom.'], correct: 0 }
+            ]
+        }
+    };
+
+    class Player {
+        constructor() { this.width = 45; this.height = 75; this.reset(); }
+        reset() {
+            this.x = 100; this.y = GROUND_Y - this.height;
+            this.vx = 0; this.vy = 0;
+            this.isJumping = false;
+            this.isClimbing = false;
+            this.health = 100;
+            this.invul = 0;
+        }
+        draw() {
+            ctx.save(); ctx.translate(this.x, this.y);
+            if (this.invul % 10 > 5) ctx.globalAlpha = 0.5;
+            ctx.fillStyle = '#4a3728'; ctx.fillRect(0, 20, this.width, this.height - 20);
+            ctx.strokeStyle = '#2d1e14'; ctx.lineWidth = 2; ctx.strokeRect(0, 20, this.width, this.height - 20);
+            ctx.fillStyle = '#ffdbac'; ctx.beginPath(); ctx.arc(this.width/2, 15, 15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.restore();
+        }
+        update() {
+            if (this.isClimbing) {
+                this.vy = 0; if (inputState.jump) this.y -= CLIMB_SPEED;
+                let onLadder = ladders.some(l => this.x + this.width/2 > l.x && this.x + this.width/2 < l.x + l.w && this.y + this.height > l.y && this.y < l.y + l.h);
+                if (!onLadder) this.isClimbing = false;
+            } else {
+                this.x += this.vx; this.y += this.vy;
+                if (this.invul > 0) this.invul--;
+                if (this.y + this.height < GROUND_Y) { this.vy += GRAVITY; this.isJumping = true; } 
+                else { this.vy = 0; this.y = GROUND_Y - this.height; this.isJumping = false; }
+            }
+            cameraX = this.x - CANVAS_WIDTH / 2;
+            if (cameraX < 0) cameraX = 0;
+            if (cameraX > WORLD_WIDTH - CANVAS_WIDTH) cameraX = WORLD_WIDTH - CANVAS_WIDTH;
+            
+            // Health Clamping
+            if (this.health < 0) this.health = 0;
+            hpBar.style.width = this.health + '%';
+            if (this.health <= 0) { spawnFloatingText("Neustart...", "#ef4444"); this.reset(); }
+        }
+    }
+
+    class Platform {
+        constructor(x, y, w, h, type = 'static', range = 0, speed = 0.03) {
+            this.x = x; this.y = y; this.w = w; this.h = h;
+            this.type = type; this.startX = x; this.startY = y;
+            this.range = range; this.speed = speed;
+            this.offset = Math.random() * Math.PI * 2;
+        }
+        draw() {
+            ctx.save(); ctx.fillStyle = '#3e2723'; ctx.fillRect(this.x, this.y, this.w, this.h);
+            ctx.strokeStyle = '#d97706'; ctx.lineWidth = 3; ctx.strokeRect(this.x, this.y, this.w, this.h);
+            ctx.restore();
+        }
+        update() {
+            if (this.type === 'horizontal' || this.type === 'collision') {
+                const oldX = this.x;
+                const move = this.type === 'horizontal' ? Math.sin(Date.now()*this.speed*0.1 + this.offset) : Math.abs(Math.sin(Date.now()*this.speed*0.1 + this.offset));
+                this.x = this.startX + move * this.range;
+                return this.x - oldX;
+            } else if (this.type === 'vertical') {
+                this.y = this.startY + Math.sin(Date.now() * this.speed * 0.1 + this.offset) * this.range;
+            }
+            return 0;
+        }
+    }
+
+    class Ladder {
+        constructor(x, y, w, h) { this.x = x; this.y = y; this.w = w; this.h = h; }
+        draw() {
+            ctx.save(); ctx.strokeStyle = '#5d4037'; ctx.lineWidth = 6;
+            ctx.beginPath(); ctx.moveTo(this.x + 5, this.y); ctx.lineTo(this.x + 5, this.y + this.h); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(this.x + this.w - 5, this.y); ctx.lineTo(this.x + this.w - 5, this.y + this.h); ctx.stroke();
+            ctx.lineWidth = 4;
+            for (let i = this.y + 15; i < this.y + this.h; i += 25) { ctx.beginPath(); ctx.moveTo(this.x, i); ctx.lineTo(this.x + this.w, i); ctx.stroke(); }
+            ctx.restore();
+        }
+    }
+
+    function shuffle(array) {
+        let currentIndex = array.length, randomIndex;
+        while (currentIndex != 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex); currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
+
+    function spawnFloatingText(text, color) {
+        const container = document.getElementById('floating-score-container');
+        const el = document.createElement('div');
+        el.className = 'floating-score';
+        el.textContent = text; 
+        el.style.color = color;
+        container.appendChild(el);
+        setTimeout(() => { if(el.parentNode) container.removeChild(el); }, 1500);
+    }
+
+    function addPoints(pts, category, label) {
+        scoreCategories[category] += pts;
+        totalScore += pts;
+        scoreEl.textContent = totalScore;
+        spawnFloatingText(`+${pts} ${label}`, "#fbbf24");
+    }
+
+    function initLevel(lvl) {
+        resizeCanvas(); player.reset();
+        platforms = [new Platform(0, GROUND_Y, WORLD_WIDTH, 100)]; ladders = []; scrolls = []; enemies = []; 
+
+        if (lvl === 1) {
+            levelNameEl.textContent = 'Station 1: Jerusalem';
+            platforms.push(new Platform(400, 420, 250, 40), new Platform(800, 250, 300, 40), new Platform(1300, 420, 300, 40));
+            ladders.push(new Ladder(810, 250, 50, GROUND_Y - 250));
+            scrolls.push(new Scroll(950, 150, 'Pharisäer'), new Scroll(2000, GROUND_Y - 80, 'Römer'));
+            enemies.push({x: 1600, y: GROUND_Y-85, startX: 1600, range: 400, dir: 1, w: 60, h: 85});
+        } else if (lvl === 2) {
+            levelNameEl.textContent = 'Station 2: Judäische Wüste';
+            platforms.push(new Platform(500, 450, 250, 40, 'horizontal', 200, 0.05), new Platform(1100, 300, 300, 40, 'vertical', 120, 0.05), new Platform(1800, 450, 300, 40, 'horizontal', 300, 0.06));
+            ladders.push(new Ladder(1120, 300, 50, GROUND_Y - 300));
+            scrolls.push(new Scroll(1250, 150, 'Essener'), new Scroll(2400, GROUND_Y - 80, 'Zeloten'));
+        } else {
+            levelNameEl.textContent = 'Station 3: Tempelberg';
+            platforms.push(new Platform(300, 450, 250, 40, 'collision', 150, 0.04), new Platform(800, 300, 250, 40, 'collision', 250, 0.04), new Platform(1300, 150, 400, 40));
+            ladders.push(new Ladder(1350, 150, 60, GROUND_Y - 150));
+            scrolls.push(new Scroll(1500, 60, 'Sadduzäer'));
+        }
+        finishGate = {x: WORLD_WIDTH - 300, y: GROUND_Y - 280, w: 160, h: 280};
+        updateDashboardUI(); updateProgressUI();
+    }
+
+    class Scroll {
+        constructor(x, y, key) { this.x = x; this.y = y; this.key = key; this.collected = false; }
+        draw() {
+            if (this.collected) return;
+            ctx.save(); ctx.font = '55px serif'; ctx.textAlign = 'center';
+            ctx.fillText(contentData[this.key].symbol, this.x, this.y + Math.sin(Date.now()/300)*15); ctx.restore();
+        }
+    }
+
+    window.startGame = function() {
+        document.getElementById('start-screen').classList.add('hidden');
+        player = new Player(); totalScore = 0; scoreCategories = { discovery: 0, quiz: 0, survival: 0 };
+        actionLog = []; discoveredGroups.clear(); initLevel(1);
+        gameRunning = true; requestAnimationFrame(gameLoop);
+    };
+
+    function logAction(msg) { const time = new Date().toLocaleTimeString().split(' ')[0]; actionLog.push(`${time} - ${msg}`); }
+
+    function gameLoop() { if (gameRunning) { update(); draw(); requestAnimationFrame(gameLoop); } }
+
+    function update() {
+        if (inputState.left) player.vx = -SPEED; else if (inputState.right) player.vx = SPEED; else player.vx *= 0.82;
+        let onLadder = ladders.some(l => player.x + player.width/2 > l.x && player.x + player.width/2 < l.x + l.w && player.y + player.height > l.y && player.y < l.y + l.h);
+        if (onLadder && inputState.jump) player.isClimbing = true; else if (!onLadder) player.isClimbing = false;
+        if (inputState.jump && !player.isJumping && !player.isClimbing) { player.vy = JUMP_FORCE; player.isJumping = true; }
+        player.update();
+
+        enemies.forEach(e => {
+            e.x += 4 * e.dir; if (Math.abs(e.x - e.startX) > e.range) e.dir *= -1;
+            if (player.invul <= 0 && Math.abs(player.x - (e.x + 30)) < 40 && Math.abs(player.y - e.y) < 65) { 
+                player.health -= 20; player.invul = 60; logAction("Feindkontakt."); spawnFloatingText("-20 HP", "#ef4444");
+            }
+        });
+
+        platforms.forEach(p => {
+            const shift = p.update();
+            if (!player.isClimbing && player.vy >= 0 && player.x + player.width > p.x && player.x < p.x + p.w && player.y + player.height > p.y && player.y + player.height < p.y + 25 + player.vy) {
+                player.y = p.y - player.height; player.vy = 0; player.isJumping = false; player.x += shift;
+            }
+        });
+
+        scrolls.forEach(s => {
+            if (!s.collected && Math.abs(player.x - s.x) < 70 && Math.abs(player.y - s.y) < 70) {
+                s.collected = true; logAction(`Quelle gefunden: ${contentData[s.key].title}`); 
+                addPoints(contentData[s.key].discoveryPoints, 'discovery', 'Exploration');
+                showInfo(s.key);
+            }
+        });
+
+        if (player.x + player.width > finishGate.x) {
+            const levelGroups = currentLevel === 1 ? ['Pharisäer', 'Römer'] : currentLevel === 2 ? ['Essener', 'Zeloten'] : ['Sadduzäer'];
+            if (levelGroups.every(g => discoveredGroups.has(g))) {
+                if (currentLevel < 3) { currentLevel++; initLevel(currentLevel); } else endGame();
+            } else { player.x = finishGate.x - player.width; }
+        }
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        const bgData = bgImages[currentLevel];
+        if (bgData && bgData.loaded && !bgData.error && bgData.img.naturalWidth > 0) {
+            ctx.save(); const shift = cameraX * 0.5;
+            ctx.drawImage(bgData.img, -(shift % CANVAS_WIDTH), 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+            ctx.drawImage(bgData.img, -(shift % CANVAS_WIDTH) + CANVAS_WIDTH, 0, CANVAS_WIDTH, CANVAS_HEIGHT); ctx.restore();
+        } else {
+            const grad = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
+            if(currentLevel === 1) { grad.addColorStop(0, '#4a90e2'); grad.addColorStop(1, '#caf0f8'); }
+            else if(currentLevel === 2) { grad.addColorStop(0, '#d97706'); grad.addColorStop(1, '#ffedd5'); }
+            else { grad.addColorStop(0, '#1e293b'); grad.addColorStop(1, '#94a3b8'); }
+            ctx.fillStyle = grad; ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        }
+        ctx.save(); ctx.translate(-cameraX, 0);
+        ladders.forEach(l => l.draw()); platforms.forEach(p => p.draw()); scrolls.forEach(s => s.draw());
+        enemies.forEach(e => { ctx.fillStyle = '#991b1b'; ctx.fillRect(e.x, e.y, e.w, e.h); ctx.fillStyle = '#fbbf24'; ctx.fillRect(e.x, e.y, e.w, 10); });
+        ctx.fillStyle = '#854d0e'; ctx.fillRect(finishGate.x, finishGate.y, finishGate.w, finishGate.h);
+        ctx.strokeStyle = '#fef3c7'; ctx.lineWidth = 10; ctx.strokeRect(finishGate.x+15, finishGate.y+15, finishGate.w-30, finishGate.h-15);
+        player.draw(); ctx.restore();
+    }
+
+    function showInfo(key) {
+        gameRunning = false; activeQuizKey = key; activeQuizStep = 0; currentQuizErrors = 0;
+        const group = contentData[key];
+        document.getElementById('group-icon').textContent = group.symbol;
+        document.getElementById('info-title').textContent = group.title;
+        document.getElementById('info-content').innerHTML = group.text;
+        document.getElementById('info-content').classList.remove('hidden');
+        document.getElementById('success-feedback').classList.add('hidden');
+        document.getElementById('mini-quiz-section').classList.add('hidden');
+        document.getElementById('start-quiz-btn').classList.remove('hidden');
+        document.getElementById('close-info-btn').classList.add('hidden');
+        document.getElementById('info-popup').classList.remove('hidden');
+    }
+
+    window.startQuiz = function() {
+        document.getElementById('info-content').classList.add('hidden');
+        document.getElementById('start-quiz-btn').classList.add('hidden');
+        document.getElementById('mini-quiz-section').classList.remove('hidden');
+        renderQuizStep();
+    };
+
+    function renderQuizStep() {
+        const group = contentData[activeQuizKey]; const quiz = group.questions[activeQuizStep];
+        document.getElementById('current-q-num').textContent = activeQuizStep + 1;
+        const qDiv = document.getElementById('quiz-options');
+        qDiv.innerHTML = '';
+        const qText = document.createElement('p'); qText.className = 'mb-4 font-bold text-left'; qText.textContent = quiz.q;
+        qDiv.appendChild(qText);
+        
+        let options = quiz.a.map((text, idx) => ({ text, isCorrect: idx === quiz.correct }));
+        shuffle(options);
+
+        options.forEach(opt => {
+            const d = document.createElement('div'); d.className = 'quiz-option'; d.textContent = opt.text;
+            d.onclick = () => {
+                if (isProcessing) return;
+                if (opt.isCorrect) {
+                    activeQuizStep++; if (activeQuizStep < 3) renderQuizStep(); else finalizeInfo();
+                } else { 
+                    currentQuizErrors++; player.health -= 10; d.style.background = '#fee2e2'; spawnFloatingText("-10 HP", "#ef4444"); 
+                }
+            };
+            qDiv.appendChild(d);
+        });
+    }
+
+    function finalizeInfo() {
+        const pts = Math.max(50, 200 - (currentQuizErrors * 50));
+        scoreCategories.quiz += pts; totalScore += pts; scoreEl.textContent = totalScore;
+        discoveredGroups.add(activeQuizKey);
+        document.getElementById('mini-quiz-section').classList.add('hidden');
+        document.getElementById('step-score-breakdown').textContent = `Analytische Validierung abgeschlossen: +${pts} Punkte`;
+        document.getElementById('success-feedback').classList.remove('hidden');
+        document.getElementById('close-info-btn').classList.remove('hidden');
+        updateDashboardUI(); updateProgressUI();
+    }
+
+    window.closeInfo = function() { document.getElementById('info-popup').classList.add('hidden'); gameRunning = true; requestAnimationFrame(gameLoop); };
+
+    function updateDashboardUI() {
+        const grid = document.getElementById('dashboard-grid'); grid.innerHTML = '';
+        Object.keys(contentData).forEach(key => {
+            const item = document.createElement('div'); const unlocked = discoveredGroups.has(key);
+            item.className = `dashboard-item ${unlocked ? 'unlocked' : ''}`;
+            const title = document.createElement('h4'); title.textContent = (unlocked ? contentData[key].symbol : '?') + ' ' + (unlocked ? contentData[key].title : 'Unbekannt');
+            item.appendChild(title);
+            const desc = document.createElement('p'); desc.textContent = unlocked ? contentData[key].text.replace(/<b>|<\/b>/g, '') : 'Noch zu analysieren...';
+            item.appendChild(desc);
+            grid.appendChild(item);
+        });
+    }
+
+    function updateProgressUI() {
+        const total = 5; const got = discoveredGroups.size;
+        document.getElementById('progress-dots').textContent = '●'.repeat(got) + '○'.repeat(total-got);
+    }
+
+    function endGame() {
+        gameRunning = false; 
+        document.getElementById('victory-screen').classList.remove('hidden');
+        const survivalBonus = Math.floor(player.health * 5);
+        scoreCategories.survival = survivalBonus;
+        document.getElementById('final-score').textContent = totalScore + survivalBonus;
+        const breakdown = document.getElementById('score-breakdown-final');
+        breakdown.innerHTML = '';
+        const cats = [
+            {l: 'Exploration', v: scoreCategories.discovery},
+            {l: 'Präzision', v: scoreCategories.quiz},
+            {l: 'Integritäts-Bonus (HP)', v: survivalBonus}
+        ];
+        cats.forEach(c => {
+            const div = document.createElement('div'); div.style.display = 'flex'; div.style.justifyContent = 'space-between';
+            const s1 = document.createElement('span'); s1.textContent = c.l + ':';
+            const s2 = document.createElement('span'); s2.textContent = c.v;
+            div.appendChild(s1); div.appendChild(s2); breakdown.appendChild(div);
+        });
+
+        const archiveList = document.getElementById('final-archive-list'); 
+        archiveList.innerHTML = '';
+        discoveredGroups.forEach(key => {
+            const div = document.createElement('div'); div.className = "p-4 bg-amber-50 rounded border border-amber-200 mb-2 text-left";
+            const h = document.createElement('h4'); h.className = "font-black text-amber-800 mb-1 uppercase"; h.style.fontSize = "0.9rem"; h.textContent = contentData[key].symbol + ' ' + contentData[key].title;
+            const p = document.createElement('p'); p.className = "text-sm italic"; p.textContent = contentData[key].text.replace(/<b>|<\/b>/g, '');
+            div.appendChild(h); div.appendChild(p); archiveList.appendChild(div);
+        });
+    }
+
+    window.downloadProtocol = function() {
+        let text = "ARCHIVIERTER FORSCHUNGSBERICHT: JUDÄA 30 N. CHR.\n==============================================\n";
+        text += "GESAMT-SCORE: " + document.getElementById('final-score').textContent + "\n\nERKENNTNISSE:\n";
+        discoveredGroups.forEach(key => text += `\n[ ${contentData[key].title} ]\n${contentData[key].text.replace(/<b>|<\/b>/g, '')}\n`);
+        text += "\n\nPROTOKOLL:\n" + actionLog.join("\n");
+        const blob = new Blob([text], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = 'Historik_Bericht_Judaee.txt'; a.click();
+    };
+
+    function resizeCanvas() {
+        const area = document.getElementById('game-area');
+        CANVAS_WIDTH = area.clientWidth; CANVAS_HEIGHT = area.clientHeight;
+        canvas.width = CANVAS_WIDTH; canvas.height = CANVAS_HEIGHT;
+        GROUND_Y = CANVAS_HEIGHT - 100;
+    }
+
+    const handleTouch = (id, key) => {
+        const el = document.getElementById(id);
+        const set = (v) => (e) => { e.preventDefault(); inputState[key] = v; };
+        el.addEventListener('touchstart', set(true), { passive: false });
+        el.addEventListener('touchend', set(false), { passive: false });
+        el.addEventListener('touchcancel', set(false), { passive: false });
+    };
+    handleTouch('ctrl-left', 'left'); handleTouch('ctrl-right', 'right'); handleTouch('ctrl-jump', 'jump');
+
+    window.addEventListener('keydown', e => {
+        if(e.code === 'ArrowLeft') inputState.left = true;
+        if(e.code === 'ArrowRight') inputState.right = true;
+        if(e.code === 'ArrowUp' || e.code === 'Space') inputState.jump = true;
+    });
+    window.addEventListener('keyup', e => {
+        if(e.code === 'ArrowLeft') inputState.left = false;
+        if(e.code === 'ArrowRight') inputState.right = false;
+        if(e.code === 'ArrowUp' || e.code === 'Space') inputState.jump = false;
+    });
+
+    window.onresize = resizeCanvas;
+    resizeCanvas();
+})(); // IIFE Ende
+</script>
+</body>
+</html>
