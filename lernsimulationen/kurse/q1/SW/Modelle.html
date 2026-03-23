@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AEQUITAS // NEURO-MASTER 12.0</title>
+    <style>
+        /* DESIGN SYSTEM */
+        :root {
+            --neon-blue: #00f2ff;
+            --neon-purple: #bc13fe;
+            --neon-pink: #ff0055;
+            --success: #00ff88;
+            --bg-deep: #010108;
+            --panel-bg: rgba(10, 15, 35, 0.95);
+            --border-glow: rgba(0, 242, 255, 0.25);
+            --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --font-tech: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: var(--bg-deep);
+            color: #d1d5db;
+            font-family: var(--font-main);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+        }
+
+        /* ATMOSPHERE */
+        .ambient-fx {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            background: 
+                radial-gradient(circle at 10% 15%, rgba(188, 19, 254, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 85%, rgba(0, 242, 255, 0.08) 0%, transparent 40%);
+            pointer-events: none;
+        }
+
+        .grid-mask {
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(var(--border-glow) 1px, transparent 1px), linear-gradient(90deg, var(--border-glow) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.15;
+            mask-image: radial-gradient(circle at center, black, transparent 80%);
+        }
+
+        /* LAYOUT CORE */
+        #neuro-app {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .hud-header {
+            height: clamp(80px, 12vh, 110px);
+            margin: 1rem 1rem 0.5rem 1rem;
+            padding: 0 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border-glow);
+            border-radius: 1.25rem;
+            background: var(--panel-bg);
+            backdrop-filter: blur(25px);
+        }
+
+        .stat-group { display: flex; align-items: center; gap: 2.5rem; }
+        .label { font-family: var(--font-tech); font-size: 0.6rem; letter-spacing: 0.25rem; text-transform: uppercase; color: var(--neon-purple); margin-bottom: 0.2rem; }
+        .value { font-family: var(--font-tech); font-size: clamp(1.2rem, 2.2vw, 1.8rem); font-weight: 800; color: #fff; }
+
+        .viewport {
+            flex: 1;
+            margin: 0.5rem 1rem 1rem 1rem;
+            border-radius: 1.25rem;
+            border: 1px solid var(--border-glow);
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .screen {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(1.5rem, 5vw, 4rem);
+            animation: slideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+        /* BUTTONS */
+        .btn-neuro {
+            padding: 1rem 2.5rem;
+            background: rgba(0, 242, 255, 0.05);
+            border: 2px solid var(--neon-blue);
+            color: var(--neon-blue);
+            font-family: var(--font-tech);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-neuro:hover:not(:disabled) { background: var(--neon-blue); color: #000; box-shadow: 0 0 40px var(--neon-blue); transform: translateY(-3px); }
+        .btn-neuro:disabled { opacity: 0.2; border-color: #444; color: #444; cursor: not-allowed; }
+
+        /* INTERACTIVE MAP */
+        .map-surface { width: 100%; height: 100%; position: relative; }
+        .node-anchor {
+            position: absolute;
+            width: 100px; height: 100px;
+            transform: translate(-50%, -50%);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            z-index: 50;
+        }
+        .node-visual {
+            width: 75px; height: 75px;
+            border: 2px solid var(--neon-blue);
+            border-radius: 1.5rem;
+            background: #000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .node-anchor:hover .node-visual { transform: scale(1.2) rotate(4deg); border-color: #fff; box-shadow: 0 0 30px var(--neon-blue); }
+        .node-anchor.done .node-visual { background: var(--success); color: #000; border-color: #fff; box-shadow: 0 0 20px var(--success); }
+
+        .node-val { font-family: var(--font-tech); font-size: 1.6rem; font-weight: 900; }
+        .node-tag { font-size: 0.5rem; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; }
+
+        /* TASK INTERFACE */
+        .task-box { width: 100%; max-width: 900px; text-align: left; }
+        .question { font-size: clamp(1.4rem, 3.5vw, 2.4rem); font-weight: 800; color: #fff; line-height: 1.1; margin-bottom: 3rem; border-left: 8px solid var(--neon-purple); padding-left: 2rem; }
+        .option-card { width: 100%; padding: 1.5rem 2rem; margin-bottom: 1rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 1rem; color: #cbd5e1; text-align: left; cursor: pointer; transition: 0.3s; font-size: 1.25rem; }
+        .option-card:hover { background: rgba(0, 242, 255, 0.1); border-color: var(--neon-blue); color: #fff; transform: translateX(15px); }
+
+        /* WORD SEARCH */
+        .vocab-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 6px; max-width: 550px; margin: 2rem auto; }
+        .v-cell { aspect-ratio: 1; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; border-radius: 6px; font-family: var(--font-tech); font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: 0.1s; }
+        .v-cell.sel { background: var(--neon-blue); color: #000; box-shadow: 0 0 20px var(--neon-blue); }
+        .v-cell.found { background: var(--success); color: #000; }
+
+        /* MODAL */
+        .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.96); backdrop-filter: blur(12px); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+        .modal-box { background: #050512; border: 1px solid var(--neon-blue); padding: 4rem; border-radius: 2.5rem; max-width: 750px; width: 100%; text-align: center; }
+        .code-strip { font-family: var(--font-tech); font-size: clamp(2.5rem, 8vw, 4.5rem); color: var(--success); margin: 2.5rem 0; padding: 1.5rem; border: 2px dashed rgba(0, 255, 136, 0.4); background: rgba(0,0,0,0.6); border-radius: 1.5rem; text-shadow: 0 0 25px var(--success); letter-spacing: 0.8rem; }
+
+        .cloze-field { border: none; border-bottom: 4px solid var(--neon-blue); background: transparent; color: #fff; width: 180px; text-align: center; font-size: 2.2rem; margin: 0 10px; outline: none; font-weight: 800; transition: 0.3s; }
+        .cloze-field:focus { width: 220px; border-color: white; }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-fx"><div class="grid-mask"></div></div>
+
+    <div id="neuro-app">
+        <!-- HUD -->
+        <header class="hud-header">
+            <div class="stat-group">
+                <div class="stat-block"><span class="label">Sentinel ID</span><span id="ui-id" class="value" style="color:var(--neon-purple)">----</span></div>
+                <div class="stat-block"><span class="label">Stability</span><span id="ui-time" class="value">35:00</span></div>
+            </div>
+            <div class="stat-group">
+                <div class="stat-block items-center"><span class="label">Core-Sync</span><span id="ui-sync" class="value">0/8</span></div>
+                <div class="stat-block items-center"><span class="label">Integrity</span><span id="ui-score" class="value" style="color:var(--neon-blue)">0000</span></div>
+            </div>
+            <button id="ctrl-log" class="btn-neuro" style="padding:0.6rem 1.2rem; font-size:0.7rem;">Archive Export</button>
+        </header>
+
+        <!-- VIEWPORT -->
+        <main id="neuro-viewport" class="viewport">
+            <!-- Screen content injected safely -->
+        </main>
+    </div>
+
+    <div id="neuro-modal" class="hidden"></div>
+
+    <script>
+        /**
+         * AEQUITAS SINGULARITY - NEURO-MASTER 12.0
+         * DSGVO-Konform, XSS-Sicher, Non-Linearer Zugriff.
+         */
+        (function() {
+            "use strict";
+
+            const MISSIONS = [
+                { id: 1, name: "Schelsky", c: "Uy1OSVZFTA==", tasks: [
+                    { t: "choice", q: "Welches Hauptphänomen beschreibt Helmut Schelskys 'nivellierte Mittelstandsgesellschaft'?", o: ["Totale finanzielle Gleichheit aller Bürger", "Angleichung von Lebensstilen durch Massenkonsum", "Verschwinden aller industriellen Berufe"], cor: 1, h: "Denk an die Rolle moderner Güter für alle sozialen Gruppen (1950er)." },
+                    { t: "choice", q: "Wer stieg laut Schelsky KOLLEKTIV in den Mittelstand auf?", o: ["Die Industriearbeiterschaft", "Der alte Landadel", "Das Kleinbürgertum"], cor: 0, h: "Suche die Gruppe, die durch steigende Löhne und Rechte zum Rückgrat des neuen Mittelstands wurde." },
+                    { t: "choice", q: "Welcher Prozess betraf das ehemalige Besitzbürgertum besonders stark?", o: ["Massive Privilegierung", "Kollektive Deklassierung", "Völlige Isolation"], cor: 1, h: "Sie verloren ihre exklusive Sonderstellung in der Nachkriegsgesellschaft." },
+                    { t: "choice", q: "Schelskys Modell charakterisiert die Mobilität als...", o: ["Statisch", "Geringfügig", "Hochmobil"], cor: 2, h: "Berücksichtige die massiven sozialen Auf- und Abstiegsprozesse nach 1945." },
+                    { t: "cloze", q: "Das Ideal dieser Entwicklung ist die ______ Mittelstandsgesellschaft.", a: "nivellierte", h: "Der Begriff steht für 'ausgeglichen' oder 'geebnet'." }
+                ]},
+                { id: 2, name: "Bolte", c: "Qi1aV0lFQkVM", tasks: [
+                    { t: "choice", q: "Wofür steht die horizontale Breite der Zwiebel im Bolte-Modell?", o: ["Den Reichtum der Schicht", "Die Bevölkerungsanzahl der Schicht", "Das Durchschnittsalter"], cor: 1, h: "In einem quantitativen Modell zeigt die Breite die Masse der Menschen an." },
+                    { t: "choice", q: "Wo liegt der Schwerpunkt der Bevölkerung im Jahr 1967 laut Bolte?", o: ["In der Oberschicht", "Im breiten Mittelstand", "In der Unterschicht"], cor: 1, h: "Das Modell zeigt eine bauchige Mitte." },
+                    { t: "choice", q: "Was kennzeichnet die Grenzen im Zwiebelmodell?", o: ["Starre Mauern ohne Durchlass", "Fließende Übergänge und Überlappungen", "Absolute Leere zwischen Schichten"], cor: 1, h: "Bolte betonte die Durchlässigkeit der Schichtstruktur." },
+                    { t: "choice", q: "Welcher Aspekt steht bei Bolte im Vordergrund?", o: ["Qualitative Machtstrukturen", "Quantitative Verteilung", "Religiöse Hierarchie"], cor: 1, h: "Es geht um das 'Wie viele' in einer Gruppe." },
+                    { t: "cloze", q: "Die namensgebende Form des Modells ist die ______.", a: "zwiebel", h: "Suche ein scharfes Gemüse mit vielen Schichten." }
+                ]},
+                { id: 3, name: "Dahrendorf", c: "RC1IQVVT", tasks: [
+                    { t: "cloze", q: "Das Haus-Modell ist ein rein ______ orientiertes Schichtmodell.", a: "vertikal", h: "Es bildet die Oben-Unten-Hierarchie ab." },
+                    { t: "cloze", q: "Das Dach des Hauses repräsentiert die ______.", a: "eliten", h: "Begriff für die mächtige Führungsschicht." },
+                    { t: "cloze", q: "Das Fundament des Hauses bildet die ______.", a: "arbeiterschicht", h: "Die große manuelle Basis der Gesellschaft." },
+                    { t: "choice", q: "Welche Gruppe fehlt im klassischen Dahrendorf-Haus völlig?", o: ["Die Angestellten", "Die Arbeitslosen", "Die Dienstklasse"], cor: 1, h: "Er bildete nur aktiv am Erwerbsleben Teilnehmende ab." },
+                    { t: "choice", q: "Dahrendorfs primäres Einteilungskriterium ist...", o: ["Besitz von Bildung", "Macht und funktionale Autorität", "Individuelles Glück"], cor: 1, h: "Es geht um Befehlsgewalt innerhalb von Organisationen." }
+                ]},
+                { id: 4, name: "Geißler", c: "Ry1BTkJBVQ==", tasks: [
+                    { t: "choice", q: "Welches grafische Element fügte Geißler dem Haus-Modell hinzu?", o: ["Einen modernen Keller", "Anbauten für nicht-integrierte Gruppen", "Einen gläsernen Dachgarten"], cor: 1, h: "Er wollte Gruppen sichtbar machen, die rechtlich oder sozial außerhalb der Norm stehen." },
+                    { t: "choice", q: "Die 'Anbauten' symbolisieren vor allem...", o: ["Besonders reiche Expats", "Strukturell benachteiligte ausländische Gruppen", "Digitale Nomaden"], cor: 1, h: "Denk an die mangelnde rechtliche Gleichstellung bestimmter Bevölkerungsteile." },
+                    { t: "choice", q: "Geißler modernisierte das Modell als Antwort auf die...", o: ["Französische Revolution", "Wiedervereinigung und Pluralisierung", "Einführung des Internets"], cor: 1, h: "Sein Modell passt zum komplexen Deutschland der 1990er Jahre." },
+                    { t: "choice", q: "Welches zusätzliche Merkmal wird bei Geißler relevant?", o: ["IQ und Fitness", "Nationalität und Herkunft", "Anzahl der Social Media Follower"], cor: 1, h: "Es geht um horizontale Faktoren jenseits des Berufsstatus." },
+                    { t: "cloze", q: "Geißlers Modell bildet die zunehmende ______ der Gesellschaft ab.", a: "pluralisierung", h: "Ein anderes Wort für 'Vielgestaltigkeit' oder 'Vervielfältigung'." }
+                ]},
+                { id: 5, name: "Hradil", c: "SC1MQUdF", tasks: [
+                    { t: "choice", q: "Was ist ein 'horizontales' Ungleichheitsmerkmal nach Hradil?", o: ["Das Bruttogehalt", "Das Geschlecht oder Alter", "Die Position im Unternehmen"], cor: 1, h: "Ein Merkmal, das keine direkte 'Höher-Niedriger'-Hierarchie bildet." },
+                    { t: "choice", q: "Hradils 'Soziale Lagen' kombinieren die Schichtposition mit...", o: ["Anderen Lebensbedingungen (Region, Phase)", "Der Automarke", "Dem IQ"], cor: 0, h: "Es geht um ein ganzes Bündel von Faktoren, die das Leben prägen." },
+                    { t: "choice", q: "Was versteht man unter 'subjektiver Wohlfahrt'?", o: ["Die Anzahl der Immobilien", "Die persönliche Lebenszufriedenheit", "Das Nettovermögen"], cor: 1, h: "Hier geht es um das Gefühl, nicht um zählbare Werte." },
+                    { t: "choice", q: "Warum reicht der Begriff 'Schicht' laut Hradil nicht mehr?", o: ["Zu kompliziert", "Gleiche Schichten haben oft völlig andere Lebensbedingungen", "Es gibt keine Berufe mehr"], cor: 1, h: "Denk an den Unterschied zwischen Jung/Alt oder Ost/West bei gleichem Beruf." },
+                    { t: "cloze", q: "Hradils ansatz ist im Kern ______.", a: "mehrdimensional", h: "Er nutzt viele verschiedene Ebenen/Dimensionen gleichzeitig." }
+                ]},
+                { id: 6, name: "Bourdieu", c: "Qi1IQUJJVFVV", tasks: [
+                    { t: "choice", q: "Welches Kapital meint Bildung, Titel und kulturelles Wissen?", o: ["Ökonomisches Kapital", "Kulturelles Kapital", "Soziales Kapital"], cor: 1, h: "Dieses Kapital hat man im Kopf oder als Zeugnis/Diplom." },
+                    { t: "choice", q: "Was bildet den 'Habitus'?", o: ["Nur das Geldvermögen", "Das verinnerlichte System von Mustern (Stil/Geschmack)", "Die genetische Veranlagung"], cor: 1, h: "Es wirkt als innerer Kompass für unser Auftreten und unsere Vorlieben." },
+                    { t: "choice", q: "Was ist 'Soziales Kapital'?", o: ["Bargeld", "Beziehungen und Netzwerke (Vitamin B)", "Eigentumswohnungen"], cor: 1, h: "Die Summe der nützlichen Kontakte einer Person." },
+                    { t: "choice", q: "Wie nennt Bourdieu Wissen, das 'Teil der Person' geworden ist?", o: ["Inkorporiertes Kapital", "Institutionalisiertes Kapital", "Aktives Kapital"], cor: 0, h: "Der Begriff kommt von 'Corpus' (Körper)." },
+                    { t: "cloze", q: "Die Summe aller Kapitalarten bestimmt die Position im sozialen ______.", a: "raum", h: "Denk an ein Koordinatensystem oder Feld." }
+                ]},
+                { id: 7, name: "Sinus", c: "Uy1NSUxJRVU=", tasks: [
+                    { t: "choice", q: "Auf der horizontalen Achse der Sinus-Karte liegen...", o: ["Einkommenswerte", "Grundorientierungen und Werte", "Lebensalter"], cor: 1, h: "Von Tradition bis Neuorientierung/Modernisierung." },
+                    { t: "choice", q: "Was sind 'Soziale Milieus'?", o: ["Wohngebiete", "Gruppen Gleichgesinnter mit ähnlichen Werten", "Religionsgruppen"], cor: 1, h: "Menschen, die ähnlich denken und ähnliche Lebensstile pflegen." },
+                    { t: "choice", q: "Welches Milieu liegt 'oben rechts' (modern/reich)?", o: ["Traditionelle", "Expeditive", "Prekäre"], cor: 1, h: "Suche nach den mobilen, ehrgeizigen Trendsettern der Elite." },
+                    { t: "choice", q: "Die Sinus-Milieus zeichnen sich aus durch...", o: ["Scharfe, starre Grenzen", "Fließende Übergänge (Überschneidungen)", "Absolute Unveränderlichkeit"], cor: 1, h: "Denk an die 'Kartoffeln' im Modell, die sich überlappen." },
+                    { t: "cloze", q: "Die vertikale Achse beschreibt die soziale ______.", a: "lage", h: "Ein anderes Wort für 'Situation' oder 'Status'." }
+                ]},
+                { id: 8, name: "Jugend", c: "VTE4LVNFQw==", tasks: [
+                    { t: "choice", q: "Welches Jugendmilieu ist am stärksten lifestyle-affin?", o: ["Experimentalistische Hedonisten", "Bürgerliche Mitte", "Prekäre"], cor: 0, h: "Suche nach der Gruppe, die Spaß und Ausbruch aus dem Alltag fokussiert." },
+                    { t: "choice", q: "Was kennzeichnet die 'Adaptiv-Pragmatischen'?", o: ["Totaler Widerstand gegen Regeln", "Anpassungsfähigkeit und Leistungsorientierung", "Völlige Isolation"], cor: 1, h: "Der Name deutet auf jemanden hin, der sich flexibel einfügt." },
+                    { t: "choice", q: "Prekäre Jugendliche leiden strukturell oft unter...", o: ["Zuviel Freizeit", "Teilhabemangel und Ausgrenzung", "Übermäßigem Reichtum"], cor: 1, h: "Such den Begriff für soziale Benachteiligung." },
+                    { t: "choice", q: "Expeditive Jugendliche sind...", o: ["Traditionell", "Erfolgs- und Netzwerkorientiert", "Technikavers"], cor: 1, h: "Sie sind die mobilen Visionäre der nächsten Generation." },
+                    { t: "cloze", q: "Die u18-Studie untersucht die ______ der Jugendlichen.", a: "lebenswelten", h: "Ein Begriff für den gesamten Lebenszusammenhang." }
+                ]}
+            ];
+
+            const VOCAB = ["NIVELLIERUNG", "SCHICHT", "MILIEU", "HABITUS", "KAPITAL", "MITTELSTAND", "MOBILITAET", "PRESTIGE", "INTEGRATION", "STATUS"];
+
+            let state = {
+                id: "Sentinel-" + Math.random().toString(36).substr(2, 4).toUpperCase(),
+                done: [], score: 0, time: 35 * 60,
+                curS: -1, curT: 0, attempts: 0, paused: true,
+                foundWords: [], selection: []
+            };
+
+            let clockId;
+            const $ = (id) => document.getElementById(id);
+
+            function updateHUD() {
+                $('ui-id').textContent = state.id;
+                $('ui-sync').textContent = state.done.length + "/8";
+                $('ui-score').textContent = String(state.score).padStart(4, '0');
+                const m = Math.floor(state.time / 60);
+                const s = state.time % 60;
+                $('ui-time').textContent = (m < 0 ? 0 : m).toString().padStart(2,'0') + ":" + (s < 0 ? 0 : s).toString().padStart(2,'0');
+            }
+
+            function showModal(title, content, isByp = false, cb = null) {
+                const host = $('neuro-modal');
+                host.innerHTML = '';
+                const mask = document.createElement('div'); mask.className = 'modal-mask';
+                const box = document.createElement('div'); box.className = 'modal-box';
+                const h2 = document.createElement('h2'); h2.className = 'label'; h2.style.fontSize = '2rem'; h2.textContent = title;
+                const body = document.createElement('div'); body.style.margin = '3rem 0'; body.style.fontSize = '1.6rem';
+                
+                if(typeof content === 'string') body.textContent = content; else body.appendChild(content);
+                
+                const foot = document.createElement('div'); foot.className = 'flex gap-6';
+                const bOk = document.createElement('button'); bOk.className = 'btn-neuro flex-1'; bOk.textContent = "Bestätigen";
+                bOk.addEventListener('click', () => { host.classList.add('hidden'); if(cb) cb(); });
+                foot.appendChild(bOk);
+                
+                if(isByp) {
+                    const bByp = document.createElement('button'); bByp.className = 'btn-neuro flex-1'; bByp.style.borderColor = 'var(--neon-pink)'; bByp.style.color = 'var(--neon-pink)'; bByp.textContent = "Bypass (-120s)";
+                    bByp.addEventListener('click', () => { state.time -= 120; state.attempts = 0; state.curT++; host.classList.add('hidden'); renderTask(); });
+                    foot.appendChild(bByp);
+                }
+                
+                box.appendChild(h2); box.appendChild(body); box.appendChild(foot);
+                mask.appendChild(box); host.appendChild(mask); host.classList.remove('hidden');
+            }
+
+            function renderIntro() {
+                const v = $('neuro-viewport'); v.innerHTML = '';
+                const s = document.createElement('div'); s.className = 'screen';
+                const h = document.createElement('h1'); h.textContent = "AEQUITAS"; h.style.fontSize = "clamp(5rem, 15vw, 10rem)"; h.style.color = "#fff"; h.style.fontWeight = "900";
+                const p = document.createElement('p'); p.textContent = "NEURO-PROTOCOL 12.0 // ANALYSE DER SOZIALEN WIRKLICHKEIT"; p.style.margin = "3rem 0"; p.style.letterSpacing = "0.8rem"; p.style.color = "var(--neon-blue)";
+                const b = document.createElement('button'); b.className = "btn-neuro"; b.style.fontSize = "2rem"; b.textContent = "Neural-Link Aufbauen";
+                
+                b.addEventListener('click', () => {
+                    state.paused = false;
+                    startClock();
+                    renderMap();
+                });
+                
+                s.appendChild(h); s.appendChild(p); s.appendChild(b); v.appendChild(s);
+                updateHUD();
+            }
+
+            function renderMap() {
+                const v = $('neuro-viewport'); v.innerHTML = '';
+                const surface = document.createElement('div'); surface.className = 'map-surface';
+                const coords = [[15,30], [42,18], [68,18], [85,40], [75,75], [50,88], [25,75], [50,50]];
+                
+                MISSIONS.forEach((m, i) => {
+                    const node = document.createElement('div'); node.className = 'node-anchor';
+                    const isDone = state.done.includes(m.id);
+                    if(isDone) node.classList.add('done');
+                    node.style.left = coords[i][0] + "%"; node.style.top = coords[i][1] + "%";
+                    
+                    const inner = document.createElement('div'); inner.className = 'node-visual';
+                    const spanId = document.createElement('span'); spanId.className = 'node-val'; spanId.textContent = isDone ? "✓" : m.id;
+                    const spanNm = document.createElement('span'); spanNm.className = 'node-tag'; spanNm.textContent = m.name;
+                    inner.appendChild(spanId); inner.appendChild(spanNm); node.appendChild(inner);
+                    
+                    if(!isDone) {
+                        node.addEventListener('click', () => { state.curS = i; state.curT = 0; state.attempts = 0; renderTask(); });
+                    }
+                    surface.appendChild(node);
+                });
+                
+                const term = document.createElement('button'); term.className = 'btn-neuro'; term.textContent = "Final Decryption";
+                term.style.position = "absolute"; term.style.bottom = "4rem"; term.style.left = "50%"; term.style.transform = "translateX(-50%)";
+                term.disabled = state.done.length < 8;
+                term.addEventListener('click', openTerminal);
+                surface.appendChild(term); v.appendChild(surface);
+            }
+
+            function renderTask() {
+                const sector = MISSIONS[state.curS];
+                const task = sector.tasks[state.curT];
+                if(!task) { finishSector(sector); return; }
+                
+                const v = $('neuro-viewport'); v.innerHTML = '';
+                const screen = document.createElement('div'); screen.className = 'screen';
+                const box = document.createElement('div'); box.className = 'task-box';
+                
+                const label = document.createElement('div'); label.className = 'label'; label.textContent = `Sector ${sector.name} // Task 0${state.curT + 1}`;
+                box.appendChild(label);
+
+                if(task.t === "choice") {
+                    const q = document.createElement('div'); q.className = 'question'; q.textContent = task.q;
+                    box.appendChild(q);
+                    task.o.forEach((o, i) => {
+                        const btn = document.createElement('button'); btn.className = 'option-card'; btn.textContent = o;
+                        btn.addEventListener('click', () => { 
+                            if(i === task.cor) { state.score += 50; state.time += 30; state.attempts = 0; state.curT++; renderTask(); updateHUD(); } 
+                            else { state.time -= 60; state.attempts++; updateHUD(); showModal("SYNC FEHLER", "Tip: " + task.h, state.attempts >= 2); } 
+                        });
+                        box.appendChild(btn);
+                    });
+                } else {
+                    const q = document.createElement('div'); q.className = 'question';
+                    const parts = task.q.split('______');
+                    q.appendChild(document.createTextNode(parts[0]));
+                    const inp = document.createElement('input'); inp.className = 'cloze-field'; inp.id = 'gap-in'; inp.maxLength = 20;
+                    q.appendChild(inp); 
+                    if(parts[1]) q.appendChild(document.createTextNode(parts[1]));
+                    box.appendChild(q);
+                    
+                    const go = document.createElement('button'); go.className = 'btn-neuro'; go.style.marginTop = "4rem"; go.textContent = "Algorithmus prüfen";
+                    go.addEventListener('click', () => { 
+                        if($('gap-in').value.toLowerCase().trim() === task.a) { state.score += 50; state.curT++; renderTask(); } 
+                        else { state.time -= 60; state.attempts++; showModal("SYNC FEHLER", "Tip: " + task.h, state.attempts >= 2); } 
+                    });
+                    box.appendChild(go);
+                }
+                screen.appendChild(box); v.appendChild(screen);
+            }
+
+            function finishSector(s) {
+                if(!state.done.includes(s.id)) state.done.push(s.id);
+                const frag = document.createDocumentFragment();
+                const code = document.createElement('div'); code.className = 'code-strip'; code.textContent = atob(s.c);
+                frag.appendChild(code);
+                const p = document.createElement('p'); p.style.fontSize = '1.4rem'; p.textContent = "Sektor-Frequenz gesichert. Fragment für Terminal registriert.";
+                frag.appendChild(p);
+                showModal("STABILISIERUNG ABGESCHLOSSEN", frag, false, renderMap);
+            }
+
+            function openTerminal() {
+                const v = $('neuro-viewport'); v.innerHTML = '';
+                const sc = document.createElement('div'); sc.className = 'screen';
+                const h2 = document.createElement('h2'); h2.className = 'label'; h2.style.fontSize = '3rem'; h2.style.marginBottom = '4rem'; h2.textContent = 'Master Key Decryption';
+                sc.appendChild(h2);
+                
+                const grid = document.createElement('div'); grid.style.display = 'grid'; grid.style.gridTemplateColumns = '1fr 1fr'; grid.style.gap = '2rem'; grid.style.marginBottom = '4rem'; grid.style.width = "100%"; grid.style.maxWidth = "750px";
+                MISSIONS.forEach(m => {
+                    const i = document.createElement('input'); i.className = 'cloze-field'; i.style.width = "100%"; i.placeholder = m.name + " Key"; i.id = 'key-' + m.id;
+                    grid.appendChild(i);
+                });
+                sc.appendChild(grid);
+                
+                const b = document.createElement('button'); b.className = 'btn-neuro'; b.textContent = "Reboot Singularity";
+                b.addEventListener('click', () => {
+                    let valid = true;
+                    MISSIONS.forEach(m => { if($('key-'+m.id).value.toUpperCase().trim() !== atob(m.c)) valid = false; });
+                    if(valid) startWordSearch(); else showModal("ZUGRIFF VERWEIGERT", "Matrix-Schlüssel nicht kompatibel.");
+                });
+                sc.appendChild(b); v.appendChild(sc);
+            }
+
+            function startWordSearch() {
+                const v = $('neuro-viewport'); v.innerHTML = '';
+                const sc = document.createElement('div'); sc.className = 'screen';
+                const h2 = document.createElement('h2'); h2.className = 'label'; h2.textContent = 'Vokabel-Stabilitäts-Check';
+                sc.appendChild(h2);
+
+                const board = document.createElement('div'); board.className = 'vocab-grid';
+                const size = 12; let matrix = Array(size).fill().map(() => Array(size).fill(''));
+                
+                VOCAB.forEach(w => {
+                    let done = false; let tries = 0;
+                    while(!done && tries < 100) {
+                        let r = Math.floor(Math.random()*size), c = Math.floor(Math.random()*size), dr = Math.random()>0.5?1:0, dc = dr===0?1:0;
+                        if(r+dr*w.length <= size && c+dc*w.length <= size) {
+                            let fit = true; for(let i=0; i<w.length; i++) if(matrix[r+i*dr][c+i*dc] !== '') fit = false;
+                            if(fit) { for(let i=0; i<w.length; i++) matrix[r+i*dr][c+i*dc] = w[i]; done = true; }
+                        }
+                        tries++;
+                    }
+                });
+
+                for(let r=0; r<size; r++) {
+                    for(let c=0; c<size; c++) {
+                        if(matrix[r][c]==='') matrix[r][c] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[Math.floor(Math.random()*26)];
+                        const cell = document.createElement('div'); cell.className = 'v-cell'; cell.textContent = matrix[r][c];
+                        cell.addEventListener('click', () => { 
+                            cell.classList.toggle('sel'); 
+                            const current = Array.from(document.querySelectorAll('.v-cell.sel')).map(el => el.textContent).join('');
+                            VOCAB.forEach(word => {
+                                if(current === word && !state.foundWords.includes(word)) {
+                                    state.foundWords.push(word);
+                                    document.querySelectorAll('.v-cell.sel').forEach(el => { el.classList.remove('sel'); el.classList.add('found'); });
+                                    if(state.foundWords.length === VOCAB.length) showVictory();
+                                }
+                            });
+                        });
+                        board.appendChild(cell);
+                    }
+                }
+                sc.appendChild(board); v.appendChild(sc);
+            }
+
+            function startClock() {
+                if(clockId) clearInterval(clockId);
+                clockId = setInterval(() => {
+                    if(!state.paused) {
+                        state.time--; updateHUD();
+                        if(state.time <= 0) { clearInterval(clockId); location.reload(); }
+                    }
+                }, 1000);
+            }
+
+            function showVictory() {
+                state.paused = true; clearInterval(clockId);
+                const v = $('neuro-viewport'); v.innerHTML = '';
+                const sc = document.createElement('div'); sc.className = 'screen';
+                const h1 = document.createElement('h1'); h1.className = 'label'; h1.style.color = "var(--success)"; h1.style.fontSize = "10rem"; h1.textContent = "STABLE";
+                const p = document.createElement('p'); p.style.fontSize = "2.5rem"; p.textContent = "Matrix gesichert. Integrität: " + state.score;
+                sc.appendChild(h1); sc.appendChild(p); v.appendChild(sc);
+            }
+
+            $('ctrl-log').addEventListener('click', () => {
+                const b = new Blob([`LOG ID: ${state.id}\nSCORE: ${state.score}\nSYNC: ${state.done.length}/8`], {type:'text/plain'});
+                const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `Report_${state.id}.txt`; a.click();
+            });
+
+            window.onload = renderIntro;
+        })();
+    </script>
+</body>
+</html>
