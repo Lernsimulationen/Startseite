@@ -1,64 +1,141 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Q1 – Evangelische Religionslehre</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ER Q1 – Lernmodule</title>
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        style-src 'unsafe-inline';
+        img-src 'self' data:;
+        script-src 'self' 'unsafe-inline';
+        font-src 'self' data:;
+    ">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: rgba(255,255,255,0.08);
+            --border-color: rgba(255,255,255,0.15);
+            --primary: #0ea5e9;
+            --primary-hover: #0284c7;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --font-stack: system-ui, -apple-system, sans-serif;
+        }
 
-  <style>
-    body{
-      font-family: system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-      padding:2rem;
-      background:#f5f7fa;
-      color:#111827;
-    }
-    h1{
-      border-bottom:3px solid #2563eb;
-      padding-bottom:.5rem;
-    }
-    a.card{
-      display:block;
-      max-width:480px;
-      padding:14px 16px;
-      margin-top:12px;
-      background:#fff;
-      border:1px solid #d1d5db;
-      border-radius:8px;
-      text-decoration:none;
-      color:#111827;
-      font-weight:600;
-    }
-    a.card:hover{
-      background:#eff6ff;
-      border-color:#2563eb;
-    }
-    footer{
-      margin-top:2rem;
-      font-size:.9rem;
-    }
-  </style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: var(--font-stack);
+            background: linear-gradient(135deg, #1e293b 0%, #020617 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        header {
+            padding: 2rem 1rem 1rem;
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0 0 0.5rem 0;
+            color: var(--primary);
+            font-size: 2rem;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1rem 1rem 3rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .card {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.25rem;
+            transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            background: rgba(255,255,255,0.13);
+            border-color: var(--primary);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
+        .card p {
+            margin: 0;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .badge {
+            display: inline-block;
+            margin-bottom: 0.75rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            background: rgba(14,165,233,0.15);
+            color: #bae6fd;
+            border: 1px solid rgba(14,165,233,0.25);
+        }
+    </style>
 </head>
-
 <body>
-  <h1>Q1 – Evangelische Religionslehre</h1>
+    <header>
+        <h1>Q1 Evangelische Religionslehre</h1>
+        <p class="subtitle">Digitale Lernmodule und Spiele</p>
+    </header>
 
-  <p>Übersicht der Lernmodule:</p>
+    <main class="container">
+        <div class="grid">
+            <a class="card" href="./Hiobs-Klagen.html">
+                <div class="badge">Modul</div>
+                <h2>Hiob – Klagen</h2>
+                <p>Arbeitsmaterial und interaktive Zugänge zu Hiob und der Frage nach Leid, Klage und Gottesrede.</p>
+            </a>
 
-  <a class="card" href="Hiobs-Klagen.html">
-    Hiobs Klagen
-  </a>
-  
- <a class="card" href="GottesAntwort.html">
-    Gottes Antwort aus dem Gewittersturm
-  </a>
+            <a class="card" href="./GottesAntwort.html">
+                <div class="badge">Modul</div>
+                <h2>Gottes Antwort</h2>
+                <p>Interaktives Lernmodul zur Gottesrede im Hiobbuch mit Reflexion, Auswahlaufgaben und Portfolio.</p>
+            </a>
 
- <a class="card" href="Gruppen.html">
-    Soziale Gruppen zur Zeit Jesu
-  </a>
-  
-  <footer>
-    <a href="../index.html">← Zurück zur Q1-Übersicht</a>
-  </footer>
+            <a class="card" href="./Gruppen.html">
+                <div class="badge">Material</div>
+                <h2>Gruppenarbeit</h2>
+                <p>Zugänge, Aufgaben und Materialien für kooperative Arbeitsphasen im Unterricht.</p>
+            </a>
+
+            <a class="card" href="./Gleichnisse/index.html">
+                <div class="badge">Game</div>
+                <h2>Gleichnisse</h2>
+                <p>Spielerischer Zugang zu biblischen Gleichnissen mit eigenem Spielmodul.</p>
+            </a>
+        </div>
+    </main>
 </body>
 </html>
-
