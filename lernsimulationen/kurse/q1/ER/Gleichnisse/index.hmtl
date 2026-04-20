@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Code der Gleichnisse - Offline Edition</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app" id="app">
+    <section class="intro" id="intro">
+      <div class="intro-copy">
+        <p class="eyebrow">Offline-Adventure</p>
+        <img class="archive-mark" src="assets/archive-core.svg" alt="Stabilisiertes Archivsymbol">
+        <h1>Code der Gleichnisse</h1>
+        <p class="lead">Das Archiv ist beschädigt. Stelle die Deutungscodes wieder her.</p>
+        <div class="privacy-card">
+          <strong>Offline & privat</strong>
+          <span>Keine Namen. Keine Cloud. Keine automatische Speicherung.</span>
+        </div>
+        <button class="primary-action" id="startGame" type="button">Mission starten</button>
+      </div>
+      <aside class="intro-visual" aria-label="Generiertes Archivbild">
+        <div class="scene scene-archive">
+          <img class="scene-img" src="assets/mission-archive.jpg" alt="Digitales Offline-Archiv mit Textfragmenten">
+          <div class="scanline"></div>
+          <div class="scene-symbol">ARCHIV</div>
+          <div class="scene-caption">
+            <strong>Sektor gesperrt</strong>
+            <span>Acht Codes fehlen.</span>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="game hidden" id="game" aria-live="polite">
+      <header class="hud">
+        <div class="hud-item">
+          <span>Mission</span>
+          <strong id="levelLabel">1/8</strong>
+        </div>
+        <div class="hud-item">
+          <span>Punkte</span>
+          <strong id="pointsLabel">0</strong>
+        </div>
+        <div class="timer-wrap" aria-label="Verbleibende Zeit">
+          <svg class="timer-ring" viewBox="0 0 120 120" role="img">
+            <circle class="timer-track" cx="60" cy="60" r="52"></circle>
+            <circle class="timer-progress" id="timerProgress" cx="60" cy="60" r="52"></circle>
+          </svg>
+          <strong id="timeLabel">60s</strong>
+        </div>
+        <div class="hud-item">
+          <span>Log</span>
+          <strong id="logLabel">0</strong>
+        </div>
+      </header>
+
+      <div class="progress" aria-label="Spielfortschritt">
+        <span id="progressBar"></span>
+      </div>
+
+      <section class="runner-stage" aria-label="Archiv-Run">
+        <canvas id="runnerCanvas" width="900" height="220"></canvas>
+        <div class="runner-actions">
+          <button id="jumpButton" type="button">Sprung</button>
+          <button id="musicButton" type="button">Musik an</button>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <article class="task-panel">
+          <p class="eyebrow" id="missionType">Mission</p>
+          <h2 id="missionTitle">Mission wird geladen</h2>
+          <p id="missionText"></p>
+          <div class="fragment" id="fragmentText"></div>
+          <div class="feedback" id="feedback" role="status"></div>
+        </article>
+
+        <article class="visual-panel" id="visualPanel"></article>
+        <article class="interaction-panel" id="interactionPanel"></article>
+      </section>
+
+      <footer class="controls">
+        <button id="hintButton" type="button">Tipp</button>
+        <button id="retryButton" type="button">Reset</button>
+        <button id="exportButton" type="button">Export</button>
+        <button id="clearLogButton" type="button">Log löschen</button>
+      </footer>
+      <p class="privacy-note" id="privacyNote"></p>
+    </section>
+
+    <section class="results hidden" id="results">
+      <p class="eyebrow">Archivstatus</p>
+      <h2>Archiv stabil</h2>
+      <p id="resultSummary"></p>
+      <div class="result-grid">
+        <div>
+          <span>Punkte</span>
+          <strong id="finalPoints">0</strong>
+        </div>
+        <div>
+          <span>Log-Eintraege</span>
+          <strong id="finalLogCount">0</strong>
+        </div>
+      </div>
+      <div class="privacy-card wide">
+        <strong>Protokoll</strong>
+        <span>Nur im Arbeitsspeicher. Export nur auf Knopfdruck.</span>
+      </div>
+      <div class="controls final-controls">
+        <button class="primary-action" id="restartButton" type="button">Neue Runde</button>
+        <button id="finalExportButton" type="button">Export</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
