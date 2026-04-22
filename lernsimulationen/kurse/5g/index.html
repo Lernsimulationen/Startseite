@@ -1,21 +1,181 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Q1 – Lernsimulationen</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>5G - Lernsimulationen</title>
+
+  <style>
+    :root{
+      --bg: #f3f6fb;
+      --bg-accent: #e8eefc;
+      --surface: rgba(255,255,255,0.92);
+      --surface-strong: #ffffff;
+      --text: #10203a;
+      --muted: #5b6b84;
+      --border: rgba(33, 55, 94, 0.14);
+      --accent: #2457d6;
+      --accent-soft: rgba(36, 87, 214, 0.12);
+      --shadow: 0 20px 45px rgba(18, 36, 66, 0.08);
+      --radius: 20px;
+      --max: 960px;
+    }
+
+    *{ box-sizing: border-box; }
+
+    body{
+      margin: 0;
+      font-family: "Segoe UI", "Trebuchet MS", Arial, sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(36, 87, 214, 0.12), transparent 34%),
+        linear-gradient(180deg, var(--bg), var(--bg-accent));
+    }
+
+    .shell{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+    }
+
+    .eyebrow{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.72);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    h1{
+      margin: 16px 0 10px;
+      font-size: clamp(2rem, 3.5vw, 2.8rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    .lead{
+      margin: 0;
+      max-width: 70ch;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .grid{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 28px;
+    }
+
+    a.card{
+      display: grid;
+      gap: 10px;
+      padding: 20px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--surface-strong), var(--surface));
+      box-shadow: var(--shadow);
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    a.card:hover{
+      transform: translateY(-2px);
+      border-color: rgba(36, 87, 214, 0.28);
+      box-shadow: 0 24px 52px rgba(18, 36, 66, 0.12);
+    }
+
+    .card-title{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 1.08rem;
+      font-weight: 700;
+    }
+
+    .card-tag{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .card-copy{
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 0.95rem;
+    }
+
+    .card-meta{
+      display: inline-flex;
+      width: fit-content;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(16, 32, 58, 0.05);
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    footer{
+      margin-top: 28px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+
+    .back-link{
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .back-link:hover{
+      text-decoration: underline;
+    }
+  </style>
 </head>
+
 <body>
-  <h1>Q1 – Lernsimulationen</h1>
+  <div class="shell">
+    <div class="eyebrow">5G</div>
+    <h1>Lernsimulationen fuer die 5G</h1>
+    <p class="lead">
+      Hier finden Sie die digitalen Lernspiele und Simulationen fuer diesen
+      Kursbereich.
+    </p>
 
-  <p>Hier findest du die digitalen Lernspiele und Simulationen für diesen Kurs.</p>
+    <main class="grid">
+      <a class="card" href="Gefühle.html">
+        <div class="card-title">
+          <span>Gefuehlsdetektiv</span>
+          <span class="card-tag">Modul</span>
+        </div>
+        <div class="card-copy">
+          Interaktive Einheit zum Thema Gefuehle, Perspektiven und soziale
+          Wahrnehmung.
+        </div>
+        <div class="card-meta">Modul starten</div>
+      </a>
+    </main>
 
-  <ul>
-    <li>
-      <a href="Gefühle.html">Gefühlsdetektiv – Jeder fühlt anders</a>
-    </li>
-    <li><em>Weitere Inhalte folgen.</em></li>
-  </ul>
-
-  <p><a href="../../">Zurück zur Startseite</a></p>
+    <footer>
+      <a class="back-link" href="../index.html">&larr; Zurueck zur Kursuebersicht</a>
+    </footer>
+  </div>
 </body>
 </html>

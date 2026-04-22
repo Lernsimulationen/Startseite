@@ -1,141 +1,224 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ER Q1 – Lernmodule</title>
-    <meta http-equiv="Content-Security-Policy" content="
-        default-src 'self';
-        style-src 'unsafe-inline';
-        img-src 'self' data:;
-        script-src 'self' 'unsafe-inline';
-        font-src 'self' data:;
-    ">
-    <style>
-        :root {
-            --bg-dark: #0f172a;
-            --bg-card: rgba(255,255,255,0.08);
-            --border-color: rgba(255,255,255,0.15);
-            --primary: #0ea5e9;
-            --primary-hover: #0284c7;
-            --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
-            --font-stack: system-ui, -apple-system, sans-serif;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Q1 ER - Lernmodule</title>
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    style-src 'unsafe-inline';
+    img-src 'self' data:;
+    script-src 'self' 'unsafe-inline';
+    font-src 'self' data:;
+  ">
 
-        * { box-sizing: border-box; }
+  <style>
+    :root{
+      --bg: #f3f6fb;
+      --bg-accent: #e8eefc;
+      --surface: rgba(255,255,255,0.92);
+      --surface-strong: #ffffff;
+      --text: #10203a;
+      --muted: #5b6b84;
+      --border: rgba(33, 55, 94, 0.14);
+      --accent: #2457d6;
+      --accent-soft: rgba(36, 87, 214, 0.12);
+      --shadow: 0 20px 45px rgba(18, 36, 66, 0.08);
+      --radius: 20px;
+      --max: 1080px;
+    }
 
-        body {
-            margin: 0;
-            font-family: var(--font-stack);
-            background: linear-gradient(135deg, #1e293b 0%, #020617 100%);
-            color: var(--text-main);
-            min-height: 100vh;
-        }
+    *{ box-sizing: border-box; }
 
-        header {
-            padding: 2rem 1rem 1rem;
-            text-align: center;
-        }
+    body{
+      margin: 0;
+      font-family: "Segoe UI", "Trebuchet MS", Arial, sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(36, 87, 214, 0.12), transparent 34%),
+        linear-gradient(180deg, var(--bg), var(--bg-accent));
+    }
 
-        h1 {
-            margin: 0 0 0.5rem 0;
-            color: var(--primary);
-            font-size: 2rem;
-        }
+    .shell{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+    }
 
-        .subtitle {
-            color: var(--text-muted);
-            margin: 0;
-        }
+    .eyebrow{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.72);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
 
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 1rem 1rem 3rem;
-        }
+    h1{
+      margin: 16px 0 10px;
+      font-size: clamp(2rem, 3.5vw, 2.9rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 1rem;
-            margin-top: 2rem;
-        }
+    .lead{
+      margin: 0;
+      max-width: 72ch;
+      color: var(--muted);
+      line-height: 1.6;
+    }
 
-        .card {
-            display: block;
-            text-decoration: none;
-            color: inherit;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 1.25rem;
-            transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
-        }
+    .grid{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      margin-top: 28px;
+    }
 
-        .card:hover {
-            transform: translateY(-3px);
-            background: rgba(255,255,255,0.13);
-            border-color: var(--primary);
-        }
+    a.card{
+      display: grid;
+      gap: 10px;
+      padding: 20px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--surface-strong), var(--surface));
+      box-shadow: var(--shadow);
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+    }
 
-        .card h2 {
-            margin-top: 0;
-            margin-bottom: 0.5rem;
-            font-size: 1.2rem;
-            color: var(--primary);
-        }
+    a.card:hover{
+      transform: translateY(-2px);
+      border-color: rgba(36, 87, 214, 0.28);
+      box-shadow: 0 24px 52px rgba(18, 36, 66, 0.12);
+    }
 
-        .card p {
-            margin: 0;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
+    .card-title{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 1.08rem;
+      font-weight: 700;
+    }
 
-        .badge {
-            display: inline-block;
-            margin-bottom: 0.75rem;
-            padding: 0.25rem 0.6rem;
-            border-radius: 999px;
-            font-size: 0.8rem;
-            background: rgba(14,165,233,0.15);
-            color: #bae6fd;
-            border: 1px solid rgba(14,165,233,0.25);
-        }
-    </style>
+    .card-tag{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .card-copy{
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 0.95rem;
+    }
+
+    .card-meta{
+      display: inline-flex;
+      width: fit-content;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(16, 32, 58, 0.05);
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    footer{
+      margin-top: 28px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+
+    .back-link{
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .back-link:hover{
+      text-decoration: underline;
+    }
+  </style>
 </head>
+
 <body>
-    <header>
-        <h1>Q1 Evangelische Religionslehre</h1>
-        <p class="subtitle">Digitale Lernmodule und Spiele</p>
-    </header>
+  <div class="shell">
+    <div class="eyebrow">Q1 ER</div>
+    <h1>Evangelische Religionslehre in Q1</h1>
+    <p class="lead">
+      Digitale Lernmodule, Materialien und spielerische Zugaenge fuer den
+      Unterricht in der Qualifikationsphase 1.
+    </p>
 
-    <main class="container">
-        <div class="grid">
-            <a class="card" href="./Hiobs-Klagen.html">
-                <div class="badge">Modul</div>
-                <h2>Hiob – Klagen</h2>
-                <p>Arbeitsmaterial und interaktive Zugänge zu Hiob und der Frage nach Leid, Klage und Gottesrede.</p>
-            </a>
-
-            <a class="card" href="./GottesAntwort.html">
-                <div class="badge">Modul</div>
-                <h2>Gottes Antwort</h2>
-                <p>Interaktives Lernmodul zur Gottesrede im Hiobbuch mit Reflexion, Auswahlaufgaben und Portfolio.</p>
-            </a>
-
-            <a class="card" href="./Gruppen.html">
-                <div class="badge">Material</div>
-                <h2>Gruppenarbeit</h2>
-                <p>Zugänge, Aufgaben und Materialien für kooperative Arbeitsphasen im Unterricht.</p>
-            </a>
-
-            <a class="card" href="./Gleichnisse/index.html">
-                <div class="badge">Game</div>
-                <h2>Gleichnisse</h2>
-                <p>Spielerischer Zugang zu biblischen Gleichnissen mit eigenem Spielmodul.</p>
-            </a>
+    <main class="grid">
+      <a class="card" href="./Hiobs-Klagen.html">
+        <div class="card-title">
+          <span>Hiob - Klagen</span>
+          <span class="card-tag">Modul</span>
         </div>
+        <div class="card-copy">
+          Arbeitsmaterial und interaktive Zugaenge zu Hiob und der Frage nach
+          Leid, Klage und Gottesrede.
+        </div>
+        <div class="card-meta">Modul oeffnen</div>
+      </a>
+
+      <a class="card" href="./GottesAntwort.html">
+        <div class="card-title">
+          <span>Gottes Antwort</span>
+          <span class="card-tag">Modul</span>
+        </div>
+        <div class="card-copy">
+          Interaktives Lernmodul zur Gottesrede im Hiobbuch mit Reflexion,
+          Auswahlaufgaben und Portfolio.
+        </div>
+        <div class="card-meta">Modul oeffnen</div>
+      </a>
+
+      <a class="card" href="./Gruppen.html">
+        <div class="card-title">
+          <span>Gruppenarbeit</span>
+          <span class="card-tag">Material</span>
+        </div>
+        <div class="card-copy">
+          Zugaenge, Aufgaben und Materialien fuer kooperative Arbeitsphasen im
+          Unterricht.
+        </div>
+        <div class="card-meta">Material oeffnen</div>
+      </a>
+
+      <a class="card" href="./Gleichnisse/index.html">
+        <div class="card-title">
+          <span>Gleichnisse</span>
+          <span class="card-tag">Game</span>
+        </div>
+        <div class="card-copy">
+          Spielerischer Zugang zu biblischen Gleichnissen mit eigenem
+          Spielmodul.
+        </div>
+        <div class="card-meta">Spiel starten</div>
+      </a>
     </main>
+
+    <footer>
+      <a class="back-link" href="../index.html">&larr; Zurueck zur Q1-Uebersicht</a>
+    </footer>
+  </div>
 </body>
 </html>

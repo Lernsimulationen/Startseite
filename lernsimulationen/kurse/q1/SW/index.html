@@ -1,68 +1,214 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Q1 – Sozialwissenschaften</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Q1 SW - Lernmodule</title>
 
   <style>
+    :root{
+      --bg: #f3f6fb;
+      --bg-accent: #e8eefc;
+      --surface: rgba(255,255,255,0.92);
+      --surface-strong: #ffffff;
+      --text: #10203a;
+      --muted: #5b6b84;
+      --border: rgba(33, 55, 94, 0.14);
+      --accent: #2457d6;
+      --accent-soft: rgba(36, 87, 214, 0.12);
+      --shadow: 0 20px 45px rgba(18, 36, 66, 0.08);
+      --radius: 20px;
+      --max: 1080px;
+    }
+
+    *{ box-sizing: border-box; }
+
     body{
-      font-family: system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-      padding:2rem;
-      background:#f5f7fa;
-      color:#111827;
+      margin: 0;
+      font-family: "Segoe UI", "Trebuchet MS", Arial, sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(36, 87, 214, 0.12), transparent 34%),
+        linear-gradient(180deg, var(--bg), var(--bg-accent));
     }
+
+    .shell{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+    }
+
+    .eyebrow{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.72);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
     h1{
-      border-bottom:3px solid #2563eb;
-      padding-bottom:.5rem;
+      margin: 16px 0 10px;
+      font-size: clamp(2rem, 3.5vw, 2.9rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
     }
+
+    .lead{
+      margin: 0;
+      max-width: 72ch;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .grid{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      margin-top: 28px;
+    }
+
     a.card{
-      display:block;
-      max-width:480px;
-      padding:14px 16px;
-      margin-top:12px;
-      background:#fff;
-      border:1px solid #d1d5db;
-      border-radius:8px;
-      text-decoration:none;
-      color:#111827;
-      font-weight:600;
+      display: grid;
+      gap: 10px;
+      padding: 20px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--surface-strong), var(--surface));
+      box-shadow: var(--shadow);
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
     }
+
     a.card:hover{
-      background:#eff6ff;
-      border-color:#2563eb;
+      transform: translateY(-2px);
+      border-color: rgba(36, 87, 214, 0.28);
+      box-shadow: 0 24px 52px rgba(18, 36, 66, 0.12);
     }
+
+    .card-title{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 1.08rem;
+      font-weight: 700;
+    }
+
+    .card-tag{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .card-copy{
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 0.95rem;
+    }
+
+    .card-meta{
+      display: inline-flex;
+      width: fit-content;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(16, 32, 58, 0.05);
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
     footer{
-      margin-top:2rem;
-      font-size:.9rem;
+      margin-top: 28px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+
+    .back-link{
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .back-link:hover{
+      text-decoration: underline;
     }
   </style>
 </head>
 
 <body>
-  <h1>Q1 – Sozialwissenschaften</h1>
+  <div class="shell">
+    <div class="eyebrow">Q1 SW</div>
+    <h1>Sozialwissenschaften in Q1</h1>
+    <p class="lead">
+      Uebersicht der verfuegbaren Lernmodule und Simulationen im Fach
+      Sozialwissenschaften.
+    </p>
 
-  <p>Übersicht der Lernmodule:</p>
+    <main class="grid">
+      <a class="card" href="Steuerstaat.html">
+        <div class="card-title">
+          <span>Steuerstaat</span>
+          <span class="card-tag">Modul</span>
+        </div>
+        <div class="card-copy">
+          Modul zu Staat, Steuern und politischen Gestaltungsspielraeumen.
+        </div>
+        <div class="card-meta">Modul oeffnen</div>
+      </a>
 
-  <a class="card" href="Steuerstaat.html">
-    Steuerstaat
-  </a>
+      <a class="card" href="co2.html">
+        <div class="card-title">
+          <span>CO2-Steuerungsdilemma</span>
+          <span class="card-tag">Modul</span>
+        </div>
+        <div class="card-copy">
+          Lernangebot zu Zielkonflikten und politischen Entscheidungen rund um
+          Klimapolitik.
+        </div>
+        <div class="card-meta">Modul oeffnen</div>
+      </a>
 
- <a class="card" href="co2.html">
-    CO2-Steuerungsdilemma
-  </a>
+      <a class="card" href="Modelle.html">
+        <div class="card-title">
+          <span>Modelle sozialer Ungleichheit</span>
+          <span class="card-tag">Theorie</span>
+        </div>
+        <div class="card-copy">
+          Einfuehrung und Vergleich zentraler Modelle sozialer Ungleichheit.
+        </div>
+        <div class="card-meta">Modul oeffnen</div>
+      </a>
 
-   <a class="card" href="Modelle.html">
-    Modelle sozialer Ungleichheit
-  </a>
+      <a class="card" href="Beispiele.html">
+        <div class="card-title">
+          <span>Beispiele zu den Modellen</span>
+          <span class="card-tag">Praxis</span>
+        </div>
+        <div class="card-copy">
+          Konkrete Beispiele und Vertiefungen zu den besprochenen Modellen.
+        </div>
+        <div class="card-meta">Modul oeffnen</div>
+      </a>
+    </main>
 
-     <a class="card" href="Beispiele.html">
-    Beispiele zu den Modellen
-  </a>
-  
-  <footer>
-    <a href="../index.html">← Zurück zur Q1-Übersicht</a>
-  </footer>
+    <footer>
+      <a class="back-link" href="../index.html">&larr; Zurueck zur Q1-Uebersicht</a>
+    </footer>
+  </div>
 </body>
 </html>
-

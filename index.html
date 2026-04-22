@@ -3,125 +3,235 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lernstudio – Startseite</title>
+  <title>Lernstudio - Startseite</title>
+  <meta
+    name="description"
+    content="Zentrale Uebersicht der digitalen Lernangebote im Lernstudio."
+  />
 
   <style>
+    :root{
+      --bg: #f3f6fb;
+      --bg-accent: #e8eefc;
+      --surface: rgba(255,255,255,0.9);
+      --surface-strong: #ffffff;
+      --text: #10203a;
+      --muted: #5b6b84;
+      --border: rgba(33, 55, 94, 0.14);
+      --accent: #2457d6;
+      --accent-soft: rgba(36, 87, 214, 0.12);
+      --shadow: 0 20px 45px rgba(18, 36, 66, 0.08);
+      --radius: 20px;
+      --max: 1080px;
+    }
+
+    *{ box-sizing: border-box; }
+
     body{
-      font-family: system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-      margin:0;
-      padding:2rem;
-      background:#f5f7fa;
-      color:#111827;
-      line-height:1.6;
+      margin: 0;
+      font-family: "Segoe UI", "Trebuchet MS", Arial, sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(36, 87, 214, 0.12), transparent 34%),
+        linear-gradient(180deg, var(--bg), var(--bg-accent));
+    }
+
+    .shell{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+    }
+
+    .eyebrow{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.72);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
     }
 
     h1{
-      margin-top:0;
-      border-bottom:3px solid #2563eb;
-      padding-bottom:.5rem;
+      margin: 16px 0 10px;
+      font-size: clamp(2rem, 3.5vw, 3rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
     }
 
-    p{
-      max-width:720px;
+    .lead{
+      margin: 0;
+      max-width: 70ch;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 1rem;
     }
 
     .grid{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:12px;
-      max-width:560px;
-      margin-top:1.5rem;
-    }
-
-    @media(min-width:700px){
-      .grid{ grid-template-columns:1fr 1fr; }
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 28px;
     }
 
     a.card{
-      display:block;
-      padding:14px 16px;
-      background:#ffffff;
-      border:1px solid #d1d5db;
-      border-radius:8px;
-      text-decoration:none;
-      color:#111827;
-      font-weight:700;
-      transition:background .15s, border-color .15s, transform .08s;
+      display: grid;
+      gap: 10px;
+      padding: 20px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--surface-strong), var(--surface));
+      box-shadow: var(--shadow);
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
     }
 
     a.card:hover{
-      background:#eff6ff;
-      border-color:#2563eb;
-      transform: translateY(-1px);
+      transform: translateY(-2px);
+      border-color: rgba(36, 87, 214, 0.28);
+      box-shadow: 0 24px 52px rgba(18, 36, 66, 0.12);
     }
 
-    .muted{
-      font-weight:500;
-      color:#6b7280;
-      font-size:.9rem;
-      margin-top:4px;
+    .card-title{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .card-tag{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 42px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .card-copy{
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 0.95rem;
+    }
+
+    .card-meta{
+      display: inline-flex;
+      width: fit-content;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(16, 32, 58, 0.05);
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 600;
     }
 
     footer{
-      margin-top:2.5rem;
-      border-top:1px solid #d1d5db;
-      padding-top:1rem;
-      font-size:.85rem;
-      color:#6b7280;
-      max-width:720px;
+      margin-top: 32px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 0.92rem;
     }
 
-    footer a{
-      color:#2563eb;
-      text-decoration:none;
-      font-weight:600;
+    .footer-link{
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
     }
 
-    footer a:hover{
-      text-decoration:underline;
+    .footer-link:hover{
+      text-decoration: underline;
     }
   </style>
 </head>
 
 <body>
+  <div class="shell">
+    <div class="eyebrow">Lernstudio</div>
+    <h1>Zentrale Uebersicht der digitalen Lernangebote</h1>
+    <p class="lead">
+      Waehlen Sie den passenden Bereich aus, um zu den jeweiligen Kursen,
+      Lernsimulationen und Materialien zu gelangen.
+    </p>
 
-  <h1>Lernstudio</h1>
+    <main class="grid">
+      <a class="card" href="lernsimulationen/kurse/5g/index.html">
+        <div class="card-title">
+          <span>5G</span>
+          <span class="card-tag">SI</span>
+        </div>
+        <div class="card-copy">
+          Lernmodule und digitale Angebote fuer die Sekundarstufe I.
+        </div>
+        <div class="card-meta">Direkt zur Kursseite</div>
+      </a>
 
-  <p>
-    Zentrale Übersicht der digitalen Lernangebote.
-    Bitte wähle deinen Bereich.
-  </p>
+      <a class="card" href="lernsimulationen/kurse/AG/index.html">
+        <div class="card-title">
+          <span>AG</span>
+          <span class="card-tag">Projekt</span>
+        </div>
+        <div class="card-copy">
+          Arbeitsgemeinschaften, Projekte und interaktive Simulationen.
+        </div>
+        <div class="card-meta">Direkt zur Kursseite</div>
+      </a>
 
-  <div class="grid">
-    <a class="card" href="lernsimulationen/kurse/5g/index.html">
-      5G
-      <div class="muted">Sekundarstufe I</div>
-    </a>
+      <a class="card" href="lernsimulationen/kurse/Vertretung/index.html">
+        <div class="card-title">
+          <span>Vertretung</span>
+          <span class="card-tag">Klasse</span>
+        </div>
+        <div class="card-copy">
+          Einsaetze fuer Vertretungsstunden mit sofort nutzbaren Lernspielen.
+        </div>
+        <div class="card-meta">Direkt zur Kursseite</div>
+      </a>
 
-    <a class="card" href="lernsimulationen/kurse/AG/index.html">
-      AG
-      <div class="muted">5. Jahrgang – Arbeitsgemeinschaft</div>
-    </a>
+      <a class="card" href="lernsimulationen/kurse/q1/index.html">
+        <div class="card-title">
+          <span>Q1</span>
+          <span class="card-tag">SII</span>
+        </div>
+        <div class="card-copy">
+          Materialien und Simulationen fuer die Qualifikationsphase 1.
+        </div>
+        <div class="card-meta">Direkt zur Kursseite</div>
+      </a>
 
-    <a class="card" href="lernsimulationen/kurse/Vertretung/index.html">
-      Vertretung
-      <div class="muted">Vertretungsstunden (z. B. Demokratie)</div>
-    </a>
+      <a class="card" href="lernsimulationen/kurse/q2/index.html">
+        <div class="card-title">
+          <span>Q2</span>
+          <span class="card-tag">SII</span>
+        </div>
+        <div class="card-copy">
+          Module und Uebersichten fuer die Qualifikationsphase 2.
+        </div>
+        <div class="card-meta">Direkt zur Kursseite</div>
+      </a>
+    </main>
 
-    <a class="card" href="lernsimulationen/kurse/q1/index.html">
-      Q1
-      <div class="muted">Sekundarstufe II</div>
-    </a>
-
-    <a class="card" href="lernsimulationen/kurse/q2/index.html">
-      Q2
-      <div class="muted">Sekundarstufe II</div>
-    </a>
+    <footer>
+      <span>Lokale Startseite ohne externe Abhaengigkeiten</span>
+      <a class="footer-link" href="Datenschutz.html">Zum Datenschutzhinweis</a>
+    </footer>
   </div>
-
-  <footer>
-    <a href="Datenschutz.html">Datenschutzhinweis</a>
-  </footer>
-
 </body>
 </html>
