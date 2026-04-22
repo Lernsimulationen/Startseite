@@ -2,878 +2,1120 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none';">
-    <title>WER HILFT? – Der Samariter-Run</title>
+    <title>Der barmherzige Samariter - Q1 Evangelische Religionslehre</title>
     <style>
         :root {
-            --bg: #0f172a;
-            --hud-bg: rgba(0, 0, 0, 0.85);
-            --text: #f8fafc;
-            --primary: #3b82f6;
-            --success: #22c55e;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --guilt: #a855f7;
-            --gold: #fbbf24;
+            --bg: #f4efe6;
+            --paper: rgba(255, 252, 247, 0.92);
+            --panel: rgba(255, 248, 238, 0.96);
+            --line: #d6c6b0;
+            --text: #2d241a;
+            --muted: #6d6255;
+            --primary: #9f4b2a;
+            --primary-dark: #7d341a;
+            --secondary: #2f5d62;
+            --accent: #d6a94b;
+            --good: #2e7d5a;
+            --warn: #b7791f;
+            --bad: #8d3b2f;
+            --shadow: 0 20px 50px rgba(73, 48, 20, 0.14);
+            --radius: 22px;
         }
 
         * {
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-            touch-action: none;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
             margin: 0;
-            padding: 0;
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
-            display: flex;
-            flex-direction: column;
+            min-height: 100vh;
+            font-family: Georgia, "Times New Roman", serif;
+            color: var(--text);
+            background:
+                linear-gradient(rgba(244, 239, 230, 0.9), rgba(244, 239, 230, 0.96)),
+                url("assets/bg/road.png") center/cover fixed no-repeat;
         }
 
-        /* --- HUD (DOM) --- */
-        #hud {
+        .page {
+            width: min(1180px, calc(100vw - 32px));
+            margin: 24px auto 40px;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, rgba(255, 248, 238, 0.97), rgba(244, 229, 203, 0.92));
+            border: 1px solid rgba(122, 85, 40, 0.18);
+            border-radius: 32px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .hero-inner {
+            display: grid;
+            grid-template-columns: 1.3fr 0.9fr;
+            gap: 28px;
+            padding: 34px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: rgba(159, 75, 42, 0.1);
+            color: var(--primary-dark);
+            font-size: 0.95rem;
+            letter-spacing: 0.03em;
+        }
+
+        h1, h2, h3 {
+            margin: 0;
+            font-weight: 700;
+        }
+
+        h1 {
+            margin-top: 18px;
+            font-size: clamp(2.3rem, 5vw, 4.2rem);
+            line-height: 0.98;
+            letter-spacing: -0.04em;
+        }
+
+        .hero p,
+        .panel p,
+        .option p,
+        li {
+            line-height: 1.6;
+            font-size: 1.04rem;
+        }
+
+        .lead {
+            margin-top: 18px;
+            max-width: 62ch;
+            color: var(--muted);
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .button,
+        button {
+            border: none;
+            border-radius: 999px;
+            padding: 14px 22px;
+            font: inherit;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+        }
+
+        .button:hover,
+        button:hover {
+            transform: translateY(-1px);
+        }
+
+        .button-primary {
+            background: var(--primary);
+            color: #fff9f2;
+            box-shadow: 0 10px 24px rgba(159, 75, 42, 0.28);
+        }
+
+        .button-secondary {
+            background: rgba(47, 93, 98, 0.12);
+            color: var(--secondary);
+        }
+
+        .button-ghost {
+            background: rgba(255, 255, 255, 0.72);
+            color: var(--text);
+            border: 1px solid rgba(122, 85, 40, 0.18);
+        }
+
+        .hero-side {
+            display: grid;
+            gap: 16px;
+            align-content: start;
+        }
+
+        .quote-card,
+        .mini-card,
+        .panel,
+        .result-card,
+        .option,
+        .note {
+            background: var(--paper);
+            border: 1px solid rgba(122, 85, 40, 0.16);
+            border-radius: var(--radius);
+            box-shadow: 0 16px 36px rgba(92, 67, 41, 0.09);
+        }
+
+        .quote-card {
+            padding: 22px;
+        }
+
+        .quote-card blockquote {
+            margin: 0;
+            font-size: 1.15rem;
+            line-height: 1.6;
+        }
+
+        .quote-card cite {
+            display: block;
+            margin-top: 12px;
+            color: var(--muted);
+            font-style: normal;
+        }
+
+        .mini-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .mini-card {
+            padding: 18px;
+        }
+
+        .mini-card strong {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--secondary);
+            font-size: 1rem;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 280px minmax(0, 1fr);
+            gap: 22px;
+            margin-top: 22px;
+        }
+
+        .sidebar,
+        .content {
+            display: grid;
+            gap: 18px;
+            align-content: start;
+        }
+
+        .panel {
+            padding: 22px;
+        }
+
+        .panel h2,
+        .panel h3 {
+            margin-bottom: 12px;
+        }
+
+        .panel ul {
+            margin: 10px 0 0;
+            padding-left: 20px;
+            color: var(--muted);
+        }
+
+        .status-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .status-item {
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.65);
+            border: 1px solid rgba(122, 85, 40, 0.12);
+        }
+
+        .status-item span {
+            display: block;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .status-item strong {
+            display: block;
+            margin-top: 4px;
+            font-size: 1.25rem;
+        }
+
+        .progress-shell {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 14px;
+            border-radius: 999px;
+            background: rgba(47, 93, 98, 0.12);
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 0.3s ease;
+        }
+
+        .scene-title {
+            margin-top: 8px;
+            font-size: clamp(1.7rem, 3vw, 2.5rem);
+            line-height: 1.1;
+        }
+
+        .pill-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 16px 0 22px;
+        }
+
+        .pill {
+            padding: 9px 14px;
+            border-radius: 999px;
+            background: rgba(47, 93, 98, 0.1);
+            color: var(--secondary);
+            font-size: 0.95rem;
+        }
+
+        .scene-text {
+            color: var(--text);
+            font-size: 1.08rem;
+            margin-bottom: 18px;
+        }
+
+        .impulse {
+            padding: 16px 18px;
+            border-left: 4px solid var(--accent);
+            border-radius: 18px;
+            background: rgba(214, 169, 75, 0.11);
+            color: #594725;
+        }
+
+        .options {
+            display: grid;
+            gap: 16px;
+            margin-top: 22px;
+        }
+
+        .option {
+            padding: 20px;
+        }
+
+        .option-top {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            background: var(--hud-bg);
-            padding: 8px 16px;
-            height: 70px;
-            border-bottom: 2px solid #334155;
-            z-index: 100;
+            gap: 12px;
+            align-items: start;
         }
 
-        .hud-group { display: flex; gap: 15px; align-items: center; }
-        .stat { display: flex; flex-direction: column; align-items: center; min-width: 60px; }
-        .stat-label { font-size: 10px; color: #94a3b8; text-transform: uppercase; font-weight: bold; }
-        .stat-val { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; }
-        
-        #timer.pulse { animation: timer-pulse 1s infinite; color: var(--danger); }
-        @keyframes timer-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-
-        .inventory { display: flex; gap: 6px; }
-        .slot { width: 45px; height: 45px; background: #1e293b; border: 2px solid #475569; border-radius: 8px; display: flex; justify-content: center; align-items: center; overflow: hidden; }
-        .slot img { max-width: 80%; max-height: 80%; object-fit: contain; }
-        .slot span { font-size: 20px; }
-
-        .combo-badge { background: var(--success); padding: 4px 10px; border-radius: 20px; font-weight: 900; font-size: 14px; box-shadow: 0 0 10px var(--success); }
-
-        /* --- GAME CANVAS --- */
-        #canvas-wrapper {
-            flex: 1;
-            position: relative;
-            background: #1e293b;
-            overflow: hidden;
+        .option h3 {
+            font-size: 1.18rem;
         }
-        canvas {
+
+        .option .tag {
+            flex-shrink: 0;
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-size: 0.88rem;
+            background: rgba(159, 75, 42, 0.11);
+            color: var(--primary-dark);
+        }
+
+        .option button {
+            margin-top: 10px;
+            background: var(--secondary);
+            color: #f7fbfb;
+        }
+
+        .feedback {
+            margin-top: 18px;
+            padding: 18px;
+            border-radius: 18px;
+            background: rgba(255, 248, 238, 0.95);
+            border: 1px solid rgba(122, 85, 40, 0.15);
+        }
+
+        .feedback strong {
             display: block;
+            margin-bottom: 8px;
+        }
+
+        .feedback.good strong { color: var(--good); }
+        .feedback.warn strong { color: var(--warn); }
+        .feedback.bad strong { color: var(--bad); }
+
+        .feedback-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+            margin-top: 18px;
+        }
+
+        .result-card {
+            padding: 20px;
+        }
+
+        .score {
+            font-size: 2rem;
+            color: var(--primary-dark);
+            margin-top: 6px;
+        }
+
+        .note {
+            padding: 20px;
+            margin-top: 18px;
+        }
+
+        .note textarea {
             width: 100%;
-            height: 100%;
+            min-height: 130px;
+            margin-top: 12px;
+            padding: 14px;
+            resize: vertical;
+            border-radius: 16px;
+            border: 1px solid rgba(122, 85, 40, 0.22);
+            background: rgba(255, 255, 255, 0.86);
+            font: inherit;
+            color: var(--text);
         }
 
-        /* --- OVERLAYS --- */
-        .overlay {
-            position: absolute;
-            inset: 0;
-            display: none; /* Standardmäßig unsichtbar */
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: rgba(15, 23, 42, 0.95);
-            z-index: 50;
-            padding: 20px;
-            text-align: center;
-        }
-        .overlay.active { display: flex; } /* Sichtbar via Klasse */
-
-        /* FIX: display:flex entfernt, damit .overlay-Logik greift */
-        #loading-screen { 
-            z-index: 200; 
-            background: var(--bg); 
-            color: white; 
+        .footer-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 18px;
         }
 
-        .btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 16px 32px;
-            border-radius: 12px;
-            font-size: 20px;
-            font-weight: bold;
-            margin-top: 20px;
-            box-shadow: 0 4px 0 #1d4ed8;
-            cursor: pointer;
-        }
-        .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #1d4ed8; }
-
-        #guilt-flash {
-            position: fixed;
-            inset: 0;
-            background: rgba(168, 85, 247, 0.3);
-            pointer-events: none;
-            display: none;
-            z-index: 200;
+        .reflection-list {
+            margin-top: 10px;
+            padding-left: 20px;
         }
 
-        #portrait-warning {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: #000;
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            text-align: center;
-            padding: 20px;
+        .reflection-list li {
+            margin-bottom: 8px;
         }
-        @media (orientation: portrait) { #portrait-warning { display: flex; } }
+
+        .muted {
+            color: var(--muted);
+        }
+
+        @media (max-width: 920px) {
+            .hero-inner,
+            .layout,
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page {
+                width: min(100vw - 20px, 1180px);
+                margin-top: 10px;
+            }
+
+            .hero-inner,
+            .panel,
+            .quote-card,
+            .mini-card,
+            .option,
+            .result-card,
+            .note {
+                padding: 18px;
+            }
+        }
     </style>
 </head>
 <body>
+    <main class="page">
+        <section class="hero">
+            <div class="hero-inner">
+                <div>
+                    <div class="eyebrow">Q1 Evangelische Religionslehre · Entscheidungssimulation</div>
+                    <h1>Der barmherzige Samariter</h1>
+                    <p class="lead">
+                        Diese Neufassung ist keine Geschicklichkeits-App, sondern eine fachlich orientierte Simulation.
+                        Du triffst Entscheidungen entlang des Weges nach Jericho, begründest sie und erhältst eine
+                        theologisch-ethische Auswertung zu Nächstenliebe, Risiko, Verantwortung und sozialer Distanz.
+                    </p>
+                    <div class="hero-actions">
+                        <button id="start-button" class="button button-primary">Simulation starten</button>
+                        <button id="jump-results" class="button button-secondary">Zur Auswertung</button>
+                    </div>
+                </div>
 
-<div id="portrait-warning">
-    <h1>Querformat nutzen</h1>
-    <p>Bitte drehe dein iPad für den Samariter-Run.</p>
-</div>
+                <div class="hero-side">
+                    <div class="quote-card">
+                        <blockquote>
+                            "Wer von diesen dreien, meinst du, ist dem, der unter die Räuber gefallen war,
+                            der Nächste geworden?"
+                        </blockquote>
+                        <cite>Lukas 10,36</cite>
+                    </div>
 
-<!-- Ladebildschirm -->
-<div id="loading-screen" class="overlay active">
-    <h1 style="color: var(--gold)">Lade Assets...</h1>
-    <div id="loading-bar-container" style="width: 200px; height: 10px; background: #334155; border-radius: 5px; margin-top: 10px;">
-        <div id="loading-bar" style="width: 0%; height: 100%; background: var(--success); border-radius: 5px; transition: width 0.1s;"></div>
-    </div>
-    <p id="loading-status" style="margin-top: 10px; font-size: 12px; color: #94a3b8;">Initialisiere...</p>
-</div>
+                    <div class="mini-grid">
+                        <div class="mini-card">
+                            <strong>Fachziel</strong>
+                            <div class="muted">Das Gleichnis nicht nur nacherzählen, sondern ethisch deuten.</div>
+                        </div>
+                        <div class="mini-card">
+                            <strong>Kompetenz</strong>
+                            <div class="muted">Urteilsbildung, Perspektivwechsel, Transfer in Gegenwartssituationen.</div>
+                        </div>
+                        <div class="mini-card">
+                            <strong>Arbeitsweise</strong>
+                            <div class="muted">Szenario lesen, Option wählen, Begründung prüfen, Ergebnisse sichern.</div>
+                        </div>
+                        <div class="mini-card">
+                            <strong>Datenschutz</strong>
+                            <div class="muted">Alles läuft lokal im Browser. Es werden keine Daten versendet.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-<div id="hud">
-    <div class="hud-group">
-        <div class="stat"><span class="stat-label">Zeit</span><span id="timer" class="stat-val">45:00</span></div>
-        <div class="stat"><span class="stat-label">Herzen</span><span id="hearts" class="stat-val"></span></div>
-    </div>
-    <div class="hud-group">
-        <div class="stat"><span class="stat-label">Sterne</span><span id="humanity" class="stat-val" style="color:var(--gold)">0</span></div>
-        <div class="stat"><span class="stat-label">Schuld</span><span id="guilt" class="stat-val" style="color:var(--guilt)">0</span></div>
-        <div id="combo" class="combo-badge">x1</div>
-    </div>
-    <div class="hud-group">
-        <div class="inventory">
-            <div id="slot-0" class="slot"></div>
-            <div id="slot-1" class="slot"></div>
-            <div id="slot-2" class="slot"></div>
-        </div>
-        <div class="stat"><span class="stat-label">Weg</span><span id="progress" class="stat-val">0/12</span></div>
-    </div>
-</div>
+        <section class="layout">
+            <aside class="sidebar">
+                <section class="panel">
+                    <h2>Arbeitsauftrag</h2>
+                    <p class="muted">
+                        Prüfe in jeder Szene, was verantwortliches Handeln bedeutet. Eine "gute" Entscheidung ist nicht
+                        automatisch die bequemste oder ungefährlichste, aber auch nicht jede spontane Hilfe ist klug.
+                    </p>
+                    <ul>
+                        <li>Beachte die konkrete Situation.</li>
+                        <li>Unterscheide zwischen Mitleid und tragfähiger Hilfe.</li>
+                        <li>Frage nach Kosten, Risiko und Verantwortung.</li>
+                    </ul>
+                </section>
 
-<div id="canvas-wrapper">
-    <canvas id="gameCanvas"></canvas>
-    <div id="guilt-flash"></div>
+                <section class="panel">
+                    <h3>Dein Stand</h3>
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <span>Fortschritt</span>
+                            <strong id="status-progress">0 / 5 Szenen</strong>
+                        </div>
+                        <div class="status-item">
+                            <span>Profil</span>
+                            <strong id="status-profile">Noch offen</strong>
+                        </div>
+                        <div class="status-item">
+                            <span>Nächstenliebe-Index</span>
+                            <strong id="status-score">0 Punkte</strong>
+                        </div>
+                    </div>
+                </section>
 
-    <!-- UI SCREENS -->
-    <div id="screen-start" class="overlay">
-        <h1 style="font-size: 48px; color: var(--gold); margin-bottom: 10px;">SAMARITER RUN</h1>
-        <p style="font-size: 20px; max-width: 500px;">Hilf denen, die in Not sind. Aber beeile dich – die Zeit in Jerusalem läuft ab.</p>
-        <button class="btn" onclick="Game.start()">Lauf starten</button>
-        <p id="asset-debug-info" style="margin-top: 20px; font-size: 10px; color: #4b5563;"></p>
-    </div>
+                <section class="panel">
+                    <h3>Begriffe</h3>
+                    <ul>
+                        <li><strong>Nächstenliebe:</strong> aktive Zuwendung, die Grenzen überschreitet.</li>
+                        <li><strong>Barmherzigkeit:</strong> Hilfe aus Mitgefühl, nicht aus Pflicht allein.</li>
+                        <li><strong>Verantwortung:</strong> Hilfe so organisieren, dass sie trägt.</li>
+                        <li><strong>Transfer:</strong> Übertragung der Einsichten auf heutige Kontexte.</li>
+                    </ul>
+                </section>
+            </aside>
 
-    <div id="screen-summary" class="overlay">
-        <h1 id="summary-title">RUNDE BEENDET</h1>
-        <div id="summary-stats" style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; text-align: left; min-width: 300px; margin: 15px 0;"></div>
-        <p>Wer war heute dein "Nächster"?</p>
-        <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center;">
-            <button id="summary-answer-wounded" class="btn" style="padding:10px 15px; font-size:14px;" onclick="Game.finish('Der Verletzte')">Der Verletzte</button>
-            <button id="summary-answer-host" class="btn" style="padding:10px 15px; font-size:14px;" onclick="Game.finish('Der Wirt')">Der Wirt</button>
-            <button id="summary-answer-self" class="btn" style="padding:10px 15px; font-size:14px;" onclick="Game.finish('Ich selbst')">Ich selbst</button>
-        </div>
-        <p id="summary-answer-note" style="min-height: 24px; margin: 0 0 12px; color: #cbd5e1; font-size: 14px;"></p>
-        <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
-            <button class="btn" style="background: var(--success); box-shadow: 0 4px 0 #15803d;" onclick="Game.export()">Log exportieren (.txt)</button>
-            <button class="btn" style="background: #475569; box-shadow: 0 4px 0 #334155;" onclick="Game.restart()">Neu starten</button>
-        </div>
-    </div>
-</div>
+            <section class="content">
+                <section id="simulation-panel" class="panel">
+                    <div class="progress-shell">
+                        <div class="progress-bar">
+                            <div id="progress-fill" class="progress-fill"></div>
+                        </div>
+                        <div id="progress-text">Szene 1 von 5</div>
+                    </div>
 
-<script>
-/**
- * FIX: Relative Pfade ohne führenden Slash für maximale Robustheit (GitHub Pages / Subfolder)
- */
-const ASSET_PATHS = {
-    bg_road: 'assets/bg/road.png',
-    player: 'assets/chars/player.png',
-    wounded: 'assets/chars/npc_wounded.png',
-    bandage: 'assets/items/bandage.png',
-    coin: 'assets/items/coin.png',
-    heart: 'assets/ui/heart.png',
-    sparkle: 'assets/ui/sparkle.png' // Optionales Asset
-};
+                    <div class="eyebrow" id="scene-type">Textsituation</div>
+                    <h2 class="scene-title" id="scene-title">Vor dem Weg nach Jericho</h2>
+                    <div class="pill-row" id="scene-tags"></div>
+                    <p class="scene-text" id="scene-text">
+                        Klicke auf "Simulation starten", um mit der ersten Entscheidungsszene zu beginnen.
+                    </p>
+                    <div class="impulse" id="scene-impulse">
+                        Impuls: Achte darauf, ob eine Entscheidung nur deine eigene Seite schützt oder ob sie
+                        Verantwortung für den gefährdeten Menschen übernimmt.
+                    </div>
 
-const Game = {
-    cfg: {
-        maxNodes: 12,
-        initialTime: 2700,
-        itemIcons: { bandage: "🩹", coin: "🪙" },
-        nodeTypes: ["HELP", "DANGER", "DISTRACTION", "INN", "FIND_ITEM"],
-        assetTimeout: 3000 // FIX: Timeout pro Asset in ms
-    },
+                    <div class="options" id="options"></div>
 
-    state: {
-        scene: "LOADING",
-        timeLeft: 2700,
-        hearts: 3,
-        humanity: 0,
-        guilt: 0,
-        combo: 1,
-        bestCombo: 1,
-        inventory: [null, null, null],
-        map: [],
-        nodeIndex: 0,
-        stats: { helped: 0, skipped: 0, mgWon: 0, mgLost: 0, guiltPeak: 0 },
-        log: [],
-        lastTick: 0,
-        shake: 0,
-        particles: [],
-        assets: {},
-        loggedMissing: {},
-        assetLoadReport: [], // FIX: Für Debug-Tabelle
-        input: { down: false, x: 0, y: 0, startX: 0, startY: 0 },
-        summaryAnswer: ""
-    },
+                    <div id="feedback" class="feedback hidden">
+                        <strong id="feedback-title"></strong>
+                        <p id="feedback-text"></p>
+                        <p id="feedback-ethic" class="muted"></p>
+                        <div class="feedback-actions">
+                            <button id="next-button" class="button button-primary">Nächste Szene</button>
+                        </div>
+                    </div>
+                </section>
 
-    init() {
-        this.canvas = document.getElementById('gameCanvas');
-        this.ctx = this.canvas.getContext('2d');
-        this.resize();
-        window.addEventListener('resize', () => this.resize());
+                <section id="results-panel" class="panel">
+                    <div class="eyebrow">Auswertung</div>
+                    <h2>Dein ethisches Profil</h2>
+                    <p class="muted">
+                        Die Auswertung zeigt nicht nur Punkte, sondern welche Haltung in deinen Entscheidungen sichtbar
+                        wurde. Sie soll zur Diskussion anregen, nicht moralisch abstrafen.
+                    </p>
 
-        this.initInput();
-        
-        // AssetLoader starten
-        this.loadAssets().then(() => {
-            console.log("%c--- ASSET LOAD REPORT ---", "font-weight: bold; color: #3b82f6;");
-            console.table(this.state.assetLoadReport);
-            
-            const loadedCount = this.state.assetLoadReport.filter(r => r.status === "SUCCESS").length;
-            const totalCount = this.state.assetLoadReport.length;
-            document.getElementById('asset-debug-info').innerText = `Assets: ${loadedCount}/${totalCount} geladen`;
+                    <div class="result-grid">
+                        <div class="result-card">
+                            <div class="muted">Gesamtprofil</div>
+                            <div id="result-profile" class="score">Noch keine Daten</div>
+                            <p id="result-summary" class="muted">
+                                Starte zuerst die Simulation.
+                            </p>
+                        </div>
+                        <div class="result-card">
+                            <div class="muted">Nächstenliebe-Index</div>
+                            <div id="result-score" class="score">0 / 100</div>
+                            <p id="result-balance" class="muted">
+                                Bewertet werden Mitgefühl, Verantwortung, Mut und realistische Hilfe.
+                            </p>
+                        </div>
+                        <div class="result-card">
+                            <div class="muted">Stärkste Dimension</div>
+                            <div id="result-strongest" class="score">-</div>
+                            <p id="result-strongest-text" class="muted">
+                                Noch keine Entscheidung getroffen.
+                            </p>
+                        </div>
+                        <div class="result-card">
+                            <div class="muted">Schwächste Dimension</div>
+                            <div id="result-weakest" class="score">-</div>
+                            <p id="result-weakest-text" class="muted">
+                                Noch keine Entscheidung getroffen.
+                            </p>
+                        </div>
+                    </div>
 
-            // FIX: Loading Screen wird nun korrekt versteckt, da display:flex aus der ID-Regel entfernt wurde
-            document.getElementById('loading-screen').classList.remove('active');
-            document.getElementById('screen-start').classList.add('active');
-            this.state.scene = "START";
-            requestAnimationFrame((t) => this.loop(t));
-        });
+                    <div class="note">
+                        <h3>Reflexion für die Q1</h3>
+                        <ol class="reflection-list">
+                            <li>Wo zeigt das Gleichnis, dass "der Nächste" nicht vorher feststeht, sondern im Handeln entsteht?</li>
+                            <li>Welche Rolle spielen Angst, Status und soziale Distanz in deinen Entscheidungen?</li>
+                            <li>Wann wird Hilfe im schulischen oder gesellschaftlichen Alltag konkret und belastbar?</li>
+                        </ol>
+                        <label for="reflection-input"><strong>Eigene Deutung oder Unterrichtsnotiz</strong></label>
+                        <textarea id="reflection-input" placeholder="Formuliere hier deine eigene Deutung des Gleichnisses oder eine Transferidee für heute."></textarea>
+                        <div class="footer-actions">
+                            <button id="export-button" class="button button-primary">Auswertung exportieren</button>
+                            <button id="restart-button" class="button button-ghost">Neu beginnen</button>
+                        </div>
+                    </div>
+                </section>
+            </section>
+        </section>
+    </main>
 
-        this.logAction("SYSTEM", "INIT", "SUCCESS", "Engine geladen");
-    },
-
-    /**
-     * FIX: Verbesserter Asset Loader mit Timeouts und robuster Event-Reihenfolge
-     */
-    async loadAssets() {
-        const keys = Object.keys(ASSET_PATHS);
-        const statusEl = document.getElementById('loading-status');
-        const bar = document.getElementById('loading-bar');
-        let loadedCount = 0;
-
-        const promises = keys.map(key => {
-            return new Promise(resolve => {
-                const path = ASSET_PATHS[key];
-                const img = new Image();
-                
-                // FIX: Timer gegen ewig hängende Requests
-                const timeout = setTimeout(() => {
-                    img.onload = null;
-                    img.onerror = null;
-                    this.state.assets[key] = null;
-                    this.recordAssetStatus(key, path, "FAIL", "Timeout");
-                    updateProgress();
-                    resolve();
-                }, this.cfg.assetTimeout);
-
-                const updateProgress = () => {
-                    loadedCount++;
-                    bar.style.width = (loadedCount / keys.length * 100) + "%";
-                    statusEl.innerText = `Lade: ${key}...`;
-                };
-
-                // FIX: Handler setzen BEVOR src zugewiesen wird
-                img.onload = () => {
-                    clearTimeout(timeout);
-                    this.state.assets[key] = img;
-                    this.recordAssetStatus(key, path, "SUCCESS", "onload");
-                    updateProgress();
-                    resolve();
-                };
-
-                img.onerror = () => {
-                    clearTimeout(timeout);
-                    this.state.assets[key] = null;
-                    this.recordAssetStatus(key, path, "FAIL", "onerror");
-                    updateProgress();
-                    resolve();
-                };
-
-                img.src = path;
-            });
-        });
-
-        await Promise.all(promises);
-    },
-
-    recordAssetStatus(key, path, status, reason) {
-        this.state.assetLoadReport.push({ key, path, status, reason });
-        this.logAction("ASSET", status, key, reason);
-    },
-
-    /**
-     * FIX: Korrektes Resizing ohne Skalierungs-Stacking
-     */
-    resize() {
-        const dpr = window.devicePixelRatio || 1;
-        const rect = this.canvas.getBoundingClientRect();
-        
-        // Pixelgröße des Buffers
-        this.canvas.width = rect.width * dpr;
-        this.canvas.height = rect.height * dpr;
-        
-        // FIX: setTransform setzt die Matrix zurück und skaliert neu (verhindert Kumulierung)
-        this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        
-        // Logische Einheiten für das Game (CSS Pixel)
-        this.vw = rect.width;
-        this.vh = rect.height;
-        
-        this.logAction("SYSTEM", "RESIZE", `${this.vw}x${this.vh}`, `DPR: ${dpr}`);
-    },
-
-    // --- GAME LOOP ---
-    loop(now) {
-        if(!this.state.lastTick) this.state.lastTick = now;
-        const dt = (now - this.state.lastTick) / 1000;
-        this.state.lastTick = now;
-
-        if(this.state.scene !== "START" && this.state.scene !== "SUMMARY" && this.state.scene !== "LOADING") {
-            this.state.timeLeft -= dt;
-            if(this.state.timeLeft <= 0) this.gameOver("Zeit abgelaufen");
-        }
-
-        this.update(dt);
-        this.draw();
-        this.updateDOM();
-
-        requestAnimationFrame((t) => this.loop(t));
-    },
-
-    update(dt) {
-        if(this.state.shake > 0) this.state.shake -= dt * 10;
-        this.state.particles = this.state.particles.filter(p => p.life > 0);
-        this.state.particles.forEach(p => {
-            p.x += p.vx * dt;
-            p.y += p.vy * dt;
-            p.life -= dt;
-        });
-
-        if(this.state.scene === "MG_RUNNER") this.updateRunner(dt);
-        if(this.state.scene === "MG_TIMING") this.updateTiming(dt);
-        if(this.state.scene === "MG_WOUND" && this.mgWound) {
-            this.mgWound.timer -= dt;
-            if(this.mgWound.timer <= 0) this.resolveMG("WOUND", false);
-        }
-    },
-
-    draw() {
-        const ctx = this.ctx;
-        ctx.clearRect(0, 0, this.vw, this.vh);
-
-        if(this.state.shake > 0) {
-            ctx.save();
-            ctx.translate((Math.random()-0.5)*this.state.shake, (Math.random()-0.5)*this.state.shake);
-        }
-
-        this.drawBackground();
-
-        switch(this.state.scene) {
-            case "MAP": this.drawMap(); break;
-            case "MG_WOUND": this.drawMGWound(); break;
-            case "MG_RUNNER": this.drawMGRunner(); break;
-            case "MG_TIMING": this.drawMGTiming(); break;
-        }
-
-        // Partikel
-        this.state.particles.forEach(p => {
-            ctx.globalAlpha = p.life;
-            ctx.fillStyle = p.color;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
-            ctx.fill();
-        });
-        ctx.globalAlpha = 1;
-
-        if(this.state.shake > 0) ctx.restore();
-
-        // Zeit-Warnung
-        if(this.state.timeLeft < 20) {
-            ctx.strokeStyle = `rgba(239, 68, 68, ${0.3 + Math.sin(Date.now()/100)*0.2})`;
-            ctx.lineWidth = 10;
-            ctx.strokeRect(5, 5, this.vw-10, this.vh-10);
-        }
-    },
-
-    drawBackground() {
-        const img = this.state.assets.bg_road;
-        if (img) {
-            this.ctx.drawImage(img, 0, 0, this.vw, this.vh);
-        } else {
-            this.ctx.fillStyle = "#1e293b";
-            this.ctx.fillRect(0, 0, this.vw, this.vh);
-            this.logMissingAsset("bg_road");
-        }
-    },
-
-    drawSprite(assetKey, x, y, w, h, fallbackEmoji) {
-        const img = this.state.assets[assetKey];
-        const ctx = this.ctx;
-        if (img) {
-            ctx.drawImage(img, x - w/2, y - h/2, w, h);
-        } else {
-            ctx.font = `${h * 0.7}px Arial`;
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText(fallbackEmoji, x, y);
-            this.logMissingAsset(assetKey);
-        }
-    },
-
-    logMissingAsset(key) {
-        if (!this.state.loggedMissing[key]) {
-            this.logAction("ASSET", "MISSING", key, "fallback_used");
-            this.state.loggedMissing[key] = true;
-        }
-    },
-
-    drawMap() {
-        const ctx = this.ctx;
-        const spacing = 140;
-        const startX = 100;
-        
-        ctx.beginPath();
-        ctx.setLineDash([10, 10]);
-        ctx.strokeStyle = "rgba(255,255,255,0.2)";
-        ctx.lineWidth = 4;
-        this.state.map.forEach((n, i) => {
-            const x = startX + i * spacing;
-            const y = this.vh/2 + (n.branch * 60);
-            if(i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        });
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        this.state.map.forEach((n, i) => {
-            const x = startX + i * spacing;
-            const y = this.vh/2 + (n.branch * 60);
-            const active = i === this.state.nodeIndex;
-            const done = i < this.state.nodeIndex;
-
-            if (active) {
-                this.drawSprite('player', x, y, 70, 70, "🏃");
-            } else {
-                ctx.fillStyle = done ? "rgba(34, 197, 94, 0.7)" : "rgba(51, 65, 85, 0.7)";
-                ctx.beginPath();
-                ctx.arc(x, y, 22, 0, Math.PI*2);
-                ctx.fill();
-                ctx.fillStyle = "white";
-                ctx.font = "18px sans-serif";
-                ctx.fillText(n.icon, x, y + 6);
+    <script>
+        const SCENES = [
+            {
+                title: "Ein Mensch liegt am Weg",
+                type: "Beobachtung",
+                tags: ["Notlage", "Erste Reaktion", "Perspektivwechsel"],
+                text: "Du kommst auf dem Weg nach Jericho vorbei. Ein Mensch liegt verletzt am Rand. Die Kleidung ist zerrissen, er stöhnt nur noch schwach. Es ist unklar, ob die Räuber noch in der Nähe sind.",
+                impulse: "Die erste Frage lautet nicht: 'Was kostet mich das?', sondern: 'Was braucht der verletzte Mensch jetzt?'",
+                options: [
+                    {
+                        label: "Ich gehe auf Abstand weiter und hoffe, dass jemand Zuständiger kommt.",
+                        tone: "Distanz",
+                        feedbackTitle: "Sicherheit ohne Verantwortung",
+                        feedbackText: "Du minimierst dein eigenes Risiko, übernimmst aber keine Verantwortung für die akute Notlage. Genau diese Distanz kritisiert das Gleichnis.",
+                        ethic: "Ethisch problematisch: Die Not des anderen wird gesehen, aber nicht in Handeln übersetzt.",
+                        effect: { compassion: 4, responsibility: 2, courage: 1, wisdom: 5, score: 8 }
+                    },
+                    {
+                        label: "Ich halte an, verschaffe mir einen Überblick und spreche den Verletzten an.",
+                        tone: "Annäherung",
+                        feedbackTitle: "Der erste Schritt zur Nächstenliebe",
+                        feedbackText: "Du näherst dich vorsichtig und prüfst die Situation. Das verbindet Mitgefühl mit Verantwortung und ist dem Samariter sehr nahe.",
+                        ethic: "Ethisch stark: Hilfe beginnt mit Hinsehen und Ansprechbarkeit.",
+                        effect: { compassion: 18, responsibility: 16, courage: 14, wisdom: 13, score: 25 }
+                    },
+                    {
+                        label: "Ich rufe laut um Hilfe, bleibe aber in größerer Entfernung.",
+                        tone: "Vorsicht",
+                        feedbackTitle: "Nicht gleichgültig, aber begrenzt",
+                        feedbackText: "Du ignorierst die Not nicht, gehst aber selbst nicht in Beziehung. Das kann ein Zwischenschritt sein, bleibt jedoch hinter echter Zuwendung zurück.",
+                        ethic: "Ethisch gemischt: Hilfe wird ausgelagert, nicht wirklich getragen.",
+                        effect: { compassion: 10, responsibility: 9, courage: 6, wisdom: 12, score: 17 }
+                    }
+                ]
+            },
+            {
+                title: "Zeitdruck und sozialer Status",
+                type: "Konflikt",
+                tags: ["Pflicht", "Status", "Prioritäten"],
+                text: "Du erinnerst dich: Wichtige Menschen sind bereits vorbeigegangen. Außerdem hast du selbst einen Termin und riskierst, zu spät zu kommen. Hilfe kostet Zeit und könnte deinen Ruf beschädigen.",
+                impulse: "Das Gleichnis stellt die Frage, ob religiöser oder sozialer Status wichtiger wird als konkrete Barmherzigkeit.",
+                options: [
+                    {
+                        label: "Ich priorisiere meinen Termin. Moralisch wäre Hilfe gut, aber heute ist es unpraktisch.",
+                        tone: "Selbstschutz",
+                        feedbackTitle: "Einsicht ohne Konsequenz",
+                        feedbackText: "Du erkennst zwar, was richtig wäre, stellst aber den eigenen Ablauf darüber. Das entspricht eher den Vorübergehenden als dem Samariter.",
+                        ethic: "Ethisch schwach: Das Richtige bleibt Theorie.",
+                        effect: { compassion: 5, responsibility: 4, courage: 3, wisdom: 6, score: 9 }
+                    },
+                    {
+                        label: "Ich nehme die Verzögerung in Kauf, weil der verletzte Mensch jetzt wichtiger ist.",
+                        tone: "Priorisierung der Not",
+                        feedbackTitle: "Menschenwürde vor Bequemlichkeit",
+                        feedbackText: "Du akzeptierst persönliche Nachteile und setzt die konkrete Notlage an erste Stelle. Genau darin liegt die Provokation des Gleichnisses.",
+                        ethic: "Ethisch sehr stark: Der andere wird nicht Mittel, sondern Maßstab des Handelns.",
+                        effect: { compassion: 17, responsibility: 16, courage: 17, wisdom: 11, score: 24 }
+                    },
+                    {
+                        label: "Ich bleibe nur kurz, verspreche spätere Hilfe und gehe dann weiter.",
+                        tone: "Vertagung",
+                        feedbackTitle: "Gut gemeint, aber zu unkonkret",
+                        feedbackText: "Dein Impuls ist nicht gleichgültig, aber die Hilfe bleibt ungesichert. In akuter Not reicht ein späteres Versprechen meist nicht.",
+                        ethic: "Ethisch begrenzt: Verantwortung wird vertagt.",
+                        effect: { compassion: 9, responsibility: 7, courage: 8, wisdom: 9, score: 15 }
+                    }
+                ]
+            },
+            {
+                title: "Konkrete Hilfe organisieren",
+                type: "Praxis",
+                tags: ["Handeln", "Ressourcen", "Fürsorge"],
+                text: "Der Verletzte braucht Versorgung. Du hast Öl, Tücher, Wasser und etwas Geld bei dir. Jetzt musst du entscheiden, wie du aus Mitgefühl tragfähige Hilfe machst.",
+                impulse: "Barmherzigkeit im Gleichnis bleibt nicht Gefühl, sondern wird zu konkreter, materieller Unterstützung.",
+                options: [
+                    {
+                        label: "Ich tröste den Verletzten kurz, gebe aber nichts von meinen Ressourcen ab.",
+                        tone: "Symbolische Hilfe",
+                        feedbackTitle: "Anteilnahme ohne Einsatz",
+                        feedbackText: "Dein Verhalten zeigt Mitgefühl, aber keine wirksame Versorgung. Das lindert die Lage kaum.",
+                        ethic: "Ethisch unzureichend: Worte ersetzen nicht jede Handlung.",
+                        effect: { compassion: 9, responsibility: 5, courage: 8, wisdom: 5, score: 12 }
+                    },
+                    {
+                        label: "Ich versorge die Wunden, setze eigene Mittel ein und bringe den Verletzten in Sicherheit.",
+                        tone: "Konkrete Fürsorge",
+                        feedbackTitle: "Barmherzigkeit wird praktisch",
+                        feedbackText: "Du handelst umfassend: medizinisch, organisatorisch und persönlich. So wird Hilfe belastbar und der andere wirklich geschützt.",
+                        ethic: "Ethisch sehr stark: Hilfe wird konkret, wirksam und verbindlich.",
+                        effect: { compassion: 18, responsibility: 18, courage: 15, wisdom: 16, score: 26 }
+                    },
+                    {
+                        label: "Ich gebe etwas Geld, kümmere mich aber nicht weiter um den weiteren Verlauf.",
+                        tone: "Teilhilfe",
+                        feedbackTitle: "Hilfreich, aber nicht ausreichend",
+                        feedbackText: "Materielle Hilfe ist wichtig, doch ohne Begleitung bleibt offen, ob sie wirklich beim Verletzten ankommt.",
+                        ethic: "Ethisch solide, aber noch nicht voll verantwortlich.",
+                        effect: { compassion: 12, responsibility: 11, courage: 10, wisdom: 12, score: 19 }
+                    }
+                ]
+            },
+            {
+                title: "Hilfe endet nicht am ersten Impuls",
+                type: "Nachsorge",
+                tags: ["Verbindlichkeit", "Strukturen", "Verantwortung"],
+                text: "Du erreichst eine Herberge. Nun stellt sich die Frage, ob deine Hilfe mit dem Abliefern endet oder ob du auch für den weiteren Verlauf Verantwortung übernimmst.",
+                impulse: "Im Gleichnis zahlt der Samariter nicht nur sofort, sondern sorgt auch für die Zeit danach.",
+                options: [
+                    {
+                        label: "Ich liefere den Verletzten ab und erkläre, dass ich ab jetzt nichts mehr damit zu tun habe.",
+                        tone: "Abgabe",
+                        feedbackTitle: "Hilfe delegiert, Verantwortung beendet",
+                        feedbackText: "Du sorgst zwar für eine kurzfristige Entlastung, ziehst dich aber sofort zurück. Verbindlichkeit bleibt schwach.",
+                        ethic: "Ethisch mittel: Es gibt Hilfe, aber kaum Nachsorge.",
+                        effect: { compassion: 10, responsibility: 8, courage: 9, wisdom: 11, score: 17 }
+                    },
+                    {
+                        label: "Ich bezahle, spreche mit dem Wirt und sichere zu, weitere Kosten zu übernehmen.",
+                        tone: "Verbindliche Nachsorge",
+                        feedbackTitle: "Verantwortung mit Weitblick",
+                        feedbackText: "Du organisierst nicht nur den Moment, sondern den Fortgang der Hilfe. Genau diese Nachhaltigkeit macht die Tat des Samariters besonders.",
+                        ethic: "Ethisch sehr stark: Hilfe wird institutionell abgesichert.",
+                        effect: { compassion: 16, responsibility: 19, courage: 12, wisdom: 18, score: 25 }
+                    },
+                    {
+                        label: "Ich bitte den Wirt, sich zu kümmern, ohne Kosten oder Zuständigkeiten zu klären.",
+                        tone: "Unklare Verantwortung",
+                        feedbackTitle: "Guter Wille ohne klare Struktur",
+                        feedbackText: "Du willst weiterhelfen, überlässt aber zu viel dem Zufall. Hilfe braucht auch Verlässlichkeit und Absprachen.",
+                        ethic: "Ethisch ambivalent: Die Richtung stimmt, die Absicherung fehlt.",
+                        effect: { compassion: 12, responsibility: 9, courage: 10, wisdom: 10, score: 18 }
+                    }
+                ]
+            },
+            {
+                title: "Transfer in die Gegenwart",
+                type: "Deutung",
+                tags: ["Schule", "Alltag", "Transfer"],
+                text: "In deiner Schule wird ein Mitschüler online lächerlich gemacht und zunehmend ausgegrenzt. Viele sehen es, wenige reagieren. Jetzt zeigt sich, ob das Gleichnis nur antike Erzählung bleibt oder zur Gegenwartsfrage wird.",
+                impulse: "Die entscheidende Frage lautet jetzt: Wer wird heute dem Ausgegrenzten zum Nächsten?",
+                options: [
+                    {
+                        label: "Ich halte mich raus, weil soziale Konflikte schnell auf mich zurückfallen könnten.",
+                        tone: "Rückzug",
+                        feedbackTitle: "Die moderne Version des Vorbeigehens",
+                        feedbackText: "Der Fall ist anders als auf dem Weg nach Jericho, aber das Muster ist ähnlich: Not wird gesehen, doch das Risiko der Hilfe wirkt größer als die Not des anderen.",
+                        ethic: "Ethisch problematisch: Distanz schützt den eigenen Status, nicht den verletzten Menschen.",
+                        effect: { compassion: 4, responsibility: 3, courage: 2, wisdom: 5, score: 7 }
+                    },
+                    {
+                        label: "Ich suche das Gespräch, sichere Unterstützung und hole bei Bedarf Lehrkräfte oder Vertrauenspersonen dazu.",
+                        tone: "Mutige Intervention",
+                        feedbackTitle: "Zeitgemäße Nächstenliebe",
+                        feedbackText: "Du handelst nicht allein heroisch, sondern verantwortungsvoll und strukturiert. Das entspricht dem Geist des Gleichnisses in heutiger Form.",
+                        ethic: "Ethisch sehr stark: Zuwendung und Systemverantwortung greifen ineinander.",
+                        effect: { compassion: 18, responsibility: 18, courage: 16, wisdom: 18, score: 27 }
+                    },
+                    {
+                        label: "Ich schreibe dem Mitschüler privat etwas Nettes, ohne öffentlich Stellung zu beziehen.",
+                        tone: "Diskrete Solidarität",
+                        feedbackTitle: "Hilfreich, aber begrenzt",
+                        feedbackText: "Persönliche Zuwendung kann wichtig sein, verändert aber die ausgrenzende Struktur nur teilweise. Für nachhaltige Hilfe braucht es oft mehr.",
+                        ethic: "Ethisch ordentlich, aber noch vorsichtig.",
+                        effect: { compassion: 13, responsibility: 10, courage: 9, wisdom: 12, score: 18 }
+                    }
+                ]
             }
-        });
-    },
-
-    // --- MINI GAMES ---
-    initMGWound() {
-        this.mgWound = {
-            target: { x: this.vw/2 + 40, y: this.vh/2 - 30, r: 45 },
-            item: { x: this.vw/2, y: this.vh - 100, dragging: false },
-            timer: 12
-        };
-    },
-
-    drawMGWound() {
-        const ctx = this.ctx;
-
-        this.drawSprite('wounded', this.vw/2, this.vh/2, 280, 380, "👤");
-
-        ctx.fillStyle = "rgba(239, 68, 68, 0.4)";
-        ctx.beginPath();
-        ctx.arc(this.mgWound.target.x, this.mgWound.target.y, this.mgWound.target.r, 0, Math.PI*2);
-        ctx.fill();
-
-        if(this.state.input.down) {
-            const d = Math.hypot(this.state.input.x - this.mgWound.item.x, this.state.input.y - this.mgWound.item.y);
-            if(d < 60) this.mgWound.item.dragging = true;
-        } else {
-            this.mgWound.item.dragging = false;
-        }
-
-        if(this.mgWound.item.dragging) {
-            this.mgWound.item.x = this.state.input.x;
-            this.mgWound.item.y = this.state.input.y;
-            if(Math.hypot(this.mgWound.item.x - this.mgWound.target.x, this.mgWound.item.y - this.mgWound.target.y) < 45) {
-                this.resolveMG("WOUND", true);
-            }
-        }
-
-        this.drawSprite('bandage', this.mgWound.item.x, this.mgWound.item.y, 80, 80, "🩹");
-    },
-
-    initMGRunner() {
-        this.runnerLane = 1;
-        this.runnerTimer = 15;
-        this.hazards = [];
-        this.hazardSpawn = 0;
-    },
-
-    updateRunner(dt) {
-        this.runnerTimer -= dt;
-        if(this.runnerTimer <= 0) this.resolveMG("RUNNER", true);
-        this.hazardSpawn += dt;
-        const speed = 400 + (this.state.guilt * 50);
-        if(this.hazardSpawn > (1.0 - this.state.guilt * 0.1)) {
-            this.hazards.push({ lane: Math.floor(Math.random()*3), y: -100 });
-            this.hazardSpawn = 0;
-        }
-        for(let i = this.hazards.length - 1; i >= 0; i--) {
-            const h = this.hazards[i];
-            h.y += dt * speed;
-            if(h.y > this.vh - 130 && h.y < this.vh - 60 && h.lane === this.runnerLane) {
-                this.hazards.splice(i, 1);
-                this.hit();
-                continue;
-            }
-            if(h.y > this.vh) this.hazards.splice(i, 1);
-        }
-    },
-
-    drawMGRunner() {
-        const ctx = this.ctx;
-        ctx.strokeStyle = "rgba(255,255,255,0.05)";
-        for(let i=1; i<3; i++) {
-            ctx.beginPath(); ctx.moveTo(this.vw/3 * i, 0); ctx.lineTo(this.vw/3 * i, this.vh); ctx.stroke();
-        }
-
-        this.hazards.forEach(h => {
-            const hX = (this.vw/3 * h.lane) + this.vw/6;
-            ctx.font = "45px Arial";
-            ctx.textAlign = "center";
-            ctx.fillText("🪨", hX, h.y);
-        });
-
-        const pX = (this.vw/3 * this.runnerLane) + this.vw/6;
-        this.drawSprite('player', pX, this.vh - 90, 90, 90, "🏃");
-    },
-
-    initMGTiming() {
-        this.timing = { pos: 100, dir: 1, speed: 300 + (this.state.guilt * 80) };
-    },
-
-    updateTiming(dt) {
-        this.timing.pos += this.timing.speed * this.timing.dir * dt;
-        if(this.timing.pos > this.vw - 100 || this.timing.pos < 100) this.timing.dir *= -1;
-    },
-
-    drawMGTiming() {
-        const ctx = this.ctx;
-        ctx.fillStyle = "#334155";
-        ctx.fillRect(100, this.vh/2 - 10, this.vw - 200, 20);
-        ctx.fillStyle = "#22c55e";
-        ctx.fillRect(this.vw/2 - 50, this.vh/2 - 20, 100, 40);
-
-        this.drawSprite('coin', this.timing.pos, this.vh/2, 60, 60, "🪙");
-    },
-
-    resolveTiming() {
-        const success = Math.abs(this.timing.pos - this.vw/2) < 60;
-        this.resolveMG("TIMING", success);
-    },
-
-    // --- LOGIK & INFRASTRUKTUR ---
-
-    start() {
-        this.state.scene = "MAP";
-        this.state.nodeIndex = 0;
-        this.state.timeLeft = this.cfg.initialTime;
-        this.state.hearts = 3;
-        this.state.humanity = 0;
-        this.state.guilt = 0;
-        this.state.combo = 1;
-        this.state.bestCombo = 1;
-        this.state.inventory = [null, null, null];
-        this.state.summaryAnswer = "";
-        this.state.stats = { helped: 0, skipped: 0, mgWon: 0, mgLost: 0, guiltPeak: 0 };
-        this.state.log = [];
-        this.state.particles = [];
-        this.state.shake = 0;
-        this.generateMap();
-        document.getElementById('screen-summary').classList.remove('active');
-        document.getElementById('screen-start').classList.remove('active');
-        document.getElementById('summary-answer-note').innerText = "";
-        this.updateSummarySelection();
-        this.logAction("GAME", "RUN_START", this.state.seed, "Start gedrückt");
-    },
-
-    generateMap() {
-        this.state.seed = Math.floor(Math.random()*999999);
-        this.state.map = [];
-        for(let i=0; i<this.cfg.maxNodes; i++) {
-            const type = this.cfg.nodeTypes[Math.floor(Math.random()*this.cfg.nodeTypes.length)];
-            this.state.map.push({
-                type: type,
-                icon: this.getNodeIcon(type),
-                branch: (i > 3 && i < 10) ? (Math.random() > 0.5 ? 1 : -1) : 0
-            });
-        }
-    },
-
-    getNodeIcon(t) {
-        if(t === "HELP") return "🩹";
-        if(t === "DANGER") return "🪨";
-        if(t === "INN") return "🏠";
-        if(t === "FIND_ITEM") return "🎁";
-        return "⚖️";
-    },
-
-    initInput() {
-        const el = this.canvas;
-        const setPos = (e) => {
-            const rect = el.getBoundingClientRect();
-            this.state.input.x = e.clientX - rect.left;
-            this.state.input.y = e.clientY - rect.top;
-        };
-
-        el.addEventListener('pointerdown', e => {
-            el.setPointerCapture(e.pointerId);
-            this.state.input.down = true;
-            setPos(e);
-            this.state.input.startX = this.state.input.x;
-            this.state.input.startY = this.state.input.y;
-            this.handlePointerDown();
-        });
-        el.addEventListener('pointermove', e => {
-            if(!this.state.input.down) return;
-            setPos(e);
-        });
-        el.addEventListener('pointerup', e => {
-            if(!this.state.input.down) return;
-            setPos(e);
-            const dx = this.state.input.x - this.state.input.startX;
-            this.handlePointerUp(dx);
-            if (el.hasPointerCapture?.(e.pointerId)) {
-                el.releasePointerCapture(e.pointerId);
-            }
-            this.state.input.down = false;
-        });
-        el.addEventListener('pointercancel', e => {
-            if (el.hasPointerCapture?.(e.pointerId)) {
-                el.releasePointerCapture(e.pointerId);
-            }
-            this.state.input.down = false;
-        });
-    },
-
-    handlePointerDown() {
-        if(this.state.scene === "MAP") {
-            const node = this.state.map[this.state.nodeIndex];
-            const spacing = 140;
-            const x = 100 + this.state.nodeIndex * spacing;
-            const y = this.vh/2 + (node.branch * 60);
-            if(Math.hypot(this.state.input.x - x, this.state.input.y - y) < 60) this.triggerNode(node);
-        }
-        if(this.state.scene === "MG_TIMING") this.resolveTiming();
-    },
-
-    handlePointerUp(dx) {
-        if(this.state.scene === "MG_RUNNER" && Math.abs(dx) > 30) {
-            this.runnerLane = dx > 0 ? Math.min(2, this.runnerLane+1) : Math.max(0, this.runnerLane-1);
-        }
-    },
-
-    triggerNode(node) {
-        if(this.state.guilt >= 2 && Math.random() > 0.7) {
-            const flash = document.getElementById('guilt-flash');
-            flash.style.display = 'block';
-            setTimeout(() => flash.style.display = 'none', 500);
-            this.state.timeLeft -= 120;
-        }
-        this.logAction("MAP", "ENTER_NODE", this.state.nodeIndex, node.type);
-        switch(node.type) {
-            case "HELP": this.state.scene = "MG_WOUND"; this.initMGWound(); break;
-            case "DANGER": this.state.scene = "MG_RUNNER"; this.initMGRunner(); break;
-            case "INN": this.state.scene = "MG_TIMING"; this.initMGTiming(); break;
-            default: this.advance(); break; 
-        }
-    },
-
-    advance() {
-        this.state.nodeIndex++;
-        if(this.state.nodeIndex >= this.cfg.maxNodes) this.gameOver("Ziel erreicht");
-        else this.state.scene = "MAP";
-    },
-
-    resolveMG(type, success) {
-        if(success) {
-            this.state.humanity += (20 * this.state.combo);
-            this.state.combo = Math.min(5, this.state.combo + 1);
-            this.state.bestCombo = Math.max(this.state.bestCombo, this.state.combo);
-            if(type === "WOUND") this.state.guilt = Math.max(0, this.state.guilt - 1);
-            if(type === "TIMING") this.addItem("coin");
-            if(type === "WOUND") this.state.stats.helped++;
-            this.state.stats.mgWon++;
-            this.spawnParticles(this.vw/2, this.vh/2, "#22c55e");
-        } else {
-            this.state.combo = 1;
-            this.state.guilt++;
-            if(type === "WOUND") this.state.stats.skipped++;
-            this.state.stats.mgLost++;
-            this.state.stats.guiltPeak = Math.max(this.state.stats.guiltPeak, this.state.guilt);
-            this.hit();
-            if(this.state.scene === "SUMMARY") return;
-        }
-        this.state.stats.guiltPeak = Math.max(this.state.stats.guiltPeak, this.state.guilt);
-        this.advance();
-    },
-
-    hit() {
-        this.state.hearts--;
-        this.state.shake = 15;
-        this.spawnParticles(this.vw/2, this.vh/2, "#ef4444");
-        this.state.stats.guiltPeak = Math.max(this.state.stats.guiltPeak, this.state.guilt);
-        if(this.state.hearts <= 0) this.gameOver("Keine Herzen mehr");
-    },
-
-    addItem(type) {
-        const idx = this.state.inventory.indexOf(null);
-        if(idx !== -1) this.state.inventory[idx] = type;
-    },
-
-    spawnParticles(x, y, color) {
-        for(let i=0; i<15; i++) {
-            this.state.particles.push({
-                x, y, vx: (Math.random()-0.5)*300, vy: (Math.random()-0.5)*300,
-                life: 1.0, size: 4 + Math.random()*4, color
-            });
-        }
-    },
-
-    updateDOM() {
-        const m = Math.floor(this.state.timeLeft / 60);
-        const s = Math.floor(this.state.timeLeft % 60);
-        const timerEl = document.getElementById('timer');
-        timerEl.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
-        
-        const heartEl = document.getElementById('hearts');
-        heartEl.innerHTML = "";
-        for(let i=0; i<Math.max(0, this.state.hearts); i++) {
-            const h = this.state.assets.heart;
-            if(h) heartEl.innerHTML += `<img src="${ASSET_PATHS.heart}" style="width:22px; margin: 0 1px;">`;
-            else heartEl.innerHTML += "❤️";
-        }
-
-        document.getElementById('humanity').innerText = this.state.humanity;
-        document.getElementById('guilt').innerText = this.state.guilt;
-        document.getElementById('combo').innerText = `x${this.state.combo}`;
-        document.getElementById('progress').innerText = `${this.state.nodeIndex}/${this.cfg.maxNodes}`;
-
-        this.state.inventory.forEach((item, i) => {
-            const slot = document.getElementById(`slot-${i}`);
-            slot.innerHTML = "";
-            if(item && this.state.assets[item]) {
-                slot.innerHTML = `<img src="${ASSET_PATHS[item]}" alt="${item}">`;
-            } else if(item) {
-                slot.innerHTML = `<span>${this.cfg.itemIcons[item]}</span>`;
-            }
-        });
-    },
-
-    gameOver(reason) {
-        if(this.state.scene === "SUMMARY") return;
-        this.state.scene = "SUMMARY";
-        document.getElementById('screen-summary').classList.add('active');
-        document.getElementById('summary-title').innerText = reason.toUpperCase();
-        const stats = document.getElementById('summary-stats');
-        const summaryHtml = `Punkte: ${this.state.humanity}<br>Schuld-Peak: ${this.state.stats.guiltPeak}<br>Beste Kette: x${this.state.bestCombo}<br>Geholfen: ${this.state.stats.helped}<br>Verpasst: ${this.state.stats.skipped}`;
-        stats.innerHTML = `⭐ Punkte: ${this.state.humanity}<br>⚫ Schuld-Peak: ${this.state.guilt}<br>🔥 Kette: x${this.state.combo}`;
-        stats.innerHTML = summaryHtml;
-        document.getElementById('summary-answer-note').innerText = this.state.summaryAnswer
-            ? `Auswahl gespeichert: ${this.state.summaryAnswer}`
-            : "WÃ¤hle zum Abschluss noch deinen NÃ¤chsten aus.";
-        this.updateSummarySelection();
-        this.logAction("GAME", "END", reason, `Score: ${this.state.humanity}`);
-    },
-
-    finish(ans) {
-        this.state.summaryAnswer = ans;
-        this.logAction("SUMMARY", "NEIGHBOR", ans, "Auswahl gespeichert");
-        document.getElementById('summary-answer-note').innerText = `Auswahl gespeichert: ${ans}`;
-        this.updateSummarySelection();
-    },
-
-    restart() {
-        this.start();
-    },
-
-    updateSummarySelection() {
-        const buttons = [
-            { id: 'summary-answer-wounded', value: 'Der Verletzte' },
-            { id: 'summary-answer-host', value: 'Der Wirt' },
-            { id: 'summary-answer-self', value: 'Ich selbst' }
         ];
-        buttons.forEach(({ id, value }) => {
-            const el = document.getElementById(id);
-            if(!el) return;
-            const active = this.state.summaryAnswer === value;
-            el.style.outline = active ? "3px solid #fbbf24" : "none";
-            el.style.transform = active ? "translateY(2px)" : "";
-            el.style.boxShadow = active ? "0 2px 0 #1d4ed8" : "";
-        });
-    },
 
-    logAction(scene, action, decision, result) {
-        this.state.log.push({
-            t: new Date().toISOString(),
-            scene, action, dec: decision, res: result,
-            pts: this.state.humanity, h: this.state.hearts, g: this.state.guilt, cb: this.state.combo,
-            time: Math.floor(this.state.timeLeft), node: this.state.nodeIndex
-        });
-    },
+        const state = {
+            started: false,
+            sceneIndex: 0,
+            totals: {
+                compassion: 0,
+                responsibility: 0,
+                courage: 0,
+                wisdom: 0,
+                score: 0
+            },
+            answers: [],
+            reflection: ""
+        };
 
-    export() {
-        let txt = "SAMARITER RUN - BILDUNGSLOG V1.2 (STABLE LOADER)\n";
-        txt += `Seed: ${this.state.seed}\n`;
-        txt += `Naechster: ${this.state.summaryAnswer || 'keine Auswahl'}\n`;
-        txt += "Timestamp;Scene;Action;Decision;Result;Humanity;Hearts;Guilt;Combo;Time;Node\n";
-        this.state.log.forEach(l => {
-            txt += `${l.t};${l.scene};${l.action};${l.dec};${l.res};${l.pts};${l.h};${l.g};${l.cb};${l.time};${l.node}\n`;
-        });
-        const blob = new Blob([txt], { type: 'text/plain' });
-        const a = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        a.href = url;
-        a.download = 'samariter_run_log.txt';
-        a.click();
-        URL.revokeObjectURL(url);
-    }
-};
+        const elements = {
+            startButton: document.getElementById("start-button"),
+            jumpResults: document.getElementById("jump-results"),
+            progressFill: document.getElementById("progress-fill"),
+            progressText: document.getElementById("progress-text"),
+            sceneType: document.getElementById("scene-type"),
+            sceneTitle: document.getElementById("scene-title"),
+            sceneTags: document.getElementById("scene-tags"),
+            sceneText: document.getElementById("scene-text"),
+            sceneImpulse: document.getElementById("scene-impulse"),
+            options: document.getElementById("options"),
+            feedback: document.getElementById("feedback"),
+            feedbackTitle: document.getElementById("feedback-title"),
+            feedbackText: document.getElementById("feedback-text"),
+            feedbackEthic: document.getElementById("feedback-ethic"),
+            nextButton: document.getElementById("next-button"),
+            statusProgress: document.getElementById("status-progress"),
+            statusProfile: document.getElementById("status-profile"),
+            statusScore: document.getElementById("status-score"),
+            resultProfile: document.getElementById("result-profile"),
+            resultSummary: document.getElementById("result-summary"),
+            resultScore: document.getElementById("result-score"),
+            resultBalance: document.getElementById("result-balance"),
+            resultStrongest: document.getElementById("result-strongest"),
+            resultStrongestText: document.getElementById("result-strongest-text"),
+            resultWeakest: document.getElementById("result-weakest"),
+            resultWeakestText: document.getElementById("result-weakest-text"),
+            exportButton: document.getElementById("export-button"),
+            restartButton: document.getElementById("restart-button"),
+            reflectionInput: document.getElementById("reflection-input"),
+            resultsPanel: document.getElementById("results-panel")
+        };
 
-window.onload = () => Game.init();
-</script>
+        function createTag(label) {
+            const span = document.createElement("span");
+            span.className = "pill";
+            span.textContent = label;
+            return span;
+        }
+
+        function renderScene() {
+            const scene = SCENES[state.sceneIndex];
+            const progress = ((state.sceneIndex) / SCENES.length) * 100;
+
+            elements.progressFill.style.width = `${progress}%`;
+            elements.progressText.textContent = `Szene ${state.sceneIndex + 1} von ${SCENES.length}`;
+            elements.sceneType.textContent = scene.type;
+            elements.sceneTitle.textContent = scene.title;
+            elements.sceneText.textContent = scene.text;
+            elements.sceneImpulse.textContent = `Impuls: ${scene.impulse}`;
+            elements.sceneTags.innerHTML = "";
+            scene.tags.forEach(tag => elements.sceneTags.appendChild(createTag(tag)));
+            elements.options.innerHTML = "";
+            elements.feedback.className = "feedback hidden";
+
+            scene.options.forEach((option, index) => {
+                const article = document.createElement("article");
+                article.className = "option";
+                article.innerHTML = `
+                    <div class="option-top">
+                        <h3>${index + 1}. ${option.label}</h3>
+                        <div class="tag">${option.tone}</div>
+                    </div>
+                    <p>Wähle diese Option, wenn du meinst, dass sie der Situation angemessen ist und sich fachlich begründen lässt.</p>
+                    <button type="button">Diese Entscheidung prüfen</button>
+                `;
+                article.querySelector("button").addEventListener("click", () => chooseOption(option, scene));
+                elements.options.appendChild(article);
+            });
+
+            updateStatus();
+        }
+
+        function chooseOption(option, scene) {
+            if (elements.feedback.dataset.locked === "true") {
+                return;
+            }
+
+            elements.feedback.dataset.locked = "true";
+            state.answers.push({
+                scene: scene.title,
+                decision: option.label,
+                tone: option.tone,
+                feedback: option.feedbackText,
+                ethic: option.ethic,
+                effect: option.effect
+            });
+
+            state.totals.compassion += option.effect.compassion;
+            state.totals.responsibility += option.effect.responsibility;
+            state.totals.courage += option.effect.courage;
+            state.totals.wisdom += option.effect.wisdom;
+            state.totals.score += option.effect.score;
+
+            const moodClass = option.effect.score >= 23 ? "good" : option.effect.score >= 16 ? "warn" : "bad";
+            elements.feedback.className = `feedback ${moodClass}`;
+            elements.feedbackTitle.textContent = option.feedbackTitle;
+            elements.feedbackText.textContent = option.feedbackText;
+            elements.feedbackEthic.textContent = option.ethic;
+
+            Array.from(elements.options.querySelectorAll("button")).forEach(button => {
+                button.disabled = true;
+                button.style.opacity = "0.58";
+                button.style.cursor = "default";
+            });
+
+            updateStatus();
+            updateResults();
+        }
+
+        function nextScene() {
+            if (elements.feedback.dataset.locked !== "true") {
+                return;
+            }
+
+            state.sceneIndex += 1;
+            elements.feedback.dataset.locked = "false";
+
+            if (state.sceneIndex >= SCENES.length) {
+                elements.progressFill.style.width = "100%";
+                elements.progressText.textContent = `Abgeschlossen: ${SCENES.length} von ${SCENES.length}`;
+                elements.sceneType.textContent = "Abschluss";
+                elements.sceneTitle.textContent = "Die Simulation ist ausgewertet";
+                elements.sceneText.textContent = "Scrolle nun zur Auswertung und formuliere deine eigene Deutung: Wer wird im Handeln zum Nächsten?";
+                elements.sceneImpulse.textContent = "Impuls: Gute Ethik zeigt sich nicht nur in richtigen Sätzen, sondern in tragfähiger Verantwortung.";
+                elements.sceneTags.innerHTML = "";
+                ["Auswertung", "Reflexion", "Transfer"].forEach(tag => elements.sceneTags.appendChild(createTag(tag)));
+                elements.options.innerHTML = "";
+                elements.feedback.className = "feedback good";
+                elements.feedbackTitle.textContent = "Simulation abgeschlossen";
+                elements.feedbackText.textContent = "Du hast alle fünf Szenen bearbeitet. Nutze jetzt die Auswertung und formuliere deine theologische oder ethische Deutung.";
+                elements.feedbackEthic.textContent = "Unterrichtsimpuls: Vergleiche dein Profil mit Priester, Levit und Samariter.";
+                elements.nextButton.textContent = "Zur Auswertung springen";
+                elements.nextButton.onclick = () => elements.resultsPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+                updateStatus();
+                updateResults();
+                return;
+            }
+
+            renderScene();
+        }
+
+        function getProfile(score) {
+            if (score >= 110) {
+                return {
+                    name: "Verbindlich barmherzig",
+                    text: "Du verbindest Mitgefühl mit Organisation, Mut und langfristiger Verantwortung. Damit liegst du sehr nah am Profil des Samariters."
+                };
+            }
+            if (score >= 85) {
+                return {
+                    name: "Hilfsbereit mit Struktur",
+                    text: "Du reagierst grundsätzlich solidarisch und triffst oft tragfähige Entscheidungen. An einzelnen Stellen könntest du noch mutiger oder verbindlicher werden."
+                };
+            }
+            if (score >= 60) {
+                return {
+                    name: "Ambivalent engagiert",
+                    text: "Du erkennst Not, schwankst aber zwischen Hilfe und Selbstschutz. Genau hier lohnt sich die ethische Diskussion in der Q1."
+                };
+            }
+            return {
+                name: "Distanziert vorsichtig",
+                text: "Deine Entscheidungen schützen oft vor allem dich selbst. Das macht die Provokation des Gleichnisses besonders deutlich."
+            };
+        }
+
+        function strongestAndWeakest() {
+            const entries = [
+                ["Mitgefühl", state.totals.compassion],
+                ["Verantwortung", state.totals.responsibility],
+                ["Mut", state.totals.courage],
+                ["Klugheit", state.totals.wisdom]
+            ];
+
+            const sorted = [...entries].sort((a, b) => b[1] - a[1]);
+            return {
+                strongest: sorted[0],
+                weakest: sorted[sorted.length - 1]
+            };
+        }
+
+        function updateStatus() {
+            const completed = state.answers.length;
+            elements.statusProgress.textContent = `${completed} / ${SCENES.length} Szenen`;
+            const profile = getProfile(state.totals.score);
+            elements.statusProfile.textContent = completed === 0 ? "Noch offen" : profile.name;
+            elements.statusScore.textContent = `${state.totals.score} Punkte`;
+        }
+
+        function updateResults() {
+            const profile = getProfile(state.totals.score);
+            const { strongest, weakest } = strongestAndWeakest();
+
+            elements.resultProfile.textContent = profile.name;
+            elements.resultSummary.textContent = profile.text;
+            elements.resultScore.textContent = `${state.totals.score} / 127`;
+            elements.resultBalance.textContent = `Mitgefühl ${state.totals.compassion}, Verantwortung ${state.totals.responsibility}, Mut ${state.totals.courage}, Klugheit ${state.totals.wisdom}.`;
+            elements.resultStrongest.textContent = strongest[0];
+            elements.resultStrongestText.textContent = `Hier liegt aktuell dein deutlichster Schwerpunkt mit ${strongest[1]} Punkten.`;
+            elements.resultWeakest.textContent = weakest[0];
+            elements.resultWeakestText.textContent = `Diese Dimension ist am wenigsten ausgeprägt und bietet die beste Gesprächsgrundlage für die Reflexion.`;
+        }
+
+        function resetSimulation() {
+            state.started = false;
+            state.sceneIndex = 0;
+            state.totals = { compassion: 0, responsibility: 0, courage: 0, wisdom: 0, score: 0 };
+            state.answers = [];
+            state.reflection = "";
+            elements.reflectionInput.value = "";
+            elements.feedback.dataset.locked = "false";
+            elements.nextButton.textContent = "Nächste Szene";
+            elements.nextButton.onclick = nextScene;
+            updateStatus();
+            updateResults();
+            renderIntroScene();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        function renderIntroScene() {
+            elements.progressFill.style.width = "0%";
+            elements.progressText.textContent = `Szene 1 von ${SCENES.length}`;
+            elements.sceneType.textContent = "Einstieg";
+            elements.sceneTitle.textContent = "Vor dem Weg nach Jericho";
+            elements.sceneText.textContent = "Die Simulation verbindet das Gleichnis vom barmherzigen Samariter mit ethischer Urteilsbildung. Starte, wenn du bereit bist.";
+            elements.sceneImpulse.textContent = "Impuls: Gute Entscheidungen brauchen nicht nur Gefühl, sondern auch eine verantwortete Begründung.";
+            elements.sceneTags.innerHTML = "";
+            ["Gleichnis", "Ethik", "Q1"].forEach(tag => elements.sceneTags.appendChild(createTag(tag)));
+            elements.options.innerHTML = `
+                <article class="option">
+                    <div class="option-top">
+                        <h3>Arbeite dich Szene für Szene durch die Situation.</h3>
+                        <div class="tag">Start</div>
+                    </div>
+                    <p>Die Auswertung wächst mit jeder Entscheidung. Nutze danach die Reflexion, um dein Ergebnis theologisch zu deuten.</p>
+                </article>
+            `;
+            elements.feedback.className = "feedback hidden";
+        }
+
+        function exportResults() {
+            state.reflection = elements.reflectionInput.value.trim();
+            const profile = getProfile(state.totals.score);
+            const { strongest, weakest } = strongestAndWeakest();
+
+            let text = "DER BARMHERZIGE SAMARITER - ENTSCHEIDUNGSSIMULATION Q1\n";
+            text += `Erstellt: ${new Date().toISOString()}\n`;
+            text += `Profil: ${profile.name}\n`;
+            text += `Gesamtpunkte: ${state.totals.score}\n`;
+            text += `Mitgefuehl: ${state.totals.compassion}\n`;
+            text += `Verantwortung: ${state.totals.responsibility}\n`;
+            text += `Mut: ${state.totals.courage}\n`;
+            text += `Klugheit: ${state.totals.wisdom}\n`;
+            text += `Staerkste Dimension: ${strongest[0]} (${strongest[1]})\n`;
+            text += `Schwaechste Dimension: ${weakest[0]} (${weakest[1]})\n\n`;
+            text += "ENTSCHEIDUNGEN\n";
+
+            state.answers.forEach((answer, index) => {
+                text += `${index + 1}. ${answer.scene}\n`;
+                text += `Entscheidung: ${answer.decision}\n`;
+                text += `Rueckmeldung: ${answer.feedback}\n`;
+                text += `Ethische Deutung: ${answer.ethic}\n\n`;
+            });
+
+            text += "EIGENE REFLEXION\n";
+            text += `${state.reflection || "Keine eigene Notiz eingegeben."}\n`;
+
+            const blob = new Blob([text], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "samariter_q1_auswertung.txt";
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        elements.startButton.addEventListener("click", () => {
+            state.started = true;
+            state.sceneIndex = 0;
+            state.answers = [];
+            state.totals = { compassion: 0, responsibility: 0, courage: 0, wisdom: 0, score: 0 };
+            state.reflection = "";
+            elements.reflectionInput.value = "";
+            elements.feedback.dataset.locked = "false";
+            elements.nextButton.textContent = "Nächste Szene";
+            elements.nextButton.onclick = nextScene;
+            updateResults();
+            renderScene();
+        });
+
+        elements.jumpResults.addEventListener("click", () => {
+            elements.resultsPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+
+        elements.nextButton.onclick = nextScene;
+        elements.restartButton.addEventListener("click", resetSimulation);
+        elements.exportButton.addEventListener("click", exportResults);
+        elements.reflectionInput.addEventListener("input", event => {
+            state.reflection = event.target.value;
+        });
+
+        renderIntroScene();
+        updateStatus();
+        updateResults();
+    </script>
 </body>
 </html>
