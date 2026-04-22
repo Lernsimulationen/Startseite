@@ -390,8 +390,8 @@
                     <span id="score-display" class="score-val">0</span>
                     <span id="total-display" class="score-total">/ 14 KOMPLETT</span>
                 </div>
-                <button id="btn-save" class="btn">Speichern</button>
-                <button id="btn-load" class="btn">Laden</button>
+                <button id="btn-save" class="btn">Spielstand exportieren</button>
+                <button id="btn-load" class="btn">Spielstand importieren</button>
                 <button id="btn-reset" class="btn btn-danger">Neustart</button>
             </div>
         </div>
@@ -707,7 +707,7 @@
                 if (!godProgress[currentGod.id].includes(currentChallengeIndex)) {
                     godProgress[currentGod.id].push(currentChallengeIndex);
                 }
-                saveToLocalStorage();
+                saveToSessionStorage();
                 
                 setTimeout(() => {
                     renderGame();
@@ -855,12 +855,12 @@
             btnNo.onclick = close;
         }
 
-        function saveToLocalStorage() {
-            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(godProgress)); } catch(e){}
+        function saveToSessionStorage() {
+            try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(godProgress)); } catch(e){}
         }
 
-        function loadFromLocalStorage() {
-            const saved = localStorage.getItem(STORAGE_KEY);
+        function loadFromSessionStorage() {
+            const saved = sessionStorage.getItem(STORAGE_KEY);
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
@@ -916,7 +916,7 @@
                     });
                     
                     godProgress = safeData;
-                    saveToLocalStorage();
+                    saveToSessionStorage();
                     renderGame();
                     showToast(`${count} Götter geladen!`);
                 } catch(err) { showToast('Defekte Datei', 'error'); }
@@ -943,7 +943,7 @@
             confirmAction("Wirklich alles löschen?", () => {
                 godProgress = Object.create(null);
                 gameStats = { correct: 0, wrong: 0, startTime: Date.now() };
-                saveToLocalStorage();
+                saveToSessionStorage();
                 document.getElementById('win-screen').style.display = 'none';
                 renderGame();
                 showToast('Spiel zurückgesetzt');
@@ -976,7 +976,7 @@
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
             setupEventListeners();
-            loadFromLocalStorage();
+            loadFromSessionStorage();
             renderGame();
         });
 

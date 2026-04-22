@@ -1,36 +1,162 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Datenschutzhinweis</title>
+
+  <style>
+    :root{
+      --bg: #f3f6fb;
+      --bg-accent: #e8eefc;
+      --surface: rgba(255,255,255,0.94);
+      --surface-strong: #ffffff;
+      --text: #10203a;
+      --muted: #5b6b84;
+      --border: rgba(33, 55, 94, 0.14);
+      --accent: #2457d6;
+      --shadow: 0 20px 45px rgba(18, 36, 66, 0.08);
+      --radius: 20px;
+      --max: 980px;
+    }
+
+    *{ box-sizing: border-box; }
+
+    body{
+      margin: 0;
+      font-family: "Segoe UI", "Trebuchet MS", Arial, sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(36, 87, 214, 0.12), transparent 34%),
+        linear-gradient(180deg, var(--bg), var(--bg-accent));
+    }
+
+    .shell{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+    }
+
+    .card{
+      background: linear-gradient(180deg, var(--surface-strong), var(--surface));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+
+    .eyebrow{
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.72);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    h1{
+      margin: 16px 0 10px;
+      font-size: clamp(2rem, 3.4vw, 2.8rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    h2{
+      margin: 24px 0 10px;
+      font-size: 1.15rem;
+    }
+
+    p{
+      margin: 0 0 14px;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    ul{
+      margin: 0 0 16px 20px;
+      padding: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    li + li{
+      margin-top: 8px;
+    }
+
+    a{
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    a:hover{
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
+  <div class="shell">
+    <div class="card">
+      <div class="eyebrow">Datenschutz</div>
+      <h1>Datenschutzhinweis</h1>
 
-<h1>Datenschutzhinweis</h1>
+      <p>
+        Diese Website ist ein privates Projekt und dient ausschließlich zu Lern-
+        und Demonstrationszwecken.
+      </p>
 
-<p>
-Diese Website ist ein privates Projekt und dient ausschließlich
-zu Lern- und Demonstrationszwecken.
-</p>
+      <h2>Hosting</h2>
+      <p>
+        Beim Aufruf der Seiten werden durch den Hosting-Anbieter GitHub
+        technische Zugriffsdaten verarbeitet, zum Beispiel IP-Adresse,
+        Zeitpunkt des Zugriffs und technische Metadaten des Abrufs.
+      </p>
+      <p>
+        Diese Verarbeitung erfolgt zur technischen Bereitstellung und Sicherheit
+        der Website. Ich werte diese Server-Logdaten nicht selbst aus.
+      </p>
 
-<p>
-Beim Aufruf der Seiten werden durch den Hosting-Anbieter GitHub
-technische Zugriffsdaten (z. B. IP-Adresse, Zeitpunkt des Zugriffs)
-in Server-Logdateien verarbeitet.
-</p>
+      <h2>Keine externen Tracking-Dienste</h2>
+      <p>
+        Auf dieser Website werden keine Analyse-, Tracking- oder Werbedienste
+        von Drittanbietern eingesetzt. Es werden keine Cookies zu Werbe- oder
+        Profilbildungszwecken gesetzt.
+      </p>
 
-<p>
-Diese Daten dienen ausschließlich der technischen Bereitstellung
-und Sicherheit der Website und werden nicht von mir ausgewertet.
-</p>
+      <h2>Lokale Verarbeitung im Browser</h2>
+      <p>
+        Mehrere Lernmodule verarbeiten Eingaben ausschließlich lokal im Browser.
+        Inhalte werden nicht an mich oder an Dritte übertragen.
+      </p>
+      <ul>
+        <li>Einige Module speichern den Bearbeitungsstand nur temporär in der aktuellen Browser-Sitzung.</li>
+        <li>Einige Module bieten einen freiwilligen Export als lokale Text- oder JSON-Datei auf dem verwendeten Gerät an.</li>
+        <li>Exportdateien werden nur erzeugt, wenn Nutzerinnen oder Nutzer den Export selbst auslösen.</li>
+      </ul>
 
-<p>
-Weitere Informationen zur Datenverarbeitung durch GitHub finden Sie unter:
-<br>
-<a href="https://docs.github.com/de/site-policy/privacy-policies/github-privacy-statement">
-https://docs.github.com/de/site-policy/privacy-policies/github-privacy-statement
-</a>
-</p>
+      <h2>Hinweis zu Eingaben</h2>
+      <p>
+        Bitte geben Sie in Freitextfeldern nach Möglichkeit keine echten
+        personenbezogenen Daten wie vollständige Namen, Adressen,
+        Telefonnummern oder E-Mail-Adressen ein, sofern dies für die Aufgabe
+        nicht erforderlich ist.
+      </p>
 
+      <h2>Weitere Informationen</h2>
+      <p>
+        Weitere Informationen zur Datenverarbeitung durch GitHub finden Sie unter:
+        <br />
+        <a href="https://docs.github.com/de/site-policy/privacy-policies/github-privacy-statement">
+          GitHub Privacy Statement
+        </a>
+      </p>
+    </div>
+  </div>
 </body>
 </html>

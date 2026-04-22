@@ -787,7 +787,7 @@ const Game = {
 
     export() {
         let txt = "SAMARITER RUN - BILDUNGSLOG V1.2 (STABLE LOADER)\n";
-        txt += `Seed: ${this.state.seed} | Device: ${navigator.userAgent}\n`;
+        txt += `Seed: ${this.state.seed}\n`;
         txt += "Timestamp;Scene;Action;Decision;Result;Humanity;Hearts;Guilt;Combo;Time;Node\n";
         this.state.log.forEach(l => {
             txt += `${l.t};${l.scene};${l.action};${l.dec};${l.res};${l.pts};${l.h};${l.g};${l.cb};${l.time};${l.node}\n`;
@@ -795,7 +795,7 @@ const Game = {
         const blob = new Blob([txt], { type: 'text/plain' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `samariter_run_log_${this.state.seed}.txt`;
+        a.download = 'samariter_run_log.txt';
         a.click();
     }
 };

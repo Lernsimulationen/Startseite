@@ -434,11 +434,10 @@
 <script nonce="hiobSicherheit123">
     /**
      * KONFIGURATION & DATENSCHUTZ
-     * 'session' = Daten werden gelöscht, wenn Browser geschlossen wird (Empfohlen für Schulen)
-     * 'local' = Daten bleiben dauerhaft (Nur für private Geräte)
+     * Bearbeitungsstände werden nur in der aktuellen Browser-Sitzung gehalten
+     * und beim Schließen des Tabs oder Browsers verworfen.
      */
     const CONFIG = {
-        STORAGE_MODE: 'session', 
         STORAGE_KEY: 'hiob_app_data_v1',
         DEBOUNCE_MS: 500
     };
@@ -476,7 +475,7 @@
     const StorageService = {
         getProvider() {
             try {
-                return CONFIG.STORAGE_MODE === 'session' ? sessionStorage : localStorage;
+                return sessionStorage;
             } catch(e) {
                 console.warn("Storage access denied/failed", e);
                 return null; // Fallback für extrem restriktive Browser-Settings
