@@ -111,6 +111,13 @@ body.overlay-open {
   color: #27485c;
 }
 
+.privacy-note {
+  margin: 8px 0 0;
+  color: #4f5e69;
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
 .setup-strip {
   display: grid;
   grid-template-columns: repeat(4, minmax(82px, 1fr)) auto;
@@ -1174,6 +1181,10 @@ body.overlay-open {
 
   .toolbar {
     justify-content: flex-start;
+  }
+
+  .privacy-note {
+    margin-top: 0;
   }
 
   .game-shell {

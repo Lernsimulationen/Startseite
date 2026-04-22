@@ -296,7 +296,12 @@ function coordKey(coord) {
 }
 
 function normalizeName(value, fallback) {
-  const cleaned = value.replace(/[<>]/g, "").trim();
+  const cleaned = value
+    .replace(/[<>]/g, "")
+    .replace(/[^\p{L}\p{N}\s._-]/gu, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 14);
   return cleaned || fallback;
 }
 
