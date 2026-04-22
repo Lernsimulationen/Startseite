@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agora des Alphabets</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-block">
+          <p class="eyebrow">Altgriechisch fuer Klasse 5</p>
+          <h1>Agora des Alphabets</h1>
+          <p class="tagline">Vier Teams. Ein Brett. Ein Alphabet.</p>
+        </div>
+
+        <form id="setupForm" class="setup-strip">
+          <label>
+            Team 1
+            <input type="text" name="player0" value="Alpha" maxlength="14" />
+          </label>
+          <label>
+            Team 2
+            <input type="text" name="player1" value="Beta" maxlength="14" />
+          </label>
+          <label>
+            Team 3
+            <input type="text" name="player2" value="Gamma" maxlength="14" />
+          </label>
+          <label>
+            Team 4
+            <input type="text" name="player3" value="Delta" maxlength="14" />
+          </label>
+          <button type="submit" class="primary start-button">Neue Runde</button>
+        </form>
+
+        <div class="toolbar">
+          <button type="button" class="tool-button panel-toggle" data-panel-target="rulesPanel">Regeln</button>
+          <button type="button" class="tool-button panel-toggle" data-panel-target="alphabetPanel">Alphabet</button>
+          <button type="button" class="tool-button panel-toggle" data-panel-target="tasksPanel">Stapel</button>
+          <button type="button" class="tool-button panel-toggle" data-panel-target="logPanel">Log</button>
+          <button type="button" id="toggleSoundButton" class="tool-button sound-button">Klang an</button>
+        </div>
+      </header>
+
+      <main class="game-shell">
+        <section class="board-stage">
+          <div class="board-frame">
+            <section id="questionPop" class="question-pop" aria-live="polite">
+              <div class="question-art" aria-hidden="true"></div>
+              <div class="question-copy">
+                <div class="question-header">
+                  <span id="questionModeLabel" class="question-mode">Bereit</span>
+                  <p id="questionSubline" class="question-subline">Wuerfle fuer dein Team.</p>
+                </div>
+                <div id="questionStage" class="question-stage"></div>
+                <div id="answerButtons" class="answers"></div>
+                <div id="moveButtons" class="move-buttons"></div>
+                <button id="continueButton" class="secondary hidden">Weiter</button>
+              </div>
+            </section>
+
+            <div id="board" class="board" aria-label="Spielbrett"></div>
+          </div>
+        </section>
+
+        <aside class="side-rail">
+          <section class="turn-card">
+            <div class="turn-top">
+              <div id="turnBadge" class="turn-badge">A</div>
+              <div>
+                <p class="tiny-label">Am Zug</p>
+                <h2 id="currentPlayerName">Alpha</h2>
+              </div>
+            </div>
+
+            <div class="turn-controls">
+              <div id="dieFace" class="die-face" aria-live="polite">?</div>
+              <button id="rollButton" class="primary roll-button">Wuerfeln</button>
+            </div>
+
+            <p id="phaseHint" class="phase-hint">Alpha wuerfelt zuerst.</p>
+            <div id="effectStatus" class="effect-status hidden"></div>
+            <div id="turnActions" class="turn-actions"></div>
+          </section>
+
+          <section class="teams-card">
+            <div class="compact-head">
+              <p class="tiny-label">Teams</p>
+            </div>
+            <div id="playerList" class="player-list"></div>
+          </section>
+        </aside>
+      </main>
+
+      <div id="overlayRoot" class="overlay-root hidden" aria-hidden="true">
+        <button type="button" class="overlay-backdrop" data-close-overlay aria-label="Overlay schliessen"></button>
+
+        <section id="rulesPanel" class="overlay-panel hidden">
+          <div class="overlay-head">
+            <h2>Regeln</h2>
+            <button type="button" class="close-button" data-close-overlay>Schliessen</button>
+          </div>
+          <div class="overlay-scroll">
+            <div class="rule-grid">
+              <p>Wuerfeln, Aufgabe loesen, dann ziehen.</p>
+              <p>Mit 5 oder 6 kommt eine Figur aus dem Haus.</p>
+              <p>Landest du auf einer fremden Figur, geht sie zurueck.</p>
+              <p>Richtige Antwort: Götterbonus und extra Schub.</p>
+              <p>Falsche Antwort: Tempelpause, naechste Runde aussetzen.</p>
+              <p>Gewonnen hat, wer zuerst alle vier Figuren im Tempel hat.</p>
+              <p>Eine 6 gibt direkt einen Bonuswurf.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="alphabetPanel" class="overlay-panel hidden">
+          <div class="overlay-head">
+            <h2>Alphabettafel</h2>
+            <button type="button" class="close-button" data-close-overlay>Schliessen</button>
+          </div>
+          <div class="overlay-scroll">
+            <div id="alphabetGrid" class="alphabet-grid"></div>
+          </div>
+        </section>
+
+        <section id="tasksPanel" class="overlay-panel hidden">
+          <div class="overlay-head">
+            <h2>Aufgabenstapel</h2>
+            <button type="button" class="close-button" data-close-overlay>Schliessen</button>
+          </div>
+          <div class="overlay-scroll">
+            <div class="task-summary">
+              <div>
+                <span>Gesamt</span>
+                <strong id="panelTaskTotal">480</strong>
+              </div>
+              <div>
+                <span>Noch im Stapel</span>
+                <strong id="panelTaskRemaining">480</strong>
+              </div>
+            </div>
+            <div id="taskBreakdown" class="task-breakdown"></div>
+          </div>
+        </section>
+
+        <section id="logPanel" class="overlay-panel hidden">
+          <div class="overlay-head">
+            <h2>Zugprotokoll</h2>
+            <button type="button" class="close-button" data-close-overlay>Schliessen</button>
+          </div>
+          <div class="overlay-scroll">
+            <ol id="logList" class="log-list"></ol>
+          </div>
+        </section>
+      </div>
+
+      <div id="feedbackFlash" class="feedback-flash" aria-hidden="true"></div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
