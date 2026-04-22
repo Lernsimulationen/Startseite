@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none';">
     <title>WER HILFT? – Der Samariter-Run</title>
     <style>
         :root {
@@ -190,11 +191,15 @@
         <div id="summary-stats" style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; text-align: left; min-width: 300px; margin: 15px 0;"></div>
         <p>Wer war heute dein "Nächster"?</p>
         <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center;">
-            <button class="btn" style="padding:10px 15px; font-size:14px;" onclick="Game.finish('Der Verletzte')">Der Verletzte</button>
-            <button class="btn" style="padding:10px 15px; font-size:14px;" onclick="Game.finish('Der Wirt')">Der Wirt</button>
-            <button class="btn" style="padding:10px 15px; font-size:14px;" onclick="Game.finish('Ich selbst')">Ich selbst</button>
+            <button id="summary-answer-wounded" class="btn" style="padding:10px 15px; font-size:14px;" onclick="Game.finish('Der Verletzte')">Der Verletzte</button>
+            <button id="summary-answer-host" class="btn" style="padding:10px 15px; font-size:14px;" onclick="Game.finish('Der Wirt')">Der Wirt</button>
+            <button id="summary-answer-self" class="btn" style="padding:10px 15px; font-size:14px;" onclick="Game.finish('Ich selbst')">Ich selbst</button>
         </div>
-        <button class="btn" style="background: var(--success); box-shadow: 0 4px 0 #15803d;" onclick="Game.export()">Log exportieren (.txt)</button>
+        <p id="summary-answer-note" style="min-height: 24px; margin: 0 0 12px; color: #cbd5e1; font-size: 14px;"></p>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+            <button class="btn" style="background: var(--success); box-shadow: 0 4px 0 #15803d;" onclick="Game.export()">Log exportieren (.txt)</button>
+            <button class="btn" style="background: #475569; box-shadow: 0 4px 0 #334155;" onclick="Game.restart()">Neu starten</button>
+        </div>
     </div>
 </div>
 
@@ -240,7 +245,8 @@ const Game = {
         assets: {},
         loggedMissing: {},
         assetLoadReport: [], // FIX: Für Debug-Tabelle
-        input: { down: false, x: 0, y: 0, startX: 0, startY: 0 }
+        input: { down: false, x: 0, y: 0, startX: 0, startY: 0 },
+        summaryAnswer: ""
     },
 
     init() {
@@ -379,6 +385,10 @@ const Game = {
 
         if(this.state.scene === "MG_RUNNER") this.updateRunner(dt);
         if(this.state.scene === "MG_TIMING") this.updateTiming(dt);
+        if(this.state.scene === "MG_WOUND" && this.mgWound) {
+            this.mgWound.timer -= dt;
+            if(this.mgWound.timer <= 0) this.resolveMG("WOUND", false);
+        }
     },
 
     draw() {
@@ -499,8 +509,6 @@ const Game = {
 
     drawMGWound() {
         const ctx = this.ctx;
-        this.mgWound.timer -= 0.016;
-        if(this.mgWound.timer <= 0) this.resolveMG("WOUND", false);
 
         this.drawSprite('wounded', this.vw/2, this.vh/2, 280, 380, "👤");
 
@@ -543,14 +551,16 @@ const Game = {
             this.hazards.push({ lane: Math.floor(Math.random()*3), y: -100 });
             this.hazardSpawn = 0;
         }
-        this.hazards.forEach((h, i) => {
+        for(let i = this.hazards.length - 1; i >= 0; i--) {
+            const h = this.hazards[i];
             h.y += dt * speed;
             if(h.y > this.vh - 130 && h.y < this.vh - 60 && h.lane === this.runnerLane) {
                 this.hazards.splice(i, 1);
                 this.hit();
+                continue;
             }
             if(h.y > this.vh) this.hazards.splice(i, 1);
-        });
+        }
     },
 
     drawMGRunner() {
@@ -605,9 +615,18 @@ const Game = {
         this.state.humanity = 0;
         this.state.guilt = 0;
         this.state.combo = 1;
+        this.state.bestCombo = 1;
         this.state.inventory = [null, null, null];
+        this.state.summaryAnswer = "";
+        this.state.stats = { helped: 0, skipped: 0, mgWon: 0, mgLost: 0, guiltPeak: 0 };
+        this.state.log = [];
+        this.state.particles = [];
+        this.state.shake = 0;
         this.generateMap();
+        document.getElementById('screen-summary').classList.remove('active');
         document.getElementById('screen-start').classList.remove('active');
+        document.getElementById('summary-answer-note').innerText = "";
+        this.updateSummarySelection();
         this.logAction("GAME", "RUN_START", this.state.seed, "Start gedrückt");
     },
 
@@ -654,8 +673,18 @@ const Game = {
         });
         el.addEventListener('pointerup', e => {
             if(!this.state.input.down) return;
+            setPos(e);
             const dx = this.state.input.x - this.state.input.startX;
             this.handlePointerUp(dx);
+            if (el.hasPointerCapture?.(e.pointerId)) {
+                el.releasePointerCapture(e.pointerId);
+            }
+            this.state.input.down = false;
+        });
+        el.addEventListener('pointercancel', e => {
+            if (el.hasPointerCapture?.(e.pointerId)) {
+                el.releasePointerCapture(e.pointerId);
+            }
             this.state.input.down = false;
         });
     },
@@ -703,14 +732,22 @@ const Game = {
         if(success) {
             this.state.humanity += (20 * this.state.combo);
             this.state.combo = Math.min(5, this.state.combo + 1);
+            this.state.bestCombo = Math.max(this.state.bestCombo, this.state.combo);
             if(type === "WOUND") this.state.guilt = Math.max(0, this.state.guilt - 1);
             if(type === "TIMING") this.addItem("coin");
+            if(type === "WOUND") this.state.stats.helped++;
+            this.state.stats.mgWon++;
             this.spawnParticles(this.vw/2, this.vh/2, "#22c55e");
         } else {
             this.state.combo = 1;
             this.state.guilt++;
+            if(type === "WOUND") this.state.stats.skipped++;
+            this.state.stats.mgLost++;
+            this.state.stats.guiltPeak = Math.max(this.state.stats.guiltPeak, this.state.guilt);
             this.hit();
+            if(this.state.scene === "SUMMARY") return;
         }
+        this.state.stats.guiltPeak = Math.max(this.state.stats.guiltPeak, this.state.guilt);
         this.advance();
     },
 
@@ -718,6 +755,7 @@ const Game = {
         this.state.hearts--;
         this.state.shake = 15;
         this.spawnParticles(this.vw/2, this.vh/2, "#ef4444");
+        this.state.stats.guiltPeak = Math.max(this.state.stats.guiltPeak, this.state.guilt);
         if(this.state.hearts <= 0) this.gameOver("Keine Herzen mehr");
     },
 
@@ -766,15 +804,47 @@ const Game = {
     },
 
     gameOver(reason) {
+        if(this.state.scene === "SUMMARY") return;
         this.state.scene = "SUMMARY";
         document.getElementById('screen-summary').classList.add('active');
         document.getElementById('summary-title').innerText = reason.toUpperCase();
         const stats = document.getElementById('summary-stats');
+        const summaryHtml = `Punkte: ${this.state.humanity}<br>Schuld-Peak: ${this.state.stats.guiltPeak}<br>Beste Kette: x${this.state.bestCombo}<br>Geholfen: ${this.state.stats.helped}<br>Verpasst: ${this.state.stats.skipped}`;
         stats.innerHTML = `⭐ Punkte: ${this.state.humanity}<br>⚫ Schuld-Peak: ${this.state.guilt}<br>🔥 Kette: x${this.state.combo}`;
+        stats.innerHTML = summaryHtml;
+        document.getElementById('summary-answer-note').innerText = this.state.summaryAnswer
+            ? `Auswahl gespeichert: ${this.state.summaryAnswer}`
+            : "WÃ¤hle zum Abschluss noch deinen NÃ¤chsten aus.";
+        this.updateSummarySelection();
         this.logAction("GAME", "END", reason, `Score: ${this.state.humanity}`);
     },
 
-    finish(ans) { location.reload(); },
+    finish(ans) {
+        this.state.summaryAnswer = ans;
+        this.logAction("SUMMARY", "NEIGHBOR", ans, "Auswahl gespeichert");
+        document.getElementById('summary-answer-note').innerText = `Auswahl gespeichert: ${ans}`;
+        this.updateSummarySelection();
+    },
+
+    restart() {
+        this.start();
+    },
+
+    updateSummarySelection() {
+        const buttons = [
+            { id: 'summary-answer-wounded', value: 'Der Verletzte' },
+            { id: 'summary-answer-host', value: 'Der Wirt' },
+            { id: 'summary-answer-self', value: 'Ich selbst' }
+        ];
+        buttons.forEach(({ id, value }) => {
+            const el = document.getElementById(id);
+            if(!el) return;
+            const active = this.state.summaryAnswer === value;
+            el.style.outline = active ? "3px solid #fbbf24" : "none";
+            el.style.transform = active ? "translateY(2px)" : "";
+            el.style.boxShadow = active ? "0 2px 0 #1d4ed8" : "";
+        });
+    },
 
     logAction(scene, action, decision, result) {
         this.state.log.push({
@@ -788,15 +858,18 @@ const Game = {
     export() {
         let txt = "SAMARITER RUN - BILDUNGSLOG V1.2 (STABLE LOADER)\n";
         txt += `Seed: ${this.state.seed}\n`;
+        txt += `Naechster: ${this.state.summaryAnswer || 'keine Auswahl'}\n`;
         txt += "Timestamp;Scene;Action;Decision;Result;Humanity;Hearts;Guilt;Combo;Time;Node\n";
         this.state.log.forEach(l => {
             txt += `${l.t};${l.scene};${l.action};${l.dec};${l.res};${l.pts};${l.h};${l.g};${l.cb};${l.time};${l.node}\n`;
         });
         const blob = new Blob([txt], { type: 'text/plain' });
         const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
+        const url = URL.createObjectURL(blob);
+        a.href = url;
         a.download = 'samariter_run_log.txt';
         a.click();
+        URL.revokeObjectURL(url);
     }
 };
 
