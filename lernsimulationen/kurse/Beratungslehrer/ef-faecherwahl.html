@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    style-src 'self' 'unsafe-inline';
+    script-src 'self' 'unsafe-inline';
+    img-src 'self' data:;
+    connect-src 'none';
+    frame-src 'none';
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+  ">
+  <title>EF Fächerkompass</title>
+  <style>
+    :root{
+      --ink:#07121f;
+      --paper:#f7f1e6;
+      --cream:#fff9ee;
+      --text:#122033;
+      --muted:#657386;
+      --line:rgba(18,32,51,.14);
+      --blue:#185bff;
+      --cyan:#00a8c8;
+      --orange:#ff8a2a;
+      --green:#18a86b;
+      --pink:#ef4f83;
+      --violet:#7255ff;
+      --shadow:0 24px 70px rgba(15,27,44,.18);
+      --radius:28px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:"Trebuchet MS","Segoe UI",Arial,sans-serif;
+      color:var(--text);
+      line-height:1.45;
+      background:
+        radial-gradient(circle at 7% 10%,rgba(255,138,42,.22),transparent 26%),
+        radial-gradient(circle at 88% 8%,rgba(24,91,255,.18),transparent 24%),
+        radial-gradient(circle at 74% 88%,rgba(24,168,107,.16),transparent 30%),
+        linear-gradient(135deg,#fff7e8,#edf5ff 52%,#fff2f7);
+    }
+
+    .app{width:min(1180px,100%);margin:0 auto;padding:18px 14px 30px}
+    body.locked .app,body.locked .modal{display:none}
+    .gate{
+      position:fixed;
+      inset:0;
+      display:none;
+      place-items:center;
+      padding:18px;
+      background:
+        radial-gradient(circle at 16% 14%,rgba(255,138,42,.24),transparent 28%),
+        radial-gradient(circle at 86% 18%,rgba(24,91,255,.22),transparent 28%),
+        linear-gradient(135deg,#fff7e8,#edf5ff 52%,#fff2f7);
+      z-index:50;
+    }
+    body.locked .gate{display:grid}
+    .gate-card{
+      width:min(480px,100%);
+      padding:26px;
+      border-radius:32px;
+      background:rgba(255,255,255,.82);
+      border:1px solid rgba(255,255,255,.72);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(18px);
+    }
+    .gate-card h2{margin:12px 0 8px;font-size:clamp(2rem,6vw,3.4rem);line-height:.92;letter-spacing:-.07em}
+    .gate-card p{margin:0;color:var(--muted);font-weight:850;line-height:1.5}
+    .gate-form{display:grid;gap:10px;margin-top:18px}
+    .gate-form input{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px 15px;
+      font:inherit;
+      font-weight:900;
+      color:var(--text);
+      background:white;
+      outline:none;
+    }
+    .gate-form input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(24,91,255,.12)}
+    .gate-error{min-height:22px;color:#b42318;font-weight:1000}
+    .topbar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .mark{
+      width:58px;height:58px;border-radius:20px;display:grid;place-items:center;
+      background:linear-gradient(135deg,var(--ink),#24456f);
+      color:var(--paper);font-weight:1000;letter-spacing:-.05em;box-shadow:var(--shadow);
+    }
+    h1{margin:0;font-size:clamp(2rem,5vw,4.1rem);line-height:.9;letter-spacing:-.07em}
+    .brand p{margin:6px 0 0;color:var(--muted);font-weight:800}
+
+    .nav{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    button,.ghost{
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:12px 15px;
+      font:inherit;
+      font-weight:1000;
+      color:var(--text);
+      background:rgba(255,255,255,.64);
+      box-shadow:0 8px 24px rgba(15,27,44,.08);
+      cursor:pointer;
+      text-decoration:none;
+      transition:transform .16s ease,box-shadow .16s ease,background .16s ease;
+    }
+    button:hover,.ghost:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(15,27,44,.14)}
+    .primary{background:var(--ink);color:var(--paper)}
+
+    .hero{min-height:calc(100vh - 116px)}
+    .stage,.area,.modal-card{
+      border:1px solid rgba(255,255,255,.72);
+      border-radius:var(--radius);
+      background:rgba(255,255,255,.72);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(18px);
+    }
+    .stage{padding:24px;display:grid;grid-template-rows:auto 1fr;overflow:hidden;position:relative}
+    .stage::before{
+      content:"";position:absolute;inset:auto -80px -130px auto;width:320px;height:320px;
+      border-radius:44% 56% 48% 52%;background:linear-gradient(135deg,rgba(24,91,255,.16),rgba(239,79,131,.16));
+      transform:rotate(-12deg);
+    }
+    .kicker{display:inline-flex;width:max-content;padding:8px 11px;border-radius:999px;background:var(--ink);color:var(--paper);font-size:.78rem;font-weight:1000;text-transform:uppercase;letter-spacing:.08em}
+    .lead{max-width:760px;margin:14px 0 0;font-size:clamp(1.2rem,2.7vw,2rem);line-height:1.1;font-weight:1000;letter-spacing:-.04em}
+    .hint{max-width:850px;margin-top:12px;color:var(--muted);font-weight:800}
+    .steps{position:relative;z-index:1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:16px}
+    .step{padding:11px 12px;border-radius:18px;background:rgba(255,255,255,.68);border:1px solid var(--line);font-weight:950;color:var(--muted);line-height:1.32}
+    .step strong{display:block;color:var(--text);font-size:.92rem}
+    .area-grid{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px;z-index:1}
+
+    .area{
+      min-height:166px;
+      padding:16px;
+      display:grid;
+      align-content:space-between;
+      overflow:hidden;
+      position:relative;
+      text-align:left;
+      border-radius:26px;
+    }
+    .area::after{
+      content:"";position:absolute;right:-34px;bottom:-42px;width:140px;height:140px;border-radius:42px;
+      background:rgba(var(--tone),.16);transform:rotate(18deg);
+    }
+    .area-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;position:relative;z-index:1}
+    .icon{width:66px;height:66px;border-radius:22px;display:grid;place-items:center;font-size:2rem;background:rgba(var(--tone),.16);border:1px solid rgba(var(--tone),.25)}
+    .area h2{margin:0;font-size:1.35rem;letter-spacing:-.04em}
+    .area p{margin:8px 0 0;color:var(--muted);font-weight:800;line-height:1.38}
+    .pill{display:inline-flex;width:max-content;margin-top:14px;padding:8px 10px;border-radius:999px;background:rgba(var(--tone),.14);color:rgb(var(--tone));font-weight:1000;font-size:.84rem}
+
+    .drawer{display:none;margin-top:16px;position:relative;z-index:2}
+    .drawer.show{display:block;animation:rise .25s ease both}
+    @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+    .drawer-head{display:flex;justify-content:space-between;gap:10px;align-items:end;margin-bottom:10px}
+    .drawer-head h2{margin:0;font-size:clamp(1.6rem,3vw,2.4rem);letter-spacing:-.06em}
+    .drawer-head p{margin:4px 0 0;color:var(--muted);font-weight:800}
+    .subjects{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+    .subject{
+      min-height:180px;
+      border-radius:24px;
+      border:1px solid var(--line);
+      padding:14px;
+      background:var(--cream);
+      text-align:left;
+      display:grid;
+      gap:10px;
+      align-content:start;
+      box-shadow:0 12px 28px rgba(15,27,44,.08);
+    }
+    .subject-symbol{width:60px;height:60px;border-radius:20px;display:grid;place-items:center;font-size:2rem;background:rgba(var(--tone),.15);border:1px solid rgba(var(--tone),.24)}
+    .subject h3{margin:0;font-size:1.14rem;letter-spacing:-.03em}
+    .subject p{margin:0;color:var(--muted);font-size:.94rem;font-weight:800;line-height:1.38}
+    .subject .open{margin-top:auto;width:max-content;background:rgb(var(--tone));color:white;border-color:transparent}
+
+    .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(7,18,31,.58);padding:16px;z-index:20}
+    .modal.show{display:grid}
+    .modal-card{width:min(860px,100%);max-height:min(88vh,820px);overflow:auto;padding:20px;background:#fffaf0}
+    .modal-top{display:grid;grid-template-columns:88px 1fr auto;gap:14px;align-items:start}
+    .modal-symbol{width:82px;height:82px;border-radius:26px;display:grid;place-items:center;font-size:2.55rem;background:rgba(var(--tone),.16);border:1px solid rgba(var(--tone),.28)}
+    .modal h2{margin:0;font-size:clamp(1.7rem,4vw,3rem);letter-spacing:-.06em}
+    .modal .short{margin-top:7px;color:rgb(var(--tone));font-weight:1000}
+    .modal .explain{margin:14px 0 0;color:var(--text);font-size:1.05rem;line-height:1.58;font-weight:780}
+    .check{margin-top:18px;padding:16px;border-radius:24px;background:linear-gradient(135deg,rgba(var(--tone),.12),rgba(255,255,255,.74));border:1px solid rgba(var(--tone),.22)}
+    .check h3{margin:0 0 10px}
+    .check-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+    .check-row:first-of-type{border-top:0}
+    .check-row p{margin:0;font-weight:900;color:var(--text)}
+    .choice{display:flex;gap:7px}
+    .choice button{padding:8px 10px;box-shadow:none;background:white}
+    .choice button.active{background:rgb(var(--tone));color:white}
+    .fit{
+      margin-top:12px;
+      padding:14px;
+      border-radius:20px;
+      background:var(--ink);
+      color:var(--paper);
+      font-weight:1000;
+      line-height:1.42;
+    }
+    .summary{
+      margin-top:16px;
+      padding:18px;
+      border-radius:var(--radius);
+      background:rgba(255,255,255,.76);
+      border:1px solid rgba(255,255,255,.72);
+      box-shadow:var(--shadow);
+    }
+    .summary-head{display:flex;justify-content:space-between;gap:12px;align-items:end;flex-wrap:wrap}
+    .summary h2{margin:0;font-size:clamp(1.8rem,4vw,3rem);letter-spacing:-.06em}
+    .summary p{margin:6px 0 0;color:var(--muted);font-weight:800}
+    .result-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+    .result-card{border-radius:22px;padding:14px;background:var(--cream);border:1px solid var(--line);display:grid;gap:8px}
+    .result-card strong{font-size:1.1rem}
+    .meter{height:10px;border-radius:999px;background:rgba(18,32,51,.1);overflow:hidden}
+    .meter span{display:block;height:100%;width:0%;background:rgb(var(--tone));border-radius:999px}
+    .area-notes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+    .area-note{padding:12px;border-radius:20px;background:rgba(24,91,255,.08);border:1px solid var(--line);font-weight:850;color:var(--muted)}
+    .empty{padding:18px;border-radius:22px;background:rgba(18,32,51,.06);font-weight:900;color:var(--muted);margin-top:12px}
+    .close{box-shadow:none}
+
+    @media(max-width:980px){
+      .area-grid,.steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .subjects{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media(max-width:640px){
+      .app{padding:12px 10px 24px}
+      .topbar{align-items:flex-start;flex-direction:column}
+      .nav{width:100%}
+      .nav button,.nav .ghost{flex:1;text-align:center;padding:11px 10px}
+      .stage,.summary,.modal-card{padding:15px;border-radius:22px}
+      .lead{font-size:1.25rem;line-height:1.18}
+      .hint,.step,.subject p,.summary p{font-size:.95rem;line-height:1.5}
+      .area{min-height:144px;padding:14px}
+      .area-grid,.steps,.subjects,.result-list,.area-notes{grid-template-columns:1fr}
+      .check-row{grid-template-columns:1fr;gap:8px}
+      .choice button{flex:1}
+      .modal-top{grid-template-columns:70px 1fr}
+      .modal-top .close{grid-column:1 / -1;width:max-content}
+      .modal-symbol{width:66px;height:66px;font-size:2rem}
+    }
+  </style>
+</head>
+<body class="locked">
+  <section class="gate" id="gate" aria-label="Passwortschutz">
+    <article class="gate-card">
+      <span class="kicker">Geschützter Zugang</span>
+      <h2>EF Fächerkompass</h2>
+      <p>Diese Seite ist nur gegen zufälliges Öffnen geschützt. Gib das vereinbarte Passwort ein, um den Kompass zu starten.</p>
+      <form class="gate-form" id="gateForm">
+        <input id="gatePassword" type="password" autocomplete="current-password" placeholder="Passwort eingeben" aria-label="Passwort" />
+        <button class="primary" type="submit">Kompass öffnen</button>
+        <div class="gate-error" id="gateError" aria-live="polite"></div>
+      </form>
+    </article>
+  </section>
+
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="mark">EF</div>
+        <div>
+          <h1>EF Fächerkompass</h1>
+          <p>Fächer verstehen, Interessen prüfen, Beratung vorbereiten.</p>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Navigation">
+        <a class="ghost" href="./index.html">Beratungslehrer</a>
+        <button id="summaryJump">Zusammenfassung</button>
+        <button class="primary" id="reset">Neu starten</button>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <section class="stage">
+        <div>
+          <span class="kicker">Kein Wahlbogen</span>
+          <p class="lead">Wähle zuerst einen Bereich. Dahinter findest du die Fächer, kurze starke Erklärungen und einen 3-Fragen-Check: Passt das eher zu dir oder eher nicht?</p>
+          <p class="hint">Deutsch, Mathematik und Sport sind Pflichtkurse. Dort gibt es keine Wahlfreiheit; die Karten dienen nur zur Selbstorientierung: Was fällt mir leicht, was sollte ich im Blick behalten?</p>
+          <div class="steps" aria-label="So funktioniert es">
+            <div class="step"><strong>1. Bereich öffnen</strong>Du wählst zuerst eine Fachgruppe.</div>
+            <div class="step"><strong>2. Fach ansehen</strong>Die Erklärung bleibt hinter einem Button.</div>
+            <div class="step"><strong>3. Mini-Check</strong>Drei Fragen zeigen deine aktuelle Spur.</div>
+            <div class="step"><strong>4. Zusammenfassung</strong>Alles bleibt als Orientierung gespeichert.</div>
+          </div>
+        </div>
+
+        <div class="area-grid" id="areaGrid"></div>
+
+        <section class="drawer" id="drawer">
+          <div class="drawer-head">
+            <div>
+              <h2 id="drawerTitle">Bereich</h2>
+              <p id="drawerText">Fächer ansehen und einzeln prüfen.</p>
+            </div>
+            <button id="closeDrawer">Bereich schließen</button>
+          </div>
+          <div class="subjects" id="subjects"></div>
+        </section>
+      </section>
+
+    </section>
+
+    <section class="summary" id="summary">
+      <div class="summary-head">
+        <div>
+          <span class="kicker">Deine gespeicherte Spur</span>
+          <h2>Zusammenfassung</h2>
+          <p>Hier erscheinen alle Fächer, bei denen der Mini-Check vollständig beantwortet wurde. Pflichtkurse werden nur als Selbstorientierung angezeigt, weil sie nicht frei abgewählt werden.</p>
+        </div>
+      </div>
+      <div id="summaryContent"></div>
+    </section>
+  </main>
+
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <article class="modal-card">
+      <div class="modal-top">
+        <div class="modal-symbol" id="modalSymbol">?</div>
+        <div>
+          <h2 id="modalTitle">Fach</h2>
+          <p class="short" id="modalShort"></p>
+        </div>
+        <button class="close" id="closeModal">Schließen</button>
+      </div>
+      <p class="explain" id="modalText"></p>
+      <section class="check">
+        <h3>Mini-Check: Passt das zu dir?</h3>
+        <div id="checkRows"></div>
+        <div class="fit" id="fitText">Beantworte die drei Fragen.</div>
+      </section>
+    </article>
+  </div>
+
+  <script>
+    const gatePassword = "Gustav";
+    const gateSessionKey = "ef-faecherkompass-unlocked";
+
+    function unlockGate(){
+      document.body.classList.remove("locked");
+      sessionStorage.setItem(gateSessionKey, "true");
+    }
+
+    if(sessionStorage.getItem(gateSessionKey) === "true"){
+      document.body.classList.remove("locked");
+    }
+
+    document.getElementById("gateForm").addEventListener("submit", event => {
+      event.preventDefault();
+      const input = document.getElementById("gatePassword");
+      const error = document.getElementById("gateError");
+      if(input.value.trim() === gatePassword){
+        error.textContent = "";
+        unlockGate();
+      }else{
+        error.textContent = "Das Passwort stimmt noch nicht.";
+        input.value = "";
+        input.focus();
+      }
+    });
+
+    const areas = [
+      {id:"pflicht",title:"Pflichtkurse",icon:"🧭",tone:"18,32,51",text:"Diese Fächer gehören dazu. Der Check ist nur Selbstorientierung, keine Wahlentscheidung.",subjects:["deutsch","mathe","sport"]},
+      {id:"sprachen",title:"Sprachen",icon:"🌍",tone:"24,91,255",text:"Kommunikation, Kulturen, Texte und neue Perspektiven.",subjects:["englisch","franzoesisch","spanisch_fs","spanisch_neu","italienisch_neu","latein_fs","latein_neu"]},
+      {id:"gesellschaft",title:"Gesellschaft",icon:"🏙️",tone:"255,138,42",text:"Politik, Geschichte, Räume, Menschen und Zusammenleben.",subjects:["sowi","geschichte","geographie"]},
+      {id:"natur",title:"Naturwissenschaften & Technik",icon:"🧪",tone:"24,168,107",text:"Forschen, erklären, bauen, testen und Modelle verstehen.",subjects:["biologie","chemie","physik","technik"]},
+      {id:"sinn",title:"Religion & Philosophie",icon:"💭",tone:"114,85,255",text:"Sinn, Werte, Gerechtigkeit, Glauben und gute Gründe.",subjects:["evangelisch","katholisch","philosophie"]},
+      {id:"kunstmusik",title:"Kunst & Musik",icon:"🎨",tone:"239,79,131",text:"Gestaltung, Wirkung, Ausdruck, Klang und Bilder.",subjects:["kunst","musik"]}
+    ];
+
+    const subjects = {
+      deutsch:{name:"Deutsch",symbol:"📚",tone:"18,32,51",short:"Pflichtkurs: Sprache, Texte, Medien und Ausdruck.",text:"Deutsch ist in der EF ein zentraler Pflichtkurs. Du arbeitest mit Erzähltexten, Sachtexten, Sprache, Medien und Kommunikation. Wichtig ist, dass du Texte verstehst, Gedanken sortierst und eigene Positionen klar formulierst. Das Fach hilft dir in fast allen anderen Fächern, weil Lesen, Schreiben, Argumentieren und Präsentieren überall gebraucht werden.",checks:["Ich möchte sicherer darin werden, Texte zu verstehen.","Ich will lernen, meine Meinung klarer zu begründen.","Ich finde Sprache, Medien oder Geschichten zumindest interessant."]},
+      mathe:{name:"Mathematik",symbol:"📐",tone:"18,32,51",short:"Pflichtkurs: Muster, Modelle, Funktionen und logisches Denken.",text:"Mathematik ist ein Pflichtkurs und begleitet dich durch die Oberstufe. In der EF geht es darum, Zusammenhänge zu erkennen, Modelle zu nutzen und Probleme schrittweise zu lösen. Das Fach ist nicht nur Rechnen, sondern Training für Genauigkeit, Ausdauer und logisches Denken. Auch wenn Mathe anstrengend sein kann, hilft es in Naturwissenschaften, Technik, Wirtschaft und vielen Berufen.",checks:["Ich kann mich auf klare Schritte einlassen.","Ich möchte besser verstehen, wie man Probleme systematisch löst.","Ich akzeptiere, dass Übung in Mathe besonders wichtig ist."]},
+      sport:{name:"Sport",symbol:"🏃",tone:"18,32,51",short:"Pflichtkurs: Bewegung, Team, Körper und Gesundheit.",text:"Sport ist ein Pflichtkurs, aber mehr als Bewegung. In der Oberstufe geht es um Fitness, Körperwahrnehmung, Regeln, Teamverhalten, Fairness und manchmal auch um Theorie. Das Fach kann helfen, Ausgleich zum Sitzen zu schaffen und eigene Stärken im Umgang mit Bewegung zu entdecken. Wichtig sind Einsatz, Fairness und die Bereitschaft, verschiedene Bewegungsfelder auszuprobieren.",checks:["Ich bin bereit, mich praktisch einzubringen.","Ich kann fair mit anderen zusammenarbeiten.","Ich möchte meinen Körper und meine Fitness besser verstehen."]},
+      englisch:{name:"Englisch",symbol:"🌍",tone:"24,91,255",short:"Internationale Sprache, Medien und Weltblick.",text:"Englisch ist eine Sprache für Medien, Reisen, Internet, Musik, Serien, Ausbildung und viele Berufe. In der EF geht es stärker um echte Themen: Gesellschaft, Kultur, Identität, Zukunft und globale Fragen. Du liest, hörst, diskutierst und formulierst eigene Gedanken auf Englisch. Das Fach passt besonders, wenn du Sprache praktisch nutzen möchtest und bereit bist, dich auch dann auszudrücken, wenn nicht jeder Satz perfekt ist.",checks:["Ich möchte internationale Themen besser verstehen.","Ich traue mich, auch mit Fehlern zu sprechen.","Serien, Musik, Reisen oder Medien auf Englisch interessieren mich."]},
+      franzoesisch:{name:"Französisch fortgesetzt",symbol:"🗼",tone:"24,91,255",short:"Eine bekannte Sprache sicherer und kultureller nutzen.",text:"Französisch fortgesetzt baut auf deinem bisherigen Lernen auf. In der EF wird die Sprache erwachsener: mehr Texte, mehr Kultur, mehr eigene Meinung. Du beschäftigst dich mit Alltag, Gesellschaft und Perspektiven aus französischsprachigen Ländern. Das Fach passt, wenn du deine Sprachkenntnisse nicht verlieren, sondern ausbauen möchtest. Es ist gut für Lernende, die bereit sind, Vokabeln zu pflegen und sich Schritt für Schritt mehr zuzutrauen.",checks:["Ich möchte eine Sprache vertiefen, die ich schon kenne.","Ich interessiere mich für Kultur und Europa.","Ich bin bereit, regelmäßig Wortschatz zu üben."]},
+      spanisch_fs:{name:"Spanisch fortgesetzt",symbol:"🌎",tone:"24,91,255",short:"Spanisch mit Vorwissen weiterentwickeln.",text:"Spanisch fortgesetzt ist für Lernende mit Vorkenntnissen. In der EF geht es um Kommunikation, Kultur, Jugend, Gesellschaft und Themen aus Spanien und Lateinamerika. Du wirst sicherer im Sprechen, Lesen, Hören und Schreiben. Das Fach passt, wenn du eine lebendige Weltsprache magst und gern mehr über unterschiedliche Länder und Lebensweisen erfahren möchtest.",checks:["Ich möchte Spanisch nicht neu anfangen, sondern vertiefen.","Ich interessiere mich für Spanien oder Lateinamerika.","Ich kann mir vorstellen, regelmäßig aktiv zu sprechen."]},
+      spanisch_neu:{name:"Spanisch neu einsetzend",symbol:"✨",tone:"24,91,255",short:"Eine moderne Weltsprache neu beginnen.",text:"Spanisch neu einsetzend startet in der EF von vorne. Das ist eine Chance für einen Neustart, aber auch Arbeit: Vokabeln, Aussprache und Grammatik müssen regelmäßig geübt werden. Dafür lernst du schnell, einfache Gespräche zu führen und bekommst Einblicke in Spanien und Lateinamerika. Das Fach passt, wenn dich eine neue Sprache reizt und du bereit bist, am Anfang konsequent Grundlagen aufzubauen.",checks:["Ich habe Lust auf einen echten Neustart.","Ich kann regelmäßig Vokabeln lernen.","Ich finde eine Sprache spannend, die weltweit gesprochen wird."]},
+      italienisch_neu:{name:"Italienisch neu einsetzend",symbol:"🍋",tone:"24,91,255",short:"Neue Sprache mit Kultur, Alltag und Lebensgefühl.",text:"Italienisch neu einsetzend beginnt ohne Vorkenntnisse. Du lernst Aussprache, Alltagssprache, Grammatik und erste Gespräche. Dazu kommen Kultur, Städte, Musik, Essen, Kunst und Leben in Italien. Das Fach passt, wenn du eine neue Sprache mit starkem Kulturbezug möchtest. Es ist besonders schön für Lernende, die offen sind, mit Klang, Sprechen und neuen Wörtern zu arbeiten.",checks:["Ich möchte eine neue Sprache ausprobieren.","Italien, Kultur oder Alltag anderer Länder sprechen mich an.","Ich bin bereit, Grundlagen regelmäßig zu üben."]},
+      latein_fs:{name:"Latein fortgesetzt",symbol:"🏛️",tone:"24,91,255",short:"Texte, Übersetzung, Antike und genaues Denken.",text:"Latein fortgesetzt ist anders als moderne Sprachen. Du sprichst weniger frei, sondern übersetzt und untersuchst Texte sehr genau. Dabei geht es um Sprache, Geschichte, Macht, Werte, Mythologie, Politik und antike Ideen, die bis heute wirken. Das Fach passt, wenn du ruhig, gründlich und analytisch arbeiten möchtest. Latein belohnt Genauigkeit und Geduld.",checks:["Ich arbeite gern genau und Schritt für Schritt.","Geschichte, Antike oder alte Ideen interessieren mich.","Ich komme damit klar, dass Übersetzen Geduld braucht."]},
+      latein_neu:{name:"Latein neu einsetzend",symbol:"📜",tone:"24,91,255",short:"Latein von Anfang an: Struktur, Sprache, Geschichte.",text:"Latein neu einsetzend beginnt in der EF von vorne. Du lernst nicht, Latein im Alltag zu sprechen, sondern Texte zu entschlüsseln. Dabei trainierst du Sprachlogik, Genauigkeit und historisches Verstehen. Das Fach passt, wenn du einen anderen Zugang zu Sprache möchtest und gern Rätsel Schritt für Schritt löst.",checks:["Ich möchte Sprache logisch verstehen.","Ich kann mir konzentriertes Übersetzen vorstellen.","Mich interessieren alte Kulturen oder historische Fragen."]},
+      sowi:{name:"Sozialwissenschaft",symbol:"🏛️",tone:"255,138,42",short:"Politik, Wirtschaft, Gesellschaft und aktuelle Fragen.",text:"Sozialwissenschaft schaut auf das Zusammenleben: Demokratie, Medien, Geld, Arbeit, soziale Ungleichheit, Konsum, Konflikte und Entscheidungen. Du lernst, aktuelle Themen einzuordnen und nicht nur eine Meinung zu haben, sondern sie zu begründen. Das Fach passt, wenn du verstehen möchtest, warum Politik und Wirtschaft dein Leben direkt betreffen.",checks:["Ich möchte bei aktuellen Themen besser mitreden.","Politik, Geld oder Gesellschaft interessieren mich.","Ich kann verschiedene Meinungen miteinander vergleichen."]},
+      geschichte:{name:"Geschichte",symbol:"🕰️",tone:"255,138,42",short:"Vergangenheit verstehen, Gegenwart besser einordnen.",text:"Geschichte fragt, wie Menschen früher gelebt, entschieden, gekämpft und gedacht haben. Du arbeitest mit Quellen, Perspektiven und Deutungen. In der EF geht es nicht nur um Jahreszahlen, sondern darum, Zusammenhänge zu verstehen. Das Fach passt, wenn du wissen willst, warum unsere Gegenwart so geworden ist und wie Erinnerung, Macht und Konflikte entstehen.",checks:["Ich frage gern, warum Dinge so geworden sind.","Quellen, Geschichten oder Konflikte interessieren mich.","Ich möchte Gegenwart durch Vergangenheit besser verstehen."]},
+      geographie:{name:"Geographie",symbol:"🗺️",tone:"255,138,42",short:"Räume, Umwelt, Städte, Klima und Globalisierung.",text:"Geographie verbindet Natur und Gesellschaft. Du schaust auf Klima, Städte, Wirtschaft, Migration, Ressourcen, Umwelt und Globalisierung. Das Fach arbeitet mit Karten, Bildern, Daten und echten Zukunftsfragen. Es passt, wenn dich interessiert, wie Menschen Räume verändern und wie unsere Welt zusammenhängt.",checks:["Klima, Städte oder Umwelt interessieren mich.","Ich möchte globale Zusammenhänge besser verstehen.","Karten, Räume oder Zukunftsfragen sprechen mich an."]},
+      biologie:{name:"Biologie",symbol:"🧬",tone:"24,168,107",short:"Leben, Körper, Umwelt und Systeme.",text:"Biologie beschäftigt sich mit Leben: Körper, Gesundheit, Zellen, Genetik, Ökosysteme, Evolution und Umwelt. Du lernst, lebendige Systeme zu verstehen und Beobachtungen zu erklären. Das Fach passt, wenn dich Menschen, Natur, Tiere, Pflanzen, Medizin oder Nachhaltigkeit interessieren.",checks:["Körper, Natur oder Gesundheit interessieren mich.","Ich möchte verstehen, wie lebendige Systeme funktionieren.","Beobachten und Erklären liegen mir eher."]},
+      chemie:{name:"Chemie",symbol:"⚗️",tone:"24,168,107",short:"Stoffe, Reaktionen, Experimente und Modelle.",text:"Chemie fragt, woraus Stoffe bestehen und warum sie reagieren. Du arbeitest mit Experimenten, Beobachtungen und Modellen auf Teilchenebene. Das Fach hilft, Alltagsthemen wie Materialien, Umwelt, Ernährung, Medizin oder Energie besser zu verstehen. Es passt, wenn du gern untersuchst und wissen willst, was unsichtbar im Hintergrund passiert.",checks:["Experimente und Beobachten interessieren mich.","Ich möchte verstehen, warum Stoffe reagieren.","Ich kann mir vorstellen, mit Modellen zu arbeiten."]},
+      physik:{name:"Physik",symbol:"🧲",tone:"24,168,107",short:"Kräfte, Energie, Technik und Naturgesetze.",text:"Physik fragt, wie Dinge funktionieren: Bewegung, Energie, Elektrizität, Licht, Kräfte und technische Anwendungen. Du arbeitest mit Experimenten, Messwerten, Modellen und manchmal mit Mathematik. Das Fach passt, wenn du wissen willst, warum etwas passiert und wie man es beweisen oder berechnen kann.",checks:["Ich will wissen, wie Technik oder Natur funktioniert.","Ich kann mich auf Modelle und Messwerte einlassen.","Logisches Denken macht mir zumindest manchmal Spaß."]},
+      technik:{name:"Technik",symbol:"🛠️",tone:"24,168,107",short:"Planen, bauen, prüfen und Probleme lösen.",text:"Technik ist praktisch und problemlösend. Du beschäftigst dich mit technischen Systemen, Konstruktion, Materialien, Energie, Steuerung und Anwendung. Das Fach passt, wenn du nicht nur reden, sondern entwickeln, testen und verbessern möchtest. Es verbindet Kopf und Hand.",checks:["Ich löse Probleme gern praktisch.","Bauen, Planen oder Tüfteln interessiert mich.","Ich möchte verstehen, wie Systeme funktionieren."]},
+      evangelisch:{name:"Evangelische Religionslehre",symbol:"🕊️",tone:"114,85,255",short:"Bibel, Freiheit, Verantwortung, Dialog und Gewissen.",text:"Evangelische Religionslehre schaut besonders auf Fragen nach Gewissen, Freiheit, Verantwortung, Bibel, Jesus, Gerechtigkeit und Hoffnung aus evangelischer Perspektive. Du musst nicht evangelisch sein und auch nicht dem Christentum angehören. Gerade wenn du muslimisch bist oder in der Sekundarstufe 1 Praktische Philosophie hattest, kann das Fach interessant sein, weil du religiöse und nicht religiöse Sichtweisen vergleichst: Was bedeutet Glaube im Alltag? Wie sprechen Christentum, Islam und andere Weltanschauungen über Verantwortung, Schuld, Vergebung und Hoffnung? Wichtig ist Offenheit für interreligiösen Dialog und respektvolles Fragen.",checks:["Ich möchte religiöse und nicht religiöse Sichtweisen vergleichen, ohne selbst christlich sein zu müssen.","Mich interessieren Gewissen, Freiheit, Verantwortung oder Vergebung.","Ich kann mir vorstellen, Bibeltexte und andere Perspektiven mit meiner eigenen Sicht zu verbinden."]},
+      katholisch:{name:"Katholische Religionslehre",symbol:"⛪",tone:"114,85,255",short:"Kirche, Gemeinschaft, Tradition, Ethik und Dialog.",text:"Katholische Religionslehre schaut besonders auf Gemeinschaft, Kirche, Tradition, Sakramente, soziale Verantwortung, Gerechtigkeit und die Frage, wie Glaube in einer weltweiten Gemeinschaft gelebt wird. Du musst nicht katholisch sein und auch nicht dem Christentum angehören. Für muslimische Lernende oder Schülerinnen und Schüler aus Praktischer Philosophie kann das Fach spannend sein, weil religiöse Praxis, Gemeinschaft, Rituale und ethische Fragen vergleichbar werden: Welche Rolle spielt Religion im Alltag? Was verbindet und unterscheidet Christentum, Islam und andere Weltanschauungen? Es geht um interreligiösen Dialog, nicht um Bekenntniszwang.",checks:["Mich interessiert, wie Religion Gemeinschaft, Alltag und Rituale prägt.","Ich möchte christliche, muslimische und andere Perspektiven respektvoll vergleichen.","Soziale Verantwortung, Gerechtigkeit und Zusammenleben sind Themen, über die ich gern nachdenke."]},
+      philosophie:{name:"Philosophie",symbol:"💭",tone:"114,85,255",short:"Denken, Argumente, Gerechtigkeit und große Fragen.",text:"Philosophie fragt: Was ist gerecht? Was kann ich wissen? Wie soll ich handeln? Was macht den Menschen aus? Du brauchst keine fertigen Antworten, sondern Lust am Nachdenken. Das Fach passt, wenn du gern diskutierst, Gründe prüfst und Dinge nicht einfach hinnimmst.",checks:["Ich stelle gern Warum-Fragen.","Ich möchte lernen, besser zu argumentieren.","Gerechtigkeit, Wahrheit oder Menschsein interessieren mich."]},
+      kunst:{name:"Kunst",symbol:"🎨",tone:"239,79,131",short:"Gestalten, Bilder verstehen und Wirkung erzeugen.",text:"Kunst ist in der Oberstufe nicht nur Zeichnen. Du gestaltest, analysierst Bilder, Fotos, Architektur, Design und Medien. Es geht darum, Wirkung zu verstehen und eigene Ideen sichtbar zu machen. Das Fach passt, wenn du visuell denkst, gern entwirfst oder Bilder genauer verstehen möchtest.",checks:["Ich drücke Ideen gern sichtbar aus.","Bilder, Design oder Medienwirkung interessieren mich.","Ich bin bereit, eigene Gestaltungen zu erklären."]},
+      musik:{name:"Musik",symbol:"🎧",tone:"239,79,131",short:"Klang, Wirkung, Analyse und Gestaltung.",text:"Musik verbindet Hören, Gestalten und Verstehen. Du beschäftigst dich mit Songs, Klang, Rhythmus, Stil, Wirkung und Musik in Kultur und Medien. Man muss nicht perfekt ein Instrument spielen, aber man sollte bereit sein, Musik bewusst zu hören und darüber zu sprechen.",checks:["Musik spielt in meinem Alltag eine Rolle.","Ich möchte verstehen, warum Musik wirkt.","Klang, Rhythmus oder Gestaltung interessieren mich."]}
+    };
+
+    const areaGrid = document.getElementById("areaGrid");
+    const drawer = document.getElementById("drawer");
+    const drawerTitle = document.getElementById("drawerTitle");
+    const drawerText = document.getElementById("drawerText");
+    const subjectsBox = document.getElementById("subjects");
+    const modal = document.getElementById("modal");
+    const modalSymbol = document.getElementById("modalSymbol");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalShort = document.getElementById("modalShort");
+    const modalText = document.getElementById("modalText");
+    const checkRows = document.getElementById("checkRows");
+    const fitText = document.getElementById("fitText");
+    const summaryContent = document.getElementById("summaryContent");
+    const storageKey = "ef-faecherkompass-results";
+    let currentChecks = [];
+    let currentSubjectId = "";
+    let results = loadResults();
+
+    function loadResults(){
+      try{
+        return JSON.parse(localStorage.getItem(storageKey)) || {};
+      }catch(error){
+        return {};
+      }
+    }
+
+    function saveResults(){
+      try{
+        localStorage.setItem(storageKey, JSON.stringify(results));
+      }catch(error){
+        // Wenn Speichern im Browser blockiert ist, bleibt die Zusammenfassung in der Sitzung nutzbar.
+      }
+    }
+
+    function renderAreas(){
+      areaGrid.innerHTML = "";
+      areas.forEach(area => {
+        const button = document.createElement("button");
+        button.className = "area";
+        button.style.setProperty("--tone", area.tone);
+        button.innerHTML = `
+          <div class="area-top">
+            <div>
+              <h2>${area.title}</h2>
+              <p>${area.text}</p>
+            </div>
+            <div class="icon">${area.icon}</div>
+          </div>
+          <span class="pill">${area.subjects.length} Fächer öffnen</span>
+        `;
+        button.addEventListener("click", () => openArea(area));
+        areaGrid.appendChild(button);
+      });
+    }
+
+    function openArea(area){
+      drawerTitle.textContent = area.title;
+      drawerText.textContent = area.text;
+      subjectsBox.innerHTML = "";
+      area.subjects.forEach(id => renderSubject(id, subjects[id], area));
+      drawer.classList.add("show");
+      drawer.scrollIntoView({ behavior:"smooth", block:"nearest" });
+    }
+
+    function renderSubject(id, subject, area){
+      const card = document.createElement("article");
+      card.className = "subject";
+      card.style.setProperty("--tone", subject.tone);
+      const saved = results[id];
+      card.innerHTML = `
+        <div class="subject-symbol">${subject.symbol}</div>
+        <h3>${subject.name}</h3>
+        <p>${subject.short}</p>
+        ${saved ? `<p><strong>Gespeichert: ${saved.yes}/3 passt gerade zu dir.</strong></p>` : ""}
+        <button class="open" type="button">${saved ? "Check ändern" : "Fach prüfen"}</button>
+      `;
+      card.querySelector("button").addEventListener("click", () => openSubject(id, subject, area));
+      subjectsBox.appendChild(card);
+    }
+
+    function openSubject(id, subject, area){
+      currentSubjectId = id;
+      currentChecks = results[id]?.answers || subject.checks.map(() => null);
+      modal.style.setProperty("--tone", subject.tone);
+      modalSymbol.textContent = subject.symbol;
+      modalTitle.textContent = subject.name;
+      modalShort.textContent = subject.short;
+      modalText.textContent = subject.text;
+      checkRows.innerHTML = "";
+      subject.checks.forEach((question,index) => {
+        const row = document.createElement("div");
+        row.className = "check-row";
+        row.innerHTML = `
+          <p>${question}</p>
+          <div class="choice">
+            <button type="button" data-value="1">Ja</button>
+            <button type="button" data-value="0">Eher nein</button>
+          </div>
+        `;
+        row.querySelectorAll("button").forEach(button => {
+          if(currentChecks[index] !== null && Number(button.dataset.value) === currentChecks[index]){
+            button.classList.add("active");
+          }
+          button.addEventListener("click", () => {
+            currentChecks[index] = Number(button.dataset.value);
+            row.querySelectorAll("button").forEach(btn => btn.classList.remove("active"));
+            button.classList.add("active");
+            updateFit(subject, area);
+          });
+        });
+        checkRows.appendChild(row);
+      });
+      updateFit(subject, area);
+      modal.classList.add("show");
+    }
+
+    function getFitMessage(yes){
+      if(yes === 3) return "Starke Spur: Dieses Fach könnte sehr gut zu deinen Interessen passen. Nimm es unbedingt mit ins Beratungsgespräch.";
+      if(yes === 2) return "Gute Spur: Das Fach könnte passen. Schau dir im Vergleich noch ein zweites Fach aus diesem Bereich an.";
+      if(yes === 1) return "Gemischte Spur: Es gibt einen Anknüpfungspunkt. Vielleicht brauchst du noch mehr Infos oder ein Vergleichsfach.";
+      return "Eher schwache Spur: Dieses Fach wirkt im Moment weniger passend. Das schließt nichts aus, aber du solltest dich dazu nochmal beraten lassen.";
+    }
+
+    function updateFit(subject, area){
+      const answered = currentChecks.filter(value => value !== null).length;
+      const yes = currentChecks.reduce((sum,value) => sum + (value || 0), 0);
+      if(answered < 3){
+        fitText.textContent = `Noch ${3 - answered} Frage${3 - answered === 1 ? "" : "n"} beantworten.`;
+        return;
+      }
+      const message = getFitMessage(yes);
+      fitText.textContent = `${message} Ergebnis gespeichert.`;
+      results[currentSubjectId] = {
+        subject: subject.name,
+        area: area.title,
+        areaId: area.id,
+        tone: subject.tone,
+        symbol: subject.symbol,
+        yes,
+        answers: currentChecks,
+        message
+      };
+      saveResults();
+      renderSummary();
+      const openAreaData = areas.find(item => item.id === area.id);
+      subjectsBox.innerHTML = "";
+      openAreaData.subjects.forEach(id => renderSubject(id, subjects[id], openAreaData));
+    }
+
+    function renderSummary(){
+      const entries = Object.values(results);
+      if(!entries.length){
+        summaryContent.innerHTML = `<div class="empty">Noch keine gespeicherten Checks. Öffne einen Bereich, prüfe ein Fach und beantworte die drei Fragen.</div>`;
+        return;
+      }
+
+      const sorted = entries.sort((a,b) => b.yes - a.yes || a.subject.localeCompare(b.subject));
+      const cards = sorted.map(item => `
+        <article class="result-card" style="--tone:${item.tone}">
+          <div>${item.symbol}</div>
+          <strong>${item.subject}</strong>
+          <span>${item.area}</span>
+          <div class="meter"><span style="width:${(item.yes / 3) * 100}%"></span></div>
+          <p>${item.yes}/3 Antworten passen gerade zu dir.</p>
+          ${item.areaId === "pflicht" ? "<p>Pflichtkurs: Das ist keine Wahlentscheidung, sondern nur eine Selbstorientierung.</p>" : ""}
+        </article>
+      `).join("");
+
+      const notes = areas
+        .filter(area => area.id !== "pflicht")
+        .map(area => {
+          const areaResults = Object.values(results).filter(item => item.areaId === area.id);
+          if(!areaResults.length) return "";
+          const best = Math.max(...areaResults.map(item => item.yes));
+          if(best <= 1){
+            return `<div class="area-note"><strong>${area.title}:</strong> Dieser Bereich fühlt sich bei deinen bisherigen Checks noch nicht stimmig an. Das schließt nichts aus, aber es wäre gut, hier nochmal genauer nachzufragen oder ein weiteres Fach daraus anzuschauen.</div>`;
+          }
+          return "";
+        }).join("");
+
+      summaryContent.innerHTML = `
+        <div class="result-list">${cards}</div>
+        ${notes ? `<div class="area-notes">${notes}</div>` : ""}
+        <p>Hinweis: Die Zusammenfassung ist eine Orientierung für Gespräche mit Beratung, Klassenleitung oder Eltern. Pflichtkurse sind nicht frei wählbar oder abwählbar. Die Checks schließen kein Fach aus.</p>
+      `;
+    }
+
+    document.getElementById("closeDrawer").addEventListener("click", () => drawer.classList.remove("show"));
+    document.getElementById("closeModal").addEventListener("click", () => modal.classList.remove("show"));
+    document.getElementById("reset").addEventListener("click", () => {
+      results = {};
+      saveResults();
+      renderSummary();
+      drawer.classList.remove("show");
+      modal.classList.remove("show");
+      window.scrollTo({top:0,behavior:"smooth"});
+    });
+    document.getElementById("summaryJump").addEventListener("click", () => {
+      document.getElementById("summary").scrollIntoView({behavior:"smooth",block:"start"});
+    });
+    modal.addEventListener("click", event => {
+      if(event.target === modal) modal.classList.remove("show");
+    });
+
+    renderAreas();
+    renderSummary();
+  </script>
+</body>
+</html>

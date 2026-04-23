@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    style-src 'self' 'unsafe-inline';
+    script-src 'self' 'unsafe-inline';
+    img-src 'self' data:;
+    connect-src 'none';
+    frame-src 'none';
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+  ">
+  <title>Beratungslehrer - Lernstudio</title>
+  <style>
+    :root{
+      --bg: #eef7f6;
+      --bg-accent: #d9eeeb;
+      --surface: rgba(255,255,255,0.92);
+      --surface-strong: #ffffff;
+      --text: #16363b;
+      --muted: #59757a;
+      --border: rgba(22, 54, 59, 0.14);
+      --accent: #0f766e;
+      --accent-soft: rgba(15, 118, 110, 0.12);
+      --shadow: 0 20px 45px rgba(14, 66, 72, 0.1);
+      --radius: 22px;
+      --max: 1120px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body{
+      margin: 0;
+      font-family: "Segoe UI", "Trebuchet MS", Arial, sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top right, rgba(15, 118, 110, 0.15), transparent 32%),
+        linear-gradient(180deg, var(--bg), var(--bg-accent));
+    }
+
+    .shell{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+    }
+
+    .hero{
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+      padding: 26px;
+      border-radius: 30px;
+      border: 1px solid var(--border);
+      background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(231, 247, 244, 0.92));
+      box-shadow: var(--shadow);
+    }
+
+    .eyebrow{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.78);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    h1{
+      margin: 16px 0 10px;
+      font-size: clamp(2.1rem, 4vw, 3.4rem);
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+    }
+
+    .lead{
+      margin: 0;
+      max-width: 68ch;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .hero-actions{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .hero-card,
+    .card,
+    .info{
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--surface-strong), var(--surface));
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card{
+      padding: 22px;
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .hero-card strong{
+      font-size: 1.05rem;
+    }
+
+    .grid{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 22px;
+    }
+
+    .card{
+      padding: 20px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .card h2{
+      margin: 0;
+      font-size: 1.15rem;
+    }
+
+    .card p,
+    .info p,
+    li{
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .tag{
+      display: inline-flex;
+      width: fit-content;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .actions{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .btn{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 11px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+      font-weight: 700;
+      transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+    }
+
+    .btn:hover{
+      transform: translateY(-1px);
+      border-color: rgba(15, 118, 110, 0.26);
+      background: rgba(15, 118, 110, 0.08);
+    }
+
+    .btn.primary{
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .btn.primary:hover{
+      background: #0b625c;
+      border-color: #0b625c;
+    }
+
+    .info{
+      margin-top: 22px;
+      padding: 20px 22px;
+    }
+
+    ul{
+      margin: 12px 0 0;
+      padding-left: 20px;
+    }
+
+    footer{
+      margin-top: 28px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+
+    .back-link{
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .back-link:hover{ text-decoration: underline; }
+
+    @media (max-width: 900px){
+      .hero{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Beratungslehrer · NRW Sek II</div>
+        <h1>Digitale Beratung fuer die gymnasiale Oberstufe</h1>
+        <p class="lead">
+          Dieser Bereich sammelt lokale Beratungstools fuer die Oberstufe. Der
+          erste Baustein ist ein spielerischer Faecherwahl-Check fuer die EF in
+          Nordrhein-Westfalen, abgestimmt auf das schulische Angebot und die
+          Grundregeln der gymnasialen Oberstufe.
+        </p>
+        <div class="hero-actions">
+          <a class="btn primary" href="./ef-faecherwahl.html">EF-Faecherwahl starten</a>
+          <a class="btn" href="../../index.html">Zur Kursuebersicht</a>
+        </div>
+      </div>
+
+      <div class="hero-card">
+        <strong>Enthalten</strong>
+        <p>Spielerischer Beratungsmodus mit Regelcheck, Facherklaerungen und lokaler Auswertung.</p>
+        <strong>Fokus</strong>
+        <p>Nur NRW Sek II, speziell fuer die Einfuehrungsphase EF und die schulisch angebotenen Faecher.</p>
+        <strong>Datenschutz</strong>
+        <p>Die Seite arbeitet komplett lokal im Browser und nutzt keine externen Dienste.</p>
+      </div>
+    </section>
+
+    <main class="grid">
+      <article class="card">
+        <span class="tag">App</span>
+        <h2>EF-Faecherwahl Quest</h2>
+        <p>
+          Eine Beratung als kleines Spiel: Profil festlegen, Faecher zusammenstellen,
+          NRW-Regeln pruefen und sich Erklaerungen zu jedem Bereich geben lassen.
+        </p>
+        <div class="actions">
+          <a class="btn primary" href="./ef-faecherwahl.html">Quest oeffnen</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <span class="tag">Beratung</span>
+        <h2>Was die App prueft</h2>
+        <p>
+          Deutsch, Mathematik, Sport, Fremdsprachen, kuenstlerischer Bereich,
+          Gesellschaftswissenschaft, Naturwissenschaft und Religion bzw. Philosophie.
+        </p>
+      </article>
+
+      <article class="card">
+        <span class="tag">Schulangebot</span>
+        <h2>Eure Faecher</h2>
+        <p>
+          Die App nutzt direkt euer angegebenes Angebot: unter anderem Deutsch,
+          Mathematik, Englisch, Franzoesisch, Spanisch, Italienisch, Latein, Religion,
+          Philosophie, Kunst, Musik, Sport, Naturwissenschaften, Gesellschaftslehre und Technik.
+        </p>
+      </article>
+    </main>
+
+    <section class="info">
+      <div class="eyebrow">Hinweis</div>
+      <p>
+        Die App orientiert sich an den Grundregeln der gymnasialen Oberstufe in NRW
+        und ersetzt keine endgueltige Laufbahnberatung durch die Schule. Sie ist als
+        motivierende Vorberatung und als Unterrichts- oder Beratungstool gedacht.
+      </p>
+      <ul>
+        <li>Nur lokale Verarbeitung im Browser</li>
+        <li>Kein Login, kein Tracking, kein Versand von Daten</li>
+        <li>Literatur ist als Hinweis fuer Q1 markiert und nicht fuer die EF freigeschaltet</li>
+      </ul>
+    </section>
+
+    <footer>
+      <a class="back-link" href="../../index.html">&larr; Zurueck zur Kursuebersicht</a>
+    </footer>
+  </div>
+</body>
+</html>
