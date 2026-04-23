@@ -1,0 +1,1966 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Strukturwandel-Lernpfad – Q1 Sozialwissenschaften</title>
+  <style>
+    :root{
+      --bg: #f6efe4;
+      --bg-2: #eadbc2;
+      --panel: rgba(255,255,255,0.9);
+      --panel-strong: #fffdf9;
+      --text: #202330;
+      --muted: #5d5f61;
+      --border: rgba(88, 68, 34, 0.14);
+      --accent: #bd5a36;
+      --accent-dark: #8c3f25;
+      --teal: #2f6d76;
+      --sand: #d7a455;
+      --ok: #2f7d5c;
+      --warn: #ba7a23;
+      --shadow: 0 22px 42px rgba(86, 55, 24, 0.14);
+      --radius: 26px;
+      --soft-radius: 18px;
+      --max: 1380px;
+    }
+
+    *{
+      box-sizing: border-box;
+    }
+
+    html, body{
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body{
+      font-family: "Trebuchet MS", "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 10%, rgba(215, 164, 85, 0.22), transparent 26%),
+        radial-gradient(circle at 90% 12%, rgba(47, 109, 118, 0.13), transparent 18%),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      overflow: hidden;
+    }
+
+    .shell{
+      max-width: var(--max);
+      height: 100vh;
+      margin: 0 auto;
+      padding: 12px;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 10px;
+    }
+
+    .panel{
+      background: linear-gradient(180deg, var(--panel-strong), var(--panel));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .topbar{
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(220px, 0.6fr);
+      gap: 10px;
+      padding: 10px 12px;
+      align-items: stretch;
+    }
+
+    .hero-copy{
+      display: grid;
+      gap: 8px;
+      align-content: start;
+      min-width: 0;
+    }
+
+    .eyebrow{
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      gap: 8px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.76);
+      border: 1px solid var(--border);
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .hero-title{
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: start;
+    }
+
+    h1{
+      margin: 0;
+      font-size: clamp(1.35rem, 2vw, 2.25rem);
+      line-height: 0.98;
+      letter-spacing: -0.04em;
+    }
+
+    .lead{
+      margin: 0;
+      max-width: 64ch;
+      color: var(--muted);
+      font-size: 0.83rem;
+      line-height: 1.32;
+    }
+
+    .hero-tools{
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      padding: 8px 10px;
+      border-radius: 17px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(245, 236, 222, 0.92));
+      border: 1px solid rgba(189, 90, 54, 0.15);
+    }
+
+    .progress-meta{
+      display: grid;
+      gap: 4px;
+      min-width: 0;
+      flex: 1 1 220px;
+    }
+
+    .progress-head{
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .progress-head span:last-child{
+      color: var(--accent-dark);
+    }
+
+    .progress-track{
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(32, 35, 48, 0.09);
+      overflow: hidden;
+    }
+
+    .progress-track span{
+      display: block;
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), var(--sand));
+      transition: width 0.22s ease;
+    }
+
+    .mini-inline{
+      color: var(--muted);
+      font-size: 0.76rem;
+      line-height: 1.25;
+    }
+
+    .step-strip{
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 7px;
+    }
+
+    .step-pill{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 48px;
+      padding: 9px 10px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.74);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.79rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .step-pill:hover{
+      transform: translateY(-1px);
+      border-color: rgba(189, 90, 54, 0.24);
+    }
+
+    .step-pill.active{
+      background: linear-gradient(135deg, rgba(189, 90, 54, 0.14), rgba(215, 164, 85, 0.16));
+      border-color: rgba(189, 90, 54, 0.28);
+      box-shadow: inset 0 0 0 1px rgba(189, 90, 54, 0.05);
+    }
+
+    .step-pill.done .step-no{
+      background: rgba(47, 125, 92, 0.18);
+      color: var(--ok);
+    }
+
+    .step-pill:disabled{
+      opacity: 0.62;
+      cursor: default;
+      transform: none;
+    }
+
+    .step-no{
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(189, 90, 54, 0.12);
+      color: var(--accent-dark);
+      font-size: 0.76rem;
+      flex: 0 0 auto;
+    }
+
+    .hero-art{
+      min-height: 150px;
+      border-radius: 22px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(242, 232, 216, 0.95));
+    }
+
+    .hero-art img{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .stage-shell{
+      min-height: 0;
+      position: relative;
+    }
+
+    .stage{
+      height: 100%;
+      display: none;
+      grid-template-rows: auto 1fr auto;
+      gap: 8px;
+      padding: 10px;
+    }
+
+    .stage.active{
+      display: grid;
+    }
+
+    .stage-header{
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+      flex-wrap: wrap;
+    }
+
+    .stage-title h2{
+      margin: 5px 0 3px;
+      font-size: clamp(1.02rem, 1.7vw, 1.58rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    .stage-title p{
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.81rem;
+      line-height: 1.28;
+      max-width: 66ch;
+    }
+
+    .tag-row{
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tag{
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(189, 90, 54, 0.11);
+      color: var(--accent-dark);
+      font-size: 0.73rem;
+      font-weight: 800;
+    }
+
+    .tag.operator{
+      background: rgba(47, 109, 118, 0.11);
+      color: var(--teal);
+    }
+
+    .stage-body{
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(280px, 0.92fr) minmax(0, 1.08fr);
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    .visual-card,
+    .task-card{
+      min-height: 0;
+      border-radius: 22px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.76);
+      overflow: hidden;
+    }
+
+    .visual-card{
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    .visual-head{
+      padding: 11px 12px 0;
+      color: var(--accent-dark);
+      font-size: 0.84rem;
+      font-weight: 800;
+    }
+
+    .visual-figure{
+      min-height: 150px;
+      padding: 7px 12px 6px;
+      display: grid;
+      align-items: stretch;
+    }
+
+    .visual-figure img{
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      border-radius: 18px;
+    }
+
+    .visual-foot{
+      padding: 0 12px 12px;
+      color: var(--muted);
+      font-size: 0.77rem;
+      line-height: 1.3;
+    }
+
+    .task-card{
+      padding: 10px;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 7px;
+    }
+
+    .quick-facts{
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .fact{
+      padding: 9px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(247, 242, 234, 0.94);
+    }
+
+    .fact strong{
+      display: block;
+      margin-bottom: 4px;
+      font-size: 0.87rem;
+    }
+
+    .fact span{
+      display: block;
+      color: var(--muted);
+      font-size: 0.79rem;
+      line-height: 1.3;
+    }
+
+    details{
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.9);
+      overflow: hidden;
+    }
+
+    summary{
+      list-style: none;
+      cursor: pointer;
+      padding: 10px 12px;
+      font-size: 0.88rem;
+      font-weight: 800;
+    }
+
+    summary::-webkit-details-marker{
+      display: none;
+    }
+
+    .detail-content{
+      padding: 0 12px 12px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.34;
+    }
+
+    .interactive{
+      min-height: 0;
+      display: grid;
+      gap: 7px;
+      align-content: start;
+      overflow: auto;
+      padding-right: 4px;
+      overscroll-behavior: contain;
+    }
+
+    .task-intro{
+      padding: 9px 10px;
+      border-radius: 14px;
+      background: rgba(247, 242, 234, 0.92);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.28;
+    }
+
+    .mini-note{
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(47, 109, 118, 0.08);
+      border: 1px solid rgba(47, 109, 118, 0.16);
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.32;
+    }
+
+    textarea,
+    input[type="text"]{
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.94);
+      color: var(--text);
+      font: inherit;
+    }
+
+    textarea{
+      min-height: 66px;
+      resize: none;
+      line-height: 1.36;
+    }
+
+    .status-row{
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .status-pill{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(189, 90, 54, 0.16);
+      background: rgba(255,255,255,0.88);
+      font-size: 0.79rem;
+      font-weight: 800;
+      color: var(--accent-dark);
+    }
+
+    .status-pill.ok{
+      color: var(--ok);
+      border-color: rgba(47, 125, 92, 0.2);
+    }
+
+    .feedback{
+      min-height: 22px;
+      font-size: 0.93rem;
+      font-weight: 800;
+      color: var(--accent-dark);
+    }
+
+    .feedback.ok{
+      color: var(--ok);
+    }
+
+    .feedback.warn{
+      color: var(--warn);
+    }
+
+    .puzzle-board{
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      aspect-ratio: 3 / 2;
+      width: 100%;
+      border-radius: 18px;
+    }
+
+    .puzzle-tile{
+      border: 1px solid rgba(255,255,255,0.7);
+      border-radius: 16px;
+      background-repeat: no-repeat;
+      box-shadow: 0 10px 16px rgba(70, 44, 16, 0.12);
+      cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, outline-color 0.12s ease;
+      outline: 3px solid transparent;
+      min-height: 72px;
+    }
+
+    .puzzle-tile:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 14px 20px rgba(70, 44, 16, 0.15);
+    }
+
+    .puzzle-tile.selected{
+      outline-color: rgba(189, 90, 54, 0.6);
+      transform: scale(0.98);
+    }
+
+    .puzzle-tools{
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .comparison-grid{
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .compare-frame{
+      display: grid;
+      gap: 6px;
+    }
+
+    .compare-label{
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--muted);
+    }
+
+    .spot-board{
+      position: relative;
+      aspect-ratio: 16 / 9;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #efe6d8;
+      border: 1px solid rgba(88, 68, 34, 0.12);
+    }
+
+    .spot-board img{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .spot-target{
+      position: absolute;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.84);
+      background: rgba(189, 90, 54, 0.24);
+      box-shadow: 0 0 0 1px rgba(141, 61, 34, 0.2), 0 8px 16px rgba(70, 44, 16, 0.2);
+      cursor: pointer;
+      transform: translate(-50%, -50%);
+      transition: transform 0.12s ease, background 0.12s ease, opacity 0.12s ease;
+    }
+
+    .spot-target:hover{
+      transform: translate(-50%, -50%) scale(1.04);
+    }
+
+    .spot-target.found{
+      background: rgba(47, 125, 92, 0.55);
+      border-color: rgba(255,255,255,0.96);
+    }
+
+    .spot-target span{
+      position: absolute;
+      left: 50%;
+      top: calc(100% + 6px);
+      transform: translateX(-50%);
+      padding: 4px 7px;
+      border-radius: 999px;
+      background: rgba(32, 35, 48, 0.82);
+      color: #fff;
+      font-size: 0.68rem;
+      font-weight: 800;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.12s ease;
+    }
+
+    .spot-target.found span{
+      opacity: 1;
+    }
+
+    .wordsearch-wrap{
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 210px;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .wordsearch-grid{
+      display: grid;
+      grid-template-columns: repeat(9, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .word-cell{
+      min-height: 40px;
+      border-radius: 12px;
+      border: 1px solid rgba(88, 68, 34, 0.14);
+      background: rgba(255,255,255,0.92);
+      display: grid;
+      place-items: center;
+      font-size: 0.93rem;
+      font-weight: 800;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+    }
+
+    .word-cell:hover{
+      transform: translateY(-1px);
+      border-color: rgba(189, 90, 54, 0.26);
+    }
+
+    .word-cell.selected{
+      background: rgba(215, 164, 85, 0.28);
+      border-color: rgba(215, 164, 85, 0.44);
+    }
+
+    .word-cell.found{
+      background: rgba(47, 125, 92, 0.18);
+      border-color: rgba(47, 125, 92, 0.34);
+      color: var(--ok);
+    }
+
+    .word-list{
+      display: grid;
+      gap: 8px;
+    }
+
+    .word-chip{
+      padding: 9px 10px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.88);
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+
+    .word-chip.found{
+      background: rgba(47, 125, 92, 0.14);
+      border-color: rgba(47, 125, 92, 0.24);
+      color: var(--ok);
+    }
+
+    .crossword-layout{
+      display: grid;
+      grid-template-columns: repeat(8, 34px);
+      gap: 4px;
+      justify-content: start;
+    }
+
+    .cw-cell{
+      position: relative;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid rgba(88, 68, 34, 0.16);
+      background: rgba(255,255,255,0.92);
+      display: grid;
+      place-items: center;
+      font-size: 0.86rem;
+      font-weight: 800;
+    }
+
+    .cw-cell.block{
+      background: rgba(32, 35, 48, 0.08);
+      border-style: dashed;
+    }
+
+    .cw-no{
+      position: absolute;
+      left: 4px;
+      top: 3px;
+      font-size: 0.54rem;
+      color: var(--accent-dark);
+      font-weight: 800;
+    }
+
+    .crossword-entry{
+      display: grid;
+      gap: 8px;
+    }
+
+    .entry-row{
+      display: grid;
+      grid-template-columns: 102px minmax(0, 1fr);
+      gap: 8px;
+      align-items: center;
+      padding: 9px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.88);
+    }
+
+    .entry-row strong{
+      font-size: 0.8rem;
+    }
+
+    .summary-grid{
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      max-height: 200px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .summary-item{
+      padding: 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(189, 90, 54, 0.12);
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(247, 241, 232, 0.92));
+    }
+
+    .summary-item strong{
+      display: block;
+      margin-bottom: 4px;
+      font-size: 0.86rem;
+    }
+
+    .summary-item span{
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.32;
+      white-space: pre-wrap;
+    }
+
+    .footer-bar{
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      padding: 8px 10px;
+      border-radius: 16px;
+      border: 1px solid rgba(189, 90, 54, 0.14);
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(244, 235, 221, 0.9));
+    }
+
+    .footer-actions{
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .hint{
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    button{
+      border: none;
+      min-height: 46px;
+      padding: 11px 18px;
+      border-radius: 999px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.12s ease, opacity 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button:hover{
+      transform: translateY(-1px);
+    }
+
+    button:disabled{
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    button::after{
+      content: "";
+      position: absolute;
+      inset: 1px;
+      border-radius: inherit;
+      background: linear-gradient(180deg, rgba(255,255,255,0.24), rgba(255,255,255,0));
+      pointer-events: none;
+    }
+
+    .btn-primary{
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.16);
+      box-shadow: 0 12px 24px rgba(141, 63, 37, 0.18);
+    }
+
+    .btn-secondary{
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(239, 230, 216, 0.92));
+      color: var(--text);
+      border: 1px solid rgba(88, 68, 34, 0.12);
+      box-shadow: 0 8px 18px rgba(70, 44, 16, 0.08);
+    }
+
+    .btn-export{
+      background: linear-gradient(135deg, var(--ok), #245843);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.16);
+      box-shadow: 0 12px 24px rgba(36, 88, 67, 0.18);
+    }
+
+    .back-link{
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 800;
+    }
+
+    .back-link:hover{
+      text-decoration: underline;
+    }
+
+    @media (max-width: 1180px){
+      .topbar{
+        grid-template-columns: minmax(0, 1.4fr) minmax(180px, 0.56fr);
+      }
+
+      .stage-body{
+        grid-template-columns: minmax(250px, 0.9fr) minmax(0, 1.1fr);
+      }
+
+      .wordsearch-wrap{
+        grid-template-columns: minmax(0, 1fr) 190px;
+      }
+    }
+
+    @media (max-width: 860px){
+      .topbar{
+        grid-template-columns: minmax(0, 1.45fr) minmax(150px, 0.5fr);
+      }
+    }
+
+    @media (max-width: 700px){
+      .topbar{
+        grid-template-columns: 1fr;
+      }
+
+      .hero-art{
+        min-height: 108px;
+      }
+
+      .step-strip{
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 760px){
+      body{
+        overflow: auto;
+      }
+
+      .shell{
+        height: auto;
+        min-height: 100vh;
+      }
+
+      .stage-body,
+      .quick-facts,
+      .summary-grid,
+      .comparison-grid,
+      .wordsearch-wrap{
+        grid-template-columns: 1fr;
+      }
+
+      .stage{
+        height: auto;
+      }
+
+      .crossword-layout{
+        grid-template-columns: repeat(8, minmax(30px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="topbar panel">
+      <div class="hero-copy">
+        <div class="eyebrow">Q1 Sozialwissenschaften · Lernpfad</div>
+
+        <div class="hero-title">
+          <div>
+            <h1>Strukturwandel verstehen</h1>
+            <p class="lead">
+              Vier Kernbereiche, mehrere kleine Spiele und eine fortlaufende Lernspur:
+              Familie, Bildung, Arbeit und Demografie werden hier als kompakter Einstieg erfahrbar.
+            </p>
+          </div>
+        </div>
+
+        <div class="hero-tools">
+          <div class="progress-meta">
+            <div class="progress-head">
+              <span id="progressLabel">1 von 6 · Ankommen</span>
+              <span id="progressCount">0 %</span>
+            </div>
+            <div class="progress-track"><span id="progressFill"></span></div>
+            <div class="mini-inline">Die Sicherung kann jederzeit als TXT-Datei heruntergeladen werden.</div>
+          </div>
+          <button id="exportBtnTop" class="btn-export" type="button">TXT sichern</button>
+        </div>
+
+        <div class="step-strip" id="stepStrip">
+          <button class="step-pill active" type="button" data-step-map="0"><span class="step-no">1</span><span>Ankommen</span></button>
+          <button class="step-pill" type="button" data-step-map="1"><span class="step-no">2</span><span>Familie</span></button>
+          <button class="step-pill" type="button" data-step-map="2"><span class="step-no">3</span><span>Bildung</span></button>
+          <button class="step-pill" type="button" data-step-map="3"><span class="step-no">4</span><span>Arbeit</span></button>
+          <button class="step-pill" type="button" data-step-map="4"><span class="step-no">5</span><span>Demografie</span></button>
+          <button class="step-pill" type="button" data-step-map="5"><span class="step-no">6</span><span>Auswertung</span></button>
+        </div>
+      </div>
+
+      <div class="hero-art" aria-hidden="true">
+        <img src="assets/strukturwandel/hero-strukturwandel.png" alt="Illustration zum Wandel von der Industriegesellschaft zur Gegenwart" />
+      </div>
+    </section>
+
+    <main class="stage-shell panel">
+      <section class="stage active" data-step="0">
+        <div class="stage-header">
+          <div class="stage-title">
+            <div class="eyebrow">Start</div>
+            <h2>Ankommen: Das Bildpuzzle öffnet den Lernpfad</h2>
+            <p>Ordne das Ausgangsbild, beschreibe deinen ersten Eindruck und halte eine Vermutung fest, die du am Ende überprüfen kannst.</p>
+          </div>
+          <div class="tag-row">
+            <span class="tag">Mission 1</span>
+            <span class="tag operator">Operator: beschreiben</span>
+          </div>
+        </div>
+
+        <div class="stage-body">
+          <article class="visual-card">
+            <div class="visual-head">Bildpuzzle</div>
+            <div class="visual-figure">
+              <div id="puzzleBoard" class="puzzle-board" aria-label="Bildpuzzle zum Strukturwandel"></div>
+            </div>
+            <div class="visual-foot">
+              Links geht es um industrielle Lebens- und Arbeitsverhältnisse, rechts um Gegenwart, Vielfalt und Modernisierung.
+              Das Puzzle ist gelöst, sobald das Bild wieder stimmig zusammengesetzt ist.
+            </div>
+          </article>
+
+          <article class="task-card">
+            <div class="quick-facts">
+              <div class="fact">
+                <strong>Industrialisierung</strong>
+                <span>Fabrikarbeit, feste Hierarchien, stärkere Rollenbindung und engere Familienverbünde.</span>
+              </div>
+              <div class="fact">
+                <strong>Gegenwart</strong>
+                <span>Mehr Bildung, mehr Dienstleistungen, mehr Individualisierung und vielfältigere Lebensformen.</span>
+              </div>
+              <div class="fact">
+                <strong>Leitfrage</strong>
+                <span>Wie verändern Arbeit, Familie, Bildung und Demografie den gesellschaftlichen Alltag?</span>
+              </div>
+            </div>
+
+            <details>
+              <summary>Kurze Orientierung einblenden</summary>
+              <div class="detail-content">
+                Für den Einstieg reicht eine Grundidee: Strukturwandel bedeutet, dass sich zentrale Formen des Wirtschaftens
+                und Zusammenlebens verändern. Nicht alles wird automatisch besser, aber vieles wird anders und komplexer.
+              </div>
+            </details>
+
+            <div class="interactive">
+              <div class="task-intro">
+                Aufgabe: Löse zuerst das Puzzle. Formuliere danach in zwei Sätzen, wo du den stärksten Wandel seit der Industrialisierung vermutest.
+              </div>
+
+              <div class="puzzle-tools">
+                <button id="puzzleShuffle" class="btn-secondary" type="button">Neu mischen</button>
+                <div id="puzzleStatus" class="status-pill">Puzzle noch nicht gelöst</div>
+              </div>
+
+              <textarea id="startExpectation" placeholder="Beschreibe knapp: Was wirkt auf dich heute am stärksten verändert?"></textarea>
+
+              <div class="mini-note">
+                Datenschutz: Alle Eingaben bleiben lokal im Browser. Es werden keine Namen abgefragt und keine Daten an andere Dienste gesendet.
+              </div>
+
+              <div id="startFeedback" class="feedback"></div>
+            </div>
+          </article>
+        </div>
+
+        <div class="footer-bar">
+          <span class="hint">Tipp: Eine kurze, klare Vermutung reicht völlig aus.</span>
+          <button class="btn-primary" type="button" data-check="start">Zum Familienwandel</button>
+        </div>
+      </section>
+
+      <section class="stage" data-step="1">
+        <div class="stage-header">
+          <div class="stage-title">
+            <div class="eyebrow">Station 1</div>
+            <h2>Familie: Fehlersuche zwischen Normalfamilie, Kernfamilie und pluralen Lebensformen</h2>
+            <p>Vergleiche die beiden Bilder, markiere die vier Unterschiede und erläutere anschließend den Wandel von der Großfamilie zur heutigen Vielfalt.</p>
+          </div>
+          <div class="tag-row">
+            <span class="tag">Mission 2</span>
+            <span class="tag operator">Operator: erläutern</span>
+          </div>
+        </div>
+
+        <div class="stage-body">
+          <article class="visual-card">
+            <div class="visual-head">Fehlersuche Familie</div>
+            <div class="visual-figure">
+              <div class="comparison-grid">
+                <div class="compare-frame">
+                  <div class="compare-label">Original</div>
+                  <div class="spot-board">
+                    <img src="assets/strukturwandel/familie-wandel.png" alt="Originalbild zum Wandel von Familienformen" loading="lazy" />
+                  </div>
+                </div>
+                <div class="compare-frame">
+                  <div class="compare-label">Verändertes Bild</div>
+                  <div class="spot-board" id="familySpotBoard">
+                    <img src="assets/strukturwandel/familie-fehlersuche.png" alt="Verändertes Bild zum Familienwandel für die Fehlersuche" loading="lazy" />
+                    <button class="spot-target" type="button" data-spot-group="family" data-spot-id="ballon" aria-label="Unterschied Ballon finden" style="left:62.5%; top:5.8%; width:11%; height:17%;"><span>Ballon</span></button>
+                    <button class="spot-target" type="button" data-spot-group="family" data-spot-id="pullover" aria-label="Unterschied Pullover finden" style="left:55.2%; top:43.4%; width:17%; height:23%;"><span>roter Pullover</span></button>
+                    <button class="spot-target" type="button" data-spot-group="family" data-spot-id="bausteine" aria-label="Unterschied Bausteine finden" style="left:63.6%; top:84.2%; width:13%; height:12%;"><span>Bausteine</span></button>
+                    <button class="spot-target" type="button" data-spot-group="family" data-spot-id="katze" aria-label="Unterschied Katze finden" style="left:96%; top:71.4%; width:8.5%; height:18%;"><span>Katze</span></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="visual-foot">
+              Gesucht werden vier Unterschiede. Inhaltlich geht es danach um Familienwandel, Emanzipation, Scheidung,
+              alternative Lebensformen und das Leitbild der Normalfamilie.
+            </div>
+          </article>
+
+          <article class="task-card">
+            <div class="quick-facts">
+              <div class="fact">
+                <strong>Großfamilie</strong>
+                <span>Mehrere Generationen leben und wirtschaften enger zusammen.</span>
+              </div>
+              <div class="fact">
+                <strong>Kernfamilie</strong>
+                <span>Eltern und Kinder wohnen in einem eigenen Haushalt.</span>
+              </div>
+              <div class="fact">
+                <strong>Normalfamilie</strong>
+                <span>Klassisches Leitbild: verheiratetes heterosexuelles Paar mit Kindern.</span>
+              </div>
+            </div>
+
+            <details>
+              <summary>Fachbegriffe kurz anzeigen</summary>
+              <div class="detail-content">
+                Emanzipation beschreibt die Ausweitung von Selbstbestimmung und Gleichberechtigung, besonders in Geschlechterrollen.
+                Scheidung verweist auf die rechtliche Auflösung einer Ehe. Alternative Lebensformen sind zum Beispiel Patchworkfamilien,
+                Alleinerziehende oder homosexuelle Partnerschaften. Pluralisierung meint die sichtbare Vielfalt von Lebensformen.
+              </div>
+            </details>
+
+            <div class="interactive">
+              <div class="task-intro">
+                Klicke alle vier Unterschiede im veränderten Bild an. Erläutere danach in 2 bis 3 Sätzen, wodurch sich Familienformen seit der Industrialisierung verändert haben.
+              </div>
+
+              <div class="status-row">
+                <div id="familySpotStatus" class="status-pill">0 von 4 Unterschieden gefunden</div>
+              </div>
+
+              <textarea id="familyNote" placeholder="Erläutere: Welche Rolle spielen Emanzipation, Scheidung, Kernfamilie und alternative Lebensformen für den Familienwandel?"></textarea>
+
+              <div id="familyFeedback" class="feedback"></div>
+            </div>
+          </article>
+        </div>
+
+        <div class="footer-bar">
+          <button class="btn-secondary" type="button" data-prev>Zurück</button>
+          <button class="btn-primary" type="button" data-check="family">Weiter zur Bildung</button>
+        </div>
+      </section>
+
+      <section class="stage" data-step="2">
+        <div class="stage-header">
+          <div class="stage-title">
+            <div class="eyebrow">Station 2</div>
+            <h2>Bildung: Suchsel zu Chancen, Herkunft und Teilhabe</h2>
+            <p>Finde die zentralen Begriffe im Suchsel und analysiere anschließend, warum mehr Bildungsangebote nicht automatisch gleiche Chancen bedeuten.</p>
+          </div>
+          <div class="tag-row">
+            <span class="tag">Mission 3</span>
+            <span class="tag operator">Operator: analysieren</span>
+          </div>
+        </div>
+
+        <div class="stage-body">
+          <article class="visual-card">
+            <div class="visual-head">Bildimpuls Bildung</div>
+            <div class="visual-figure">
+              <img src="assets/strukturwandel/bildung-demografie.png" alt="Bildung und gesellschaftliche Teilhabe in einer modernen Gesellschaft" loading="lazy" />
+            </div>
+            <div class="visual-foot">
+              Bildung ist heute ein zentraler Zugang zu Beruf, Teilhabe und Aufstieg. Trotzdem bleiben soziale Herkunft,
+              Sprache und Ressourcen bedeutsam für Bildungserfolg.
+            </div>
+          </article>
+
+          <article class="task-card">
+            <div class="quick-facts">
+              <div class="fact">
+                <strong>Früher</strong>
+                <span>Bildungswege waren stärker durch Stand, Herkunft und Arbeitspflichten begrenzt.</span>
+              </div>
+              <div class="fact">
+                <strong>Heute</strong>
+                <span>Längere Bildungswege, mehr Abschlüsse und höhere Erwartungen an Qualifikation.</span>
+              </div>
+              <div class="fact">
+                <strong>Analysefokus</strong>
+                <span>Mehr Zugang heißt nicht automatisch gleiche Start- und Erfolgschancen.</span>
+              </div>
+            </div>
+
+            <details>
+              <summary>Wie funktioniert das Suchsel?</summary>
+              <div class="detail-content">
+                Tippe die Buchstaben eines gesuchten Wortes nacheinander an. Wenn deine Auswahl exakt zu einem Suchwort passt,
+                wird es automatisch markiert. Mit „Auswahl löschen“ startest du neu.
+              </div>
+            </details>
+
+            <div class="interactive">
+              <div class="task-intro">
+                Finde vier Wörter im Suchsel: Sie zeigen, warum Chancen im Bildungssystem trotz Ausbau ungleich bleiben können.
+              </div>
+
+              <div class="wordsearch-wrap">
+                <div>
+                  <div id="wordSearchGrid" class="wordsearch-grid" aria-label="Suchsel zu Bildungschancen"></div>
+                  <div class="puzzle-tools" style="margin-top:8px;">
+                    <button id="clearWordSearch" class="btn-secondary" type="button">Auswahl löschen</button>
+                    <div id="wordSearchStatus" class="status-pill">0 von 4 Wörtern gefunden</div>
+                  </div>
+                </div>
+
+                <div class="word-list" id="wordList">
+                  <div class="word-chip" data-word-chip="BILDUNG">BILDUNG</div>
+                  <div class="word-chip" data-word-chip="SPRACHE">SPRACHE</div>
+                  <div class="word-chip" data-word-chip="HERKUNFT">HERKUNFT</div>
+                  <div class="word-chip" data-word-chip="GELD">GELD</div>
+                </div>
+              </div>
+
+              <textarea id="educationNote" placeholder="Analysiere: Warum reichen mehr Schulen, Abschlüsse und Bildungswege allein nicht aus, um automatisch gleiche Chancen herzustellen?"></textarea>
+
+              <div id="educationFeedback" class="feedback"></div>
+            </div>
+          </article>
+        </div>
+
+        <div class="footer-bar">
+          <button class="btn-secondary" type="button" data-prev>Zurück</button>
+          <button class="btn-primary" type="button" data-check="education">Weiter zur Arbeit</button>
+        </div>
+      </section>
+
+      <section class="stage" data-step="3">
+        <div class="stage-header">
+          <div class="stage-title">
+            <div class="eyebrow">Station 3</div>
+            <h2>Arbeit: Fehlersuche zwischen Fabrik, Dienstleistung und digitaler Arbeitswelt</h2>
+            <p>Finde die vier Unterschiede im Bild und vergleiche danach, wie sich Arbeitsformen von der Industrialisierung bis heute verändert haben.</p>
+          </div>
+          <div class="tag-row">
+            <span class="tag">Mission 4</span>
+            <span class="tag operator">Operator: vergleichen</span>
+          </div>
+        </div>
+
+        <div class="stage-body">
+          <article class="visual-card">
+            <div class="visual-head">Fehlersuche Arbeitswelt</div>
+            <div class="visual-figure">
+              <div class="comparison-grid">
+                <div class="compare-frame">
+                  <div class="compare-label">Original</div>
+                  <div class="spot-board">
+                    <img src="assets/strukturwandel/arbeitswelt-wandel.png" alt="Originalbild zum Wandel der Arbeitswelt" loading="lazy" />
+                  </div>
+                </div>
+                <div class="compare-frame">
+                  <div class="compare-label">Verändertes Bild</div>
+                  <div class="spot-board" id="workSpotBoard">
+                    <img src="assets/strukturwandel/arbeit-fehlersuche.png" alt="Verändertes Bild zur Arbeitswelt für die Fehlersuche" loading="lazy" />
+                    <button class="spot-target" type="button" data-spot-group="work" data-spot-id="uhr" aria-label="Unterschied Uhr finden" style="left:76.7%; top:13.6%; width:8%; height:13%;"><span>blaue Uhr</span></button>
+                    <button class="spot-target" type="button" data-spot-group="work" data-spot-id="hoodie" aria-label="Unterschied Hoodie finden" style="left:67.2%; top:43.7%; width:15%; height:24%;"><span>oranger Hoodie</span></button>
+                    <button class="spot-target" type="button" data-spot-group="work" data-spot-id="fahrrad" aria-label="Unterschied Fahrrad finden" style="left:78.8%; top:50.6%; width:10%; height:18%;"><span>fehlendes Fahrrad</span></button>
+                    <button class="spot-target" type="button" data-spot-group="work" data-spot-id="becher" aria-label="Unterschied Becher finden" style="left:69.4%; top:84.2%; width:10.5%; height:12%;"><span>roter Becher</span></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="visual-foot">
+              In der Industrialisierung dominieren körperliche Fabrikarbeit, harte Taktung und geringe Absicherung.
+              Heute prägen Dienstleistung, Digitalisierung, Flexibilisierung und neue Anforderungen an Qualifikation viele Berufe.
+            </div>
+          </article>
+
+          <article class="task-card">
+            <div class="quick-facts">
+              <div class="fact">
+                <strong>Industrialisierung</strong>
+                <span>Fabrikrhythmus, Schichtarbeit, starke körperliche Belastung und Kinderarbeit.</span>
+              </div>
+              <div class="fact">
+                <strong>Heute</strong>
+                <span>Mehr Dienstleistung, Wissensarbeit, Homeoffice, Pflege, Logistik und digitale Teams.</span>
+              </div>
+              <div class="fact">
+                <strong>Wertewandel</strong>
+                <span>Neben Einkommen zählen heute häufiger Sinn, Selbstbestimmung und Vereinbarkeit.</span>
+              </div>
+            </div>
+
+            <details>
+              <summary>Vergleichsimpuls anzeigen</summary>
+              <div class="detail-content">
+                Der Wandel der Arbeitswelt ist nicht nur technisch. Er verändert auch Tagesabläufe, Qualifikationsanforderungen,
+                Geschlechterrollen, Familienleben und Erwartungen an Sicherheit oder Selbstverwirklichung.
+              </div>
+            </details>
+
+            <div class="interactive">
+              <div class="task-intro">
+                Finde wieder vier Unterschiede. Vergleiche danach in 2 bis 3 Sätzen die Arbeitswelt der Industrialisierung mit der heutigen Arbeitswelt.
+              </div>
+
+              <div class="status-row">
+                <div id="workSpotStatus" class="status-pill">0 von 4 Unterschieden gefunden</div>
+              </div>
+
+              <textarea id="workNote" placeholder="Vergleiche: Was unterscheidet Fabrikarbeit der Industrialisierung am deutlichsten von heutiger Dienstleistungs-, Pflege- oder Wissensarbeit?"></textarea>
+
+              <div id="workFeedback" class="feedback"></div>
+            </div>
+          </article>
+        </div>
+
+        <div class="footer-bar">
+          <button class="btn-secondary" type="button" data-prev>Zurück</button>
+          <button class="btn-primary" type="button" data-check="work">Weiter zur Demografie</button>
+        </div>
+      </section>
+
+      <section class="stage" data-step="4">
+        <div class="stage-header">
+          <div class="stage-title">
+            <div class="eyebrow">Station 4</div>
+            <h2>Demografie: Mini-Kreuzworträtsel zu Alterung, Leben und Bildung</h2>
+            <p>Löse das Mini-Kreuzworträtsel und beurteile anschließend, welche Folgen demografischer Wandel für Gesellschaft und Sozialstaat hat.</p>
+          </div>
+          <div class="tag-row">
+            <span class="tag">Mission 5</span>
+            <span class="tag operator">Operator: beurteilen</span>
+          </div>
+        </div>
+
+        <div class="stage-body">
+          <article class="visual-card">
+            <div class="visual-head">Demografie im Bild</div>
+            <div class="visual-figure">
+              <img src="assets/strukturwandel/demografie-wandel.png" alt="Demografischer Wandel mit älter werdender Bevölkerung und unterschiedlichen Lebenssituationen" loading="lazy" />
+            </div>
+            <div class="visual-foot">
+              Demografischer Wandel beschreibt Veränderungen bei Alter, Geburten, Haushaltsgrößen und Lebenserwartung.
+              Er wirkt auf Pflege, Arbeit, Wohnen, Familienformen, Bildung und öffentliche Infrastruktur.
+            </div>
+          </article>
+
+          <article class="task-card">
+            <div class="quick-facts">
+              <div class="fact">
+                <strong>Alterung</strong>
+                <span>Der Anteil älterer Menschen steigt, während Geburtenzahlen oft niedriger bleiben.</span>
+              </div>
+              <div class="fact">
+                <strong>Kleinere Haushalte</strong>
+                <span>Mehr Einpersonenhaushalte und unterschiedliche Wohn- und Lebensformen prägen den Alltag.</span>
+              </div>
+              <div class="fact">
+                <strong>Folgen</strong>
+                <span>Mehr Pflegebedarf, Fachkräftemangel und neue Anforderungen an soziale Sicherungssysteme.</span>
+              </div>
+            </div>
+
+            <details>
+              <summary>Hinweis zum Mini-Kreuzworträtsel</summary>
+              <div class="detail-content">
+                Trage die gesuchten Begriffe in die Felder ein. Das Gitter füllt sich automatisch mit den bereits eingegebenen Buchstaben.
+                Groß- und Kleinschreibung sind egal.
+              </div>
+            </details>
+
+            <div class="interactive">
+              <div class="task-intro">
+                Löse zuerst das Mini-Kreuzworträtsel. Beurteile danach, welche Folge des demografischen Wandels für die Gesellschaft besonders wichtig ist.
+              </div>
+
+              <div class="wordsearch-wrap">
+                <div>
+                  <div id="crosswordLayout" class="crossword-layout" aria-label="Mini-Kreuzworträtsel"></div>
+                </div>
+
+                <div class="crossword-entry">
+                  <label class="entry-row">
+                    <strong>1 waagerecht</strong>
+                    <input id="cwAlterung" type="text" maxlength="8" placeholder="älter werdende Bevölkerung" />
+                  </label>
+                  <label class="entry-row">
+                    <strong>2 senkrecht</strong>
+                    <input id="cwLeben" type="text" maxlength="5" placeholder="gesamter Alltag" />
+                  </label>
+                  <label class="entry-row">
+                    <strong>3 waagerecht</strong>
+                    <input id="cwBildung" type="text" maxlength="7" placeholder="Schlüssel für Teilhabe" />
+                  </label>
+                  <div id="crosswordStatus" class="status-pill">Kreuzworträtsel noch offen</div>
+                </div>
+              </div>
+
+              <textarea id="demoNote" placeholder="Beurteile: Welche Folge des demografischen Wandels ist gesellschaftlich besonders wichtig und warum?"></textarea>
+
+              <div id="demoFeedback" class="feedback"></div>
+            </div>
+          </article>
+        </div>
+
+        <div class="footer-bar">
+          <button class="btn-secondary" type="button" data-prev>Zurück</button>
+          <button class="btn-primary" type="button" data-check="demo">Zur Auswertung</button>
+        </div>
+      </section>
+
+      <section class="stage" data-step="5">
+        <div class="stage-header">
+          <div class="stage-title">
+            <div class="eyebrow">Abschluss</div>
+            <h2>Auswertung und Lernspur</h2>
+            <p>Hier werden die wichtigsten Ergebnisse aus allen Stationen zusammengeführt und zu einem ersten Urteil verdichtet.</p>
+          </div>
+          <div class="tag-row">
+            <span class="tag">Sicherung</span>
+            <span class="tag operator">Operator: beurteilen</span>
+          </div>
+        </div>
+
+        <div class="stage-body">
+          <article class="visual-card">
+            <div class="visual-head">Lernspur</div>
+            <div class="visual-figure">
+              <img src="assets/strukturwandel/hero-strukturwandel.png" alt="Verdichtendes Bild zum Strukturwandel" loading="lazy" />
+            </div>
+            <div class="visual-foot">
+              Vom Bildpuzzle über Fehlersuche, Suchsel und Kreuzworträtsel bis zur Reflexion:
+              Jetzt wird aus einzelnen Beobachtungen ein erstes begründetes Urteil.
+            </div>
+          </article>
+
+          <article class="task-card">
+            <div class="quick-facts">
+              <div class="fact">
+                <strong>Familie</strong>
+                <span>Pluralisierung, veränderte Rollenbilder und neue Lebensformen.</span>
+              </div>
+              <div class="fact">
+                <strong>Bildung</strong>
+                <span>Mehr Zugänge, aber weiterhin ungleiche Chancen durch Herkunft und Ressourcen.</span>
+              </div>
+              <div class="fact">
+                <strong>Arbeit + Demografie</strong>
+                <span>Digitalisierung, Flexibilisierung, Alterung und kleinere Haushalte verändern den Alltag.</span>
+              </div>
+            </div>
+
+            <div class="interactive">
+              <div id="summaryGrid" class="summary-grid"></div>
+              <textarea id="finalReflection" placeholder="Beurteile abschließend: Welcher Wandel prägt die heutige Gesellschaft am stärksten und warum?"></textarea>
+            </div>
+          </article>
+        </div>
+
+        <div class="footer-bar">
+          <div class="footer-actions">
+            <button class="btn-secondary" type="button" data-prev>Zurück</button>
+            <a class="back-link" href="index.html">Zurück zur Q1-SW-Übersicht</a>
+          </div>
+          <button id="exportBtnBottom" class="btn-export" type="button">TXT sichern</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const stageNames = ["Ankommen", "Familie", "Bildung", "Arbeit", "Demografie", "Auswertung"];
+    const stages = Array.from(document.querySelectorAll(".stage"));
+    const stepMap = Array.from(document.querySelectorAll("[data-step-map]"));
+    const progressFill = document.getElementById("progressFill");
+    const progressLabel = document.getElementById("progressLabel");
+    const progressCount = document.getElementById("progressCount");
+    const summaryGrid = document.getElementById("summaryGrid");
+
+    const completedSteps = new Set();
+    let currentStep = 0;
+    let highestUnlocked = 0;
+
+    const puzzleBoard = document.getElementById("puzzleBoard");
+    const puzzleStatus = document.getElementById("puzzleStatus");
+    const puzzleImage = "assets/strukturwandel/hero-strukturwandel.png";
+    const puzzleState = {
+      order: [0, 1, 2, 3, 4, 5],
+      selected: null,
+      solved: false
+    };
+
+    const familyFound = new Set();
+    const workFound = new Set();
+
+    const wordSearchRows = [
+      "BILDUNGXS",
+      "MAOHPQRTP",
+      "TEZELMVAR",
+      "YRFROKWNA",
+      "JUCKETMEC",
+      "LTBUSDGHE",
+      "NHPNIAEOE",
+      "VXMFCPLJR",
+      "KWTTOZDSQ"
+    ];
+
+    const wordSearchTargets = {
+      "BILDUNG": ["0-0", "0-1", "0-2", "0-3", "0-4", "0-5", "0-6"],
+      "SPRACHE": ["0-8", "1-8", "2-8", "3-8", "4-8", "5-8", "6-8"],
+      "HERKUNFT": ["1-3", "2-3", "3-3", "4-3", "5-3", "6-3", "7-3", "8-3"],
+      "GELD": ["5-6", "6-6", "7-6", "8-6"]
+    };
+
+    const wordSearchFound = new Set();
+    const wordSearchSelected = new Set();
+
+    const crosswordAnswers = {
+      alterung: "ALTERUNG",
+      leben: "LEBEN",
+      bildung: "BILDUNG"
+    };
+
+    const crosswordLayout = [
+      [
+        { word: "alterung", index: 0, no: 1 },
+        { word: "alterung", index: 1, no: 2 },
+        { word: "alterung", index: 2 },
+        { word: "alterung", index: 3 },
+        { word: "alterung", index: 4 },
+        { word: "alterung", index: 5 },
+        { word: "alterung", index: 6 },
+        { word: "alterung", index: 7 }
+      ],
+      [
+        null,
+        { word: "leben", index: 1 },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        { word: "bildung", index: 0, no: 3 },
+        { word: "bildung", index: 1 },
+        { word: "bildung", index: 2 },
+        { word: "bildung", index: 3 },
+        { word: "bildung", index: 4 },
+        { word: "bildung", index: 5 },
+        { word: "bildung", index: 6 }
+      ],
+      [
+        null,
+        { word: "leben", index: 3 },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        { word: "leben", index: 4 },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    ];
+
+    function setStep(index){
+      currentStep = Math.max(0, Math.min(index, stages.length - 1));
+      stages.forEach((stage, stageIndex) => {
+        stage.classList.toggle("active", stageIndex === currentStep);
+      });
+
+      stepMap.forEach((item, itemIndex) => {
+        item.classList.toggle("active", itemIndex === currentStep);
+        item.classList.toggle("done", completedSteps.has(itemIndex));
+        item.disabled = itemIndex > highestUnlocked;
+      });
+
+      const percent = Math.round((currentStep / (stages.length - 1)) * 100);
+      progressFill.style.width = percent + "%";
+      progressCount.textContent = percent + " %";
+      progressLabel.textContent = (currentStep + 1) + " von " + stages.length + " · " + stageNames[currentStep];
+
+      if (currentStep === 5){
+        renderSummary();
+      }
+    }
+
+    function shufflePuzzle(){
+      const order = [0, 1, 2, 3, 4, 5];
+      do{
+        for (let i = order.length - 1; i > 0; i -= 1){
+          const j = Math.floor(Math.random() * (i + 1));
+          [order[i], order[j]] = [order[j], order[i]];
+        }
+      } while (order.every((value, index) => value === index));
+
+      puzzleState.order = order;
+      puzzleState.selected = null;
+      puzzleState.solved = false;
+      renderPuzzle();
+    }
+
+    function renderPuzzle(){
+      puzzleBoard.innerHTML = "";
+      puzzleState.order.forEach((tile, position) => {
+        const col = tile % 3;
+        const row = Math.floor(tile / 3);
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "puzzle-tile" + (puzzleState.selected === position ? " selected" : "");
+        button.setAttribute("aria-label", "Puzzleteil " + (tile + 1));
+        button.style.backgroundImage = "url('" + puzzleImage + "')";
+        button.style.backgroundSize = "300% 200%";
+        button.style.backgroundPosition = (col === 0 ? "0%" : col === 1 ? "50%" : "100%") + " " + (row === 0 ? "0%" : "100%");
+        button.addEventListener("click", () => clickPuzzleTile(position));
+        puzzleBoard.appendChild(button);
+      });
+
+      puzzleStatus.className = "status-pill" + (puzzleState.solved ? " ok" : "");
+      puzzleStatus.textContent = puzzleState.solved ? "Puzzle gelöst" : "Puzzle noch nicht gelöst";
+    }
+
+    function clickPuzzleTile(position){
+      if (puzzleState.solved){
+        return;
+      }
+
+      if (puzzleState.selected === null){
+        puzzleState.selected = position;
+        renderPuzzle();
+        return;
+      }
+
+      if (puzzleState.selected === position){
+        puzzleState.selected = null;
+        renderPuzzle();
+        return;
+      }
+
+      [puzzleState.order[puzzleState.selected], puzzleState.order[position]] = [puzzleState.order[position], puzzleState.order[puzzleState.selected]];
+      puzzleState.selected = null;
+      puzzleState.solved = puzzleState.order.every((value, index) => value === index);
+      renderPuzzle();
+    }
+
+    function setFeedback(id, message, type){
+      const node = document.getElementById(id);
+      node.className = "feedback" + (type ? " " + type : "");
+      node.textContent = message;
+    }
+
+    function requireText(id, feedbackId){
+      const value = document.getElementById(id).value.trim();
+      if (!value){
+        setFeedback(feedbackId, "Ergänze bitte noch eine kurze inhaltliche Antwort.", "");
+        document.getElementById(id).focus();
+        return false;
+      }
+      return true;
+    }
+
+    function markCompleted(stepIndex){
+      completedSteps.add(stepIndex);
+      highestUnlocked = Math.max(highestUnlocked, Math.min(stepIndex + 1, stages.length - 1));
+    }
+
+    function checkStart(){
+      if (!puzzleState.solved){
+        setFeedback("startFeedback", "Löse zuerst das Bildpuzzle, bevor du weitergehst.", "");
+        return;
+      }
+      if (!requireText("startExpectation", "startFeedback")){
+        return;
+      }
+      markCompleted(0);
+      setFeedback("startFeedback", "Starker Einstieg. Deine Startvermutung ist gesichert.", "ok");
+      setStep(1);
+    }
+
+    function updateSpotStatus(group){
+      const total = 4;
+      const set = group === "family" ? familyFound : workFound;
+      const target = document.getElementById(group === "family" ? "familySpotStatus" : "workSpotStatus");
+      target.className = "status-pill" + (set.size === total ? " ok" : "");
+      target.textContent = set.size + " von " + total + " Unterschieden gefunden";
+    }
+
+    function bindSpotTargets(){
+      document.querySelectorAll(".spot-target").forEach((button) => {
+        button.addEventListener("click", () => {
+          const group = button.dataset.spotGroup;
+          const id = button.dataset.spotId;
+          const set = group === "family" ? familyFound : workFound;
+          set.add(id);
+          button.classList.add("found");
+          updateSpotStatus(group);
+        });
+      });
+      updateSpotStatus("family");
+      updateSpotStatus("work");
+    }
+
+    function checkFamily(){
+      if (familyFound.size !== 4){
+        setFeedback("familyFeedback", "Finde zuerst alle vier Unterschiede im Bild.", "");
+        return;
+      }
+      if (!requireText("familyNote", "familyFeedback")){
+        return;
+      }
+      markCompleted(1);
+      setFeedback("familyFeedback", "Sehr gut. Der Familienwandel ist jetzt fachlich sauber gesichert.", "ok");
+      setStep(2);
+    }
+
+    function renderWordSearch(){
+      const grid = document.getElementById("wordSearchGrid");
+      const foundCells = new Set(Object.values(wordSearchTargets).flat().filter((cell) => {
+        return Array.from(wordSearchFound).some((word) => wordSearchTargets[word].includes(cell));
+      }));
+
+      grid.innerHTML = "";
+      wordSearchRows.forEach((row, rowIndex) => {
+        row.split("").forEach((char, colIndex) => {
+          const key = rowIndex + "-" + colIndex;
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "word-cell";
+          if (wordSearchSelected.has(key)){
+            button.classList.add("selected");
+          }
+          if (foundCells.has(key)){
+            button.classList.add("found");
+          }
+          button.textContent = char;
+          button.addEventListener("click", () => toggleWordCell(key));
+          grid.appendChild(button);
+        });
+      });
+
+      document.querySelectorAll("[data-word-chip]").forEach((chip) => {
+        const word = chip.dataset.wordChip;
+        chip.classList.toggle("found", wordSearchFound.has(word));
+      });
+
+      const status = document.getElementById("wordSearchStatus");
+      status.className = "status-pill" + (wordSearchFound.size === Object.keys(wordSearchTargets).length ? " ok" : "");
+      status.textContent = wordSearchFound.size + " von " + Object.keys(wordSearchTargets).length + " Wörtern gefunden";
+    }
+
+    function compareSelections(a, b){
+      if (a.length !== b.length){
+        return false;
+      }
+      const sortedA = [...a].sort();
+      const sortedB = [...b].sort();
+      return sortedA.every((value, index) => value === sortedB[index]);
+    }
+
+    function toggleWordCell(key){
+      if (wordSearchSelected.has(key)){
+        wordSearchSelected.delete(key);
+      } else {
+        wordSearchSelected.add(key);
+      }
+
+      const currentSelection = Array.from(wordSearchSelected);
+      let foundNow = "";
+
+      Object.entries(wordSearchTargets).forEach(([word, cells]) => {
+        if (!wordSearchFound.has(word) && compareSelections(currentSelection, cells)){
+          wordSearchFound.add(word);
+          foundNow = word;
+        }
+      });
+
+      if (foundNow){
+        wordSearchSelected.clear();
+        setFeedback("educationFeedback", "Gefunden: " + foundNow + ".", "ok");
+      }
+
+      renderWordSearch();
+    }
+
+    function clearWordSearchSelection(){
+      wordSearchSelected.clear();
+      renderWordSearch();
+    }
+
+    function checkEducation(){
+      if (wordSearchFound.size !== Object.keys(wordSearchTargets).length){
+        setFeedback("educationFeedback", "Finde zuerst alle vier Begriffe im Suchsel.", "");
+        return;
+      }
+      if (!requireText("educationNote", "educationFeedback")){
+        return;
+      }
+      markCompleted(2);
+      setFeedback("educationFeedback", "Treffer. Du hast die Ursachen ungleicher Bildungschancen gesichert.", "ok");
+      setStep(3);
+    }
+
+    function checkWork(){
+      if (workFound.size !== 4){
+        setFeedback("workFeedback", "Finde zuerst alle vier Unterschiede im Bild.", "");
+        return;
+      }
+      if (!requireText("workNote", "workFeedback")){
+        return;
+      }
+      markCompleted(3);
+      setFeedback("workFeedback", "Starker Vergleich. Der Wandel der Arbeitswelt ist deutlich herausgearbeitet.", "ok");
+      setStep(4);
+    }
+
+    function normalizeInput(value){
+      return String(value || "")
+        .toUpperCase()
+        .replace(/\s+/g, "")
+        .replace(/Ä/g, "AE")
+        .replace(/Ö/g, "OE")
+        .replace(/Ü/g, "UE");
+    }
+
+    function renderCrossword(){
+      const values = {
+        alterung: normalizeInput(document.getElementById("cwAlterung").value),
+        leben: normalizeInput(document.getElementById("cwLeben").value),
+        bildung: normalizeInput(document.getElementById("cwBildung").value)
+      };
+
+      const container = document.getElementById("crosswordLayout");
+      container.innerHTML = "";
+
+      crosswordLayout.forEach((row) => {
+        row.forEach((cell) => {
+          const div = document.createElement("div");
+          div.className = "cw-cell" + (cell ? "" : " block");
+          if (cell){
+            const letter = values[cell.word][cell.index] || "";
+            if (cell.no){
+              const no = document.createElement("span");
+              no.className = "cw-no";
+              no.textContent = cell.no;
+              div.appendChild(no);
+            }
+            div.appendChild(document.createTextNode(letter));
+          }
+          container.appendChild(div);
+        });
+      });
+
+      const solved = Object.entries(crosswordAnswers).every(([key, answer]) => values[key] === answer);
+      const status = document.getElementById("crosswordStatus");
+      status.className = "status-pill" + (solved ? " ok" : "");
+      status.textContent = solved ? "Kreuzworträtsel gelöst" : "Kreuzworträtsel noch offen";
+    }
+
+    function checkDemo(){
+      const solved = Object.entries(crosswordAnswers).every(([key, answer]) => {
+        const field = key === "alterung" ? "cwAlterung" : key === "leben" ? "cwLeben" : "cwBildung";
+        return normalizeInput(document.getElementById(field).value) === answer;
+      });
+
+      if (!solved){
+        setFeedback("demoFeedback", "Löse zuerst das Mini-Kreuzworträtsel.", "");
+        return;
+      }
+      if (!requireText("demoNote", "demoFeedback")){
+        return;
+      }
+      markCompleted(4);
+      completedSteps.add(5);
+      setFeedback("demoFeedback", "Gut begründet. Du bist bereit für die Auswertung.", "ok");
+      setStep(5);
+    }
+
+    function sanitize(text){
+      return (text || "").trim() || "—";
+    }
+
+    function escapeHtml(text){
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function renderSummary(){
+      const items = [
+        ["Ankommen", "Puzzle: " + (puzzleState.solved ? "gelöst" : "offen") + "\n" + sanitize(document.getElementById("startExpectation").value)],
+        ["Familie", "Fehlersuche: " + familyFound.size + "/4\n" + sanitize(document.getElementById("familyNote").value)],
+        ["Bildung", "Suchsel: " + Array.from(wordSearchFound).join(", ") + "\n" + sanitize(document.getElementById("educationNote").value)],
+        ["Arbeit", "Fehlersuche: " + workFound.size + "/4\n" + sanitize(document.getElementById("workNote").value)],
+        ["Demografie", "Kreuzwort: " + (document.getElementById("crosswordStatus").textContent) + "\n" + sanitize(document.getElementById("demoNote").value)],
+        ["Abschlussurteil", sanitize(document.getElementById("finalReflection").value)]
+      ];
+
+      summaryGrid.innerHTML = items.map(([title, text]) => {
+        return '<div class="summary-item"><strong>' + escapeHtml(title) + '</strong><span>' + escapeHtml(text) + '</span></div>';
+      }).join("");
+    }
+
+    function exportTxt(){
+      renderSummary();
+      const stamp = new Date().toLocaleString("sv-SE").replace(/[: ]/g, "-");
+      const lines = [
+        "Strukturwandel-Lernpfad – Bearbeitungsstand",
+        "Datum: " + new Date().toLocaleString("de-DE"),
+        "",
+        "Ankommen:",
+        "Puzzle gelöst: " + (puzzleState.solved ? "Ja" : "Nein"),
+        sanitize(document.getElementById("startExpectation").value),
+        "",
+        "Familie:",
+        "Unterschiede gefunden: " + familyFound.size + "/4",
+        sanitize(document.getElementById("familyNote").value),
+        "",
+        "Bildung:",
+        "Suchsel-Wörter: " + (Array.from(wordSearchFound).join(", ") || "—"),
+        sanitize(document.getElementById("educationNote").value),
+        "",
+        "Arbeit:",
+        "Unterschiede gefunden: " + workFound.size + "/4",
+        sanitize(document.getElementById("workNote").value),
+        "",
+        "Demografie:",
+        "Mini-Kreuzworträtsel: " + document.getElementById("crosswordStatus").textContent,
+        sanitize(document.getElementById("demoNote").value),
+        "",
+        "Abschlussurteil:",
+        sanitize(document.getElementById("finalReflection").value)
+      ];
+
+      const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "strukturwandel-lernpfad-" + stamp + ".txt";
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+
+    document.querySelectorAll("[data-step-map]").forEach((button, index) => {
+      button.addEventListener("click", () => {
+        if (index <= highestUnlocked){
+          setStep(index);
+        }
+      });
+    });
+
+    document.querySelectorAll("[data-prev]").forEach((button) => {
+      button.addEventListener("click", () => setStep(currentStep - 1));
+    });
+
+    document.querySelectorAll("[data-check]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const target = button.dataset.check;
+        if (target === "start"){
+          checkStart();
+        } else if (target === "family"){
+          checkFamily();
+        } else if (target === "education"){
+          checkEducation();
+        } else if (target === "work"){
+          checkWork();
+        } else if (target === "demo"){
+          checkDemo();
+        }
+      });
+    });
+
+    document.getElementById("puzzleShuffle").addEventListener("click", shufflePuzzle);
+    document.getElementById("clearWordSearch").addEventListener("click", clearWordSearchSelection);
+    document.getElementById("exportBtnTop").addEventListener("click", exportTxt);
+    document.getElementById("exportBtnBottom").addEventListener("click", exportTxt);
+
+    ["cwAlterung", "cwLeben", "cwBildung"].forEach((id) => {
+      document.getElementById(id).addEventListener("input", renderCrossword);
+    });
+
+    bindSpotTargets();
+    renderWordSearch();
+    renderCrossword();
+    shufflePuzzle();
+    setStep(0);
+  </script>
+</body>
+</html>
