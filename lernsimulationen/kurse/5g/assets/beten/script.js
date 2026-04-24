@@ -150,6 +150,7 @@ const builderData = {
 };
 
 const maxStations = 5;
+const MEMORY_REVEAL_MS = 1100;
 
 function buildMemoryDeck() {
   const deck = memoryBase.flatMap((item) => [
@@ -728,7 +729,7 @@ function handleMemoryFlip(index) {
     state.memory.lock = false;
     saveState();
     render();
-  }, 650);
+  }, MEMORY_REVEAL_MS);
 }
 
 function builderPreview() {
