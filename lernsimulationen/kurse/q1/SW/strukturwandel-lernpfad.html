@@ -1470,7 +1470,7 @@
     const crosswordLayout = [
       [
         { word: "alterung", index: 0, no: 1 },
-        { word: "alterung", index: 1, no: 2 },
+        { word: "alterung", index: 1, no: 2, also: [{ word: "leben", index: 0 }] },
         { word: "alterung", index: 2 },
         { word: "alterung", index: 3 },
         { word: "alterung", index: 4 },
@@ -1494,7 +1494,7 @@
       ],
       [
         null,
-        { word: "bildung", index: 0, no: 3 },
+        { word: "bildung", index: 0, no: 3, also: [{ word: "leben", index: 2 }] },
         { word: "bildung", index: 1 },
         { word: "bildung", index: 2 },
         { word: "bildung", index: 3 },
@@ -1825,7 +1825,11 @@
             return;
           }
           const key = rowIndex + "-" + colIndex;
-          values[cell.word][cell.index] = crosswordCellState[key] || "";
+          const value = crosswordCellState[key] || "";
+          values[cell.word][cell.index] = value;
+          (cell.also || []).forEach((entry) => {
+            values[entry.word][entry.index] = value;
+          });
         });
       });
 
