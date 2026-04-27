@@ -75,7 +75,7 @@ const stops = [
       }
     ],
     reward: "⭐ Stern 1: Gut zuhören",
-    feedback: "Genau. Beim Thema Gebetserhörung gibt es verschiedene Erfahrungen, Fragen und Gefühle.",
+    feedback: "Kinder erleben das Beten nicht alle gleich. Darum ist Zuhören wichtig.",
     game: {
       type: "stars",
       title: "Mini-Spiel: Sternensuche",
@@ -122,7 +122,7 @@ const stops = [
       }
     ],
     reward: "⭐ Stern 2: Genau denken",
-    feedback: "Richtig. Gehört werden und genau den eigenen Wunsch bekommen, ist nicht dasselbe.",
+    feedback: "Beide können beten. Aber am Ende können nicht beide denselben Sieg bekommen.",
     game: {
       type: "wire",
       title: "Mini-Spiel: Heißer Draht",
@@ -170,7 +170,7 @@ const stops = [
       }
     ],
     reward: "⭐ Stern 3: Kleine Zeichen sehen",
-    feedback: "Ja. Antworten können durch Menschen, Trost, Hilfe und neuen Mut kommen.",
+    feedback: "Manchmal hilft Gott durch Menschen, Trost oder neuen Mut.",
     game: {
       type: "memory",
       title: "Mini-Spiel: Brücken-Memory",
@@ -217,7 +217,7 @@ const stops = [
       }
     ],
     reward: "⭐ Stern 4: Geduldig bleiben",
-    feedback: "Richtig. Wir Menschen sehen nicht alles auf einmal. Manches wird erst später klar.",
+    feedback: "Wir Menschen verstehen nicht immer sofort alles. Manches wird erst später klar.",
     game: {
       type: "search",
       title: "Mini-Spiel: Suchsel",
@@ -924,8 +924,8 @@ function renderStop() {
 
         ${answer ? `
           <div class="feedback-box">
-            <span class="feedback-chip ${answer.correct ? "feedback-good" : "feedback-note"}">${answer.correct ? "Super!" : "Fast!"}</span>
-            <p>${stop.feedback}</p>
+            <span class="feedback-chip ${answer.correct ? "feedback-good" : "feedback-note"}">${answer.correct ? "Super!" : "Noch nicht ganz"}</span>
+            <p>${answer.correct ? stop.feedback : `Die beste Antwort ist markiert. ${stop.feedback}`}</p>
           </div>
         ` : ""}
 

@@ -217,11 +217,17 @@ cite{ display:block; margin-top:10px; color:var(--muted); font-style:normal; }
 
 .game-shell{
   display:grid;
-  grid-template-columns:310px minmax(0, 1fr);
+  grid-template-columns:minmax(0, 1fr);
   gap:20px;
 }
 
 .panel{ padding:22px; }
+
+.main-column{ order:1; }
+.sidebar{
+  order:2;
+  grid-template-columns:minmax(0, 1fr);
+}
 
 .side-head{
   display:grid;
@@ -242,12 +248,41 @@ cite{ display:block; margin-top:10px; color:var(--muted); font-style:normal; }
 
 .step-grid,
 .journal-list,
-.story-thumbs,
 .options,
 .reasons,
 .timeline{
   display:grid;
   gap:12px;
+}
+
+.map-card,
+.journal-card{
+  display:grid;
+  gap:12px;
+}
+
+.sidebar .resource-grid{
+  grid-template-columns:repeat(4, minmax(0, 1fr));
+}
+
+.sidebar .fold-card{
+  padding:0;
+}
+
+.sidebar .fold-card summary{
+  padding:16px 18px;
+}
+
+.sidebar .fold-card .step-grid,
+.sidebar .fold-card .journal-list,
+.sidebar .fold-card .map-head{
+  padding:0 18px 18px;
+}
+
+.sidebar .map-head{
+  justify-content:flex-end;
+  margin-top:-4px;
+  margin-bottom:8px;
 }
 
 .step-button{
@@ -297,7 +332,8 @@ cite{ display:block; margin-top:10px; color:var(--muted); font-style:normal; }
 .journal-entry span{
   display:block;
   color:var(--muted);
-  font-size:0.88rem;
+  font-size:0.84rem;
+  line-height:1.35;
 }
 
 .tab-page{ display:grid; gap:18px; }
@@ -372,113 +408,35 @@ cite{ display:block; margin-top:10px; color:var(--muted); font-style:normal; }
   font:700 0.82rem/1.1 "Trebuchet MS", "Gill Sans", sans-serif;
 }
 
-.story-layout{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:12px;
-}
+.story-layout{ display:grid; grid-template-columns:1fr; gap:12px; }
 
 .scene-visual{
+  padding:20px 20px 0;
   border-radius:28px;
   overflow:hidden;
   border:1px solid var(--line);
-  background:linear-gradient(180deg, rgba(255,255,255,0.42), rgba(238,223,197,0.66));
+  background:
+    radial-gradient(circle at top left, rgba(255,255,255,0.66), transparent 36%),
+    linear-gradient(180deg, rgba(252,247,239,0.98), rgba(232,215,186,0.88));
 }
 
 .scene-visual img{
   width:100%;
-  aspect-ratio:16/8;
-  object-fit:cover;
+  height:auto;
+  min-height:420px;
+  max-height:560px;
+  object-fit:contain;
+  object-position:center center;
+  filter:drop-shadow(0 18px 20px rgba(83, 55, 30, 0.12));
 }
 
 .scene-caption{
-  padding:12px 14px;
+  margin:14px -20px 0;
+  padding:12px 18px;
   background:rgba(255,250,244,0.9);
   color:var(--muted);
   font-size:0.95rem;
-}
-
-.story-strip{
-  display:grid;
-  gap:10px;
-}
-
-.story-guide{
-  padding:10px 14px;
-  border-radius:18px;
-  background:rgba(255,252,246,0.84);
-  border:1px solid var(--line);
-  color:var(--accent-dark);
-  font:700 0.86rem/1.3 "Trebuchet MS", "Gill Sans", sans-serif;
-}
-
-.story-thumb{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:10px;
-  align-items:start;
-  width:100%;
-  padding:10px;
-  border-radius:20px;
-  border:1px solid var(--line);
-  background:rgba(255,252,246,0.84);
-  transition:transform 0.16s ease, border-color 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
-}
-
-.story-thumb:hover{
-  transform:translateY(-1px);
-}
-
-.story-thumb.active{
-  background:rgba(207,157,73,0.18);
-  border-color:rgba(171,93,51,0.34);
-  box-shadow:0 10px 24px rgba(86,57,29,0.08);
-}
-
-.story-thumb img{
-  width:100%;
-  aspect-ratio:16/9;
-  object-fit:cover;
-  border-radius:14px;
-}
-
-.story-thumb strong{
-  display:block;
-  text-align:left;
-  font-size:0.94rem;
-}
-
-.story-thumb span{
-  display:block;
-  margin-top:2px;
-  text-align:left;
-  color:var(--muted);
-  font-size:0.8rem;
-  line-height:1.35;
-}
-
-.story-thumbs{
-  display:grid;
-  grid-template-columns:repeat(3, minmax(0, 1fr));
-  gap:12px;
-}
-
-.focus-card{
-  padding:14px 16px;
-  border-radius:22px;
-  background:linear-gradient(180deg, rgba(255,252,246,0.92), rgba(247,238,218,0.96));
-  border:1px solid var(--line);
-}
-
-.focus-card strong{
-  display:block;
-  margin-bottom:6px;
-  color:var(--accent-dark);
-}
-
-.focus-card p{
-  margin:0;
-  color:var(--muted);
+  border-top:1px solid rgba(91,66,42,0.12);
 }
 
 .scene-copy{
@@ -636,7 +594,9 @@ textarea{
     grid-template-columns:1fr;
   }
 
-  .sidebar{ order:2; }
+  .sidebar .resource-grid{
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 720px){
@@ -656,6 +616,10 @@ textarea{
     grid-template-columns:1fr 1fr;
   }
 
+  .sidebar .resource-grid{
+    grid-template-columns:1fr 1fr;
+  }
+
   .runner-head,
   .scene-top,
   .option-head,
@@ -663,8 +627,17 @@ textarea{
     flex-direction:column;
   }
 
-  .story-thumbs{
-    grid-template-columns:1fr;
+  .scene-visual{
+    padding:14px 14px 0;
+  }
+
+  .scene-visual img{
+    min-height:260px;
+    max-height:380px;
+  }
+
+  .scene-caption{
+    margin:12px -14px 0;
   }
 
   .runner-footer{

@@ -1,23 +1,39 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 700" role="img" aria-labelledby="title desc">
   <title id="title">Der Samariter hilft</title>
-  <desc id="desc">Eine kniende Figur versorgt einen Verletzten in warmer Landschaft.</desc>
-  <rect width="1600" height="700" fill="#efddbb"/>
-  <rect y="0" width="1600" height="280" fill="#8fb9c8"/>
-  <circle cx="1260" cy="130" r="86" fill="#f6d67b"/>
-  <path d="M0 398c188-90 324-92 536-8 190 76 328 70 488 10 156-60 314-54 576 36v264H0z" fill="#c49563"/>
-  <path d="M0 514c178-36 316-16 496 64 112 50 262 62 416 16 162-48 342-58 688 34v72H0z" fill="#8b6341"/>
-  <ellipse cx="758" cy="520" rx="210" ry="52" fill="#715233" opacity="0.26"/>
-  <g transform="translate(722 328)">
-    <circle cx="0" cy="0" r="44" fill="#e6b17e"/>
-    <path d="M-54 42c10-16 30-28 52-28 24 0 46 12 56 30l22 44c10 20-4 44-26 44H-82c-22 0-36-24-26-44z" fill="#56714f"/>
-    <rect x="-18" y="124" width="22" height="112" rx="11" fill="#6f4f34"/>
-    <rect x="16" y="124" width="22" height="112" rx="11" fill="#6f4f34"/>
+  <desc id="desc">Der Samariter kniet am Verletzten, unterbricht den Weg und versorgt ihn in offener Landschaft.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#8db8ca"/>
+      <stop offset="100%" stop-color="#f1d0a0"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#5d4025" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="700" fill="url(#sky)"/>
+  <circle cx="1258" cy="128" r="84" fill="#f6d677"/>
+  <path d="M0 402c172-80 316-92 514-14 204 80 344 78 518 12 162-62 342-54 568 36v264H0z" fill="#c59362"/>
+  <path d="M0 518c176-34 320-16 500 62 120 52 272 60 424 14 160-48 346-58 676 34v72H0z" fill="#86603f"/>
+
+  <ellipse cx="782" cy="518" rx="236" ry="54" fill="#69492e" opacity="0.22"/>
+
+  <g filter="url(#shadow)" transform="translate(716 328)">
+    <circle cx="0" cy="0" r="44" fill="#e8b381"/>
+    <path d="M-54 40c14-14 28-20 42-20 28 0 54 12 70 34l34 54c12 20-2 44-26 44H-80c-22 0-38-22-28-42z" fill="#58724f"/>
+    <path d="M-18 152l-32 74" stroke="#58724f" stroke-width="20" stroke-linecap="round"/>
+    <path d="M24 150l44 82" stroke="#58724f" stroke-width="20" stroke-linecap="round"/>
+    <path d="M-44 90l-74 46" stroke="#58724f" stroke-width="16" stroke-linecap="round"/>
   </g>
-  <g transform="translate(852 432)">
-    <ellipse cx="0" cy="64" rx="122" ry="28" fill="#694b2e" opacity="0.24"/>
-    <rect x="-104" y="42" width="208" height="38" rx="16" fill="#b75e4a"/>
-    <circle cx="-106" cy="62" r="24" fill="#d4a37d"/>
+
+  <g filter="url(#shadow)" transform="translate(858 430)">
+    <ellipse cx="0" cy="66" rx="126" ry="28" fill="#66462d" opacity="0.22"/>
+    <rect x="-108" y="44" width="216" height="38" rx="16" fill="#b85e4a"/>
+    <circle cx="-108" cy="62" r="24" fill="#d7a47d"/>
+    <path d="M-10 44l48-18" stroke="#efe5d0" stroke-width="14" stroke-linecap="round"/>
   </g>
-  <path d="M746 408l82 18" stroke="#f0ebdc" stroke-width="16" stroke-linecap="round"/>
-  <path d="M778 282c52 16 92 48 118 96" stroke="#ffffff" stroke-width="10" stroke-linecap="round" opacity="0.64"/>
+
+  <path d="M744 408l84 20" stroke="#f1ebda" stroke-width="16" stroke-linecap="round"/>
+  <path d="M774 284c56 16 98 48 122 98" stroke="#ffffff" stroke-width="10" stroke-linecap="round" opacity="0.62"/>
+  <path d="M204 560c88-12 150-10 212 12" stroke="#d3af7f" stroke-width="10" stroke-linecap="round" opacity="0.58"/>
 </svg>

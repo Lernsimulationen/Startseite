@@ -1,32 +1,44 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 700" role="img" aria-labelledby="title desc">
   <title id="title">Transfer in die Gegenwart</title>
-  <desc id="desc">Moderne Schulszene mit Gruppenbildung und einer zugewandten Person.</desc>
-  <rect width="1600" height="700" fill="#e9efe8"/>
-  <rect y="0" width="1600" height="214" fill="#acc8dd"/>
-  <rect y="214" width="1600" height="486" fill="#d7c1a4"/>
-  <rect x="120" y="156" width="1360" height="454" rx="38" fill="#f7f3ea"/>
-  <rect x="164" y="200" width="1272" height="76" rx="20" fill="#7f9dbd"/>
-  <rect x="200" y="316" width="286" height="214" rx="28" fill="#e8edf1"/>
-  <rect x="520" y="316" width="286" height="214" rx="28" fill="#ece6dd"/>
-  <rect x="840" y="316" width="286" height="214" rx="28" fill="#e8edf1"/>
-  <rect x="1160" y="316" width="240" height="214" rx="28" fill="#ece6dd"/>
-  <g transform="translate(356 398)">
-    <circle cx="-88" cy="0" r="34" fill="#ebbf94"/>
-    <rect x="-118" y="34" width="60" height="126" rx="20" fill="#b65f48"/>
+  <desc id="desc">Eine moderne Schulszene mit Gruppenbildung, Distanz und einer zugewandten Person im Flur.</desc>
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#415467" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="700" fill="#e8eee8"/>
+  <rect y="0" width="1600" height="214" fill="#a8c4da"/>
+  <rect y="214" width="1600" height="486" fill="#d7c0a3"/>
+  <rect x="108" y="148" width="1384" height="466" rx="40" fill="#f8f4eb"/>
+  <rect x="156" y="194" width="1288" height="84" rx="20" fill="#87a5c4"/>
+  <rect x="194" y="316" width="292" height="220" rx="30" fill="#ebeff3"/>
+  <rect x="518" y="316" width="292" height="220" rx="30" fill="#ece6de"/>
+  <rect x="842" y="316" width="292" height="220" rx="30" fill="#ebeff3"/>
+  <rect x="1166" y="316" width="238" height="220" rx="30" fill="#ece6de"/>
+  <rect x="1188" y="238" width="164" height="42" rx="20" fill="#fff0c8"/>
+  <circle cx="1338" cy="162" r="28" fill="#f5d66d"/>
+
+  <g filter="url(#shadow)" transform="translate(356 400)">
+    <circle cx="-92" cy="0" r="34" fill="#ebbf94"/>
+    <path d="M-122 36c10-14 18-20 30-20 20 0 38 8 50 26v124c0 18-14 32-32 32h-16c-18 0-32-14-32-32z" fill="#b76049"/>
     <circle cx="0" cy="-8" r="34" fill="#e4b38b"/>
-    <rect x="-30" y="26" width="60" height="126" rx="20" fill="#657d57"/>
-    <circle cx="88" cy="0" r="34" fill="#d9a178"/>
-    <rect x="58" y="34" width="60" height="126" rx="20" fill="#7d5f94"/>
+    <path d="M-30 28c10-12 20-18 30-18 20 0 38 8 50 24v126c0 18-14 32-32 32H2c-18 0-32-14-32-32z" fill="#657d57"/>
+    <circle cx="92" cy="0" r="34" fill="#d9a178"/>
+    <path d="M62 36c10-14 18-20 30-20 20 0 38 8 50 26v124c0 18-14 32-32 32H94c-18 0-32-14-32-32z" fill="#7d5f94"/>
   </g>
-  <g transform="translate(978 408)">
+
+  <g filter="url(#shadow)" transform="translate(972 406)">
     <circle cx="0" cy="0" r="38" fill="#e8bc8f"/>
-    <rect x="-34" y="38" width="68" height="136" rx="22" fill="#567255"/>
+    <path d="M-34 38c10-12 20-18 34-18 20 0 38 10 50 28v136c0 20-16 36-36 36h-28c-20 0-36-16-36-36z" fill="#567255"/>
+    <path d="M44 90l76 0" stroke="#cf9d49" stroke-width="12" stroke-linecap="round"/>
   </g>
-  <g transform="translate(1230 420)">
+
+  <g filter="url(#shadow)" transform="translate(1230 422)">
     <circle cx="0" cy="0" r="38" fill="#d7a075"/>
-    <rect x="-34" y="38" width="68" height="136" rx="22" fill="#8d5c3f"/>
+    <path d="M-34 38c10-12 20-18 34-18 20 0 38 10 50 28v136c0 20-16 36-36 36h-28c-20 0-36-16-36-36z" fill="#8d5c3f"/>
   </g>
-  <path d="M1024 424c46-18 88-18 128 0" stroke="#cf9d49" stroke-width="10" stroke-linecap="round"/>
-  <rect x="1188" y="240" width="160" height="42" rx="20" fill="#fff0c8"/>
-  <circle cx="1340" cy="162" r="28" fill="#f6d76d"/>
+
+  <path d="M1026 422c46-18 88-18 128 0" stroke="#cf9d49" stroke-width="10" stroke-linecap="round"/>
+  <path d="M882 554c84-20 176-18 266 8" stroke="#d7c0a3" stroke-width="10" stroke-linecap="round" opacity="0.5"/>
 </svg>

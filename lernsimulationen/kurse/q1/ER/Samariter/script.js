@@ -454,7 +454,6 @@ const SCENES = [
 const state = {
   started: false,
   currentSceneIndex: -1,
-  selectedFrameIndex: 0,
   pendingChoice: null,
   pendingReasonIndex: -1,
   answers: [],
@@ -509,8 +508,6 @@ const elements = {
   sceneCast: document.getElementById("sceneCast"),
   sceneImage: document.getElementById("sceneImage"),
   sceneCaption: document.getElementById("sceneCaption"),
-  frameFocusText: document.getElementById("frameFocusText"),
-  storyThumbs: document.getElementById("storyThumbs"),
   sceneTags: document.getElementById("sceneTags"),
   sceneText: document.getElementById("sceneText"),
   sceneQuestion: document.getElementById("sceneQuestion"),
@@ -640,42 +637,15 @@ function updateSidebar() {
   }
 }
 
-function createFrameButton(frame, frameIndex) {
-  const roles = ["Bild 1 · Überblick", "Bild 2 · Fokus", "Bild 3 · Vertiefung"];
-  const button = document.createElement("button");
-  button.className = "story-thumb";
-  button.type = "button";
-  button.addEventListener("click", () => selectFrame(frameIndex));
-
-  const image = document.createElement("img");
-  image.src = frame.src;
-  image.alt = frame.title;
-
-  const textWrap = document.createElement("div");
-  const title = document.createElement("strong");
-  title.textContent = frame.title;
-  const caption = document.createElement("span");
-  caption.textContent = roles[frameIndex] || `Bild ${frameIndex + 1}`;
-  textWrap.append(title, caption);
-
-  button.append(image, textWrap);
-  return button;
-}
-
-function selectFrame(frameIndex) {
+function showSceneFrame(frameIndex) {
   const scene = currentScene();
-  const frame = scene.frames[frameIndex];
-  state.selectedFrameIndex = frameIndex;
+  const frame = scene.frames[0];
+  if (!frame) {
+    return;
+  }
   elements.sceneImage.src = frame.src;
   elements.sceneImage.alt = frame.title;
   elements.sceneCaption.textContent = frame.caption;
-  elements.frameFocusText.textContent = frame.focus
-    ? frame.focus.split(". ")[0].trim()
-    : "Jedes Bild lenkt deinen Blick auf einen anderen Aspekt der Szene.";
-
-  Array.from(elements.storyThumbs.children).forEach((button, index) => {
-    button.classList.toggle("active", index === frameIndex);
-  });
 }
 
 function createOption(option, index) {
@@ -707,7 +677,6 @@ function renderScene() {
   const scene = currentScene();
   state.pendingChoice = null;
   state.pendingReasonIndex = -1;
-  state.selectedFrameIndex = 0;
 
   elements.sceneType.textContent = scene.type;
   elements.sceneTitle.textContent = scene.title;
@@ -718,10 +687,7 @@ function renderScene() {
   scene.tags.forEach(item => elements.sceneTags.appendChild(createPill(item)));
   elements.sceneText.textContent = scene.text;
   elements.sceneQuestion.textContent = scene.question;
-
-  elements.storyThumbs.innerHTML = "";
-  scene.frames.forEach((frame, index) => elements.storyThumbs.appendChild(createFrameButton(frame, index)));
-  selectFrame(0);
+  showSceneFrame(0);
 
   elements.options.innerHTML = "";
   scene.options.forEach((option, index) => elements.options.appendChild(createOption(option, index)));
@@ -748,6 +714,7 @@ function openReasonPanel(option) {
     button.append(title);
     elements.reasons.appendChild(button);
   });
+  showSceneFrame(1);
   elements.reasonPanel.classList.remove("hidden");
   elements.feedback.classList.add("hidden");
 }
@@ -793,6 +760,7 @@ function finalizeChoice() {
   elements.feedback.classList.remove("hidden");
   elements.reasonPanel.classList.add("hidden");
   elements.sceneConsequence.classList.add("hidden");
+  showSceneFrame(2);
   updateSidebar();
   updateResults();
 }
@@ -918,8 +886,6 @@ function renderIntro() {
   elements.sceneImage.src = "assets/scene-1-law.svg";
   elements.sceneImage.alt = "Auftakt";
   elements.sceneCaption.textContent = "Auftakt der Bildergeschichte";
-  elements.frameFocusText.textContent = "Jedes Bild lenkt deinen Blick auf einen anderen Aspekt der Szene.";
-  elements.storyThumbs.innerHTML = "";
   elements.options.innerHTML = "";
   elements.reasonPanel.classList.add("hidden");
   elements.feedback.classList.add("hidden");

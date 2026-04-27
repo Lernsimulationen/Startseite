@@ -82,18 +82,18 @@
           </article>
         </div>
 
-        <div class="map-card">
+        <details class="map-card fold-card" open>
+          <summary>Wegkarte</summary>
           <div class="map-head">
-            <h2>Wegkarte</h2>
             <button id="backStepButton" class="tiny-button" type="button" disabled>Zurück</button>
           </div>
           <div class="step-grid" id="stepGrid"></div>
-        </div>
+        </details>
 
-        <div class="journal-card">
-          <h2>Entscheidungsjournal</h2>
+        <details class="journal-card fold-card" open>
+          <summary>Entscheidungsjournal</summary>
           <div class="journal-list" id="journalList"></div>
-        </div>
+        </details>
       </aside>
 
       <section class="main-column">
@@ -143,15 +143,6 @@
                 <img id="sceneImage" src="assets/scene-1-law.svg" alt="Szenische Illustration">
                 <div class="scene-caption" id="sceneCaption">Auftakt der Bildergeschichte</div>
               </div>
-              <div class="story-strip">
-                <div class="story-guide">Bildfolge: 1 Überblick, 2 Fokus, 3 Vertiefung.</div>
-                <div class="story-thumbs" id="storyThumbs"></div>
-              </div>
-            </div>
-
-            <div class="focus-card">
-              <strong>Dieses Bild zeigt</strong>
-              <p id="frameFocusText">Jedes Bild lenkt deinen Blick auf einen anderen Aspekt der Szene.</p>
             </div>
 
             <div class="pill-row" id="sceneTags"></div>

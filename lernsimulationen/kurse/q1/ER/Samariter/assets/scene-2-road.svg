@@ -1,24 +1,36 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 700" role="img" aria-labelledby="title desc">
   <title id="title">Weg zwischen Jerusalem und Jericho</title>
-  <desc id="desc">Staubige Hügellandschaft mit Serpentinenweg und einsamer Figur.</desc>
+  <desc id="desc">Weite Felsenlandschaft mit tiefem Tal, Serpentinenweg und einer kleinen Figur auf unsicherem Pfad.</desc>
   <defs>
     <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1">
-      <stop offset="0%" stop-color="#9ccbe3"/>
-      <stop offset="100%" stop-color="#f0d1a4"/>
+      <stop offset="0%" stop-color="#90bfd7"/>
+      <stop offset="72%" stop-color="#f2d2a2"/>
+      <stop offset="100%" stop-color="#f0c68e"/>
     </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#6c4928" flood-opacity="0.2"/>
+    </filter>
   </defs>
+
   <rect width="1600" height="700" fill="url(#sky)"/>
-  <circle cx="1210" cy="126" r="78" fill="#f7d66d" opacity="0.9"/>
-  <path d="M0 410C120 350 240 322 362 326c188 8 294 130 430 130 134 0 230-86 350-106 116-20 256 22 458 92v258H0z" fill="#caa374"/>
-  <path d="M0 484c130-66 242-82 380-38 138 44 206 114 366 112 146-2 226-84 356-110 154-30 288 26 498 118v134H0z" fill="#b78658"/>
-  <path d="M0 568c186-88 314-80 514 0 198 78 356 86 510 16 148-68 282-78 576 12v104H0z" fill="#8e6743"/>
-  <path d="M932 690c-114-96-166-150-150-194 18-52 90-42 142-84 48-38 22-78 64-116 56-52 182-58 246-148 18 34 10 78-28 114-26 24-74 44-90 74-30 58 32 106-4 168-42 74-128 104-180 186z" fill="#ebd3a7"/>
-  <path d="M960 682c-92-80-130-120-118-152 18-50 76-42 122-78 44-36 26-76 56-106 50-48 124-48 196-114 2 22-4 48-22 74-22 30-66 50-84 82-28 46 24 90 0 138-28 54-92 82-150 156z" fill="#c69763"/>
-  <g transform="translate(522 420)">
-    <circle cx="0" cy="0" r="36" fill="#e9bf8b"/>
-    <rect x="-34" y="34" width="68" height="118" rx="24" fill="#506848"/>
-    <rect x="-22" y="142" width="18" height="84" rx="9" fill="#6e5136"/>
-    <rect x="4" y="142" width="18" height="84" rx="9" fill="#6e5136"/>
+  <circle cx="1210" cy="126" r="76" fill="#f7d76f" opacity="0.9"/>
+  <path d="M0 396C144 330 272 316 390 328c148 14 250 98 356 120 138 30 256-20 372-84 174-96 292-96 482-8v304H0z" fill="#c79b69"/>
+  <path d="M0 478c136-54 248-56 386 0 138 56 250 76 382 38 126-36 230-122 376-128 118-4 236 42 456 142v170H0z" fill="#a9784e"/>
+  <path d="M0 586c218-76 384-66 574 20 198 88 384 88 582 12 154-58 292-54 444-8v96H0z" fill="#7f5a3c"/>
+
+  <path d="M944 694c-98-82-142-130-132-174 12-52 78-50 122-92 38-36 26-76 56-112 54-64 162-66 238-148 20 30 18 72-6 110-24 38-72 62-92 104-24 48 18 92-8 148-28 58-92 98-178 164z" fill="#ead1a2"/>
+  <path d="M970 688c-70-60-96-92-88-118 10-34 54-34 88-62 34-28 30-62 56-88 36-36 96-52 160-108 8 26-2 56-24 84-26 32-66 52-82 84-20 40 12 76-8 118-22 44-64 72-102 90z" fill="#c4905e"/>
+  <path d="M1024 694c-32-26-42-44-38-60 8-24 40-28 64-46 32-26 36-60 58-88 18-22 40-38 62-58-6 30-22 56-42 82-24 30-50 58-58 88-10 34-18 54-46 82z" fill="#f5e3bf"/>
+
+  <g filter="url(#shadow)" transform="translate(502 430)">
+    <ellipse cx="0" cy="126" rx="110" ry="24" fill="#5f422a" opacity="0.24"/>
+    <circle cx="0" cy="0" r="38" fill="#e7bd89"/>
+    <path d="M-38 40c14-14 26-20 38-20 22 0 42 10 58 30v108c0 20-16 36-36 36h-42c-20 0-36-16-36-36z" fill="#506a49"/>
+    <rect x="-20" y="188" width="16" height="80" rx="8" fill="#664a31"/>
+    <rect x="12" y="188" width="16" height="80" rx="8" fill="#664a31"/>
+    <path d="M-42 74l-42 32" stroke="#506a49" stroke-width="16" stroke-linecap="round"/>
   </g>
-  <rect x="450" y="534" width="190" height="24" rx="12" fill="#6f4e2e" opacity="0.36"/>
+
+  <path d="M316 474c68-18 132-18 190 2" stroke="#d6b07e" stroke-width="10" stroke-linecap="round" opacity="0.7"/>
+  <path d="M182 522c62-10 114-8 154 8" stroke="#d6b07e" stroke-width="8" stroke-linecap="round" opacity="0.56"/>
 </svg>

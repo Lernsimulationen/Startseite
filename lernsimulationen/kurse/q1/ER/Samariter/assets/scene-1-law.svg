@@ -1,34 +1,68 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 700" role="img" aria-labelledby="title desc">
   <title id="title">Gespräch über ewiges Leben</title>
-  <desc id="desc">Warmer Innenraum mit Lehrgespräch, Rollen und geöffneten Schriftrollen.</desc>
+  <desc id="desc">Ein Lehrgespräch in einem hellen Hofraum mit Schriftrolle, Zuhörenden und sichtbarer Spannung zwischen den Figuren.</desc>
   <defs>
-    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
-      <stop offset="0%" stop-color="#f7e6c6"/>
-      <stop offset="100%" stop-color="#d7b48b"/>
+    <linearGradient id="wall" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#f7ead0"/>
+      <stop offset="100%" stop-color="#ddb98d"/>
     </linearGradient>
     <linearGradient id="floor" x1="0" x2="0" y1="0" y2="1">
-      <stop offset="0%" stop-color="#af7a4b"/>
-      <stop offset="100%" stop-color="#7f5535"/>
+      <stop offset="0%" stop-color="#b67f4d"/>
+      <stop offset="100%" stop-color="#7c5335"/>
     </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#6e4523" flood-opacity="0.22"/>
+    </filter>
   </defs>
-  <rect width="1600" height="700" fill="url(#bg)"/>
-  <rect y="470" width="1600" height="230" fill="url(#floor)"/>
-  <rect x="120" y="90" width="420" height="250" rx="28" fill="#f9f2df" opacity="0.72"/>
-  <rect x="1060" y="80" width="360" height="220" rx="28" fill="#fff7ea" opacity="0.65"/>
-  <circle cx="320" cy="180" r="72" fill="#f0c89b"/>
-  <rect x="250" y="252" width="150" height="170" rx="42" fill="#7d5d92"/>
-  <circle cx="720" cy="180" r="72" fill="#d4a176"/>
-  <rect x="650" y="252" width="150" height="170" rx="42" fill="#58714a"/>
-  <circle cx="1080" cy="210" r="74" fill="#e5bb90"/>
-  <rect x="1006" y="284" width="152" height="172" rx="42" fill="#b46940"/>
-  <rect x="534" y="300" width="220" height="30" rx="15" fill="#865f3b"/>
-  <rect x="520" y="330" width="250" height="28" rx="14" fill="#9f7346"/>
-  <g transform="translate(570 250)">
-    <rect x="0" y="0" width="180" height="86" rx="20" fill="#f6edd9"/>
-    <path d="M18 22c16-8 40-8 56 0 16-8 40-8 56 0 16-8 40-8 56 0v42c-16-8-40-8-56 0-16-8-40-8-56 0-16-8-40-8-56 0z" fill="#e0c28c"/>
+
+  <rect width="1600" height="700" fill="url(#wall)"/>
+  <rect y="462" width="1600" height="238" fill="url(#floor)"/>
+  <rect x="118" y="90" width="412" height="232" rx="30" fill="#fff7e7" opacity="0.65"/>
+  <rect x="1060" y="82" width="334" height="204" rx="30" fill="#fff5df" opacity="0.62"/>
+  <circle cx="1330" cy="148" r="66" fill="#f4d06e" opacity="0.75"/>
+
+  <g opacity="0.24">
+    <rect x="624" y="74" width="352" height="172" rx="26" fill="#fbf4e5"/>
+    <path d="M700 130h200" stroke="#c79a65" stroke-width="10" stroke-linecap="round"/>
+    <path d="M700 166h200" stroke="#c79a65" stroke-width="10" stroke-linecap="round"/>
   </g>
-  <rect x="128" y="520" width="540" height="120" rx="28" fill="#fff7ea" opacity="0.76"/>
-  <rect x="804" y="500" width="590" height="128" rx="28" fill="#f9f1dd" opacity="0.75"/>
-  <circle cx="1340" cy="170" r="70" fill="#f6d36f" opacity="0.75"/>
-  <path d="M1240 520c72-70 160-104 264-104 26 0 58 4 96 12-44 36-66 84-66 142H1164c8-16 34-34 76-50z" fill="#8b6640" opacity="0.36"/>
+
+  <g filter="url(#shadow)">
+    <rect x="510" y="324" width="330" height="30" rx="15" fill="#835735"/>
+    <rect x="492" y="350" width="364" height="26" rx="13" fill="#9a6a41"/>
+    <g transform="translate(570 246)">
+      <rect x="0" y="0" width="208" height="94" rx="22" fill="#fbf0dc"/>
+      <path d="M18 28c18-10 44-10 62 0 18-10 44-10 62 0 18-10 44-10 62 0v44c-18-10-44-10-62 0-18-10-44-10-62 0-18-10-44-10-62 0z" fill="#dfbf88"/>
+      <path d="M104 22v52" stroke="#b7834d" stroke-width="8" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <g filter="url(#shadow)">
+    <circle cx="318" cy="196" r="68" fill="#efc494"/>
+    <path d="M250 260c18-22 42-34 68-34 30 0 58 14 76 38v126c0 22-18 40-40 40h-72c-22 0-40-18-40-40z" fill="#7d6297"/>
+    <rect x="274" y="414" width="18" height="88" rx="9" fill="#6c4b32"/>
+    <rect x="334" y="414" width="18" height="88" rx="9" fill="#6c4b32"/>
+    <path d="M248 282l-60 46" stroke="#7d6297" stroke-width="18" stroke-linecap="round"/>
+    <path d="M380 284l70 26" stroke="#7d6297" stroke-width="18" stroke-linecap="round"/>
+  </g>
+
+  <g filter="url(#shadow)">
+    <circle cx="722" cy="184" r="70" fill="#d5a278"/>
+    <path d="M648 254c24-28 48-40 74-40 32 0 62 16 82 42v132c0 24-20 44-44 44h-76c-24 0-44-20-44-44z" fill="#58724e"/>
+    <rect x="682" y="420" width="18" height="96" rx="9" fill="#6c4b32"/>
+    <rect x="742" y="420" width="18" height="96" rx="9" fill="#6c4b32"/>
+    <path d="M646 278l-72 18" stroke="#58724e" stroke-width="18" stroke-linecap="round"/>
+    <path d="M798 276l76 10" stroke="#58724e" stroke-width="18" stroke-linecap="round"/>
+  </g>
+
+  <g filter="url(#shadow)">
+    <circle cx="1090" cy="214" r="72" fill="#e6ba8f"/>
+    <path d="M1018 286c18-24 44-38 72-38 30 0 58 14 76 40v138c0 24-20 44-44 44h-64c-24 0-44-20-44-44z" fill="#b56c43"/>
+    <rect x="1050" y="456" width="18" height="92" rx="9" fill="#6c4b32"/>
+    <rect x="1110" y="456" width="18" height="92" rx="9" fill="#6c4b32"/>
+  </g>
+
+  <path d="M166 536h474" stroke="#f8efdf" stroke-width="16" stroke-linecap="round" opacity="0.7"/>
+  <path d="M842 534h490" stroke="#f8efdf" stroke-width="16" stroke-linecap="round" opacity="0.6"/>
+  <path d="M1214 512c64-62 152-96 266-94 26 0 56 4 94 12-40 32-64 76-70 134h-334c18-22 34-38 44-52z" fill="#7f5b3a" opacity="0.22"/>
 </svg>
