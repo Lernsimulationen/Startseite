@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 700" role="img" aria-labelledby="title desc">
+  <title id="title">Transfer in die Gegenwart</title>
+  <desc id="desc">Moderne Schulszene mit Gruppenbildung und einer zugewandten Person.</desc>
+  <rect width="1600" height="700" fill="#e9efe8"/>
+  <rect y="0" width="1600" height="214" fill="#acc8dd"/>
+  <rect y="214" width="1600" height="486" fill="#d7c1a4"/>
+  <rect x="120" y="156" width="1360" height="454" rx="38" fill="#f7f3ea"/>
+  <rect x="164" y="200" width="1272" height="76" rx="20" fill="#7f9dbd"/>
+  <rect x="200" y="316" width="286" height="214" rx="28" fill="#e8edf1"/>
+  <rect x="520" y="316" width="286" height="214" rx="28" fill="#ece6dd"/>
+  <rect x="840" y="316" width="286" height="214" rx="28" fill="#e8edf1"/>
+  <rect x="1160" y="316" width="240" height="214" rx="28" fill="#ece6dd"/>
+  <g transform="translate(356 398)">
+    <circle cx="-88" cy="0" r="34" fill="#ebbf94"/>
+    <rect x="-118" y="34" width="60" height="126" rx="20" fill="#b65f48"/>
+    <circle cx="0" cy="-8" r="34" fill="#e4b38b"/>
+    <rect x="-30" y="26" width="60" height="126" rx="20" fill="#657d57"/>
+    <circle cx="88" cy="0" r="34" fill="#d9a178"/>
+    <rect x="58" y="34" width="60" height="126" rx="20" fill="#7d5f94"/>
+  </g>
+  <g transform="translate(978 408)">
+    <circle cx="0" cy="0" r="38" fill="#e8bc8f"/>
+    <rect x="-34" y="38" width="68" height="136" rx="22" fill="#567255"/>
+  </g>
+  <g transform="translate(1230 420)">
+    <circle cx="0" cy="0" r="38" fill="#d7a075"/>
+    <rect x="-34" y="38" width="68" height="136" rx="22" fill="#8d5c3f"/>
+  </g>
+  <path d="M1024 424c46-18 88-18 128 0" stroke="#cf9d49" stroke-width="10" stroke-linecap="round"/>
+  <rect x="1188" y="240" width="160" height="42" rx="20" fill="#fff0c8"/>
+  <circle cx="1340" cy="162" r="28" fill="#f6d76d"/>
+</svg>

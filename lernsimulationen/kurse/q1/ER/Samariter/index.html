@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none';">
+  <title>Pfad der Barmherzigkeit – Q1 ER</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Q1 Evangelische Religionslehre · Interaktives Rollenspiel</p>
+        <h1>Pfad der Barmherzigkeit</h1>
+        <p class="lead">
+          Du spielst den Weg von Jerusalem nach Jericho nicht nur nach, sondern
+          entscheidest ihn mit. Jede Szene verlangt eine Handlung und eine
+          Begründung. Du kannst zurückspringen, Wege ändern und am Ende sehen,
+          ob du dich wirklich mit dem Gleichnis auseinandergesetzt hast.
+        </p>
+        <div class="hero-actions">
+          <button id="startButton" class="button button-primary" type="button">Mission starten</button>
+          <button id="openResultsButton" class="button button-secondary" type="button">Auswertung</button>
+          <a class="button button-ghost" href="../index.html">Zurück zur ER-Übersicht</a>
+        </div>
+      </div>
+
+      <aside class="hero-side">
+        <div class="bible-card">
+          <p class="bible-label">Biblischer Fokus</p>
+          <blockquote>
+            "Du sollst den Herrn, deinen Gott, lieben ... und deinen Nächsten wie dich selbst."
+          </blockquote>
+          <cite>Lukas 10,27</cite>
+        </div>
+
+        <div class="mini-grid">
+          <article class="mini-card">
+            <strong>Spielkern</strong>
+            <span>Entscheiden, begründen, Folgen tragen, Wege ändern.</span>
+          </article>
+          <article class="mini-card">
+            <strong>Interaktiv</strong>
+            <span>Bildergeschichte, Rollenwechsel und kurzer Weg-Run.</span>
+          </article>
+          <article class="mini-card">
+            <strong>Ziel</strong>
+            <span>Die Geschichte soll im Kopf bleiben und deutbar werden.</span>
+          </article>
+          <article class="mini-card">
+            <strong>Datenschutz</strong>
+            <span>Alles läuft lokal im Browser, ohne Server und ohne Tracking.</span>
+          </article>
+        </div>
+      </aside>
+    </section>
+
+    <section class="game-shell">
+      <aside class="sidebar panel">
+        <div class="side-head">
+          <p class="eyebrow small">Spielstand</p>
+          <strong id="statusLabel">Noch nicht gestartet</strong>
+        </div>
+
+        <div class="resource-grid">
+          <article class="resource-card">
+            <span>Mut</span>
+            <strong id="resourceCourage">0</strong>
+          </article>
+          <article class="resource-card">
+            <span>Sorge</span>
+            <strong id="resourceCare">0</strong>
+          </article>
+          <article class="resource-card">
+            <span>Weitblick</span>
+            <strong id="resourceWisdom">0</strong>
+          </article>
+          <article class="resource-card">
+            <span>Spuren</span>
+            <strong id="resourceFragments">0</strong>
+          </article>
+        </div>
+
+        <div class="map-card">
+          <div class="map-head">
+            <h2>Wegkarte</h2>
+            <button id="backStepButton" class="tiny-button" type="button" disabled>Zurück</button>
+          </div>
+          <div class="step-grid" id="stepGrid"></div>
+        </div>
+
+        <div class="journal-card">
+          <h2>Entscheidungsjournal</h2>
+          <div class="journal-list" id="journalList"></div>
+        </div>
+      </aside>
+
+      <section class="main-column">
+        <nav class="page-tabs" aria-label="Spielansichten">
+          <button id="showStoryPage" class="tab-button active" type="button">Spiel</button>
+          <button id="showResultsPage" class="tab-button" type="button">Auswertung</button>
+        </nav>
+
+        <section id="storyPage" class="tab-page">
+          <section class="runner panel hidden" id="runnerPanel">
+            <div class="runner-head">
+              <div>
+                <p class="eyebrow small">Wegstück</p>
+                <h2>Jericho-Run</h2>
+              </div>
+              <div class="runner-actions">
+                <button id="runnerStartButton" class="button button-secondary" type="button">Run starten</button>
+                <button id="runnerSkipButton" class="button button-ghost" type="button">Ohne Bonus weiter</button>
+              </div>
+            </div>
+            <p class="runner-copy">
+              Springe über Steine und sammle zwei Schriftfragmente. So sicherst
+              du Zusatzspuren für die spätere Auswertung. Leertaste oder
+              „Sprung“ nutzen.
+            </p>
+            <canvas id="runnerCanvas" width="980" height="240" aria-label="Jump-and-Run auf dem Weg nach Jericho"></canvas>
+            <div class="runner-footer">
+              <button id="jumpButton" class="button button-primary" type="button">Sprung</button>
+              <span id="runnerStatus">Run noch nicht gestartet</span>
+              <button id="runnerContinueButton" class="button button-secondary hidden" type="button">Zur Schlüsselszene</button>
+            </div>
+          </section>
+
+          <section class="scene panel" id="scenePanel">
+            <div class="scene-top">
+              <div>
+                <p class="eyebrow small" id="sceneType">Auftakt</p>
+                <h2 id="sceneTitle">Pfad der Barmherzigkeit</h2>
+              </div>
+              <div class="role-chip" id="sceneRole">Rolle: Beobachter</div>
+            </div>
+
+            <div class="cast-row" id="sceneCast"></div>
+
+            <div class="story-layout">
+              <div class="scene-visual">
+                <img id="sceneImage" src="assets/scene-1-law.svg" alt="Szenische Illustration">
+                <div class="scene-caption" id="sceneCaption">Auftakt der Bildergeschichte</div>
+              </div>
+              <div class="story-strip">
+                <div class="story-guide">Bildfolge: 1 Überblick, 2 Fokus, 3 Vertiefung.</div>
+                <div class="story-thumbs" id="storyThumbs"></div>
+              </div>
+            </div>
+
+            <div class="focus-card">
+              <strong>Dieses Bild zeigt</strong>
+              <p id="frameFocusText">Jedes Bild lenkt deinen Blick auf einen anderen Aspekt der Szene.</p>
+            </div>
+
+            <div class="pill-row" id="sceneTags"></div>
+
+            <div class="scene-copy">
+              <p id="sceneText">Drücke auf „Mission starten“, um die erste Szene zu öffnen.</p>
+            </div>
+
+            <div class="consequence-card" id="sceneConsequence">
+              <strong>Leitfrage</strong>
+              <p id="sceneQuestion">Was bedeutet ewiges Leben, wenn Wissen allein noch kein Leben verändert?</p>
+            </div>
+
+            <div class="options" id="options"></div>
+
+            <section class="reason-panel hidden" id="reasonPanel">
+              <div class="reason-head">
+                <h3>Begründe deine Entscheidung</h3>
+              </div>
+              <div class="reasons" id="reasons"></div>
+              <div class="reason-actions">
+                <button id="confirmChoiceButton" class="button button-primary" type="button" disabled>Entscheidung festschreiben</button>
+                <button id="changeChoiceButton" class="button button-ghost" type="button">Andere Entscheidung wählen</button>
+              </div>
+            </section>
+
+            <div class="feedback hidden" id="feedback">
+              <strong id="feedbackTitle"></strong>
+              <p id="feedbackText"></p>
+              <p class="feedback-deepen" id="feedbackDeepen"></p>
+              <div class="feedback-actions">
+                <button id="continueButton" class="button button-primary" type="button">Weiter zur nächsten Szene</button>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section id="resultsPage" class="panel tab-page hidden">
+          <p class="eyebrow small">Auswertung</p>
+          <h2>Deine Auseinandersetzung mit dem Gleichnis</h2>
+          <p class="results-copy" id="resultSummary">
+            Spiele die Szenen, begründe deine Entscheidungen und sichere Spuren,
+            damit hier am Ende deine Auseinandersetzung sichtbar wird.
+          </p>
+
+          <div class="result-grid">
+            <article class="result-card">
+              <span>Bewertung</span>
+              <strong id="resultRating">Noch offen</strong>
+            </article>
+            <article class="result-card">
+              <span>Entscheidungen</span>
+              <strong id="resultDecisions">0 / 5</strong>
+            </article>
+            <article class="result-card">
+              <span>Starke Begründungen</span>
+              <strong id="resultReasons">0</strong>
+            </article>
+            <article class="result-card">
+              <span>Gesicherte Spuren</span>
+              <strong id="resultFragments">0</strong>
+            </article>
+          </div>
+
+          <div class="result-note" id="resultNote">
+            Die Auswertung zeigt, ob du dich tragfähig mit Text, Entscheidungen
+            und Folgen auseinandergesetzt hast.
+          </div>
+
+          <details class="fold-card" open>
+            <summary>Dein Weg durch die Geschichte</summary>
+            <div class="timeline" id="timeline"></div>
+          </details>
+
+          <details class="fold-card">
+            <summary>Eigene Kurzdeutung</summary>
+            <div class="reflection">
+              <label for="reflectionInput">Formuliere in 2 bis 4 Sätzen: Wer wird im Gleichnis und heute zum Nächsten?</label>
+              <textarea id="reflectionInput" placeholder="Zum Nächsten wird, wer ..."></textarea>
+            </div>
+          </details>
+
+          <div class="footer-actions">
+            <button id="exportButton" class="button button-secondary" type="button">Auswertung exportieren</button>
+            <button id="restartButton" class="button button-ghost" type="button">Neu starten</button>
+          </div>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,674 @@
+:root{
+  --sand-1:#f3eadb;
+  --sand-2:#e8d2af;
+  --sand-3:#d0ab79;
+  --ink:#231b14;
+  --muted:#6f6152;
+  --paper:rgba(255,251,244,0.94);
+  --panel:rgba(255,248,239,0.97);
+  --line:rgba(91,66,42,0.18);
+  --accent:#ab5d33;
+  --accent-dark:#7f381b;
+  --olive:#567255;
+  --gold:#cf9d49;
+  --sky:#9ac4d9;
+  --good:#2f7d63;
+  --warn:#ab7a2d;
+  --bad:#964039;
+  --radius:28px;
+  --shadow:0 24px 54px rgba(72, 44, 18, 0.14);
+  --page:1280px;
+}
+
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+
+body{
+  margin:0;
+  min-height:100vh;
+  color:var(--ink);
+  font-family:Georgia, "Palatino Linotype", "Book Antiqua", serif;
+  background:
+    radial-gradient(circle at top left, rgba(255,255,255,0.38), transparent 22%),
+    linear-gradient(180deg, rgba(243,234,219,0.96), rgba(233,215,187,0.98)),
+    url("../../../Vertretung/Samariter/assets/bg/road.png") center top / cover fixed no-repeat;
+}
+
+img, canvas{ display:block; max-width:100%; }
+
+.page{
+  width:min(var(--page), calc(100vw - 22px));
+  margin:14px auto 34px;
+  display:grid;
+  gap:20px;
+}
+
+.hero,
+.panel{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:32px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+
+.hero{
+  display:grid;
+  grid-template-columns:minmax(0,1.1fr) minmax(320px,0.9fr);
+  gap:24px;
+  padding:28px;
+  background:
+    radial-gradient(circle at 18% 10%, rgba(255,255,255,0.7), transparent 34%),
+    linear-gradient(135deg, rgba(255,248,239,0.98), rgba(236,218,186,0.96));
+}
+
+.hero-copy,
+.hero-side,
+.main-column,
+.sidebar{ display:grid; gap:16px; align-content:start; }
+
+.eyebrow{
+  width:fit-content;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 14px;
+  border-radius:999px;
+  background:rgba(171,93,51,0.1);
+  color:var(--accent-dark);
+  font:700 0.9rem/1.1 "Trebuchet MS", "Gill Sans", sans-serif;
+  letter-spacing:0.04em;
+  text-transform:uppercase;
+}
+
+.eyebrow.small{ font-size:0.76rem; padding:7px 12px; }
+
+h1,h2,h3,strong{ margin:0; }
+h1{ font-size:clamp(2.5rem, 5vw, 5rem); line-height:0.95; letter-spacing:-0.04em; }
+h2{ font-size:clamp(1.45rem, 2.4vw, 2.15rem); line-height:1.08; }
+h3{ font-size:1.1rem; }
+p,li,textarea,button,a,summary,span,label{ font-size:1rem; line-height:1.55; }
+
+.lead{ max-width:60ch; color:var(--muted); margin:0; }
+
+.hero-actions,
+.page-tabs,
+.feedback-actions,
+.footer-actions,
+.reason-actions,
+.runner-actions{ display:flex; flex-wrap:wrap; gap:12px; }
+
+.button,
+button{
+  border:none;
+  border-radius:999px;
+  padding:13px 20px;
+  font:700 0.96rem/1.1 "Trebuchet MS", "Gill Sans", sans-serif;
+  text-decoration:none;
+  cursor:pointer;
+  transition:transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease, opacity 0.16s ease;
+}
+
+.button:hover,
+button:hover{ transform:translateY(-1px); }
+
+button:disabled,
+.button:disabled{
+  opacity:0.55;
+  cursor:default;
+  transform:none;
+}
+
+.button-primary{
+  color:#fffaf5;
+  background:linear-gradient(135deg, var(--accent), var(--accent-dark));
+  box-shadow:0 14px 28px rgba(127,56,27,0.24);
+}
+
+.button-secondary{
+  color:#f8f8f4;
+  background:linear-gradient(135deg, #67835b, #45684b);
+}
+
+.button-ghost,
+.tab-button,
+.tiny-button{
+  color:var(--ink);
+  background:rgba(255,255,255,0.76);
+  border:1px solid var(--line);
+}
+
+.tab-button.active{
+  background:linear-gradient(135deg, rgba(171,93,51,0.18), rgba(207,157,73,0.24));
+  color:var(--accent-dark);
+}
+
+.tiny-button{
+  padding:8px 12px;
+  border-radius:999px;
+  font:700 0.8rem/1 "Trebuchet MS", "Gill Sans", sans-serif;
+}
+
+.bible-card,
+.mini-card,
+.resource-card,
+.map-card,
+.journal-card,
+.result-card,
+.timeline-entry,
+.option,
+.feedback,
+.fold-card,
+.reason-card,
+.consequence-card,
+.result-note{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:24px;
+  box-shadow:0 18px 34px rgba(86,57,29,0.08);
+}
+
+.bible-card,
+.mini-card,
+.resource-card,
+.map-card,
+.journal-card,
+.result-card,
+.option,
+.feedback,
+.reason-card,
+.consequence-card,
+.result-note{ padding:18px; }
+
+.bible-label{
+  margin:0 0 8px;
+  color:var(--accent-dark);
+  font:700 0.84rem/1.2 "Trebuchet MS", "Gill Sans", sans-serif;
+  text-transform:uppercase;
+  letter-spacing:0.05em;
+}
+
+blockquote{ margin:0; font-size:1.08rem; line-height:1.6; }
+cite{ display:block; margin-top:10px; color:var(--muted); font-style:normal; }
+
+.mini-grid,
+.resource-grid,
+.result-grid{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:12px;
+}
+
+.resource-card span,
+.result-card span{
+  display:block;
+  color:var(--muted);
+  font:700 0.82rem/1.2 "Trebuchet MS", "Gill Sans", sans-serif;
+  letter-spacing:0.04em;
+  text-transform:uppercase;
+}
+
+.resource-card strong,
+.result-card strong{
+  display:block;
+  margin-top:8px;
+  font-size:1.34rem;
+}
+
+.game-shell{
+  display:grid;
+  grid-template-columns:310px minmax(0, 1fr);
+  gap:20px;
+}
+
+.panel{ padding:22px; }
+
+.side-head{
+  display:grid;
+  gap:6px;
+}
+
+.side-head strong{
+  font-size:1.1rem;
+}
+
+.map-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.step-grid,
+.journal-list,
+.story-thumbs,
+.options,
+.reasons,
+.timeline{
+  display:grid;
+  gap:12px;
+}
+
+.step-button{
+  width:100%;
+  text-align:left;
+  padding:12px 14px;
+  border-radius:18px;
+  border:1px solid var(--line);
+  background:rgba(255,252,246,0.86);
+  color:var(--ink);
+}
+
+.step-button.active{
+  background:rgba(207,157,73,0.2);
+  border-color:rgba(171,93,51,0.34);
+}
+
+.step-button.locked{
+  opacity:0.52;
+}
+
+.step-button strong{
+  display:block;
+  font-size:0.95rem;
+}
+
+.step-button span{
+  display:block;
+  margin-top:4px;
+  color:var(--muted);
+  font-size:0.86rem;
+}
+
+.journal-entry{
+  padding:12px 14px;
+  border-radius:18px;
+  background:rgba(255,252,246,0.82);
+  border:1px solid var(--line);
+}
+
+.journal-entry strong{
+  display:block;
+  margin-bottom:4px;
+  font-size:0.96rem;
+}
+
+.journal-entry span{
+  display:block;
+  color:var(--muted);
+  font-size:0.88rem;
+}
+
+.tab-page{ display:grid; gap:18px; }
+.tab-page.hidden{ display:none; }
+
+.runner{
+  background:linear-gradient(180deg, rgba(255,248,239,0.98), rgba(247,238,222,0.96));
+}
+
+.runner-head,
+.scene-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:16px;
+}
+
+.runner-copy{
+  margin:8px 0 16px;
+  color:var(--muted);
+}
+
+#runnerCanvas{
+  width:100%;
+  border-radius:26px;
+  border:1px solid rgba(86,57,29,0.18);
+  background:
+    linear-gradient(180deg, rgba(154,196,217,0.92), rgba(234,214,184,0.18) 46%),
+    url("../../../Vertretung/Samariter/assets/bg/road.png") center 70% / cover no-repeat;
+}
+
+.runner-footer{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-top:14px;
+}
+
+.runner-footer .button{
+  flex-shrink:0;
+}
+
+#runnerStatus{
+  color:var(--muted);
+  font-size:0.95rem;
+}
+
+.role-chip{
+  flex-shrink:0;
+  padding:10px 14px;
+  border-radius:999px;
+  background:rgba(86,114,85,0.12);
+  color:var(--olive);
+  font:700 0.84rem/1.1 "Trebuchet MS", "Gill Sans", sans-serif;
+}
+
+.cast-row,
+.pill-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.cast-pill,
+.pill{
+  padding:8px 12px;
+  border-radius:999px;
+  background:rgba(171,93,51,0.1);
+  color:var(--accent-dark);
+  font:700 0.82rem/1.1 "Trebuchet MS", "Gill Sans", sans-serif;
+}
+
+.story-layout{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+}
+
+.scene-visual{
+  border-radius:28px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(255,255,255,0.42), rgba(238,223,197,0.66));
+}
+
+.scene-visual img{
+  width:100%;
+  aspect-ratio:16/8;
+  object-fit:cover;
+}
+
+.scene-caption{
+  padding:12px 14px;
+  background:rgba(255,250,244,0.9);
+  color:var(--muted);
+  font-size:0.95rem;
+}
+
+.story-strip{
+  display:grid;
+  gap:10px;
+}
+
+.story-guide{
+  padding:10px 14px;
+  border-radius:18px;
+  background:rgba(255,252,246,0.84);
+  border:1px solid var(--line);
+  color:var(--accent-dark);
+  font:700 0.86rem/1.3 "Trebuchet MS", "Gill Sans", sans-serif;
+}
+
+.story-thumb{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+  align-items:start;
+  width:100%;
+  padding:10px;
+  border-radius:20px;
+  border:1px solid var(--line);
+  background:rgba(255,252,246,0.84);
+  transition:transform 0.16s ease, border-color 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
+}
+
+.story-thumb:hover{
+  transform:translateY(-1px);
+}
+
+.story-thumb.active{
+  background:rgba(207,157,73,0.18);
+  border-color:rgba(171,93,51,0.34);
+  box-shadow:0 10px 24px rgba(86,57,29,0.08);
+}
+
+.story-thumb img{
+  width:100%;
+  aspect-ratio:16/9;
+  object-fit:cover;
+  border-radius:14px;
+}
+
+.story-thumb strong{
+  display:block;
+  text-align:left;
+  font-size:0.94rem;
+}
+
+.story-thumb span{
+  display:block;
+  margin-top:2px;
+  text-align:left;
+  color:var(--muted);
+  font-size:0.8rem;
+  line-height:1.35;
+}
+
+.story-thumbs{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:12px;
+}
+
+.focus-card{
+  padding:14px 16px;
+  border-radius:22px;
+  background:linear-gradient(180deg, rgba(255,252,246,0.92), rgba(247,238,218,0.96));
+  border:1px solid var(--line);
+}
+
+.focus-card strong{
+  display:block;
+  margin-bottom:6px;
+  color:var(--accent-dark);
+}
+
+.focus-card p{
+  margin:0;
+  color:var(--muted);
+}
+
+.scene-copy{
+  padding:16px 18px;
+  border-radius:22px;
+  background:rgba(255,252,246,0.78);
+  border:1px solid var(--line);
+}
+
+.scene-copy p{ margin:0; }
+
+.consequence-card strong{
+  display:block;
+  margin-bottom:8px;
+  color:var(--accent-dark);
+}
+
+.consequence-card p{
+  margin:0;
+  color:var(--muted);
+}
+
+.option-head{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+}
+
+.option h3{
+  font-size:1.08rem;
+  line-height:1.3;
+}
+
+.option-tag{
+  flex-shrink:0;
+  padding:8px 12px;
+  border-radius:999px;
+  background:rgba(86,114,85,0.12);
+  color:var(--olive);
+  font:700 0.8rem/1.1 "Trebuchet MS", "Gill Sans", sans-serif;
+}
+
+.reason-panel{
+  padding:20px;
+  border-radius:26px;
+  background:linear-gradient(180deg, rgba(255,252,246,0.94), rgba(248,238,218,0.96));
+  border:1px solid var(--line);
+}
+
+.reason-head{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+}
+
+.reason-card{
+  width:100%;
+  text-align:left;
+  padding:16px;
+}
+
+.reason-card.active{
+  background:rgba(207,157,73,0.16);
+  border-color:rgba(171,93,51,0.34);
+}
+
+.reason-card strong{
+  display:block;
+  margin-bottom:6px;
+}
+
+.reason-card span{
+  color:var(--muted);
+  font-size:0.92rem;
+}
+
+.feedback strong{
+  display:block;
+  margin-bottom:8px;
+  font-size:1.14rem;
+}
+
+.feedback.good strong{ color:var(--good); }
+.feedback.warn strong{ color:var(--warn); }
+.feedback.bad strong{ color:var(--bad); }
+
+.feedback p{ margin:0; }
+.feedback-deepen{ margin-top:10px !important; color:var(--muted); }
+
+.fold-card{
+  padding:0;
+  overflow:hidden;
+}
+
+.fold-card summary{
+  list-style:none;
+  cursor:pointer;
+  padding:15px 18px;
+  font:700 0.98rem/1.2 "Trebuchet MS", "Gill Sans", sans-serif;
+}
+
+.fold-card summary::-webkit-details-marker{ display:none; }
+.fold-card summary::after{ content:"+"; float:right; color:var(--accent-dark); }
+.fold-card[open] summary::after{ content:"–"; }
+
+.fold-card .timeline,
+.fold-card .reflection{
+  padding:0 18px 18px;
+}
+
+.result-grid{
+  grid-template-columns:repeat(4, minmax(0, 1fr));
+}
+
+.result-note{
+  color:var(--muted);
+}
+
+.timeline-entry h3{
+  margin-bottom:6px;
+  font-size:1rem;
+}
+
+.timeline-entry p{
+  margin:0;
+  color:var(--muted);
+}
+
+.reflection label{
+  display:block;
+  margin-bottom:8px;
+  font:700 0.98rem/1.2 "Trebuchet MS", "Gill Sans", sans-serif;
+}
+
+textarea{
+  width:100%;
+  min-height:132px;
+  padding:16px;
+  resize:vertical;
+  border-radius:22px;
+  border:1px solid rgba(91,66,42,0.24);
+  background:rgba(255,255,255,0.78);
+  color:var(--ink);
+  font-family:Georgia, "Palatino Linotype", "Book Antiqua", serif;
+}
+
+.hidden{ display:none !important; }
+
+@media (max-width: 1140px){
+  .hero,
+  .game-shell,
+  .result-grid{
+    grid-template-columns:1fr;
+  }
+
+  .sidebar{ order:2; }
+}
+
+@media (max-width: 720px){
+  .page{
+    width:min(100vw - 10px, var(--page));
+    margin:6px auto 20px;
+  }
+
+  .hero,
+  .panel{
+    padding:18px;
+    border-radius:24px;
+  }
+
+  .mini-grid,
+  .resource-grid{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .runner-head,
+  .scene-top,
+  .option-head,
+  .reason-head{
+    flex-direction:column;
+  }
+
+  .story-thumbs{
+    grid-template-columns:1fr;
+  }
+
+  .runner-footer{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+}

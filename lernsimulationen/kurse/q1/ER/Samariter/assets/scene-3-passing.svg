@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 700" role="img" aria-labelledby="title desc">
+  <title id="title">Vorbeigehen am Verletzten</title>
+  <desc id="desc">Zwei Vorübergehende entfernen sich, während eine verletzte Person am Weg liegt.</desc>
+  <rect width="1600" height="700" fill="#d8c09c"/>
+  <rect y="0" width="1600" height="270" fill="#9bc1d0"/>
+  <circle cx="1180" cy="118" r="74" fill="#f5d06a" opacity="0.88"/>
+  <path d="M0 386c180-74 310-86 498-20 144 50 276 56 420 0 202-78 362-64 682 44v290H0z" fill="#b88b5c"/>
+  <path d="M0 486c170-34 298-24 468 44 120 48 270 44 416-18 170-72 368-80 716 40v148H0z" fill="#855f3b"/>
+  <path d="M468 430c72-16 162-6 246 44 92 56 168 70 274 48 78-16 122-48 180-96 20 58-8 114-70 144-90 44-234 48-346 8-118-42-186-94-284-148z" fill="#dcb483"/>
+  <g transform="translate(380 438)">
+    <ellipse cx="0" cy="78" rx="132" ry="30" fill="#6e5034" opacity="0.28"/>
+    <rect x="-112" y="54" width="224" height="42" rx="18" fill="#b24b3c"/>
+    <circle cx="-116" cy="78" r="26" fill="#d1a077"/>
+    <rect x="-86" y="42" width="40" height="20" rx="10" fill="#7d6044"/>
+  </g>
+  <g transform="translate(900 264)">
+    <circle cx="0" cy="0" r="42" fill="#f0c294"/>
+    <rect x="-38" y="40" width="76" height="172" rx="26" fill="#9a6d3f"/>
+    <rect x="-26" y="208" width="18" height="102" rx="9" fill="#6f4f34"/>
+    <rect x="8" y="208" width="18" height="102" rx="9" fill="#6f4f34"/>
+  </g>
+  <g transform="translate(1086 238)">
+    <circle cx="0" cy="0" r="42" fill="#e6b482"/>
+    <rect x="-38" y="40" width="76" height="172" rx="26" fill="#5e6d48"/>
+    <rect x="-26" y="208" width="18" height="102" rx="9" fill="#6f4f34"/>
+    <rect x="8" y="208" width="18" height="102" rx="9" fill="#6f4f34"/>
+  </g>
+  <path d="M120 630c98-18 178-12 244 20-88 22-170 24-244-20z" fill="#6f4f34" opacity="0.3"/>
+</svg>

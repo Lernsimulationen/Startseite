@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 700" role="img" aria-labelledby="title desc">
+  <title id="title">Weg zwischen Jerusalem und Jericho</title>
+  <desc id="desc">Staubige Hügellandschaft mit Serpentinenweg und einsamer Figur.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#9ccbe3"/>
+      <stop offset="100%" stop-color="#f0d1a4"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="700" fill="url(#sky)"/>
+  <circle cx="1210" cy="126" r="78" fill="#f7d66d" opacity="0.9"/>
+  <path d="M0 410C120 350 240 322 362 326c188 8 294 130 430 130 134 0 230-86 350-106 116-20 256 22 458 92v258H0z" fill="#caa374"/>
+  <path d="M0 484c130-66 242-82 380-38 138 44 206 114 366 112 146-2 226-84 356-110 154-30 288 26 498 118v134H0z" fill="#b78658"/>
+  <path d="M0 568c186-88 314-80 514 0 198 78 356 86 510 16 148-68 282-78 576 12v104H0z" fill="#8e6743"/>
+  <path d="M932 690c-114-96-166-150-150-194 18-52 90-42 142-84 48-38 22-78 64-116 56-52 182-58 246-148 18 34 10 78-28 114-26 24-74 44-90 74-30 58 32 106-4 168-42 74-128 104-180 186z" fill="#ebd3a7"/>
+  <path d="M960 682c-92-80-130-120-118-152 18-50 76-42 122-78 44-36 26-76 56-106 50-48 124-48 196-114 2 22-4 48-22 74-22 30-66 50-84 82-28 46 24 90 0 138-28 54-92 82-150 156z" fill="#c69763"/>
+  <g transform="translate(522 420)">
+    <circle cx="0" cy="0" r="36" fill="#e9bf8b"/>
+    <rect x="-34" y="34" width="68" height="118" rx="24" fill="#506848"/>
+    <rect x="-22" y="142" width="18" height="84" rx="9" fill="#6e5136"/>
+    <rect x="4" y="142" width="18" height="84" rx="9" fill="#6e5136"/>
+  </g>
+  <rect x="450" y="534" width="190" height="24" rx="12" fill="#6f4e2e" opacity="0.36"/>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 160" role="img" aria-labelledby="title">
+  <title id="title">Verwundete Person</title>
+  <ellipse cx="112" cy="126" rx="82" ry="20" fill="#5f432a" opacity=".18"/>
+  <rect x="34" y="94" width="144" height="26" rx="12" fill="#b65446"/>
+  <circle cx="42" cy="108" r="18" fill="#dba77e"/>
+  <path d="M36 96c8-12 20-16 32-10-4 6-8 12-8 20-8-2-16-4-24-10z" fill="#5b4332"/>
+  <path d="M88 80l44 8" stroke="#f2ece0" stroke-width="14" stroke-linecap="round"/>
+  <path d="M112 84c20-8 44-8 66 2" stroke="#6b4d31" stroke-width="6" stroke-linecap="round" opacity=".34"/>
+</svg>

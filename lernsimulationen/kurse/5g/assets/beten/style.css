@@ -906,16 +906,22 @@ body::after{
 .memory-grid{
   grid-template-columns: repeat(4, minmax(0, 1fr));
   margin-top: 18px;
+  align-items: stretch;
 }
 
 .memory-card{
   position: relative;
-  min-height: 126px;
+  display: block;
+  width: 100%;
+  min-height: 0;
+  aspect-ratio: 0.88 / 1;
+  padding: 0;
   border: none;
   border-radius: 22px;
   background: transparent;
   cursor: pointer;
   perspective: 1000px;
+  overflow: hidden;
 }
 
 .memory-card .memory-inner{
@@ -941,12 +947,14 @@ body::after{
 .memory-face{
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
-  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
   border-radius: 22px;
   backface-visibility: hidden;
   box-shadow: 0 14px 26px rgba(28,53,97,0.1);
+  overflow: hidden;
 }
 
 .memory-front{
@@ -963,6 +971,35 @@ body::after{
   inset: 12px;
   border-radius: 18px;
   border: 2px dashed rgba(125,132,246,0.18);
+}
+
+.memory-front::after{
+  content: "";
+  position: absolute;
+  inset: auto 16px 16px 16px;
+  height: 34%;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 18% 26%, rgba(255,255,255,0.8), transparent 16%),
+    radial-gradient(circle at 82% 36%, rgba(255,255,255,0.65), transparent 16%),
+    linear-gradient(180deg, rgba(125,132,246,0.08), rgba(125,132,246,0));
+}
+
+.memory-front,
+.memory-back{
+  isolation: isolate;
+}
+
+.memory-front > *,
+.memory-back > *{
+  position: relative;
+  z-index: 1;
+}
+
+.memory-front{
+  flex-direction: column;
+  gap: 8px;
+  text-align: center;
 }
 
 .memory-front-badge{
@@ -983,6 +1020,9 @@ body::after{
   color: #4757c5;
   font-size: 0.95rem;
   font-weight: 900;
+  line-height: 1.15;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .memory-back{
@@ -990,11 +1030,23 @@ body::after{
   background: linear-gradient(180deg, #fff9df, #fff1c0);
   border: 2px solid rgba(255,201,79,0.25);
   text-align: center;
+  padding: 12px;
+}
+
+.memory-back > span{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .memory-back em{
   display: inline-flex;
-  margin-bottom: 10px;
   padding: 6px 10px;
   border-radius: 999px;
   background: rgba(255,255,255,0.72);
@@ -1008,15 +1060,19 @@ body::after{
 
 .memory-back strong{
   display: block;
-  margin-bottom: 8px;
   color: #7e5700;
-  font-size: 1.02rem;
+  font-size: 0.98rem;
+  line-height: 1.22;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .memory-back p{
   color: #6c5930;
-  font-size: 0.95rem;
-  line-height: 1.45;
+  font-size: 0.86rem;
+  line-height: 1.35;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 @keyframes flipBounce{

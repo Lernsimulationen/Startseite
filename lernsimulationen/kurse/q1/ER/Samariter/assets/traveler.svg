@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 240" role="img" aria-labelledby="title">
+  <title id="title">Reisender</title>
+  <ellipse cx="92" cy="220" rx="56" ry="16" fill="#5f432a" opacity=".22"/>
+  <circle cx="92" cy="52" r="26" fill="#e7bd92"/>
+  <path d="M66 42c8-18 40-24 54-4-4 8-8 14-8 22-14-8-30-7-44 0-4-4-8-10-2-18z" fill="#49392f"/>
+  <path d="M52 88c10-20 28-30 42-30 18 0 40 12 48 30l12 32c6 16-6 34-24 34H52c-18 0-30-18-24-34z" fill="#57704c"/>
+  <path d="M42 118l-24 28 12 10 28-22z" fill="#57704c"/>
+  <path d="M128 116l30 26-10 12-32-22z" fill="#57704c"/>
+  <rect x="72" y="150" width="18" height="56" rx="9" fill="#7b5836"/>
+  <rect x="98" y="150" width="18" height="56" rx="9" fill="#7b5836"/>
+  <path d="M70 206h22v12H64c0-6 2-10 6-12z" fill="#3b2c24"/>
+  <path d="M98 206h24c4 2 6 6 6 12H98z" fill="#3b2c24"/>
+  <path d="M58 76c16-16 58-16 74 0-18 6-56 6-74 0z" fill="#cf9d49"/>
+</svg>

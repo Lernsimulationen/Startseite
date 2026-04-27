@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none';" />
+  <title>Tal der Lichtspuren - Rollenspiel</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand-pill" href="../index.html">5g</a>
+      <div class="brand-lockup">
+        <p class="eyebrow">Rollenspiel</p>
+        <h1>Tal der Lichtspuren</h1>
+      </div>
+      <div class="status-box">
+        <span id="statusHero">Noch kein Held gewählt</span>
+        <span id="statusProgress">0 / 5 Orte</span>
+      </div>
+    </header>
+
+    <section class="progress-panel">
+      <div class="progress-copy">
+        <p class="eyebrow">Abenteuerpfad</p>
+        <p id="progressLabel">Ankunft im Tal</p>
+      </div>
+      <div class="track">
+        <div class="track-fill" id="progressFill"></div>
+      </div>
+      <nav class="station-strip" aria-label="Reiseorte">
+        <span class="station-dot" data-stop-dot="echoes">1</span>
+        <span class="station-dot" data-stop-dot="arena">2</span>
+        <span class="station-dot" data-stop-dot="bridge">3</span>
+        <span class="station-dot" data-stop-dot="tower">4</span>
+        <span class="station-dot" data-stop-dot="sanctuary">5</span>
+      </nav>
+    </section>
+
+    <main id="app" class="app-shell"></main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

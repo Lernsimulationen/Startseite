@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 700" role="img" aria-labelledby="title desc">
+  <title id="title">Der Samariter hilft</title>
+  <desc id="desc">Eine kniende Figur versorgt einen Verletzten in warmer Landschaft.</desc>
+  <rect width="1600" height="700" fill="#efddbb"/>
+  <rect y="0" width="1600" height="280" fill="#8fb9c8"/>
+  <circle cx="1260" cy="130" r="86" fill="#f6d67b"/>
+  <path d="M0 398c188-90 324-92 536-8 190 76 328 70 488 10 156-60 314-54 576 36v264H0z" fill="#c49563"/>
+  <path d="M0 514c178-36 316-16 496 64 112 50 262 62 416 16 162-48 342-58 688 34v72H0z" fill="#8b6341"/>
+  <ellipse cx="758" cy="520" rx="210" ry="52" fill="#715233" opacity="0.26"/>
+  <g transform="translate(722 328)">
+    <circle cx="0" cy="0" r="44" fill="#e6b17e"/>
+    <path d="M-54 42c10-16 30-28 52-28 24 0 46 12 56 30l22 44c10 20-4 44-26 44H-82c-22 0-36-24-26-44z" fill="#56714f"/>
+    <rect x="-18" y="124" width="22" height="112" rx="11" fill="#6f4f34"/>
+    <rect x="16" y="124" width="22" height="112" rx="11" fill="#6f4f34"/>
+  </g>
+  <g transform="translate(852 432)">
+    <ellipse cx="0" cy="64" rx="122" ry="28" fill="#694b2e" opacity="0.24"/>
+    <rect x="-104" y="42" width="208" height="38" rx="16" fill="#b75e4a"/>
+    <circle cx="-106" cy="62" r="24" fill="#d4a37d"/>
+  </g>
+  <path d="M746 408l82 18" stroke="#f0ebdc" stroke-width="16" stroke-linecap="round"/>
+  <path d="M778 282c52 16 92 48 118 96" stroke="#ffffff" stroke-width="10" stroke-linecap="round" opacity="0.64"/>
+</svg>
