@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    style-src 'self' 'unsafe-inline';
+    script-src 'self' 'unsafe-inline';
+    img-src 'self' data:;
+    connect-src 'none';
+    frame-src 'none';
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+  ">
+  <title>Projektkurse Q1</title>
+  <style>
+    :root{
+      --bg: #fffdf8;
+      --ink: #253746;
+      --muted: #607484;
+      --line: rgba(37, 55, 70, 0.1);
+      --accent: #ff6f61;
+      --mint: #dcfaf2;
+      --blue: #dde9ff;
+      --violet: #ece4ff;
+      --shadow: 0 24px 70px rgba(204, 162, 198, 0.18);
+      --radius-xl: 40px;
+      --radius-lg: 28px;
+      --radius-md: 20px;
+      --max: 1220px;
+    }
+
+    *{ box-sizing: border-box; }
+
+    body{
+      margin: 0;
+      font-family: "Trebuchet MS", "Aptos", "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255, 192, 146, 0.34), transparent 25%),
+        radial-gradient(circle at 85% 12%, rgba(125, 199, 255, 0.22), transparent 22%),
+        radial-gradient(circle at 72% 82%, rgba(204, 173, 255, 0.18), transparent 22%),
+        linear-gradient(180deg, #fffdf8 0%, #fff5eb 45%, #fffefd 100%);
+      min-height: 100vh;
+    }
+
+    .page{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 28px 18px 64px;
+    }
+
+    .hero,
+    .footer-rail,
+    .course-card{
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,252,248,0.94));
+      box-shadow: var(--shadow);
+    }
+
+    .hero{
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      overflow: hidden;
+    }
+
+    .hero-grid{
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .eyebrow,
+    .pill,
+    .subject-chip{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      font-weight: 700;
+    }
+
+    .eyebrow{
+      padding: 9px 14px;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #6b7e89;
+      background: rgba(255,255,255,0.72);
+    }
+
+    h1{
+      margin: 18px 0 14px;
+      font-family: "Segoe UI Variable Display", "Aptos Display", "Trebuchet MS", sans-serif;
+      font-size: clamp(2.7rem, 7vw, 5rem);
+      line-height: 0.96;
+      letter-spacing: -0.05em;
+      max-width: 8ch;
+    }
+
+    .lead{
+      margin: 0;
+      max-width: 58ch;
+      color: var(--muted);
+      font-size: 1.08rem;
+      line-height: 1.8;
+    }
+
+    .hero-actions,
+    .card-actions{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .btn{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 13px 20px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      text-decoration: none;
+      color: inherit;
+      background: rgba(255,255,255,0.82);
+      font-weight: 700;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+    }
+
+    .btn:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(233, 175, 127, 0.2);
+      background: rgba(255,255,255,0.98);
+    }
+
+    .btn.primary{
+      background: linear-gradient(135deg, var(--accent), #ffb078);
+      border-color: rgba(255, 138, 76, 0.38);
+      color: #fff;
+    }
+
+    .hero-art{
+      border-radius: 30px;
+      overflow: hidden;
+      min-height: 100%;
+      border: 1px solid rgba(255,255,255,0.6);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.52)),
+        linear-gradient(135deg, var(--blue), var(--mint));
+    }
+
+    .hero-art img{
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .courses{
+      margin-top: 24px;
+    }
+
+    .section-head{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .section-title{
+      margin: 0 0 8px;
+      font-size: 1.6rem;
+      letter-spacing: -0.03em;
+    }
+
+    .section-head p,
+    .course-card p,
+    .footer-rail p{
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.72;
+    }
+
+    .pill{
+      padding: 7px 12px;
+      background: rgba(255,255,255,0.76);
+      color: #6a7b86;
+      font-size: 0.82rem;
+    }
+
+    .course-grid{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .course-card{
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      display: grid;
+      gap: 0;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .course-card:hover{
+      transform: translateY(-4px);
+      box-shadow: 0 28px 80px rgba(223, 169, 122, 0.24);
+    }
+
+    .card-image{
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(135deg, var(--blue), var(--mint));
+    }
+
+    .card-image img{
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .card-body{
+      padding: 24px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .course-card h3{
+      margin: 0;
+      font-family: "Segoe UI Variable Display", "Aptos Display", "Trebuchet MS", sans-serif;
+      font-size: 1.34rem;
+      letter-spacing: -0.02em;
+    }
+
+    .subjects{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .subject-chip{
+      padding: 7px 11px;
+      background: linear-gradient(180deg, #f4fbff, #eef8ff);
+      color: #426170;
+      font-size: 0.82rem;
+    }
+
+    .footer-rail{
+      margin-top: 24px;
+      padding: 18px 20px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .back-link{
+      text-decoration: none;
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    @media (max-width: 920px){
+      .hero-grid{
+        grid-template-columns: 1fr;
+      }
+
+      h1{
+        max-width: none;
+      }
+
+      .section-head,
+      .footer-rail{
+        flex-direction: column;
+        align-items: start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">Projektkurse · Wahl von der EF zur Q1</div>
+          <h1>Wähl den Kurs, der zu dir passt.</h1>
+          <p class="lead">
+            Hier bekommst du einen schnellen Überblick über die Projektkurse für
+            die Q1. Jede Karte zeigt dir die beiden flankierenden Fächer und führt
+            dich auf eine eigene Kursseite mit allen Details, Texten und Bildern.
+          </p>
+          <div class="hero-actions">
+            <a class="btn primary" href="#projektkurse">Projektkurse ansehen</a>
+            <a class="btn" href="./index.html">Zur Startseite</a>
+          </div>
+        </div>
+
+        <div class="hero-art">
+          <img src="./assets/ki-hero.svg" alt="Symbolbild für die Projektkurse der Q1" />
+        </div>
+      </div>
+    </section>
+
+    <section class="courses" id="projektkurse">
+      <div class="section-head">
+        <div>
+          <div class="pill">Projektkurs-Auswahl</div>
+          <h2 class="section-title">Vier Beispielkurse für deine Q1</h2>
+        </div>
+        <p>Auf der Übersichtsseite bleibt es bewusst kompakt. Klick einfach auf einen Kurs und öffne die passende Unterseite.</p>
+      </div>
+
+      <div class="course-grid">
+        <article class="course-card">
+          <div class="card-image">
+            <img src="./assets/overview-ki-photo.png" alt="Fotorealistisches Symbolbild für den Projektkurs KI" />
+          </div>
+          <div class="card-body">
+            <div class="pill">Q1</div>
+            <h3>Projektkurs KI</h3>
+            <div class="subjects">
+              <span class="subject-chip">Sozialwissenschaft</span>
+              <span class="subject-chip">Evangelische Religionslehre</span>
+            </div>
+            <p>KI, Verantwortung, Gesellschaft und die Frage, wie Technik unser Leben verändert.</p>
+            <div class="card-actions">
+              <a class="btn primary" href="./projektkurs-ki.html">Kurs ansehen</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="course-card">
+          <div class="card-image">
+            <img src="./assets/overview-3d-photo.png" alt="Fotorealistisches Symbolbild für den Projektkurs 3D-Druck" />
+          </div>
+          <div class="card-body">
+            <div class="pill">Q1</div>
+            <h3>Projektkurs 3D-Druck</h3>
+            <div class="subjects">
+              <span class="subject-chip">Kunst</span>
+              <span class="subject-chip">Physik</span>
+            </div>
+            <p>Vom digitalen Entwurf bis zum fertigen Objekt: kreativ, technisch und praktisch.</p>
+            <div class="card-actions">
+              <a class="btn primary" href="./projektkurs-3d-druck.html">Kurs ansehen</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="course-card">
+          <div class="card-image">
+            <img src="./assets/overview-sport-photo.png" alt="Fotorealistisches Symbolbild für den Projektkurs Sport" />
+          </div>
+          <div class="card-body">
+            <div class="pill">Q1</div>
+            <h3>Projektkurs Sport</h3>
+            <div class="subjects">
+              <span class="subject-chip">Sport</span>
+              <span class="subject-chip">Biologie</span>
+            </div>
+            <p>Training, Gesundheit, Motivation und die Frage, was Leistung wirklich ausmacht.</p>
+            <div class="card-actions">
+              <a class="btn primary" href="./projektkurs-sport.html">Kurs ansehen</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="course-card">
+          <div class="card-image">
+            <img src="./assets/overview-science-photo.png" alt="Fotorealistisches Symbolbild für den Projektkurs Naturwissenschaften" />
+          </div>
+          <div class="card-body">
+            <div class="pill">Q1</div>
+            <h3>Projektkurs Naturwissenschaften</h3>
+            <div class="subjects">
+              <span class="subject-chip">Biologie</span>
+              <span class="subject-chip">Chemie</span>
+            </div>
+            <p>Experimentieren, auswerten, forschen und naturwissenschaftliche Fragen tiefer verstehen.</p>
+            <div class="card-actions">
+              <a class="btn primary" href="./projektkurs-naturwissenschaften.html">Kurs ansehen</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="footer-rail">
+      <p>Wähl zuerst das Thema, das dich anspricht, und schau dir dann die Details auf der jeweiligen Kursseite an.</p>
+      <a class="back-link btn" href="./index.html">&larr; Zurück zum Lernstudio</a>
+    </section>
+  </div>
+</body>
+</html>

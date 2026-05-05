@@ -368,7 +368,7 @@
 
     const areas = [
       {id:"pflicht",title:"Pflichtkurse",icon:"🧭",tone:"18,32,51",text:"Diese Fächer gehören dazu. Der Check ist nur Selbstorientierung, keine Wahlentscheidung.",subjects:["deutsch","mathe","sport"]},
-      {id:"sprachen",title:"Sprachen",icon:"🌍",tone:"24,91,255",text:"Kommunikation, Kulturen, Texte und neue Perspektiven.",subjects:["englisch","franzoesisch","spanisch_fs","spanisch_neu","italienisch_neu","latein_fs","latein_neu"]},
+      {id:"sprachen",title:"Sprachen",icon:"🌍",tone:"24,91,255",text:"Kommunikation, Kulturen, Texte und neue Perspektiven.",subjects:["englisch","franzoesisch","spanisch_neu","italienisch_neu","latein_fs","latein_neu"]},
       {id:"gesellschaft",title:"Gesellschaft",icon:"🏙️",tone:"255,138,42",text:"Politik, Geschichte, Räume, Menschen und Zusammenleben.",subjects:["sowi","geschichte","geographie"]},
       {id:"natur",title:"Naturwissenschaften & Technik",icon:"🧪",tone:"24,168,107",text:"Forschen, erklären, bauen, testen und Modelle verstehen.",subjects:["biologie","chemie","physik","technik"]},
       {id:"sinn",title:"Religion & Philosophie",icon:"💭",tone:"114,85,255",text:"Sinn, Werte, Gerechtigkeit, Glauben und gute Gründe.",subjects:["evangelisch","katholisch","philosophie"]},
@@ -381,7 +381,6 @@
       sport:{name:"Sport",symbol:"🏃",tone:"18,32,51",short:"Pflichtkurs: Bewegung, Team, Körper und Gesundheit.",text:"Sport ist ein Pflichtkurs, aber mehr als Bewegung. In der Oberstufe geht es um Fitness, Körperwahrnehmung, Regeln, Teamverhalten, Fairness und manchmal auch um Theorie. Das Fach kann helfen, Ausgleich zum Sitzen zu schaffen und eigene Stärken im Umgang mit Bewegung zu entdecken. Wichtig sind Einsatz, Fairness und die Bereitschaft, verschiedene Bewegungsfelder auszuprobieren."},
       englisch:{name:"Englisch",symbol:"🌍",tone:"24,91,255",short:"Internationale Sprache, Medien und Weltblick.",text:"Englisch ist eine Sprache für Medien, Reisen, Internet, Musik, Serien, Ausbildung und viele Berufe. In der EF geht es stärker um echte Themen: Gesellschaft, Kultur, Identität, Zukunft und globale Fragen. Du liest, hörst, diskutierst und formulierst eigene Gedanken auf Englisch. Das Fach passt besonders, wenn du Sprache praktisch nutzen möchtest und bereit bist, dich auch dann auszudrücken, wenn nicht jeder Satz perfekt ist."},
       franzoesisch:{name:"Französisch fortgesetzt",symbol:"🗼",tone:"24,91,255",short:"Eine bekannte Sprache sicherer und kultureller nutzen.",text:"Französisch fortgesetzt baut auf deinem bisherigen Lernen auf. In der EF wird die Sprache erwachsener: mehr Texte, mehr Kultur, mehr eigene Meinung. Du beschäftigst dich mit Alltag, Gesellschaft und Perspektiven aus französischsprachigen Ländern. Das Fach passt, wenn du deine Sprachkenntnisse nicht verlieren, sondern ausbauen möchtest. Es ist gut für Lernende, die bereit sind, Vokabeln zu pflegen und sich Schritt für Schritt mehr zuzutrauen."},
-      spanisch_fs:{name:"Spanisch fortgesetzt",symbol:"🌎",tone:"24,91,255",short:"Spanisch mit Vorwissen weiterentwickeln.",text:"Spanisch fortgesetzt ist für Lernende mit Vorkenntnissen. In der EF geht es um Kommunikation, Kultur, Jugend, Gesellschaft und Themen aus Spanien und Lateinamerika. Du wirst sicherer im Sprechen, Lesen, Hören und Schreiben. Das Fach passt, wenn du eine lebendige Weltsprache magst und gern mehr über unterschiedliche Länder und Lebensweisen erfahren möchtest."},
       spanisch_neu:{name:"Spanisch neu einsetzend",symbol:"✨",tone:"24,91,255",short:"Eine moderne Weltsprache neu beginnen.",text:"Spanisch neu einsetzend startet in der EF von vorne. Das ist eine Chance für einen Neustart, aber auch Arbeit: Vokabeln, Aussprache und Grammatik müssen regelmäßig geübt werden. Dafür lernst du schnell, einfache Gespräche zu führen und bekommst Einblicke in Spanien und Lateinamerika. Das Fach passt, wenn dich eine neue Sprache reizt und du bereit bist, am Anfang konsequent Grundlagen aufzubauen."},
       italienisch_neu:{name:"Italienisch neu einsetzend",symbol:"🍋",tone:"24,91,255",short:"Neue Sprache mit Kultur, Alltag und Lebensgefühl.",text:"Italienisch neu einsetzend beginnt ohne Vorkenntnisse. Du lernst Aussprache, Alltagssprache, Grammatik und erste Gespräche. Dazu kommen Kultur, Städte, Musik, Essen, Kunst und Leben in Italien. Das Fach passt, wenn du eine neue Sprache mit starkem Kulturbezug möchtest. Es ist besonders schön für Lernende, die offen sind, mit Klang, Sprechen und neuen Wörtern zu arbeiten."},
       latein_fs:{name:"Latein fortgesetzt",symbol:"🏛️",tone:"24,91,255",short:"Texte, Übersetzung, Antike und genaues Denken.",text:"Latein fortgesetzt ist anders als moderne Sprachen. Du sprichst weniger frei, sondern übersetzt und untersuchst Texte sehr genau. Dabei geht es um Sprache, Geschichte, Macht, Werte, Mythologie, Politik und antike Ideen, die bis heute wirken. Das Fach passt, wenn du ruhig, gründlich und analytisch arbeiten möchtest. Latein belohnt Genauigkeit und Geduld."},
@@ -534,7 +533,9 @@
     }
 
     function renderSummary(){
-      const entries = Object.values(results);
+      const entries = Object.entries(results)
+        .filter(([id]) => subjects[id])
+        .map(([, value]) => value);
       if(!entries.length){
         summaryContent.innerHTML = `<div class="empty">Noch keine gemerkten Fächer. Öffne einen Bereich, schau dir ein Fach an und speichere es per Button für deine Zusammenfassung.</div>`;
         return;
