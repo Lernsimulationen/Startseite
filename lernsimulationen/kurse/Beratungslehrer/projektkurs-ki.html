@@ -3,59 +3,42 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Projektkurs KI</title>
+  <title>KI, Mensch und Verantwortung</title>
   <style>
-    :root{--bg:#fffdf8;--ink:#253746;--muted:#617685;--line:rgba(37,55,70,.1);--accent:#ff6f61;--shadow:0 24px 70px rgba(204,162,198,.18);--max:1160px}
-    *{box-sizing:border-box} body{margin:0;font-family:"Trebuchet MS","Aptos","Segoe UI",Arial,sans-serif;color:var(--ink);background:radial-gradient(circle at top left,rgba(255,192,146,.34),transparent 25%),radial-gradient(circle at 85% 12%,rgba(125,199,255,.22),transparent 22%),linear-gradient(180deg,#fffdf8 0%,#fff5eb 45%,#fffefd 100%)} .page{max-width:var(--max);margin:0 auto;padding:28px 18px 64px} .hero,.story,.gallery img,.backbar{border:1px solid var(--line);box-shadow:var(--shadow)} .hero,.story,.backbar{background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,252,248,.94));border-radius:30px} .hero{padding:28px}.eyebrow,.pill,.chip,.btn{display:inline-flex;align-items:center;border-radius:999px;border:1px solid var(--line);font-weight:700}.eyebrow,.pill,.chip{padding:8px 12px}.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#6b7e89;background:rgba(255,255,255,.72)} h1,h2{font-family:"Segoe UI Variable Display","Aptos Display","Trebuchet MS",sans-serif;letter-spacing:-.03em} h1{margin:18px 0 12px;font-size:clamp(2.5rem,6vw,4.6rem);line-height:.96} p{color:var(--muted);line-height:1.8;margin:0} .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:26px;align-items:center}.hero img,.gallery img{width:100%;display:block;object-fit:cover}.hero-art{overflow:hidden;border-radius:24px}.meta,.chips,.gallery{display:flex;flex-wrap:wrap;gap:10px}.chip{background:linear-gradient(180deg,#f4fbff,#eef8ff);color:#426170}.pill{background:rgba(255,255,255,.76);color:#6a7b86}.story{margin-top:22px;padding:24px;display:grid;gap:14px}.gallery{margin-top:20px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.gallery figure{margin:0;display:grid;gap:8px}.gallery img{aspect-ratio:1.2/1;border-radius:22px;background:#fff}.gallery figcaption{font-size:.9rem;font-weight:700;color:#55707e}.backbar{margin-top:24px;padding:18px 20px;display:flex;justify-content:space-between;gap:14px;align-items:center}.btn{text-decoration:none;color:inherit;padding:12px 18px;background:#fff}.btn.primary{background:linear-gradient(135deg,var(--accent),#ffb078);color:#fff}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}@media (max-width:920px){.hero-grid,.gallery{grid-template-columns:1fr}.backbar{flex-direction:column;align-items:start}}
+    :root{--page:#f7fbff;--surface:#fff;--soft:#f1f6fb;--ink:#172b3a;--muted:#5d7180;--line:rgba(23,43,58,.12);--indigo:#5265d8;--teal:#22a699;--coral:#ef695b;--shadow:0 20px 50px rgba(50,73,95,.12);--max:1060px}
+    *{box-sizing:border-box} body{margin:0;font-family:"Trebuchet MS","Aptos","Segoe UI",Arial,sans-serif;color:var(--ink);background:linear-gradient(135deg,rgba(82,101,216,.08),transparent 36%),linear-gradient(225deg,rgba(34,166,153,.1),transparent 32%),var(--page)} .page{max-width:var(--max);margin:0 auto;padding:28px 18px 56px}.hero,.text-panel,.backbar{border:1px solid var(--line);background:rgba(255,255,255,.94);box-shadow:var(--shadow);border-radius:8px}.hero{padding:28px;display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:26px;align-items:center}.eyebrow,.chip,.btn{display:inline-flex;align-items:center;width:fit-content;border:1px solid var(--line);border-radius:999px;font-weight:700}.eyebrow{padding:8px 12px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#506777;background:var(--soft)}.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.chip{padding:7px 11px;background:var(--soft);color:#48606f;font-size:.86rem}h1,h2{font-family:"Segoe UI Variable Display","Aptos Display","Trebuchet MS",sans-serif;letter-spacing:0}h1{margin:18px 0 0;font-size:3.6rem;line-height:1.04}h2{margin:0;font-size:1.55rem;line-height:1.25}p{margin:0;color:var(--muted);line-height:1.82}.symbol{aspect-ratio:1/1;border:1px solid var(--line);border-radius:8px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(82,101,216,.16),rgba(34,166,153,.12)),#fff}.symbol img{width:72%;height:72%;object-fit:contain;border-radius:8px}.text-panel{margin-top:18px;padding:26px;display:grid;gap:16px}.actions,.backbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center}.actions{margin-top:22px}.btn{text-decoration:none;color:inherit;padding:11px 18px;background:#fff;min-height:44px}.btn.primary{background:linear-gradient(135deg,var(--indigo),var(--teal));color:#fff;border-color:transparent}.backbar{margin-top:18px;padding:16px 18px;justify-content:space-between}@media(max-width:780px){.hero{grid-template-columns:1fr}h1{font-size:2.7rem}.symbol{max-width:260px}}
   </style>
 </head>
 <body>
   <div class="page">
     <section class="hero">
-      <div class="hero-grid">
-        <div>
-          <div class="eyebrow">Projektkurs · Q1</div>
-          <h1>Projektkurs KI</h1>
-          <div class="chips">
-            <span class="chip">Sozialwissenschaft</span>
-            <span class="chip">Evangelische Religionslehre</span>
-          </div>
-          <div class="actions">
-            <a class="btn primary" href="./projektkurse-q1.html">Zur Übersicht</a>
-            <a class="btn" href="./index.html">Zur Startseite</a>
-          </div>
+      <div>
+        <div class="eyebrow">Projektkurs · Q1</div>
+        <h1>KI, Mensch und Verantwortung</h1>
+        <div class="chips">
+          <span class="chip">Leitfach: Sozialwissenschaft</span>
+          <span class="chip">Leitfach: Evangelische Religionslehre</span>
         </div>
-        <div class="hero-art">
-          <img src="./assets/ki-project.svg" alt="Illustration zum Projektkurs KI" />
+        <div class="actions">
+          <a class="btn primary" href="./projektkurse-q1.html">Zur Übersicht</a>
+          <a class="btn" href="./index.html">Zur Startseite</a>
         </div>
+      </div>
+      <div class="symbol" aria-hidden="true">
+        <img src="./assets/symbol-ki.png" alt="" />
       </div>
     </section>
 
-    <section class="story">
-      <div class="pill">Worum es geht</div>
-      <h2>Wie verändert Künstliche Intelligenz unser Leben, unser Denken und unsere Verantwortung?</h2>
-      <p>Dieser Projektkurs verbindet aktuelle Fragen rund um KI mit gesellschaftlichen Debatten und ethischen Perspektiven. Ihr analysiert, wie Algorithmen Entscheidungen beeinflussen, diskutiert Chancen und Risiken und entwickelt eigene Positionen zu Fairness, Menschenbild, Wahrheit, Macht und Verantwortung.</p>
-      <p>Im Mittelpunkt steht die Frage, wie Künstliche Intelligenz unsere Gesellschaft verändert und welche Verantwortung damit verbunden ist. Gemeinsam schaut ihr euch an, wie KI heute schon in sozialen Medien, bei Bewerbungen, in Medizin, Schule, Politik oder Sicherheit eingesetzt wird. Ihr untersucht, wer von dieser Technik profitiert, wer benachteiligt werden kann und welche Regeln nötig sind, damit digitale Entwicklungen fair bleiben.</p>
-      <p>Dabei verbindet der Kurs gesellschaftliche Analyse mit ethischen Fragen: Was ist eigentlich noch eine freie Entscheidung, wenn Algorithmen mitlenken? Wie verändert KI unser Bild vom Menschen? Und wie gehen wir damit um, wenn Maschinen Texte, Bilder oder sogar Meinungen erzeugen? Der Kurs eignet sich für alle, die gerne mitdenken, diskutieren, recherchieren und aktuelle Entwicklungen nicht nur konsumieren, sondern wirklich verstehen wollen.</p>
-      <div class="gallery">
-        <figure>
-          <img src="./assets/ki-hero.svg" alt="Symbolbild zum Projektkurs KI" />
-          <figcaption>Gesellschaft, Technik und Zukunft zusammendenken</figcaption>
-        </figure>
-        <figure>
-          <img src="./assets/ki-discussion.svg" alt="Diskussion und Perspektiven im Projektkurs KI" />
-          <figcaption>Diskussionen über Macht, Fairness und Verantwortung</figcaption>
-        </figure>
-        <figure>
-          <img src="./assets/ki-ethics.svg" alt="Ethik und Reflexion im Projektkurs KI" />
-          <figcaption>Ethik, Menschenbild und der Blick auf die Zukunft</figcaption>
-        </figure>
-      </div>
+    <section class="text-panel">
+      <h2>„KI, Mensch und Verantwortung“ fragt danach, was Künstliche Intelligenz mit uns als Menschen macht.</h2>
+      <p>Im Projektkurs wird KI nicht nur theoretisch behandelt, sondern praktisch ausprobiert: Ihr nutzt KI-Tools zur Texterstellung, Bildgenerierung, Recherche, Analyse oder Präsentation und prüft dabei kritisch, was diese Systeme leisten – und was nicht.</p>
+      <p>Aus evangelischer Perspektive geht es um Grundfragen: Was bedeutet Menschenwürde, wenn Maschinen scheinbar denken? Was unterscheidet den Menschen von einer KI? Welche Rolle spielen Gewissen, Freiheit, Schuld, Verantwortung und das christliche Menschenbild?</p>
+      <p>An Beispielen aus Schule, Medien, Politik, Kirche, Arbeitswelt und Alltag werden Chancen und Risiken untersucht, etwa Fake News, Manipulation, Diskriminierung oder KI in Seelsorge und Bildung. Der Kurs verbindet eigenes Ausprobieren mit theologischer und ethischer Reflexion. Am Ende entsteht ein eigenes Projektprodukt, zum Beispiel Podcast, Erklärvideo, Ausstellung, Umfrage, KI-Experiment oder Diskussionsformat.</p>
     </section>
 
     <section class="backbar">
-      <p>Du willst lieber noch andere Themen vergleichen? Spring zurück zur Übersicht und öffne die nächste Kursseite.</p>
-      <a class="btn" href="./projektkurse-q1.html">&larr; Zurück zur Übersicht</a>
+      <p>Zurück zur Auswahl, um den zweiten Projektkurs zu vergleichen.</p>
+      <a class="btn" href="./projektkurse-q1.html">Projektkurse ansehen</a>
     </section>
   </div>
 </body>

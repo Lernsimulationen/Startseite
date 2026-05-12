@@ -17,19 +17,19 @@
   <title>Projektkurse Q1</title>
   <style>
     :root{
-      --bg: #fffdf8;
-      --ink: #253746;
-      --muted: #607484;
-      --line: rgba(37, 55, 70, 0.1);
-      --accent: #ff6f61;
-      --mint: #dcfaf2;
-      --blue: #dde9ff;
-      --violet: #ece4ff;
-      --shadow: 0 24px 70px rgba(204, 162, 198, 0.18);
-      --radius-xl: 40px;
-      --radius-lg: 28px;
-      --radius-md: 20px;
-      --max: 1220px;
+      --page: #f7fbff;
+      --surface: #ffffff;
+      --surface-soft: #f1f6fb;
+      --ink: #172b3a;
+      --muted: #5d7180;
+      --line: rgba(23, 43, 58, 0.12);
+      --coral: #ef695b;
+      --teal: #22a699;
+      --indigo: #5265d8;
+      --amber: #f4b44f;
+      --shadow: 0 20px 50px rgba(50, 73, 95, 0.12);
+      --max: 1160px;
+      --radius: 8px;
     }
 
     *{ box-sizing: border-box; }
@@ -39,37 +39,46 @@
       font-family: "Trebuchet MS", "Aptos", "Segoe UI", Arial, sans-serif;
       color: var(--ink);
       background:
-        radial-gradient(circle at top left, rgba(255, 192, 146, 0.34), transparent 25%),
-        radial-gradient(circle at 85% 12%, rgba(125, 199, 255, 0.22), transparent 22%),
-        radial-gradient(circle at 72% 82%, rgba(204, 173, 255, 0.18), transparent 22%),
-        linear-gradient(180deg, #fffdf8 0%, #fff5eb 45%, #fffefd 100%);
+        linear-gradient(135deg, rgba(82, 101, 216, 0.08), transparent 36%),
+        linear-gradient(225deg, rgba(34, 166, 153, 0.1), transparent 32%),
+        var(--page);
       min-height: 100vh;
     }
 
     .page{
       max-width: var(--max);
       margin: 0 auto;
-      padding: 28px 18px 64px;
+      padding: 28px 18px 56px;
     }
 
-    .hero,
+    .screen,
     .footer-rail,
     .course-card{
       border: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,252,248,0.94));
+      background: rgba(255,255,255,0.94);
       box-shadow: var(--shadow);
     }
 
-    .hero{
-      border-radius: var(--radius-xl);
-      padding: 32px;
-      overflow: hidden;
+    .screen{
+      border-radius: 18px;
+      padding: 30px;
+      min-height: min(720px, calc(100vh - 112px));
+      display: grid;
+      align-content: center;
+    }
+
+    .screen[hidden]{
+      display: none;
+    }
+
+    .screen.revealed{
+      animation: revealScreen 0.28s ease;
     }
 
     .hero-grid{
       display: grid;
-      grid-template-columns: 1.05fr 0.95fr;
-      gap: 28px;
+      grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
+      gap: 30px;
       align-items: center;
     }
 
@@ -78,167 +87,191 @@
     .subject-chip{
       display: inline-flex;
       align-items: center;
-      gap: 8px;
       width: fit-content;
-      border-radius: 999px;
       border: 1px solid var(--line);
+      border-radius: 999px;
       font-weight: 700;
     }
 
     .eyebrow{
-      padding: 9px 14px;
+      padding: 8px 12px;
       font-size: 12px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: #6b7e89;
-      background: rgba(255,255,255,0.72);
+      color: #506777;
+      background: var(--surface-soft);
+    }
+
+    h1,
+    h2,
+    h3{
+      font-family: "Segoe UI Variable Display", "Aptos Display", "Trebuchet MS", sans-serif;
+      letter-spacing: 0;
     }
 
     h1{
       margin: 18px 0 14px;
-      font-family: "Segoe UI Variable Display", "Aptos Display", "Trebuchet MS", sans-serif;
-      font-size: clamp(2.7rem, 7vw, 5rem);
-      line-height: 0.96;
-      letter-spacing: -0.05em;
-      max-width: 8ch;
+      font-size: 4.5rem;
+      line-height: 1.02;
+      max-width: 9ch;
+    }
+
+    h2{
+      margin: 0 0 10px;
+      font-size: 2rem;
+      line-height: 1.18;
+    }
+
+    h3{
+      margin: 0;
+      font-size: 1.35rem;
+      line-height: 1.25;
+    }
+
+    p{
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.75;
+      font-size: 1rem;
     }
 
     .lead{
-      margin: 0;
-      max-width: 58ch;
-      color: var(--muted);
+      max-width: 62ch;
       font-size: 1.08rem;
-      line-height: 1.8;
+    }
+
+    .nrw-info{
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+      max-width: 720px;
+    }
+
+    .info-item{
+      border-left: 4px solid var(--teal);
+      background: var(--surface-soft);
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+
+    .info-item strong{
+      display: block;
+      margin-bottom: 4px;
+      color: var(--ink);
     }
 
     .hero-actions,
-    .card-actions{
+    .card-actions,
+    .selection-actions{
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
       margin-top: 24px;
     }
 
+    .selection-actions{
+      justify-content: space-between;
+      align-items: center;
+      margin: 0 0 22px;
+    }
+
     .btn{
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 13px 20px;
+      min-height: 44px;
+      padding: 11px 18px;
       border-radius: 999px;
       border: 1px solid var(--line);
       text-decoration: none;
       color: inherit;
-      background: rgba(255,255,255,0.82);
+      background: #fff;
       font-weight: 700;
+      cursor: pointer;
       transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
     }
 
     .btn:hover{
       transform: translateY(-2px);
-      box-shadow: 0 14px 28px rgba(233, 175, 127, 0.2);
-      background: rgba(255,255,255,0.98);
+      box-shadow: 0 12px 24px rgba(50, 73, 95, 0.12);
     }
 
     .btn.primary{
-      background: linear-gradient(135deg, var(--accent), #ffb078);
-      border-color: rgba(255, 138, 76, 0.38);
+      background: linear-gradient(135deg, var(--indigo), var(--teal));
+      border-color: transparent;
       color: #fff;
     }
 
-    .hero-art{
-      border-radius: 30px;
-      overflow: hidden;
-      min-height: 100%;
-      border: 1px solid rgba(255,255,255,0.6);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.52)),
-        linear-gradient(135deg, var(--blue), var(--mint));
-    }
-
-    .hero-art img{
+    .hero-symbol{
       width: 100%;
-      height: 100%;
+      aspect-ratio: 1 / 1;
+      max-height: 520px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(135deg, rgba(82, 101, 216, 0.14), rgba(34, 166, 153, 0.14)),
+        #fff;
+      display: grid;
+      place-items: center;
+      padding: 28px;
+    }
+
+    .hero-symbol img{
+      width: min(88%, 420px);
+      height: min(88%, 420px);
+      object-fit: contain;
       display: block;
-      object-fit: cover;
-    }
-
-    .courses{
-      margin-top: 24px;
-    }
-
-    .section-head{
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 22px;
-    }
-
-    .section-title{
-      margin: 0 0 8px;
-      font-size: 1.6rem;
-      letter-spacing: -0.03em;
-    }
-
-    .section-head p,
-    .course-card p,
-    .footer-rail p{
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.72;
-    }
-
-    .pill{
-      padding: 7px 12px;
-      background: rgba(255,255,255,0.76);
-      color: #6a7b86;
-      font-size: 0.82rem;
+      border-radius: 12px;
     }
 
     .course-grid{
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 20px;
     }
 
     .course-card{
-      border-radius: var(--radius-lg);
+      border-radius: var(--radius);
       overflow: hidden;
       display: grid;
-      gap: 0;
-      transition: transform 0.18s ease, box-shadow 0.18s ease;
     }
 
-    .course-card:hover{
-      transform: translateY(-4px);
-      box-shadow: 0 28px 80px rgba(223, 169, 122, 0.24);
-    }
-
-    .card-image{
-      aspect-ratio: 16 / 9;
-      overflow: hidden;
+    .card-symbol{
+      aspect-ratio: 1.15 / 1;
+      display: grid;
+      place-items: center;
       border-bottom: 1px solid var(--line);
-      background: linear-gradient(135deg, var(--blue), var(--mint));
+      background: linear-gradient(135deg, rgba(var(--card-tint), 0.18), #fff);
+      padding: 20px;
     }
 
-    .card-image img{
-      width: 100%;
-      height: 100%;
+    .card-symbol svg{
+      width: 108px;
+      height: 108px;
+    }
+
+    .card-symbol img{
+      width: min(82%, 190px);
+      height: min(82%, 190px);
       display: block;
-      object-fit: cover;
+      object-fit: contain;
+      border-radius: 12px;
+      filter: drop-shadow(0 14px 22px rgba(50, 73, 95, 0.12));
     }
 
     .card-body{
-      padding: 24px;
+      padding: 22px;
       display: grid;
-      gap: 16px;
+      gap: 14px;
     }
 
-    .course-card h3{
-      margin: 0;
-      font-family: "Segoe UI Variable Display", "Aptos Display", "Trebuchet MS", sans-serif;
-      font-size: 1.34rem;
-      letter-spacing: -0.02em;
+    .pill,
+    .subject-chip{
+      padding: 7px 11px;
+      background: var(--surface-soft);
+      color: #48606f;
+      font-size: 0.84rem;
     }
 
     .subjects{
@@ -247,39 +280,38 @@
       gap: 8px;
     }
 
-    .subject-chip{
-      padding: 7px 11px;
-      background: linear-gradient(180deg, #f4fbff, #eef8ff);
-      color: #426170;
-      font-size: 0.82rem;
-    }
-
     .footer-rail{
-      margin-top: 24px;
-      padding: 18px 20px;
-      border-radius: var(--radius-lg);
+      margin-top: 18px;
+      padding: 16px 18px;
+      border-radius: var(--radius);
       display: flex;
       justify-content: space-between;
-      gap: 16px;
+      gap: 14px;
       align-items: center;
     }
 
-    .back-link{
-      text-decoration: none;
-      color: var(--ink);
-      font-weight: 700;
+    @keyframes revealScreen{
+      from{ opacity: 0; transform: translateY(10px); }
+      to{ opacity: 1; transform: translateY(0); }
     }
 
-    @media (max-width: 920px){
-      .hero-grid{
+    @media (max-width: 900px){
+      .screen{
+        min-height: auto;
+      }
+
+      .hero-grid,
+      .course-grid,
+      .nrw-info{
         grid-template-columns: 1fr;
       }
 
       h1{
+        font-size: 3rem;
         max-width: none;
       }
 
-      .section-head,
+      .selection-actions,
       .footer-rail{
         flex-direction: column;
         align-items: start;
@@ -289,116 +321,135 @@
 </head>
 <body>
   <div class="page">
-    <section class="hero">
+    <section class="screen" id="landingScreen">
       <div class="hero-grid">
         <div>
-          <div class="eyebrow">Projektkurse · Wahl von der EF zur Q1</div>
-          <h1>Wähl den Kurs, der zu dir passt.</h1>
+          <div class="eyebrow">Projektkurse · NRW Oberstufe</div>
+          <h1>Projektkurse wählen</h1>
           <p class="lead">
-            Hier bekommst du einen schnellen Überblick über die Projektkurse für
-            die Q1. Jede Karte zeigt dir die beiden flankierenden Fächer und führt
-            dich auf eine eigene Kursseite mit allen Details, Texten und Bildern.
+            Projektkurse sind Kurse in der Qualifikationsphase. Du arbeitest über zwei Halbjahre an einem größeren Thema. Es geht nicht nur um normalen Unterricht, sondern um ein eigenes Produkt, Recherche, Planung, Teamarbeit und Präsentation.
           </p>
+
+          <div class="nrw-info" aria-label="Informationen zu Projektkursen in NRW">
+            <div class="info-item">
+              <strong>Zwei Halbjahre</strong>
+              <p>Ein Projektkurs läuft in NRW über zwei aufeinanderfolgende Halbjahre.</p>
+            </div>
+            <div class="info-item">
+              <strong>Leitfächer</strong>
+              <p>Jeder Projektkurs ist an ein oder mehrere Fächer angebunden.</p>
+            </div>
+            <div class="info-item">
+              <strong>Eigenes Produkt</strong>
+              <p>Am Ende steht ein Ergebnis, zum Beispiel eine Aufführung, ein Podcast, ein Experiment oder eine Präsentation.</p>
+            </div>
+            <div class="info-item">
+              <strong>Selbstständig arbeiten</strong>
+              <p>Du recherchierst, planst und arbeitest stärker eigenverantwortlich als in vielen anderen Kursen.</p>
+            </div>
+          </div>
+
           <div class="hero-actions">
-            <a class="btn primary" href="#projektkurse">Projektkurse ansehen</a>
-            <a class="btn" href="./index.html">Zur Startseite</a>
+            <button class="btn primary" id="showCoursesBtn" type="button" aria-controls="courseScreen" aria-expanded="false">Projektkurse ansehen</button>
           </div>
         </div>
 
-        <div class="hero-art">
-          <img src="./assets/ki-hero.svg" alt="Symbolbild für die Projektkurse der Q1" />
+        <div class="hero-symbol" aria-hidden="true">
+          <img src="./assets/symbol-projektarbeit.png" alt="" />
         </div>
       </div>
     </section>
 
-    <section class="courses" id="projektkurse">
-      <div class="section-head">
+    <section class="screen" id="courseScreen" hidden>
+      <div class="selection-actions">
         <div>
-          <div class="pill">Projektkurs-Auswahl</div>
-          <h2 class="section-title">Vier Beispielkurse für deine Q1</h2>
+          <div class="eyebrow">Projektkurs-Auswahl</div>
+          <h2>Wähle deinen Projektkurs</h2>
         </div>
-        <p>Auf der Übersichtsseite bleibt es bewusst kompakt. Klick einfach auf einen Kurs und öffne die passende Unterseite.</p>
+        <button class="btn" id="backToLandingBtn" type="button">Zurück</button>
       </div>
 
       <div class="course-grid">
         <article class="course-card">
-          <div class="card-image">
-            <img src="./assets/overview-ki-photo.png" alt="Fotorealistisches Symbolbild für den Projektkurs KI" />
+          <div class="card-symbol" style="--card-tint: 82,101,216" aria-hidden="true">
+            <img src="./assets/symbol-ki.png" alt="" />
           </div>
           <div class="card-body">
             <div class="pill">Q1</div>
-            <h3>Projektkurs KI</h3>
+            <h3>KI, Mensch und Verantwortung</h3>
             <div class="subjects">
               <span class="subject-chip">Sozialwissenschaft</span>
               <span class="subject-chip">Evangelische Religionslehre</span>
             </div>
-            <p>KI, Verantwortung, Gesellschaft und die Frage, wie Technik unser Leben verändert.</p>
             <div class="card-actions">
-              <a class="btn primary" href="./projektkurs-ki.html">Kurs ansehen</a>
+              <a class="btn primary" href="./projektkurs-ki.html">Kursseite öffnen</a>
             </div>
           </div>
         </article>
 
         <article class="course-card">
-          <div class="card-image">
-            <img src="./assets/overview-3d-photo.png" alt="Fotorealistisches Symbolbild für den Projektkurs 3D-Druck" />
+          <div class="card-symbol" style="--card-tint: 239,105,91" aria-hidden="true">
+            <img src="./assets/symbol-dramaturgie.png" alt="" />
           </div>
           <div class="card-body">
             <div class="pill">Q1</div>
-            <h3>Projektkurs 3D-Druck</h3>
+            <h3>„Dramaturgie“</h3>
             <div class="subjects">
-              <span class="subject-chip">Kunst</span>
-              <span class="subject-chip">Physik</span>
+              <span class="subject-chip">Deutsch</span>
+              <span class="subject-chip">Literatur</span>
             </div>
-            <p>Vom digitalen Entwurf bis zum fertigen Objekt: kreativ, technisch und praktisch.</p>
             <div class="card-actions">
-              <a class="btn primary" href="./projektkurs-3d-druck.html">Kurs ansehen</a>
+              <a class="btn primary" href="./projektkurs-dramaturgie.html">Kursseite öffnen</a>
             </div>
           </div>
         </article>
 
         <article class="course-card">
-          <div class="card-image">
-            <img src="./assets/overview-sport-photo.png" alt="Fotorealistisches Symbolbild für den Projektkurs Sport" />
+          <div class="card-symbol" style="--card-tint: 34,166,153" aria-hidden="true">
+            <img src="./assets/symbol-schwammstadt.png" alt="" />
           </div>
           <div class="card-body">
             <div class="pill">Q1</div>
-            <h3>Projektkurs Sport</h3>
-            <div class="subjects">
-              <span class="subject-chip">Sport</span>
-              <span class="subject-chip">Biologie</span>
-            </div>
-            <p>Training, Gesundheit, Motivation und die Frage, was Leistung wirklich ausmacht.</p>
-            <div class="card-actions">
-              <a class="btn primary" href="./projektkurs-sport.html">Kurs ansehen</a>
-            </div>
-          </div>
-        </article>
-
-        <article class="course-card">
-          <div class="card-image">
-            <img src="./assets/overview-science-photo.png" alt="Fotorealistisches Symbolbild für den Projektkurs Naturwissenschaften" />
-          </div>
-          <div class="card-body">
-            <div class="pill">Q1</div>
-            <h3>Projektkurs Naturwissenschaften</h3>
+            <h3>Schwammstadt Ruhr</h3>
             <div class="subjects">
               <span class="subject-chip">Biologie</span>
-              <span class="subject-chip">Chemie</span>
+              <span class="subject-chip">Geographie</span>
             </div>
-            <p>Experimentieren, auswerten, forschen und naturwissenschaftliche Fragen tiefer verstehen.</p>
             <div class="card-actions">
-              <a class="btn primary" href="./projektkurs-naturwissenschaften.html">Kurs ansehen</a>
+              <a class="btn primary" href="./projektkurs-schwammstadt-ruhr.html">Kursseite öffnen</a>
             </div>
           </div>
         </article>
       </div>
     </section>
 
-    <section class="footer-rail">
-      <p>Wähl zuerst das Thema, das dich anspricht, und schau dir dann die Details auf der jeweiligen Kursseite an.</p>
-      <a class="back-link btn" href="./index.html">&larr; Zurück zum Lernstudio</a>
-    </section>
   </div>
+
+  <script>
+    const showCoursesBtn = document.getElementById("showCoursesBtn");
+    const landingScreen = document.getElementById("landingScreen");
+    const courseScreen = document.getElementById("courseScreen");
+    const backToLandingBtn = document.getElementById("backToLandingBtn");
+
+    const reveal = (screen) => {
+      screen.classList.remove("revealed");
+      void screen.offsetWidth;
+      screen.classList.add("revealed");
+    };
+
+    showCoursesBtn.addEventListener("click", () => {
+      landingScreen.setAttribute("hidden", "");
+      courseScreen.removeAttribute("hidden");
+      showCoursesBtn.setAttribute("aria-expanded", "true");
+      reveal(courseScreen);
+    });
+
+    backToLandingBtn.addEventListener("click", () => {
+      courseScreen.setAttribute("hidden", "");
+      landingScreen.removeAttribute("hidden");
+      showCoursesBtn.setAttribute("aria-expanded", "false");
+      reveal(landingScreen);
+    });
+  </script>
 </body>
 </html>
