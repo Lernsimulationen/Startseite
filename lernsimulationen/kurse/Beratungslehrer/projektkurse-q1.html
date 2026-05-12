@@ -529,10 +529,20 @@
       screen.classList.add("revealed");
     };
 
-    showCoursesBtn.addEventListener("click", () => {
+    const showOverview = () => {
+      courseScreen.setAttribute("hidden", "");
+      landingScreen.removeAttribute("hidden");
+      showCoursesBtn.setAttribute("aria-expanded", "false");
+    };
+
+    const showSelection = () => {
       landingScreen.setAttribute("hidden", "");
       courseScreen.removeAttribute("hidden");
       showCoursesBtn.setAttribute("aria-expanded", "true");
+    };
+
+    showCoursesBtn.addEventListener("click", () => {
+      showSelection();
       reveal(courseScreen);
     });
 
@@ -541,6 +551,15 @@
       landingScreen.removeAttribute("hidden");
       showCoursesBtn.setAttribute("aria-expanded", "false");
       reveal(landingScreen);
+    });
+
+    window.addEventListener("pageshow", () => {
+      if (window.location.hash === "#auswahl") {
+        showSelection();
+        return;
+      }
+
+      showOverview();
     });
   </script>
 </body>
