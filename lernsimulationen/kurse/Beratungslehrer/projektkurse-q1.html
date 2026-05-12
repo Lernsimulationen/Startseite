@@ -227,7 +227,7 @@
 
     .course-grid{
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 20px;
     }
 
@@ -238,12 +238,14 @@
     }
 
     .card-symbol{
-      aspect-ratio: 1.15 / 1;
+      height: 210px;
       display: grid;
       place-items: center;
       border-bottom: 1px solid var(--line);
-      background: linear-gradient(135deg, rgba(var(--card-tint), 0.18), #fff);
-      padding: 20px;
+      background:
+        linear-gradient(135deg, rgba(var(--card-tint), 0.14), rgba(255,255,255,0.88)),
+        #fff;
+      padding: 22px;
     }
 
     .card-symbol svg{
@@ -252,8 +254,8 @@
     }
 
     .card-symbol img{
-      width: min(82%, 190px);
-      height: min(82%, 190px);
+      width: 150px;
+      height: 150px;
       display: block;
       object-fit: contain;
       border-radius: 12px;
@@ -309,6 +311,15 @@
       h1{
         font-size: 3rem;
         max-width: none;
+      }
+
+      .card-symbol{
+        height: 190px;
+      }
+
+      .card-symbol img{
+        width: 140px;
+        height: 140px;
       }
 
       .selection-actions,
@@ -417,6 +428,87 @@
             </div>
             <div class="card-actions">
               <a class="btn primary" href="./projektkurs-schwammstadt-ruhr.html">Kursseite öffnen</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="course-card">
+          <div class="card-symbol" style="--card-tint: 239,105,91" aria-hidden="true">
+            <img src="./assets/symbol-gesang.png" alt="" />
+          </div>
+          <div class="card-body">
+            <div class="pill">Q1</div>
+            <h3>„Gesang“</h3>
+            <div class="subjects">
+              <span class="subject-chip">Musik</span>
+            </div>
+            <div class="card-actions">
+              <a class="btn primary" href="./projektkurs-gesang.html">Kursseite öffnen</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="course-card">
+          <div class="card-symbol" style="--card-tint: 82,101,216" aria-hidden="true">
+            <img src="./assets/symbol-big-band.png" alt="" />
+          </div>
+          <div class="card-body">
+            <div class="pill">Q1</div>
+            <h3>„Big Band“</h3>
+            <div class="subjects">
+              <span class="subject-chip">Musik</span>
+              <span class="subject-chip">Ensemble</span>
+            </div>
+            <div class="card-actions">
+              <a class="btn primary" href="./projektkurs-big-band.html">Kursseite öffnen</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="course-card">
+          <div class="card-symbol" style="--card-tint: 244,180,79" aria-hidden="true">
+            <img src="./assets/symbol-darstellen-gestalten.png" alt="" />
+          </div>
+          <div class="card-body">
+            <div class="pill">Q1</div>
+            <h3>Darstellen & Gestalten</h3>
+            <div class="subjects">
+              <span class="subject-chip">Kunst</span>
+            </div>
+            <div class="card-actions">
+              <a class="btn primary" href="./projektkurs-darstellen-gestalten.html">Kursseite öffnen</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="course-card">
+          <div class="card-symbol" style="--card-tint: 34,166,153" aria-hidden="true">
+            <img src="./assets/symbol-kunst.png" alt="" />
+          </div>
+          <div class="card-body">
+            <div class="pill">Q1</div>
+            <h3>Kunst</h3>
+            <div class="subjects">
+              <span class="subject-chip">Kunst</span>
+            </div>
+            <div class="card-actions">
+              <a class="btn primary" href="./projektkurs-kunst.html">Kursseite öffnen</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="course-card">
+          <div class="card-symbol" style="--card-tint: 82,101,216" aria-hidden="true">
+            <img src="./assets/symbol-3d-druck.png" alt="" />
+          </div>
+          <div class="card-body">
+            <div class="pill">Q1</div>
+            <h3>3D-Druck und digitale Konstruktion</h3>
+            <div class="subjects">
+              <span class="subject-chip">Technik</span>
+            </div>
+            <div class="card-actions">
+              <a class="btn primary" href="./projektkurs-3d-druck-digitale-konstruktion.html">Kursseite öffnen</a>
             </div>
           </div>
         </article>

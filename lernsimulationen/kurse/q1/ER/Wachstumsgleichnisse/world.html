@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Wachstumspfad - Spielwelt</title>
+  <link rel="stylesheet" href="style.css?v=20260430a">
+</head>
+<body data-autostart="world">
+  <main class="app-shell">
+    <section id="startScreen" class="screen hidden">
+      <div class="panel start-panel">
+        <p class="eyebrow">Q1 Evangelische Religionslehre</p>
+        <h1>Wachstumspfad</h1>
+      </div>
+    </section>
+
+    <section id="worldScreen" class="screen active">
+      <header class="hud">
+        <div class="hud-box">
+          <span>Welt</span>
+          <strong>Pfad der Gleichnisse</strong>
+        </div>
+        <div class="hud-box">
+          <span>Fortschritt</span>
+          <strong id="tokenCount">0 / 4 Schlüssel</strong>
+          <div id="keyRing" class="key-ring" aria-label="Gesammelte Schlüssel"></div>
+        </div>
+        <div class="hud-box wide">
+          <span>Auftrag</span>
+          <strong id="missionText">Finde den ersten Schlüssel</strong>
+        </div>
+      </header>
+
+      <div class="panel world-panel">
+        <div class="world-topbar">
+          <span>Mika sucht vier Schlüssel für das Wachstumstor</span>
+          <span>Schilder, Kisten und Hebel geben Bonuswissen</span>
+          <span>Alle Aktionen öffnen ein Pop-up</span>
+        </div>
+
+        <div id="worldStage" class="world-stage">
+          <img
+            id="worldImage"
+            class="world-image"
+            src="assets/images/world-landscape.png"
+            onerror="this.style.display='none';"
+            alt="2D-Landschaft als Spielwelt"
+          >
+          <div id="phaserWorld" class="phaser-world" aria-hidden="true"></div>
+          <div id="worldLayer" class="world-layer"></div>
+          <button id="worldPrompt" class="world-prompt hidden" type="button"></button>
+        </div>
+
+        <div class="mobile-controls" aria-label="Mobile Steuerung">
+          <button class="control-button" data-move="up" type="button">^</button>
+          <div class="control-row">
+            <button class="control-button" data-move="left" type="button">&lt;</button>
+            <button class="control-button action" id="actionButton" type="button">E</button>
+            <button class="control-button" data-move="right" type="button">&gt;</button>
+          </div>
+          <button class="control-button" data-move="down" type="button">v</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="modalScreen" class="screen hidden">
+      <div class="panel modal-panel">
+        <div class="modal-head">
+          <div>
+            <p class="eyebrow" id="modalLabel">Begegnung</p>
+            <h2 id="modalTitle">Titel</h2>
+          </div>
+          <button id="closeModal" class="secondary-button hidden" type="button">Zurück zur Welt</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="portrait-pane">
+            <div id="modalPortrait" class="portrait-sprite" aria-hidden="true"></div>
+          </div>
+          <div class="content-pane">
+            <div class="speech-card">
+              <h3 id="modalSpeaker">Figur</h3>
+              <p id="modalText" class="body-text"></p>
+            </div>
+
+            <div id="scripturePane" class="content-card hidden">
+              <div class="scripture-head">
+                <div>
+                  <p class="eyebrow">Bibeltext</p>
+                  <h3 id="scriptureReference">Referenz</h3>
+                </div>
+                <span id="scripturePageLabel" class="chip">Seite 1</span>
+              </div>
+              <div id="scriptureText" class="scripture-text"></div>
+              <p class="scripture-source">Quelle: <a id="scriptureSourceLink" href="https://www.die-bibel.de/bibel/LU12/MRK.4/Markus-4" target="_blank" rel="noreferrer">Lutherbibel 1912 (LU12), Die Bibel.de</a></p>
+            </div>
+
+            <div id="taskPane" class="content-card hidden">
+              <p class="eyebrow">Aufgabe</p>
+              <h3 id="taskTitle">Aufgabe</h3>
+              <div id="taskContent" class="task-content"></div>
+              <p id="taskFeedback" class="feedback"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="button-row end">
+          <button id="modalNext" class="primary-button" type="button">Weiter</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="searchScreen" class="screen hidden">
+      <div class="panel search-panel">
+        <div class="modal-head">
+          <div>
+            <p class="eyebrow">Abschlussprüfung 1</p>
+            <h2>Wortsuchspiel</h2>
+          </div>
+          <div class="hud-box small">
+            <span>Gefunden</span>
+            <strong id="searchProgress">0 / 10</strong>
+          </div>
+        </div>
+
+        <p class="body-text compact">
+          Tippe zuerst auf den ersten und dann auf den letzten Buchstaben eines
+          Wortes. Alle 10 Begriffe stammen aus den Gleichnissen.
+        </p>
+
+        <div class="search-layout">
+          <div id="wordGrid" class="word-grid"></div>
+          <div class="word-sidebar">
+            <h3>Wortliste</h3>
+            <div id="wordList" class="word-list"></div>
+            <p id="searchFeedback" class="feedback"></p>
+            <div class="button-row end">
+              <button id="toFinalDialog" class="primary-button" type="button" disabled>Weiter zum Abschlussdialog</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="finalScreen" class="screen hidden">
+      <div class="panel final-panel">
+        <div id="finalDialogStage">
+          <p class="eyebrow">Abschlussprüfung 2</p>
+          <h2>Deute die vier Gleichnisse</h2>
+          <p class="body-text compact">
+            Vervollständige die Satzbausteine. Erst dann zeigt sich, ob die
+            Lernreise wirklich verstanden wurde.
+          </p>
+          <div id="clozeList" class="cloze-list"></div>
+          <p id="clozeFeedback" class="feedback"></p>
+          <div class="button-row end">
+            <button id="checkCloze" class="primary-button" type="button">Deutung prüfen</button>
+          </div>
+        </div>
+
+        <div id="rewardStage" class="hidden">
+          <p class="eyebrow">Belohnung</p>
+          <h2>Das Zieltor ist offen</h2>
+          <div class="reward-layout">
+            <img
+              id="rewardImage"
+              class="reward-image"
+              src="assets/images/reward-gate.png"
+              onerror="this.style.display='none';"
+              alt="Abschlussbelohnung"
+            >
+            <div>
+              <p id="endingText" class="body-text"></p>
+              <div id="summaryList" class="summary-list"></div>
+              <div class="button-row">
+                <button id="downloadReport" class="primary-button" type="button">TXT-Protokoll herunterladen</button>
+                <button id="restartGame" class="secondary-button" type="button">Neu starten</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"></script>
+  <script src="script.js?v=20260430a"></script>
+</body>
+</html>

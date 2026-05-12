@@ -14,7 +14,7 @@
     base-uri 'self';
     form-action 'self';
   ">
-  <title>Beratungslehrer - Lernstudio</title>
+  <title>Projektkurswahl - Lernstudio</title>
   <style>
     :root{
       --bg: #eef7f6;
@@ -50,9 +50,6 @@
     }
 
     .hero{
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 18px;
       padding: 26px;
       border-radius: 30px;
       border: 1px solid var(--border);
@@ -96,63 +93,6 @@
       margin-top: 22px;
     }
 
-    .hero-card,
-    .card,
-    .info{
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      background: linear-gradient(180deg, var(--surface-strong), var(--surface));
-      box-shadow: var(--shadow);
-    }
-
-    .hero-card{
-      padding: 22px;
-      display: grid;
-      gap: 12px;
-      align-content: start;
-    }
-
-    .hero-card strong{
-      font-size: 1.05rem;
-    }
-
-    .grid{
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 16px;
-      margin-top: 22px;
-    }
-
-    .card{
-      padding: 20px;
-      display: grid;
-      gap: 12px;
-    }
-
-    .card h2{
-      margin: 0;
-      font-size: 1.15rem;
-    }
-
-    .card p,
-    .info p,
-    li{
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    .tag{
-      display: inline-flex;
-      width: fit-content;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: var(--accent-soft);
-      color: var(--accent);
-      font-size: 0.82rem;
-      font-weight: 700;
-    }
-
     .actions{
       display: flex;
       flex-wrap: wrap;
@@ -190,16 +130,6 @@
       border-color: #0b625c;
     }
 
-    .info{
-      margin-top: 22px;
-      padding: 20px 22px;
-    }
-
-    ul{
-      margin: 12px 0 0;
-      padding-left: 20px;
-    }
-
     footer{
       margin-top: 28px;
       padding-top: 18px;
@@ -213,115 +143,26 @@
     }
 
     .back-link:hover{ text-decoration: underline; }
-
-    @media (max-width: 900px){
-      .hero{ grid-template-columns: 1fr; }
-    }
   </style>
 </head>
 <body>
   <div class="shell">
     <section class="hero">
       <div>
-        <div class="eyebrow">Beratungslehrer · NRW Sek II</div>
-        <h1>Digitale Beratung fuer die gymnasiale Oberstufe</h1>
+        <div class="eyebrow">Beratungslehrer</div>
+        <h1>Projektkurswahl</h1>
         <p class="lead">
-          Dieser Bereich sammelt lokale Beratungstools fuer die Oberstufe. Der
-          erste Baustein ist ein spielerischer Faecherwahl-Check fuer die EF in
-          Nordrhein-Westfalen, abgestimmt auf das schulische Angebot und die
-          Grundregeln der gymnasialen Oberstufe.
+          Übersicht und Auswahl der angebotenen Projektkurse.
         </p>
         <div class="hero-actions">
-          <a class="btn primary" href="./ef-faecherwahl.html">EF-Faecherwahl starten</a>
-          <a class="btn" href="./projektkurse-q1.html">Projektkurse Q1</a>
-          <a class="btn" href="./facherklaerungen-kompakt.html">Faecherfokus kompakt</a>
-          <a class="btn" href="../../index.html">Zur Kursuebersicht</a>
+          <a class="btn primary" href="./projektkurse-q1.html">Projektkurswahl öffnen</a>
+          <a class="btn" href="../../index.html">Zur Kursübersicht</a>
         </div>
       </div>
-
-      <div class="hero-card">
-        <strong>Enthalten</strong>
-        <p>Spielerischer Beratungsmodus mit Regelcheck, Facherklaerungen und lokaler Auswertung.</p>
-        <strong>Fokus</strong>
-        <p>Nur NRW Sek II, speziell fuer die Einfuehrungsphase EF und die schulisch angebotenen Faecher.</p>
-        <strong>Datenschutz</strong>
-        <p>Die Seite arbeitet komplett lokal im Browser und nutzt keine externen Dienste.</p>
-      </div>
-    </section>
-
-    <main class="grid">
-      <article class="card">
-        <span class="tag">App</span>
-        <h2>EF-Faecherwahl Quest</h2>
-        <p>
-          Eine Beratung als kleines Spiel: Profil festlegen, Faecher zusammenstellen,
-          NRW-Regeln pruefen und sich Erklaerungen zu jedem Bereich geben lassen.
-        </p>
-        <div class="actions">
-          <a class="btn primary" href="./ef-faecherwahl.html">Quest oeffnen</a>
-        </div>
-      </article>
-
-      <article class="card">
-        <span class="tag">App</span>
-        <h2>Faecherfokus Kompakt</h2>
-        <p>
-          Eine zweite Website mit kompakten Erklaerungen nur zu Sozialwissenschaften,
-          Geschichte, Erdkunde, Latein, Spanisch, Technik, Religion und Philosophie.
-        </p>
-        <div class="actions">
-          <a class="btn primary" href="./facherklaerungen-kompakt.html">Website oeffnen</a>
-        </div>
-      </article>
-
-      <article class="card">
-        <span class="tag">Website</span>
-        <h2>Projektkurse fuer die Q1</h2>
-        <p>
-          Eine neue Vorstellungsseite fuer Projektkurse mit gleichwertigen Karten,
-          Platz fuer zwei flankierende Faecher, Dummytexten und optionalen Bildern.
-        </p>
-        <div class="actions">
-          <a class="btn primary" href="./projektkurse-q1.html">Projektkurse ansehen</a>
-        </div>
-      </article>
-
-      <article class="card">
-        <span class="tag">Beratung</span>
-        <h2>Was die App prueft</h2>
-        <p>
-          Deutsch, Mathematik, Sport, Fremdsprachen, kuenstlerischer Bereich,
-          Gesellschaftswissenschaft, Naturwissenschaft und Religion bzw. Philosophie.
-        </p>
-      </article>
-
-      <article class="card">
-        <span class="tag">Schulangebot</span>
-        <h2>Eure Faecher</h2>
-        <p>
-          Die App nutzt direkt euer angegebenes Angebot: unter anderem Deutsch,
-          Mathematik, Englisch, Franzoesisch, Spanisch, Italienisch, Latein, Religion,
-          Philosophie, Kunst, Musik, Sport, Naturwissenschaften, Gesellschaftslehre und Technik.
-        </p>
-      </article>
-    </main>
-
-    <section class="info">
-      <div class="eyebrow">Hinweis</div>
-      <p>
-        Die App orientiert sich an den Grundregeln der gymnasialen Oberstufe in NRW
-        und ersetzt keine endgueltige Laufbahnberatung durch die Schule. Sie ist als
-        motivierende Vorberatung und als Unterrichts- oder Beratungstool gedacht.
-      </p>
-      <ul>
-        <li>Nur lokale Verarbeitung im Browser</li>
-        <li>Kein Login, kein Tracking, kein Versand von Daten</li>
-        <li>Literatur ist als Hinweis fuer Q1 markiert und nicht fuer die EF freigeschaltet</li>
-      </ul>
     </section>
 
     <footer>
-      <a class="back-link" href="../../index.html">&larr; Zurueck zur Kursuebersicht</a>
+      <a class="back-link" href="../../index.html">&larr; Zurück zur Kursübersicht</a>
     </footer>
   </div>
 </body>
