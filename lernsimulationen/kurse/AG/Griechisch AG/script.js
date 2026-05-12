@@ -42,31 +42,206 @@ const PATH = [
 ];
 
 const LETTERS = [
-  { upper: "Α", lower: "α", name: "Alpha", sound: "a" },
-  { upper: "Β", lower: "β", name: "Beta", sound: "b" },
-  { upper: "Γ", lower: "γ", name: "Gamma", sound: "g" },
-  { upper: "Δ", lower: "δ", name: "Delta", sound: "d" },
-  { upper: "Ε", lower: "ε", name: "Epsilon", sound: "kurzes e" },
-  { upper: "Ζ", lower: "ζ", name: "Zeta", sound: "ds" },
-  { upper: "Η", lower: "η", name: "Eta", sound: "langes e" },
-  { upper: "Θ", lower: "θ", name: "Theta", sound: "th" },
-  { upper: "Ι", lower: "ι", name: "Iota", sound: "i" },
-  { upper: "Κ", lower: "κ", name: "Kappa", sound: "k" },
-  { upper: "Λ", lower: "λ", name: "Lambda", sound: "l" },
-  { upper: "Μ", lower: "μ", name: "My", sound: "m" },
-  { upper: "Ν", lower: "ν", name: "Ny", sound: "n" },
-  { upper: "Ξ", lower: "ξ", name: "Xi", sound: "ks" },
-  { upper: "Ο", lower: "ο", name: "Omikron", sound: "kurzes o" },
-  { upper: "Π", lower: "π", name: "Pi", sound: "p" },
-  { upper: "Ρ", lower: "ρ", name: "Rho", sound: "r" },
-  { upper: "Σ", lower: "σ", name: "Sigma", sound: "s" },
-  { upper: "Τ", lower: "τ", name: "Tau", sound: "t" },
-  { upper: "Υ", lower: "υ", name: "Ypsilon", sound: "ue" },
-  { upper: "Φ", lower: "φ", name: "Phi", sound: "ph" },
-  { upper: "Χ", lower: "χ", name: "Chi", sound: "ch" },
-  { upper: "Ψ", lower: "ψ", name: "Psi", sound: "ps" },
-  { upper: "Ω", lower: "ω", name: "Omega", sound: "langes o" },
+  {
+    upper: "Α",
+    lower: "α",
+    name: "Alpha",
+    sound: "a",
+    group: "vowel",
+    hint: "A wie Anfang: Alpha eröffnet das Alphabet.",
+  },
+  {
+    upper: "Β",
+    lower: "β",
+    name: "Beta",
+    sound: "b",
+    group: "consonant",
+    hint: "Beta klingt wie ein klares b.",
+  },
+  {
+    upper: "Γ",
+    lower: "γ",
+    name: "Gamma",
+    sound: "g",
+    group: "consonant",
+    hint: "Gamma beginnt weich wie g in gut.",
+  },
+  {
+    upper: "Δ",
+    lower: "δ",
+    name: "Delta",
+    sound: "d",
+    group: "consonant",
+    hint: "Delta klingt wie d und sieht oben wie ein Dreieck aus.",
+  },
+  {
+    upper: "Ε",
+    lower: "ε",
+    name: "Epsilon",
+    sound: "kurzes e",
+    group: "vowel",
+    hint: "Epsilon ist das kurze e.",
+  },
+  {
+    upper: "Ζ",
+    lower: "ζ",
+    name: "Zeta",
+    sound: "ds",
+    group: "double",
+    hint: "Zeta verbindet d und s zu einem Doppellaut.",
+  },
+  {
+    upper: "Η",
+    lower: "η",
+    name: "Eta",
+    sound: "langes e",
+    group: "vowel",
+    hint: "Eta ist das lange e.",
+  },
+  {
+    upper: "Θ",
+    lower: "θ",
+    name: "Theta",
+    sound: "th",
+    group: "breath",
+    hint: "Theta ist ein t mit Hauch: th.",
+  },
+  {
+    upper: "Ι",
+    lower: "ι",
+    name: "Iota",
+    sound: "i",
+    group: "vowel",
+    hint: "Iota ist klein, aber wichtig: i.",
+  },
+  {
+    upper: "Κ",
+    lower: "κ",
+    name: "Kappa",
+    sound: "k",
+    group: "consonant",
+    hint: "Kappa klingt knapp und klar wie k.",
+  },
+  {
+    upper: "Λ",
+    lower: "λ",
+    name: "Lambda",
+    sound: "l",
+    group: "consonant",
+    hint: "Lambda klingt wie l.",
+  },
+  {
+    upper: "Μ",
+    lower: "μ",
+    name: "My",
+    sound: "m",
+    group: "consonant",
+    hint: "My klingt wie m.",
+  },
+  {
+    upper: "Ν",
+    lower: "ν",
+    name: "Ny",
+    sound: "n",
+    group: "consonant",
+    hint: "Ny klingt wie n.",
+  },
+  {
+    upper: "Ξ",
+    lower: "ξ",
+    name: "Xi",
+    sound: "ks",
+    group: "double",
+    hint: "Xi bündelt k und s: ks.",
+  },
+  {
+    upper: "Ο",
+    lower: "ο",
+    name: "Omikron",
+    sound: "kurzes o",
+    group: "vowel",
+    hint: "Omikron ist das kleine, kurze o.",
+  },
+  {
+    upper: "Π",
+    lower: "π",
+    name: "Pi",
+    sound: "p",
+    group: "consonant",
+    hint: "Pi klingt wie p.",
+  },
+  {
+    upper: "Ρ",
+    lower: "ρ",
+    name: "Rho",
+    sound: "r",
+    group: "consonant",
+    hint: "Rho klingt gerollt wie r.",
+  },
+  {
+    upper: "Σ",
+    lower: "σ",
+    name: "Sigma",
+    sound: "s",
+    group: "consonant",
+    hint: "Sigma ist der s-Laut; am Wortende steht ς.",
+  },
+  {
+    upper: "Τ",
+    lower: "τ",
+    name: "Tau",
+    sound: "t",
+    group: "consonant",
+    hint: "Tau klingt wie t.",
+  },
+  {
+    upper: "Υ",
+    lower: "υ",
+    name: "Ypsilon",
+    sound: "ü",
+    group: "vowel",
+    hint: "Ypsilon klingt im Unterricht oft wie ü.",
+  },
+  {
+    upper: "Φ",
+    lower: "φ",
+    name: "Phi",
+    sound: "ph",
+    group: "breath",
+    hint: "Phi ist p mit Hauch: ph.",
+  },
+  {
+    upper: "Χ",
+    lower: "χ",
+    name: "Chi",
+    sound: "ch",
+    group: "breath",
+    hint: "Chi hat den rauen ch-Laut.",
+  },
+  {
+    upper: "Ψ",
+    lower: "ψ",
+    name: "Psi",
+    sound: "ps",
+    group: "double",
+    hint: "Psi verbindet p und s zu ps.",
+  },
+  {
+    upper: "Ω",
+    lower: "ω",
+    name: "Omega",
+    sound: "langes o",
+    group: "vowel",
+    hint: "Omega ist das große, lange o am Ende.",
+  },
 ];
+
+const LETTER_GROUP_LABELS = {
+  vowel: "Vokal",
+  consonant: "Konsonant",
+  breath: "Hauchlaut",
+  double: "Doppellaut",
+};
 
 const QUESTION_VARIANTS_PER_TYPE = 4;
 const QUESTION_TYPES = [
@@ -75,8 +250,8 @@ const QUESTION_TYPES = [
     title: "Buchstabenname",
     description: "Name zum Zeichen",
     prompts: [
-      "Wie heisst dieses Buchstabenpaar?",
-      "Welcher Name gehoert zu diesem griechischen Zeichen?",
+      "Wie heißt dieses Buchstabenpaar?",
+      "Welcher Name gehört zu diesem griechischen Zeichen?",
       "Wie nennt man diesen Buchstaben?",
       "Welcher Buchstabenname passt hier?",
     ],
@@ -84,23 +259,23 @@ const QUESTION_TYPES = [
   {
     key: "lower",
     title: "Kleinschrift",
-    description: "Gross zu klein",
+    description: "Groß zu klein",
     prompts: [
-      "Welche Kleinschreibung gehoert zu {upper}?",
+      "Welche Kleinschreibung gehört zu {upper}?",
       "Welches kleine Zeichen passt zu {upper}?",
       "Wie schreibt man {upper} klein?",
-      "Welcher Kleinbuchstabe gehoert zu {upper}?",
+      "Welcher Kleinbuchstabe gehört zu {upper}?",
     ],
   },
   {
     key: "upper",
-    title: "Grossschrift",
-    description: "Klein zu gross",
+    title: "Großschrift",
+    description: "Klein zu groß",
     prompts: [
-      "Welche Grossschreibung gehoert zu {lower}?",
-      "Welches grosse Zeichen passt zu {lower}?",
-      "Wie schreibt man {lower} gross?",
-      "Welcher Grossbuchstabe gehoert zu {lower}?",
+      "Welche Großschreibung gehört zu {lower}?",
+      "Welches große Zeichen passt zu {lower}?",
+      "Wie schreibt man {lower} groß?",
+      "Welcher Großbuchstabe gehört zu {lower}?",
     ],
   },
   {
@@ -108,10 +283,10 @@ const QUESTION_TYPES = [
     title: "Lautwert",
     description: "Laut zum Zeichen",
     prompts: [
-      "Wie klingt dieser Buchstabe ungefaehr?",
+      "Wie klingt dieser Buchstabe ungefähr?",
       "Welcher Laut passt zu diesem Zeichen?",
       "Wie spricht man diesen Buchstaben grob aus?",
-      "Welcher Lautwert gehoert zu diesem Buchstaben?",
+      "Welcher Lautwert gehört zu diesem Buchstaben?",
     ],
   },
   {
@@ -120,7 +295,7 @@ const QUESTION_TYPES = [
     description: "Zeichen zum Namen",
     prompts: [
       "Wie sieht {name} aus?",
-      "Welches Zeichenpaar gehoert zu {name}?",
+      "Welches Zeichenpaar gehört zu {name}?",
       "Welche Schreibweise passt zu {name}?",
       "Womit schreibt man {name} im Alphabet?",
     ],
@@ -136,6 +311,7 @@ const DISTRACTOR_PATTERNS = [
 
 const TOTAL_TASKS =
   LETTERS.length * QUESTION_TYPES.length * QUESTION_VARIANTS_PER_TYPE;
+const MAX_VISIBLE_LOG_ENTRIES = 8;
 
 const TEAMS = [
   {
@@ -239,6 +415,9 @@ const moveButtons = document.querySelector("#moveButtons");
 const continueButton = document.querySelector("#continueButton");
 const playerList = document.querySelector("#playerList");
 const alphabetGrid = document.querySelector("#alphabetGrid");
+const alphabetSearch = document.querySelector("#alphabetSearch");
+const alphabetFilterButtons = [...document.querySelectorAll("[data-letter-filter]")];
+const alphabetEmpty = document.querySelector("#alphabetEmpty");
 const taskBreakdown = document.querySelector("#taskBreakdown");
 const panelTaskTotal = document.querySelector("#panelTaskTotal");
 const panelTaskRemaining = document.querySelector("#panelTaskRemaining");
@@ -269,6 +448,8 @@ const state = {
   bonusValue: 0,
   effect: null,
   notice: "",
+  alphabetFilter: "all",
+  alphabetSearch: "",
 };
 
 const pawnElements = [];
@@ -342,7 +523,7 @@ function buildQuestionOfType(type, letter, letterIndex, variant) {
       display: formatLetterPair(letter),
       options: shuffle([letter.name, ...distractors.map((entry) => entry.name)]),
       correct: letter.name,
-      explanation: `${formatLetterPair(letter)} heisst ${letter.name} und klingt wie ${letter.sound}.`,
+      explanation: `${formatLetterPair(letter)} heißt ${letter.name} und klingt wie ${letter.sound}.`,
     };
   }
 
@@ -354,7 +535,7 @@ function buildQuestionOfType(type, letter, letterIndex, variant) {
       display: letter.upper,
       options: shuffle([letter.lower, ...distractors.map((entry) => entry.lower)]),
       correct: letter.lower,
-      explanation: `Zu ${letter.upper} gehoert ${letter.lower}.`,
+      explanation: `Zu ${letter.upper} gehört ${letter.lower}.`,
     };
   }
 
@@ -366,7 +547,7 @@ function buildQuestionOfType(type, letter, letterIndex, variant) {
       display: letter.lower,
       options: shuffle([letter.upper, ...distractors.map((entry) => entry.upper)]),
       correct: letter.upper,
-      explanation: `Zur Kleinschreibung ${letter.lower} gehoert ${letter.upper}.`,
+      explanation: `Zur Kleinschreibung ${letter.lower} gehört ${letter.upper}.`,
     };
   }
 
@@ -378,7 +559,7 @@ function buildQuestionOfType(type, letter, letterIndex, variant) {
       display: formatLetterPair(letter),
       options: shuffle([letter.sound, ...distractors.map((entry) => entry.sound)]),
       correct: letter.sound,
-      explanation: `${formatLetterPair(letter)} klingt ungefaehr wie ${letter.sound}.`,
+      explanation: `${formatLetterPair(letter)} klingt ungefähr wie ${letter.sound}.`,
     };
   }
 
@@ -793,10 +974,10 @@ async function answerQuestion(selectedOption) {
     player.skipTurns = Math.min(1, player.skipTurns + 1);
     state.effect = {
       type: "penalty",
-      text: `Tempelpause: ${player.displayName} setzt die naechste Runde aus.`,
+      text: `Tempelpause: ${player.displayName} setzt die nächste Runde aus.`,
     };
-    const message = `Nicht ganz. ${state.question.explanation} Tempelpause: ${player.displayName} setzt die naechste Runde aus.`;
-    addLog(`${player.displayName} loest die Aufgabe nicht richtig und erhaelt eine Tempelpause.`);
+    const message = `Nicht ganz. ${state.question.explanation} Tempelpause: ${player.displayName} setzt die nächste Runde aus.`;
+    addLog(`${player.displayName} löst die Aufgabe nicht richtig und erhält eine Tempelpause.`);
     setTurnEnd(nextPlayer, message, `Weiter zu ${state.players[nextPlayer].displayName}`);
     state.busy = false;
     render();
@@ -810,7 +991,7 @@ async function answerQuestion(selectedOption) {
   state.bonusValue = Math.floor(Math.random() * 3) + 1;
   state.effect = {
     type: "reward",
-    text: `Goetterbonus: +${state.bonusValue} Schritte fuer diesen Zug.`,
+      text: `Götterbonus: +${state.bonusValue} Schritte für diesen Zug.`,
   };
   state.legalMoves = getLegalMoves(
     state.currentPlayer,
@@ -819,7 +1000,7 @@ async function answerQuestion(selectedOption) {
   );
   if (state.legalMoves.length === 0) {
     const nextPlayer = (state.currentPlayer + 1) % state.players.length;
-    const message = `Richtig. ${state.question.explanation} Der Goetterbonus ist +${state.bonusValue}, aber es gibt trotzdem keinen moeglichen Zug.`;
+      const message = `Richtig. ${state.question.explanation} Der Götterbonus ist +${state.bonusValue}, aber es gibt trotzdem keinen möglichen Zug.`;
     addLog(`${player.displayName} wusste die Antwort, konnte aber nicht ziehen.`);
     setTurnEnd(nextPlayer, message, `Weiter zu ${state.players[nextPlayer].displayName}`);
     state.busy = false;
@@ -848,7 +1029,7 @@ async function movePawn(pawnIndex) {
   let message = "";
 
   if (progress === -1 && state.bonusValue > 0) {
-    message = `${player.displayName} bringt Figur ${pawnIndex + 1} ins Spiel und zieht mit dem Goetterbonus noch ${state.bonusValue} Felder weiter.`;
+      message = `${player.displayName} bringt Figur ${pawnIndex + 1} ins Spiel und zieht mit dem Götterbonus noch ${state.bonusValue} Felder weiter.`;
   } else if (progress === -1) {
     message = `${player.displayName} bringt Figur ${pawnIndex + 1} ins Spiel.`;
   } else if (targetProgress >= 40 && progress < 40) {
@@ -875,7 +1056,7 @@ async function movePawn(pawnIndex) {
       playCaptureSound();
       message += ` ${state.players[captured.playerIndex].displayName}s Figur ${
         captured.pawnIndex + 1
-      } muss zurueck.`;
+      } muss zurück.`;
     }
   }
 
@@ -895,7 +1076,7 @@ async function movePawn(pawnIndex) {
     setTurnEnd(
       state.currentPlayer,
       `${message} Bonuswurf.`,
-      `Bonuswurf fuer ${player.displayName}`
+      `Bonuswurf für ${player.displayName}`
     );
   } else {
     const nextPlayer = (state.currentPlayer + 1) % state.players.length;
@@ -1015,9 +1196,9 @@ function renderQuestionCard() {
 
   if (state.phase === "roll") {
     questionModeLabel.textContent = "Bereit";
-    questionSubline.textContent = "Wuerfle fuer dein Team.";
+    questionSubline.textContent = "Würfle für dein Team.";
     questionStage.innerHTML = `
-      <p class="question-prompt">Der naechste Zug beginnt mit dem Wurf.</p>
+      <p class="question-prompt">Der nächste Zug beginnt mit dem Wurf.</p>
       <div class="greek-display">Α Β Γ Δ</div>
     `;
     return;
@@ -1045,7 +1226,7 @@ function renderQuestionCard() {
 
   if (state.phase === "move") {
     questionModeLabel.textContent = "Ziehen";
-    questionSubline.textContent = "Waehlt eine leuchtende Figur.";
+    questionSubline.textContent = "Wählt eine leuchtende Figur.";
     questionStage.innerHTML = `
       <p class="question-prompt">${state.question.explanation}</p>
       <div class="greek-display">${state.question.display}</div>
@@ -1128,20 +1309,79 @@ function renderPlayers() {
   });
 }
 
+function letterMatchesAlphabetFilter(letter) {
+  const filter = state.alphabetFilter;
+  const query = state.alphabetSearch.trim().toLowerCase();
+  const matchesFilter =
+    filter === "all" ||
+    letter.group === filter ||
+    (filter === "consonant" && letter.group !== "vowel");
+
+  if (!matchesFilter) {
+    return false;
+  }
+
+  if (!query) {
+    return true;
+  }
+
+  const searchable = [
+    letter.upper,
+    letter.lower,
+    letter.name,
+    letter.sound,
+    letter.hint,
+    LETTER_GROUP_LABELS[letter.group],
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  return searchable.includes(query);
+}
+
 function renderAlphabetGrid() {
-  alphabetGrid.innerHTML = LETTERS.map(
-    (letter) => `
-      <article class="alphabet-card">
-        <strong>${letter.upper} ${letter.lower}</strong>
-        <span>${letter.name}</span>
-        <span>${letter.sound}</span>
-      </article>
-    `
-  ).join("");
+  const visibleLetters = LETTERS.filter(letterMatchesAlphabetFilter);
+
+  alphabetFilterButtons.forEach((button) => {
+    button.classList.toggle("active", button.dataset.letterFilter === state.alphabetFilter);
+  });
+
+  alphabetGrid.innerHTML = visibleLetters
+    .map(
+      (letter) => `
+        <article class="alphabet-card ${letter.group}">
+          <div class="alphabet-card-top">
+            <strong>${letter.upper}<span>${letter.lower}</span></strong>
+            <em>${LETTER_GROUP_LABELS[letter.group]}</em>
+          </div>
+          <dl class="letter-facts">
+            <div>
+              <dt>Name</dt>
+              <dd>${letter.name}</dd>
+            </div>
+            <div>
+              <dt>Laut</dt>
+              <dd>${letter.sound}</dd>
+            </div>
+          </dl>
+          <p>${letter.hint}</p>
+        </article>
+      `
+    )
+    .join("");
+
+  alphabetEmpty.classList.toggle("hidden", visibleLetters.length > 0);
 }
 
 function renderLog() {
-  logList.innerHTML = state.log.map((entry) => `<li>${entry}</li>`).join("");
+  const visibleEntries = state.log.slice(-MAX_VISIBLE_LOG_ENTRIES);
+  const hiddenCount = state.log.length - visibleEntries.length;
+  const olderNotice =
+    hiddenCount > 0 ? [`${hiddenCount} ältere Einträge ausgeblendet.`] : [];
+
+  logList.innerHTML = [...olderNotice, ...visibleEntries]
+    .map((entry) => `<li>${entry}</li>`)
+    .join("");
 }
 
 function renderBoardPawns() {
@@ -1206,7 +1446,7 @@ function renderStatus() {
       ? `${state.notice} ${player.displayName} ist jetzt am Zug.`
       : `${player.displayName} ist am Zug.`;
   } else if (state.phase === "quiz") {
-    phaseHint.textContent = `${player.displayName} hat eine ${state.die} gewuerfelt.`;
+    phaseHint.textContent = `${player.displayName} hat eine ${state.die} gewürfelt.`;
   } else if (state.phase === "move") {
     phaseHint.textContent = `${player.displayName} darf jetzt mit ${state.die} + ${state.bonusValue} ziehen.`;
   } else if (state.phase === "turnEnd") {
@@ -1265,6 +1505,18 @@ continueButton.addEventListener("click", advanceTurn);
 
 panelToggles.forEach((button) => {
   button.addEventListener("click", () => openPanel(button.dataset.panelTarget));
+});
+
+alphabetSearch.addEventListener("input", (event) => {
+  state.alphabetSearch = event.target.value;
+  renderAlphabetGrid();
+});
+
+alphabetFilterButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    state.alphabetFilter = button.dataset.letterFilter;
+    renderAlphabetGrid();
+  });
 });
 
 overlayCloseButtons.forEach((button) => {
