@@ -225,27 +225,97 @@
       border-radius: 12px;
     }
 
+    .course-selection{
+      align-content: start;
+    }
+
+    .selection-note{
+      margin: 0 0 22px;
+      max-width: 720px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
     .course-grid{
+      position: relative;
+      height: var(--orbit-h, clamp(600px, 78vh, 820px));
+      min-height: 480px;
+      max-width: 1050px;
+      width: 100%;
+      margin: 0 auto;
+      isolation: isolate;
+      overflow: visible;
+    }
+
+    .course-grid::before{
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: var(--ring-size, 520px);
+      height: var(--ring-size, 520px);
+      transform: translate(-50%, -50%);
+      border: 1px dashed rgba(82, 101, 216, 0.28);
+      border-radius: 50%;
+      background:
+        radial-gradient(circle, rgba(255,255,255,0.92) 0 24%, rgba(34,166,153,0.08) 25% 31%, transparent 32%),
+        linear-gradient(135deg, rgba(82,101,216,0.08), rgba(34,166,153,0.08));
+      z-index: -1;
+    }
+
+    .orbit-center{
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: var(--center-size, 190px);
+      height: var(--center-size, 190px);
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.92);
+      box-shadow: 0 18px 45px rgba(50, 73, 95, 0.1);
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 20px;
+      place-items: center;
+      text-align: center;
+      padding: 22px;
+      pointer-events: none;
+    }
+
+    .orbit-center strong{
+      display: block;
+      color: var(--ink);
+      font-size: 1.05rem;
+    }
+
+    .orbit-center span{
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.35;
     }
 
     .course-card{
       border-radius: var(--radius);
       overflow: hidden;
       display: grid;
+      grid-template-rows: auto 1fr;
+      position: absolute;
+      width: var(--card-w, 180px);
+      height: var(--card-h, 270px);
+      will-change: transform;
+      transition: box-shadow 0.18s ease;
     }
 
     .card-symbol{
-      height: 210px;
+      height: var(--symbol-h, 96px);
       display: grid;
       place-items: center;
       border-bottom: 1px solid var(--line);
       background:
         linear-gradient(135deg, rgba(var(--card-tint), 0.14), rgba(255,255,255,0.88)),
         #fff;
-      padding: 22px;
+      padding: var(--card-pad, 14px);
     }
 
     .card-symbol svg{
@@ -254,8 +324,8 @@
     }
 
     .card-symbol img{
-      width: 150px;
-      height: 150px;
+      width: var(--symbol-img, 72px);
+      height: var(--symbol-img, 72px);
       display: block;
       object-fit: contain;
       border-radius: 12px;
@@ -263,23 +333,40 @@
     }
 
     .card-body{
-      padding: 22px;
+      padding: var(--card-pad, 14px);
       display: grid;
-      gap: 14px;
+      gap: 9px;
+      align-content: start;
+    }
+
+    .course-card h3{
+      font-size: var(--card-title, 1rem);
+      line-height: 1.18;
+    }
+
+    .course-card .btn{
+      min-height: var(--card-btn-h, 38px);
+      padding: 9px 12px;
+      font-size: var(--card-btn-text, 0.84rem);
+      width: 100%;
     }
 
     .pill,
     .subject-chip{
-      padding: 7px 11px;
+      padding: 5px 9px;
       background: var(--surface-soft);
       color: #48606f;
-      font-size: 0.84rem;
+      font-size: var(--chip-text, 0.74rem);
     }
 
     .subjects{
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
+    }
+
+    .card-actions{
+      margin-top: auto;
     }
 
     .footer-rail{
@@ -303,9 +390,13 @@
       }
 
       .hero-grid,
-      .course-grid,
       .nrw-info{
         grid-template-columns: 1fr;
+      }
+
+      .course-grid{
+        max-width: 100%;
+        min-height: 500px;
       }
 
       h1{
@@ -314,18 +405,58 @@
       }
 
       .card-symbol{
-        height: 190px;
+        height: var(--symbol-h, 86px);
       }
 
       .card-symbol img{
-        width: 140px;
-        height: 140px;
+        width: var(--symbol-img, 64px);
+        height: var(--symbol-img, 64px);
       }
 
       .selection-actions,
       .footer-rail{
         flex-direction: column;
         align-items: start;
+      }
+    }
+
+    @media (max-width: 560px){
+      .page{
+        padding-inline: 10px;
+      }
+
+      .screen{
+        padding: 18px 14px;
+      }
+
+      .selection-note{
+        font-size: 0.9rem;
+        margin-bottom: 14px;
+      }
+
+      .orbit-center span{
+        display: none;
+      }
+
+      .subjects{
+        display: none;
+      }
+
+      .course-card h3{
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+      }
+
+      .course-card .btn{
+        font-size: 0;
+        padding-inline: 8px;
+      }
+
+      .course-card .btn::after{
+        content: "Öffnen";
+        font-size: var(--card-btn-text, 0.7rem);
       }
     }
   </style>
@@ -371,79 +502,35 @@
       </div>
     </section>
 
-    <section class="screen" id="courseScreen" hidden>
+    <section class="screen course-selection" id="courseScreen" hidden>
       <div class="selection-actions">
         <div>
           <div class="eyebrow">Projektkurs-Auswahl</div>
-          <h2>Wähle deinen Projektkurs</h2>
+          <h2>Alle Projektkurse auf einen Blick</h2>
         </div>
         <button class="btn" id="backToLandingBtn" type="button">Zurück</button>
       </div>
+      <p class="selection-note">Alle Projektkurse sind gleichwertig. Die Reihenfolge dient nur der Orientierung und sagt nichts darüber aus, welcher Kurs wichtiger, besser oder passender ist.</p>
 
-      <div class="course-grid">
+      <div class="course-grid" id="courseOrbit" aria-label="Gleichwertige Projektkursauswahl als rotierender Kreis">
+        <div class="orbit-center" aria-hidden="true">
+          <div>
+            <strong>gleichwertig</strong>
+            <span>alle Kurse stehen auf Augenhöhe</span>
+          </div>
+        </div>
+
         <article class="course-card">
           <div class="card-symbol" style="--card-tint: 82,101,216" aria-hidden="true">
-            <img src="./assets/symbol-ki.png" alt="" />
+            <img src="./assets/symbol-3d-druck.png" alt="" />
           </div>
           <div class="card-body">
-            <div class="pill">Q1</div>
-            <h3>KI, Mensch und Verantwortung</h3>
+            <h3>3D-Druck und digitale Konstruktion</h3>
             <div class="subjects">
-              <span class="subject-chip">Sozialwissenschaft</span>
-              <span class="subject-chip">Evangelische Religionslehre</span>
+              <span class="subject-chip">Mathe</span>
             </div>
             <div class="card-actions">
-              <a class="btn primary" href="./projektkurs-ki.html">Kursseite öffnen</a>
-            </div>
-          </div>
-        </article>
-
-        <article class="course-card">
-          <div class="card-symbol" style="--card-tint: 239,105,91" aria-hidden="true">
-            <img src="./assets/symbol-dramaturgie.png" alt="" />
-          </div>
-          <div class="card-body">
-            <div class="pill">Q1</div>
-            <h3>„Dramaturgie“</h3>
-            <div class="subjects">
-              <span class="subject-chip">Deutsch</span>
-              <span class="subject-chip">Literatur</span>
-            </div>
-            <div class="card-actions">
-              <a class="btn primary" href="./projektkurs-dramaturgie.html">Kursseite öffnen</a>
-            </div>
-          </div>
-        </article>
-
-        <article class="course-card">
-          <div class="card-symbol" style="--card-tint: 34,166,153" aria-hidden="true">
-            <img src="./assets/symbol-schwammstadt.png" alt="" />
-          </div>
-          <div class="card-body">
-            <div class="pill">Q1</div>
-            <h3>Schwammstadt Ruhr</h3>
-            <div class="subjects">
-              <span class="subject-chip">Biologie</span>
-              <span class="subject-chip">Geographie</span>
-            </div>
-            <div class="card-actions">
-              <a class="btn primary" href="./projektkurs-schwammstadt-ruhr.html">Kursseite öffnen</a>
-            </div>
-          </div>
-        </article>
-
-        <article class="course-card">
-          <div class="card-symbol" style="--card-tint: 239,105,91" aria-hidden="true">
-            <img src="./assets/symbol-gesang.png" alt="" />
-          </div>
-          <div class="card-body">
-            <div class="pill">Q1</div>
-            <h3>„Gesang“</h3>
-            <div class="subjects">
-              <span class="subject-chip">Musik</span>
-            </div>
-            <div class="card-actions">
-              <a class="btn primary" href="./projektkurs-gesang.html">Kursseite öffnen</a>
+              <a class="btn primary" href="./projektkurs-3d-druck-digitale-konstruktion.html">Kursseite öffnen</a>
             </div>
           </div>
         </article>
@@ -453,11 +540,9 @@
             <img src="./assets/symbol-big-band.png" alt="" />
           </div>
           <div class="card-body">
-            <div class="pill">Q1</div>
             <h3>„Big Band“</h3>
             <div class="subjects">
               <span class="subject-chip">Musik</span>
-              <span class="subject-chip">Ensemble</span>
             </div>
             <div class="card-actions">
               <a class="btn primary" href="./projektkurs-big-band.html">Kursseite öffnen</a>
@@ -470,9 +555,9 @@
             <img src="./assets/symbol-darstellen-gestalten.png" alt="" />
           </div>
           <div class="card-body">
-            <div class="pill">Q1</div>
             <h3>Darstellen & Gestalten</h3>
             <div class="subjects">
+              <span class="subject-chip">Deutsch</span>
               <span class="subject-chip">Kunst</span>
             </div>
             <div class="card-actions">
@@ -482,11 +567,56 @@
         </article>
 
         <article class="course-card">
+          <div class="card-symbol" style="--card-tint: 239,105,91" aria-hidden="true">
+            <img src="./assets/symbol-dramaturgie.png" alt="" />
+          </div>
+          <div class="card-body">
+            <h3>„Dramaturgie“</h3>
+            <div class="subjects">
+              <span class="subject-chip">Deutsch</span>
+            </div>
+            <div class="card-actions">
+              <a class="btn primary" href="./projektkurs-dramaturgie.html">Kursseite öffnen</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="course-card">
+          <div class="card-symbol" style="--card-tint: 239,105,91" aria-hidden="true">
+            <img src="./assets/symbol-gesang.png" alt="" />
+          </div>
+          <div class="card-body">
+            <h3>„Gesang“</h3>
+            <div class="subjects">
+              <span class="subject-chip">Musik</span>
+            </div>
+            <div class="card-actions">
+              <a class="btn primary" href="./projektkurs-gesang.html">Kursseite öffnen</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="course-card">
+          <div class="card-symbol" style="--card-tint: 82,101,216" aria-hidden="true">
+            <img src="./assets/symbol-ki.png" alt="" />
+          </div>
+          <div class="card-body">
+            <h3>KI, Mensch und Verantwortung</h3>
+            <div class="subjects">
+              <span class="subject-chip">Religionslehre</span>
+              <span class="subject-chip">SoWi</span>
+            </div>
+            <div class="card-actions">
+              <a class="btn primary" href="./projektkurs-ki.html">Kursseite öffnen</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="course-card">
           <div class="card-symbol" style="--card-tint: 34,166,153" aria-hidden="true">
             <img src="./assets/symbol-kunst.png" alt="" />
           </div>
           <div class="card-body">
-            <div class="pill">Q1</div>
             <h3>Kunst</h3>
             <div class="subjects">
               <span class="subject-chip">Kunst</span>
@@ -498,17 +628,33 @@
         </article>
 
         <article class="course-card">
-          <div class="card-symbol" style="--card-tint: 82,101,216" aria-hidden="true">
-            <img src="./assets/symbol-3d-druck.png" alt="" />
+          <div class="card-symbol" style="--card-tint: 34,166,153" aria-hidden="true">
+            <img src="./assets/symbol-schwammstadt.png" alt="" />
           </div>
           <div class="card-body">
-            <div class="pill">Q1</div>
-            <h3>3D-Druck und digitale Konstruktion</h3>
+            <h3>Schwammstadt Ruhr</h3>
             <div class="subjects">
-              <span class="subject-chip">Technik</span>
+              <span class="subject-chip">Erdkunde</span>
+              <span class="subject-chip">Biologie</span>
             </div>
             <div class="card-actions">
-              <a class="btn primary" href="./projektkurs-3d-druck-digitale-konstruktion.html">Kursseite öffnen</a>
+              <a class="btn primary" href="./projektkurs-schwammstadt-ruhr.html">Kursseite öffnen</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="course-card">
+          <div class="card-symbol" style="--card-tint: 34,166,153" aria-hidden="true">
+            <img src="./assets/symbol-science.png" alt="" />
+          </div>
+          <div class="card-body">
+            <h3>Science</h3>
+            <div class="subjects">
+              <span class="subject-chip">Biologie</span>
+              <span class="subject-chip">Chemie</span>
+            </div>
+            <div class="card-actions">
+              <a class="btn primary" href="./projektkurs-science.html">Kursseite öffnen</a>
             </div>
           </div>
         </article>
@@ -522,11 +668,72 @@
     const landingScreen = document.getElementById("landingScreen");
     const courseScreen = document.getElementById("courseScreen");
     const backToLandingBtn = document.getElementById("backToLandingBtn");
+    const courseOrbit = document.getElementById("courseOrbit");
+    const courseCards = Array.from(courseOrbit.querySelectorAll(".course-card"));
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let orbitAngle = -Math.PI / 2;
+    let orbitPaused = false;
+    let lastFrame = performance.now();
 
     const reveal = (screen) => {
       screen.classList.remove("revealed");
       void screen.offsetWidth;
       screen.classList.add("revealed");
+    };
+
+    const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+    const layoutOrbit = () => {
+      const orbitWidth = courseOrbit.clientWidth;
+      const viewportWidth = window.innerWidth;
+      const isCompact = viewportWidth < 640;
+      const isMedium = viewportWidth < 900;
+      const cardWidth = clamp(orbitWidth * (isCompact ? 0.24 : 0.16), isCompact ? 82 : isMedium ? 128 : 148, isCompact ? 118 : 190);
+      const cardHeight = clamp(cardWidth * (isCompact ? 1.46 : 1.5), isCompact ? 122 : isMedium ? 196 : 230, isCompact ? 172 : 270);
+      const orbitTop = courseOrbit.getBoundingClientRect().top;
+      const availableHeight = window.innerHeight - orbitTop - 28;
+      const orbitHeight = clamp(Math.max(availableHeight, orbitWidth * (isCompact ? 1.5 : isMedium ? 0.84 : 0.78)), isCompact ? 520 : isMedium ? 640 : 700, isCompact ? 680 : isMedium ? 760 : 860);
+      const centerSize = clamp(orbitWidth * (isCompact ? 0.25 : 0.18), isCompact ? 88 : 150, isCompact ? 112 : 190);
+      const cardPadding = clamp(cardWidth * 0.075, 8, 14);
+      const symbolHeight = clamp(cardHeight * 0.36, isCompact ? 56 : 82, isCompact ? 74 : 100);
+      const symbolImage = clamp(cardWidth * 0.38, isCompact ? 38 : 58, isCompact ? 50 : 76);
+
+      courseOrbit.style.setProperty("--card-w", `${cardWidth}px`);
+      courseOrbit.style.setProperty("--card-h", `${cardHeight}px`);
+      courseOrbit.style.setProperty("--orbit-h", `${orbitHeight}px`);
+      courseOrbit.style.setProperty("--center-size", `${centerSize}px`);
+      courseOrbit.style.setProperty("--card-pad", `${cardPadding}px`);
+      courseOrbit.style.setProperty("--symbol-h", `${symbolHeight}px`);
+      courseOrbit.style.setProperty("--symbol-img", `${symbolImage}px`);
+      courseOrbit.style.setProperty("--card-title", `${clamp(cardWidth / 175, 0.72, 1)}rem`);
+      courseOrbit.style.setProperty("--chip-text", `${clamp(cardWidth / 240, 0.58, 0.74)}rem`);
+      courseOrbit.style.setProperty("--card-btn-h", `${clamp(cardHeight * 0.14, 30, 38)}px`);
+      courseOrbit.style.setProperty("--card-btn-text", `${clamp(cardWidth / 230, 0.62, 0.84)}rem`);
+
+      const radius = Math.max(0, Math.min(orbitWidth / 2 - cardWidth / 2 - 6, orbitHeight / 2 - cardHeight / 2 - 6));
+      courseOrbit.style.setProperty("--ring-size", `${radius * 2}px`);
+
+      courseCards.forEach((card, index) => {
+        const angle = orbitAngle + (index / courseCards.length) * Math.PI * 2;
+        const x = orbitWidth / 2 + Math.cos(angle) * radius - cardWidth / 2;
+        const y = orbitHeight / 2 + Math.sin(angle) * radius - cardHeight / 2;
+        card.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      });
+    };
+
+    const runOrbit = (time) => {
+      const delta = time - lastFrame;
+      lastFrame = time;
+
+      if (!orbitPaused && !reducedMotion.matches && !courseScreen.hasAttribute("hidden")) {
+        orbitAngle += delta * 0.00008;
+      }
+
+      if (!courseScreen.hasAttribute("hidden")) {
+        layoutOrbit();
+      }
+
+      requestAnimationFrame(runOrbit);
     };
 
     const showOverview = () => {
@@ -539,6 +746,7 @@
       landingScreen.setAttribute("hidden", "");
       courseScreen.removeAttribute("hidden");
       showCoursesBtn.setAttribute("aria-expanded", "true");
+      requestAnimationFrame(layoutOrbit);
     };
 
     showCoursesBtn.addEventListener("click", () => {
@@ -552,6 +760,26 @@
       showCoursesBtn.setAttribute("aria-expanded", "false");
       reveal(landingScreen);
     });
+
+    courseOrbit.addEventListener("pointerenter", () => {
+      orbitPaused = true;
+    });
+
+    courseOrbit.addEventListener("pointerleave", () => {
+      orbitPaused = false;
+    });
+
+    courseOrbit.addEventListener("focusin", () => {
+      orbitPaused = true;
+    });
+
+    courseOrbit.addEventListener("focusout", () => {
+      orbitPaused = false;
+    });
+
+    window.addEventListener("resize", layoutOrbit);
+    reducedMotion.addEventListener("change", layoutOrbit);
+    requestAnimationFrame(runOrbit);
 
     window.addEventListener("pageshow", () => {
       if (window.location.hash === "#auswahl") {
