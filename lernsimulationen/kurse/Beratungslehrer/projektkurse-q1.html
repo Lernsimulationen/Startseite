@@ -236,6 +236,52 @@
       line-height: 1.65;
     }
 
+    .belt-controls{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin: 0 0 16px;
+      flex-wrap: wrap;
+    }
+
+    .course-count{
+      display: inline-flex;
+      align-items: center;
+      min-height: 42px;
+      padding: 9px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.84);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      font-weight: 800;
+    }
+
+    .speed-controls{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .control-label{
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .control-btn{
+      min-height: 38px;
+      padding: 8px 13px;
+      font-size: 0.88rem;
+    }
+
+    .control-btn[aria-pressed="true"]{
+      background: var(--ink);
+      color: #fff;
+      border-color: transparent;
+    }
+
     .belt-window{
       position: relative;
       height: var(--belt-h, 390px);
@@ -424,7 +470,8 @@
       }
 
       .selection-actions,
-      .footer-rail{
+      .footer-rail,
+      .belt-controls{
         flex-direction: column;
         align-items: start;
       }
@@ -521,6 +568,16 @@
         <button class="btn" id="backToLandingBtn" type="button">Zurück</button>
       </div>
       <p class="selection-note">Alle Projektkurse sind gleichwertig. Die Reihenfolge dient nur der Orientierung und sagt nichts darüber aus, welcher Kurs wichtiger, besser oder passender ist.</p>
+      <div class="belt-controls" aria-label="Steuerung der Projektkurs-Auswahl">
+        <div class="course-count" id="courseCount">9 Projektkurse stehen zur Wahl</div>
+        <div class="speed-controls" aria-label="Geschwindigkeit des Fließbands">
+          <span class="control-label">Tempo</span>
+          <button class="btn control-btn" type="button" data-speed="0.55" aria-pressed="false">ruhig</button>
+          <button class="btn control-btn" type="button" data-speed="1" aria-pressed="true">normal</button>
+          <button class="btn control-btn" type="button" data-speed="1.8" aria-pressed="false">schnell</button>
+          <button class="btn control-btn" id="fastForwardBtn" type="button">vorspulen</button>
+        </div>
+      </div>
 
       <div class="belt-window" id="courseBelt" aria-label="Gleichwertige Projektkursauswahl als Fließband">
         <div class="belt-guide" aria-hidden="true"></div>
@@ -676,11 +733,15 @@
     const backToLandingBtn = document.getElementById("backToLandingBtn");
     const courseBelt = document.getElementById("courseBelt");
     const courseTrack = document.getElementById("courseTrack");
+    const courseCount = document.getElementById("courseCount");
+    const speedButtons = Array.from(document.querySelectorAll("[data-speed]"));
+    const fastForwardBtn = document.getElementById("fastForwardBtn");
     const courseCards = Array.from(courseTrack.querySelectorAll(".course-card"));
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let beltOffset = 0;
     let beltPaused = false;
     let beltStep = 260;
+    let beltSpeed = 1;
     let lastFrame = performance.now();
 
     const reveal = (screen) => {
@@ -721,22 +782,26 @@
       beltStep = cardWidth + gap;
     };
 
+    const normalizeBelt = () => {
+      while (beltOffset >= beltStep) {
+        beltOffset -= beltStep;
+        courseTrack.append(courseTrack.querySelector(".course-card"));
+      }
+
+      courseTrack.style.transform = `translate3d(${-beltOffset}px, 0, 0)`;
+    };
+
     const moveBelt = (time) => {
       const delta = time - lastFrame;
       lastFrame = time;
 
       if (!beltPaused && !reducedMotion.matches && !courseScreen.hasAttribute("hidden")) {
-        beltOffset += delta * 0.035;
-
-        while (beltOffset >= beltStep) {
-          beltOffset -= beltStep;
-          courseTrack.append(courseTrack.querySelector(".course-card"));
-        }
+        beltOffset += delta * 0.035 * beltSpeed;
       }
 
       if (!courseScreen.hasAttribute("hidden")) {
         layoutBelt();
-        courseTrack.style.transform = `translate3d(${-beltOffset}px, 0, 0)`;
+        normalizeBelt();
       }
 
       requestAnimationFrame(moveBelt);
@@ -800,6 +865,23 @@
         event.preventDefault();
         link.click();
       });
+    });
+
+    courseCount.textContent = `${courseCards.length} Projektkurse stehen zur Wahl`;
+
+    speedButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        beltSpeed = Number(button.dataset.speed);
+        speedButtons.forEach((speedButton) => {
+          speedButton.setAttribute("aria-pressed", String(speedButton === button));
+        });
+      });
+    });
+
+    fastForwardBtn.addEventListener("click", () => {
+      layoutBelt();
+      beltOffset += beltStep;
+      normalizeBelt();
     });
 
     window.addEventListener("resize", layoutBelt);
