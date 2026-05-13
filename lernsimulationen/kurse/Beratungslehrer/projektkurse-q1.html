@@ -257,29 +257,14 @@
       font-weight: 800;
     }
 
-    .speed-controls{
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .control-label{
+    .swipe-hint{
       color: var(--muted);
       font-size: 0.9rem;
       font-weight: 700;
-    }
-
-    .control-btn{
-      min-height: 38px;
-      padding: 8px 13px;
-      font-size: 0.88rem;
-    }
-
-    .control-btn[aria-pressed="true"]{
-      background: var(--ink);
-      color: #fff;
-      border-color: transparent;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 9px 14px;
     }
 
     .belt-window{
@@ -294,6 +279,13 @@
         radial-gradient(circle at 50% 50%, rgba(34,166,153,0.12), transparent 42%);
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
       isolation: isolate;
+      touch-action: pan-y;
+      cursor: grab;
+      user-select: none;
+    }
+
+    .belt-window.is-dragging{
+      cursor: grabbing;
     }
 
     .belt-window::before,
@@ -359,9 +351,16 @@
     }
 
     .course-card:hover,
-    .course-card:focus-within{
+    .course-card:focus-within,
+    .course-card.is-focused{
       transform: translateY(-6px);
       box-shadow: 0 26px 56px rgba(50, 73, 95, 0.18);
+    }
+
+    .course-card.is-focused{
+      outline: 3px solid rgba(82, 101, 216, 0.34);
+      outline-offset: 4px;
+      z-index: 3;
     }
 
     .card-symbol{
@@ -570,13 +569,7 @@
       <p class="selection-note">Alle Projektkurse sind gleichwertig. Die Reihenfolge dient nur der Orientierung und sagt nichts darüber aus, welcher Kurs wichtiger, besser oder passender ist.</p>
       <div class="belt-controls" aria-label="Steuerung der Projektkurs-Auswahl">
         <div class="course-count" id="courseCount">9 Projektkurse stehen zur Wahl</div>
-        <div class="speed-controls" aria-label="Geschwindigkeit des Fließbands">
-          <span class="control-label">Tempo</span>
-          <button class="btn control-btn" type="button" data-speed="0.55" aria-pressed="false">ruhig</button>
-          <button class="btn control-btn" type="button" data-speed="1" aria-pressed="true">normal</button>
-          <button class="btn control-btn" type="button" data-speed="1.8" aria-pressed="false">schnell</button>
-          <button class="btn control-btn" id="fastForwardBtn" type="button">vorspulen</button>
-        </div>
+        <div class="swipe-hint">Wischen oder ziehen beschleunigt die Auswahl.</div>
       </div>
 
       <div class="belt-window" id="courseBelt" aria-label="Gleichwertige Projektkursauswahl als Fließband">
@@ -734,15 +727,13 @@
     const courseBelt = document.getElementById("courseBelt");
     const courseTrack = document.getElementById("courseTrack");
     const courseCount = document.getElementById("courseCount");
-    const speedButtons = Array.from(document.querySelectorAll("[data-speed]"));
-    const fastForwardBtn = document.getElementById("fastForwardBtn");
     const courseCards = Array.from(courseTrack.querySelectorAll(".course-card"));
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let beltOffset = 0;
-    let beltPaused = false;
     let beltStep = 260;
-    let beltSpeed = 1;
+    let beltVelocity = 0.035;
     let lastFrame = performance.now();
+    let dragState = null;
 
     const reveal = (screen) => {
       screen.classList.remove("revealed");
@@ -788,20 +779,50 @@
         courseTrack.append(courseTrack.querySelector(".course-card"));
       }
 
+      while (beltOffset < 0) {
+        beltOffset += beltStep;
+        courseTrack.prepend(courseTrack.lastElementChild);
+      }
+
       courseTrack.style.transform = `translate3d(${-beltOffset}px, 0, 0)`;
+    };
+
+    const updateFocusedCard = () => {
+      const beltCenter = courseBelt.getBoundingClientRect().left + courseBelt.clientWidth / 2;
+      let focusedCard = null;
+      let focusedDistance = Number.POSITIVE_INFINITY;
+
+      courseCards.forEach((card) => {
+        const cardRect = card.getBoundingClientRect();
+        const cardCenter = cardRect.left + cardRect.width / 2;
+        const distance = Math.abs(cardCenter - beltCenter);
+
+        if (distance < focusedDistance) {
+          focusedDistance = distance;
+          focusedCard = card;
+        }
+      });
+
+      courseCards.forEach((card) => {
+        const isFocused = card === focusedCard;
+        card.classList.toggle("is-focused", isFocused);
+        card.setAttribute("aria-current", isFocused ? "true" : "false");
+      });
     };
 
     const moveBelt = (time) => {
       const delta = time - lastFrame;
       lastFrame = time;
 
-      if (!beltPaused && !reducedMotion.matches && !courseScreen.hasAttribute("hidden")) {
-        beltOffset += delta * 0.035 * beltSpeed;
+      if (!reducedMotion.matches && !courseScreen.hasAttribute("hidden") && !dragState) {
+        beltOffset += delta * beltVelocity;
+        beltVelocity += (0.035 - beltVelocity) * 0.018;
       }
 
       if (!courseScreen.hasAttribute("hidden")) {
         layoutBelt();
         normalizeBelt();
+        updateFocusedCard();
       }
 
       requestAnimationFrame(moveBelt);
@@ -832,21 +853,53 @@
       reveal(landingScreen);
     });
 
-    courseBelt.addEventListener("pointerenter", () => {
-      beltPaused = true;
+    courseBelt.addEventListener("pointerdown", (event) => {
+      if (event.target.closest("a")) return;
+
+      dragState = {
+        pointerId: event.pointerId,
+        lastX: event.clientX,
+        lastTime: performance.now(),
+        moved: false,
+      };
+      courseBelt.classList.add("is-dragging");
+      courseBelt.setPointerCapture(event.pointerId);
     });
 
-    courseBelt.addEventListener("pointerleave", () => {
-      beltPaused = false;
+    courseBelt.addEventListener("pointermove", (event) => {
+      if (!dragState || dragState.pointerId !== event.pointerId) return;
+
+      const now = performance.now();
+      const deltaX = event.clientX - dragState.lastX;
+      const deltaTime = Math.max(now - dragState.lastTime, 16);
+      beltOffset -= deltaX;
+      beltVelocity = clamp(-deltaX / deltaTime, -0.18, 0.18);
+      dragState.lastX = event.clientX;
+      dragState.lastTime = now;
+      dragState.moved = dragState.moved || Math.abs(deltaX) > 3;
+      normalizeBelt();
+      updateFocusedCard();
     });
 
-    courseBelt.addEventListener("focusin", () => {
-      beltPaused = true;
-    });
+    const endDrag = (event) => {
+      if (!dragState || dragState.pointerId !== event.pointerId) return;
 
-    courseBelt.addEventListener("focusout", () => {
-      beltPaused = false;
-    });
+      if (dragState.moved) {
+        courseBelt.dataset.swiped = "true";
+        window.setTimeout(() => {
+          delete courseBelt.dataset.swiped;
+        }, 0);
+      }
+
+      dragState = null;
+      courseBelt.classList.remove("is-dragging");
+      if (courseBelt.hasPointerCapture(event.pointerId)) {
+        courseBelt.releasePointerCapture(event.pointerId);
+      }
+    };
+
+    courseBelt.addEventListener("pointerup", endDrag);
+    courseBelt.addEventListener("pointercancel", endDrag);
 
     courseCards.forEach((card) => {
       const link = card.querySelector("a");
@@ -856,6 +909,11 @@
       card.setAttribute("tabindex", "0");
 
       card.addEventListener("click", (event) => {
+        if (courseBelt.dataset.swiped === "true") {
+          event.preventDefault();
+          return;
+        }
+
         if (event.target.closest("a")) return;
         link.click();
       });
@@ -868,21 +926,6 @@
     });
 
     courseCount.textContent = `${courseCards.length} Projektkurse stehen zur Wahl`;
-
-    speedButtons.forEach((button) => {
-      button.addEventListener("click", () => {
-        beltSpeed = Number(button.dataset.speed);
-        speedButtons.forEach((speedButton) => {
-          speedButton.setAttribute("aria-pressed", String(speedButton === button));
-        });
-      });
-    });
-
-    fastForwardBtn.addEventListener("click", () => {
-      layoutBelt();
-      beltOffset += beltStep;
-      normalizeBelt();
-    });
 
     window.addEventListener("resize", layoutBelt);
     reducedMotion.addEventListener("change", layoutBelt);
