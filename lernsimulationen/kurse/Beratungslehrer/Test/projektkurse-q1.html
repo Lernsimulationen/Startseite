@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    style-src 'self' 'unsafe-inline';
+    script-src 'self' 'unsafe-inline';
+    img-src 'self' data:;
+    connect-src 'none';
+    frame-src 'none';
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+  ">
+  <title>Projektkurse Q1</title>
+  <style>
+    :root{
+      --page: #f7fbff;
+      --surface: #ffffff;
+      --surface-soft: #f1f6fb;
+      --ink: #172b3a;
+      --muted: #5d7180;
+      --line: rgba(23, 43, 58, 0.12);
+      --coral: #ef695b;
+      --teal: #22a699;
+      --indigo: #5265d8;
+      --amber: #f4b44f;
+      --shadow: 0 20px 50px rgba(50, 73, 95, 0.12);
+      --max: 1160px;
+      --radius: 8px;
+    }
+
+    *{ box-sizing: border-box; }
+
+    body{
+      margin: 0;
+      font-family: "Trebuchet MS", "Aptos", "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(135deg, rgba(82, 101, 216, 0.08), transparent 36%),
+        linear-gradient(225deg, rgba(34, 166, 153, 0.1), transparent 32%),
+        var(--page);
+      min-height: 100vh;
+    }
+
+    .page{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 28px 18px 56px;
+    }
+
+    .screen,
+    .footer-rail,
+    .course-card{
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.94);
+      box-shadow: var(--shadow);
+    }
+
+    .screen{
+      border-radius: 18px;
+      padding: 30px;
+      min-height: min(720px, calc(100vh - 112px));
+      display: grid;
+      align-content: center;
+    }
+
+    .screen[hidden]{
+      display: none;
+    }
+
+    .screen.revealed{
+      animation: revealScreen 0.28s ease;
+    }
+
+    .hero-grid{
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
+      gap: 30px;
+      align-items: center;
+    }
+
+    .eyebrow,
+    .pill,
+    .subject-chip{
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-weight: 700;
+    }
+
+    .eyebrow{
+      padding: 8px 12px;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #506777;
+      background: var(--surface-soft);
+    }
+
+    h1,
+    h2,
+    h3{
+      font-family: "Segoe UI Variable Display", "Aptos Display", "Trebuchet MS", sans-serif;
+      letter-spacing: 0;
+    }
+
+    h1{
+      margin: 18px 0 14px;
+      font-size: 4.5rem;
+      line-height: 1.02;
+      max-width: 9ch;
+    }
+
+    h2{
+      margin: 0 0 10px;
+      font-size: 2rem;
+      line-height: 1.18;
+    }
+
+    h3{
+      margin: 0;
+      font-size: 1.35rem;
+      line-height: 1.25;
+    }
+
+    p{
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.75;
+      font-size: 1rem;
+    }
+
+    .lead{
+      max-width: 62ch;
+      font-size: 1.08rem;
+    }
+
+    .nrw-info{
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+      max-width: 720px;
+    }
+
+    .info-item{
+      border-left: 4px solid var(--teal);
+      background: var(--surface-soft);
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+
+    .info-item strong{
+      display: block;
+      margin-bottom: 4px;
+      color: var(--ink);
+    }
+
+    .hero-actions,
+    .card-actions,
+    .selection-actions{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .selection-actions{
+      justify-content: space-between;
+      align-items: center;
+      margin: 0 0 22px;
+    }
+
+    .btn{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 11px 18px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      text-decoration: none;
+      color: inherit;
+      background: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+    }
+
+    .btn:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(50, 73, 95, 0.12);
+    }
+
+    .btn.primary{
+      background: linear-gradient(135deg, var(--indigo), var(--teal));
+      border-color: transparent;
+      color: #fff;
+    }
+
+    .hero-symbol{
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      max-height: 520px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(135deg, rgba(82, 101, 216, 0.14), rgba(34, 166, 153, 0.14)),
+        #fff;
+      display: grid;
+      place-items: center;
+      padding: 28px;
+    }
+
+    .hero-symbol img{
+      width: min(88%, 420px);
+      height: min(88%, 420px);
+      object-fit: contain;
+      display: block;
+      border-radius: 12px;
+    }
+
+    .course-selection{
+      align-content: start;
+    }
+
+    .selection-note{
+      margin: 0 0 22px;
+      max-width: 720px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .belt-controls{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin: 0 0 16px;
+      flex-wrap: wrap;
+    }
+
+    .course-count{
+      display: inline-flex;
+      align-items: center;
+      min-height: 42px;
+      padding: 9px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.84);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      font-weight: 800;
+    }
+
+    .swipe-hint{
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 9px 14px;
+    }
+
+    .belt-window{
+      position: relative;
+      height: var(--belt-h, 390px);
+      width: 100%;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.86), rgba(241,246,251,0.78)),
+        radial-gradient(circle at 50% 50%, rgba(34,166,153,0.12), transparent 42%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+      isolation: isolate;
+      touch-action: pan-y;
+      cursor: grab;
+      user-select: none;
+    }
+
+    .belt-window.is-dragging{
+      cursor: grabbing;
+    }
+
+    .belt-window::before,
+    .belt-window::after{
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: clamp(42px, 12vw, 140px);
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    .belt-window::before{
+      left: 0;
+      background:
+        linear-gradient(90deg, rgba(247,251,255,1), rgba(247,251,255,0));
+    }
+
+    .belt-window::after{
+      right: 0;
+      background:
+        linear-gradient(270deg, rgba(247,251,255,1), rgba(247,251,255,0));
+    }
+
+    .belt-guide{
+      position: absolute;
+      left: 28px;
+      right: 28px;
+      top: 50%;
+      height: 18px;
+      transform: translateY(-50%);
+      border-radius: 999px;
+      background:
+        repeating-linear-gradient(90deg, rgba(82,101,216,0.16) 0 18px, rgba(82,101,216,0.04) 18px 34px),
+        rgba(255,255,255,0.58);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.76);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .course-grid{
+      height: 100%;
+      display: flex;
+      align-items: center;
+      gap: var(--belt-gap, 22px);
+      width: max-content;
+      padding: 0 var(--belt-pad, 28px);
+      will-change: transform;
+    }
+
+    .course-card{
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      position: relative;
+      flex: 0 0 var(--card-w, 220px);
+      width: var(--card-w, 180px);
+      height: var(--card-h, 270px);
+      transition: box-shadow 0.18s ease, transform 0.18s ease;
+      cursor: pointer;
+    }
+
+    .course-card:hover,
+    .course-card:focus-within,
+    .course-card.is-focused{
+      transform: translateY(-6px);
+      box-shadow: 0 26px 56px rgba(50, 73, 95, 0.18);
+    }
+
+    .course-card.is-focused{
+      outline: 3px solid rgba(82, 101, 216, 0.34);
+      outline-offset: 4px;
+      z-index: 3;
+    }
+
+    .card-symbol{
+      height: var(--symbol-h, 96px);
+      display: grid;
+      place-items: center;
+      border-bottom: 1px solid var(--line);
+      background:
+        linear-gradient(135deg, rgba(var(--card-tint), 0.14), rgba(255,255,255,0.88)),
+        #fff;
+      padding: var(--card-pad, 14px);
+    }
+
+    .card-symbol svg{
+      width: 108px;
+      height: 108px;
+    }
+
+    .card-symbol img{
+      width: var(--symbol-img, 72px);
+      height: var(--symbol-img, 72px);
+      display: block;
+      object-fit: contain;
+      border-radius: 12px;
+      filter: drop-shadow(0 14px 22px rgba(50, 73, 95, 0.12));
+    }
+
+    .card-body{
+      padding: var(--card-pad, 14px);
+      display: grid;
+      gap: 9px;
+      align-content: start;
+    }
+
+    .course-card h3{
+      font-size: var(--card-title, 1rem);
+      line-height: 1.18;
+    }
+
+    .course-card .btn{
+      min-height: var(--card-btn-h, 38px);
+      padding: 9px 12px;
+      font-size: var(--card-btn-text, 0.84rem);
+      width: 100%;
+    }
+
+    .pill,
+    .subject-chip{
+      padding: 5px 9px;
+      background: var(--surface-soft);
+      color: #48606f;
+      font-size: var(--chip-text, 0.74rem);
+    }
+
+    .subjects{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .card-actions{
+      margin-top: auto;
+    }
+
+    .footer-rail{
+      margin-top: 18px;
+      padding: 16px 18px;
+      border-radius: var(--radius);
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+    }
+
+    @keyframes revealScreen{
+      from{ opacity: 0; transform: translateY(10px); }
+      to{ opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 900px){
+      .screen{
+        min-height: auto;
+      }
+
+      .hero-grid,
+      .nrw-info{
+        grid-template-columns: 1fr;
+      }
+
+      .belt-window{
+        height: var(--belt-h, 330px);
+      }
+
+      h1{
+        font-size: 3rem;
+        max-width: none;
+      }
+
+      .card-symbol{
+        height: var(--symbol-h, 86px);
+      }
+
+      .card-symbol img{
+        width: var(--symbol-img, 64px);
+        height: var(--symbol-img, 64px);
+      }
+
+      .selection-actions,
+      .footer-rail,
+      .belt-controls{
+        flex-direction: column;
+        align-items: start;
+      }
+    }
+
+    @media (max-width: 560px){
+      .page{
+        padding-inline: 10px;
+      }
+
+      .screen{
+        padding: 18px 14px;
+      }
+
+      .selection-note{
+        font-size: 0.9rem;
+        margin-bottom: 14px;
+      }
+
+      .subjects{
+        display: none;
+      }
+
+      .card-actions{
+        display: none;
+      }
+
+      .course-card h3{
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .belt-window{
+        overflow-x: auto;
+      }
+
+      .course-grid{
+        transform: none !important;
+      }
+    }
+
+    .match-shell{
+      display: grid;
+      grid-template-columns: minmax(280px, 0.92fr) minmax(320px, 1.08fr);
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .deck-wrap,
+    .match-panel{
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: var(--shadow);
+    }
+
+    .deck-wrap{
+      position: relative;
+      min-height: 610px;
+      border-radius: 28px;
+      padding: clamp(18px, 3vw, 32px);
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 22% 16%, rgba(239, 105, 91, 0.2), transparent 28%),
+        radial-gradient(circle at 78% 10%, rgba(34, 166, 153, 0.2), transparent 24%),
+        linear-gradient(145deg, rgba(255,255,255,0.95), rgba(241,246,251,0.9));
+    }
+
+    .deck-wrap::before{
+      content: "";
+      position: absolute;
+      inset: 18px;
+      border: 1px dashed rgba(23, 43, 58, 0.16);
+      border-radius: 24px;
+      pointer-events: none;
+    }
+
+    .deck-topline{
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .deck-progress{
+      flex: 1;
+      height: 9px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(23, 43, 58, 0.1);
+    }
+
+    .deck-progress span{
+      display: block;
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--coral), var(--amber), var(--teal));
+      transition: width 0.22s ease;
+    }
+
+    .swipe-stage{
+      position: relative;
+      height: min(68vh, 430px);
+      min-height: 390px;
+      display: grid;
+      place-items: center;
+      touch-action: pan-y;
+      user-select: none;
+    }
+
+    .swipe-card{
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      width: min(100%, 390px);
+      height: min(100%, 430px);
+      border-radius: 32px;
+      grid-template-rows: minmax(150px, 45%) 1fr;
+      transform:
+        translateY(calc(var(--stack-index, 0) * 12px))
+        scale(calc(1 - (var(--stack-index, 0) * 0.045)));
+      transform-origin: center 85%;
+      opacity: calc(1 - (var(--stack-index, 0) * 0.16));
+      transition: transform 0.22s ease, opacity 0.22s ease, box-shadow 0.22s ease;
+      cursor: grab;
+      will-change: transform;
+    }
+
+    .swipe-card.is-top{
+      z-index: 5;
+      cursor: grab;
+    }
+
+    .swipe-card.is-dragging{
+      cursor: grabbing;
+      transition: none;
+    }
+
+    .swipe-card.is-gone{
+      pointer-events: none;
+      transition: transform 0.28s ease, opacity 0.28s ease;
+    }
+
+    .swipe-card.is-hidden{
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(28px) scale(0.92);
+    }
+
+    .swipe-card:hover,
+    .swipe-card:focus-within,
+    .swipe-card.is-focused{
+      transform:
+        translateY(calc(var(--stack-index, 0) * 12px - 5px))
+        scale(calc(1 - (var(--stack-index, 0) * 0.045)));
+    }
+
+    .swipe-card .card-symbol{
+      height: auto;
+      border-bottom: 0;
+      background:
+        radial-gradient(circle at 70% 20%, rgba(255,255,255,0.8), transparent 24%),
+        linear-gradient(135deg, rgba(var(--card-tint), 0.24), rgba(var(--card-tint), 0.08)),
+        #fff;
+      padding: 26px;
+    }
+
+    .swipe-card .card-symbol img{
+      width: min(54%, 168px);
+      height: min(54%, 168px);
+    }
+
+    .swipe-card .card-body{
+      padding: 24px;
+      gap: 14px;
+    }
+
+    .swipe-card h3{
+      font-size: clamp(1.55rem, 4vw, 2.35rem);
+      line-height: 1.02;
+    }
+
+    .swipe-card .btn{
+      min-height: 46px;
+      font-size: 0.94rem;
+    }
+
+    .swipe-badge{
+      position: absolute;
+      top: 24px;
+      z-index: 7;
+      padding: 9px 15px;
+      border: 3px solid currentColor;
+      border-radius: 12px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: rotate(var(--badge-tilt, -10deg)) scale(0.9);
+      pointer-events: none;
+    }
+
+    .swipe-badge.like{
+      right: 22px;
+      color: var(--teal);
+      --badge-tilt: 10deg;
+    }
+
+    .swipe-badge.nope{
+      left: 22px;
+      color: var(--coral);
+    }
+
+    .swipe-card[data-swipe="like"] .swipe-badge.like,
+    .swipe-card[data-swipe="nope"] .swipe-badge.nope{
+      opacity: 1;
+      transform: rotate(var(--badge-tilt, -10deg)) scale(1);
+    }
+
+    .swipe-controls{
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .swipe-btn{
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      display: grid;
+      place-items: center;
+      background: #fff;
+      color: var(--ink);
+      font-size: 1.55rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 16px 34px rgba(50, 73, 95, 0.15);
+      transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+    }
+
+    .swipe-btn:hover{
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 20px 42px rgba(50, 73, 95, 0.2);
+    }
+
+    .swipe-btn.nope{
+      color: var(--coral);
+    }
+
+    .swipe-btn.like{
+      color: var(--teal);
+    }
+
+    .swipe-btn.undo{
+      width: 54px;
+      height: 54px;
+      align-self: center;
+      color: var(--indigo);
+      font-size: 1.2rem;
+    }
+
+    .swipe-btn:disabled{
+      opacity: 0.42;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .empty-deck{
+      position: absolute;
+      inset: 52px 22px 96px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 26px;
+      border-radius: 28px;
+      background: rgba(255,255,255,0.76);
+      border: 1px solid var(--line);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .empty-deck.is-visible{
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .match-panel{
+      border-radius: 28px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .match-panel h3{
+      font-size: 1.55rem;
+    }
+
+    .match-list{
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 10px;
+    }
+
+    .match-list li{
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface-soft);
+    }
+
+    .match-list img{
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+      border-radius: 10px;
+      background: #fff;
+    }
+
+    .match-list strong{
+      color: var(--ink);
+      font-weight: 800;
+    }
+
+    .match-empty{
+      padding: 16px;
+      border: 1px dashed var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.7);
+    }
+
+    .preview-card{
+      display: grid;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.92), rgba(241,246,251,0.78)),
+        #fff;
+    }
+
+    .preview-card strong{
+      display: block;
+      color: var(--ink);
+      font-size: 1.05rem;
+    }
+
+    .preview-text{
+      max-height: min(62vh, 520px);
+      min-height: 220px;
+      overflow: auto;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+      white-space: pre-line;
+    }
+
+    .final-card{
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(34, 166, 153, 0.34);
+      background:
+        radial-gradient(circle at 92% 10%, rgba(34,166,153,0.24), transparent 34%),
+        rgba(255,255,255,0.86);
+    }
+
+    .final-card[hidden]{
+      display: none;
+    }
+
+    @media (max-width: 900px){
+      .match-shell{
+        grid-template-columns: 1fr;
+      }
+
+      .deck-wrap{
+        min-height: 560px;
+      }
+    }
+
+    @media (max-width: 560px){
+      .deck-wrap{
+        min-height: 520px;
+        padding: 14px;
+        border-radius: 22px;
+      }
+
+      .swipe-stage{
+        min-height: 350px;
+      }
+
+      .swipe-card{
+        border-radius: 24px;
+      }
+
+      .swipe-card .card-body{
+        padding: 18px;
+      }
+
+      .swipe-card .subjects{
+        display: flex;
+      }
+
+      .swipe-card .card-actions{
+        display: block;
+      }
+
+      .swipe-btn{
+        width: 58px;
+        height: 58px;
+      }
+
+      .preview-text{
+        max-height: 420px;
+        min-height: 220px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .swipe-card,
+      .deck-progress span{
+        transition: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="screen" id="landingScreen">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">Projektkurse · NRW Oberstufe</div>
+          <h1>Projektkurse wählen</h1>
+          <p class="lead">
+            Projektkurse sind Kurse in der Qualifikationsphase. Du arbeitest über zwei Halbjahre an einem größeren Thema. Es geht nicht nur um normalen Unterricht, sondern um ein eigenes Produkt, Recherche, Planung, Teamarbeit und Präsentation.
+          </p>
+
+          <div class="nrw-info" aria-label="Informationen zu Projektkursen in NRW">
+            <div class="info-item">
+              <strong>Zwei Halbjahre</strong>
+              <p>Ein Projektkurs läuft in NRW über zwei aufeinanderfolgende Halbjahre.</p>
+            </div>
+            <div class="info-item">
+              <strong>Leitfächer</strong>
+              <p>Jeder Projektkurs ist an ein oder mehrere Fächer angebunden.</p>
+            </div>
+            <div class="info-item">
+              <strong>Eigenes Produkt</strong>
+              <p>Am Ende steht ein Ergebnis, zum Beispiel eine Aufführung, ein Podcast, ein Experiment oder eine Präsentation.</p>
+            </div>
+            <div class="info-item">
+              <strong>Selbstständig arbeiten</strong>
+              <p>Du recherchierst, planst und arbeitest stärker eigenverantwortlich als in vielen anderen Kursen.</p>
+            </div>
+          </div>
+
+          <div class="hero-actions">
+            <button class="btn primary" id="showCoursesBtn" type="button" aria-controls="courseScreen" aria-expanded="false">Projektkurse ansehen</button>
+          </div>
+        </div>
+
+        <div class="hero-symbol" aria-hidden="true">
+          <img src="./assets/symbol-projektarbeit.png" alt="" />
+        </div>
+      </div>
+    </section>
+
+    <section class="screen course-selection" id="courseScreen" hidden>
+      <div class="selection-actions">
+        <div>
+          <div class="eyebrow">Projektkurs-Matcher</div>
+          <h2>Swipe dich Runde für Runde zum Match</h2>
+        </div>
+        <button class="btn" id="backToLandingBtn" type="button">Zurück</button>
+      </div>
+      <p class="selection-note">Der Text zur aktuellen Karte erscheint rechts als Live-Vorschau. Nach rechts gewischte Kurse kommen in die nächste Runde, nach links scheiden sie aus. Das läuft so lange, bis nur noch ein Match übrig ist.</p>
+      <div class="belt-controls" aria-label="Steuerung der Projektkurs-Auswahl">
+        <div class="course-count" id="courseCount">Runde 1: 0 von 9 geswiped</div>
+        <div class="swipe-hint">Tastatur: Pfeil links/rechts · rechts kommt weiter, links scheidet aus.</div>
+      </div>
+
+      <div class="match-shell">
+        <div class="deck-wrap">
+          <div class="deck-topline" aria-label="Fortschritt">
+            <div class="course-count" id="deckStatus">Noch 9 Karten</div>
+            <div class="deck-progress" aria-hidden="true"><span id="deckProgress"></span></div>
+          </div>
+
+          <div class="swipe-stage" id="courseDeck" aria-label="Projektkurse als Swipe-Karten" aria-live="polite">
+            <article class="course-card swipe-card" data-course="3d-druck">
+              <span class="swipe-badge nope">Weiter</span>
+              <span class="swipe-badge like">Merken</span>
+              <div class="card-symbol" style="--card-tint: 82,101,216" aria-hidden="true">
+                <img src="./assets/symbol-3d-druck.png" alt="" />
+              </div>
+              <div class="card-body">
+                <h3>3D-Druck und digitale Konstruktion</h3>
+                <div class="subjects">
+                  <span class="subject-chip">Mathe</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="course-card swipe-card" data-course="big-band">
+              <span class="swipe-badge nope">Weiter</span>
+              <span class="swipe-badge like">Merken</span>
+              <div class="card-symbol" style="--card-tint: 82,101,216" aria-hidden="true">
+                <img src="./assets/symbol-big-band.png" alt="" />
+              </div>
+              <div class="card-body">
+                <h3>„Big Band“</h3>
+                <div class="subjects">
+                  <span class="subject-chip">Musik</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="course-card swipe-card" data-course="darstellen-gestalten">
+              <span class="swipe-badge nope">Weiter</span>
+              <span class="swipe-badge like">Merken</span>
+              <div class="card-symbol" style="--card-tint: 244,180,79" aria-hidden="true">
+                <img src="./assets/symbol-darstellen-gestalten.png" alt="" />
+              </div>
+              <div class="card-body">
+                <h3>Darstellen & Gestalten</h3>
+                <div class="subjects">
+                  <span class="subject-chip">Deutsch</span>
+                  <span class="subject-chip">Kunst</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="course-card swipe-card" data-course="dramaturgie">
+              <span class="swipe-badge nope">Weiter</span>
+              <span class="swipe-badge like">Merken</span>
+              <div class="card-symbol" style="--card-tint: 239,105,91" aria-hidden="true">
+                <img src="./assets/symbol-dramaturgie.png" alt="" />
+              </div>
+              <div class="card-body">
+                <h3>„Dramaturgie“</h3>
+                <div class="subjects">
+                  <span class="subject-chip">Deutsch</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="course-card swipe-card" data-course="gesang">
+              <span class="swipe-badge nope">Weiter</span>
+              <span class="swipe-badge like">Merken</span>
+              <div class="card-symbol" style="--card-tint: 239,105,91" aria-hidden="true">
+                <img src="./assets/symbol-gesang.png" alt="" />
+              </div>
+              <div class="card-body">
+                <h3>„Gesang“</h3>
+                <div class="subjects">
+                  <span class="subject-chip">Musik</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="course-card swipe-card" data-course="ki">
+              <span class="swipe-badge nope">Weiter</span>
+              <span class="swipe-badge like">Merken</span>
+              <div class="card-symbol" style="--card-tint: 82,101,216" aria-hidden="true">
+                <img src="./assets/symbol-ki.png" alt="" />
+              </div>
+              <div class="card-body">
+                <h3>KI, Mensch und Verantwortung</h3>
+                <div class="subjects">
+                  <span class="subject-chip">Religionslehre</span>
+                  <span class="subject-chip">SoWi</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="course-card swipe-card" data-course="kunst">
+              <span class="swipe-badge nope">Weiter</span>
+              <span class="swipe-badge like">Merken</span>
+              <div class="card-symbol" style="--card-tint: 34,166,153" aria-hidden="true">
+                <img src="./assets/symbol-kunst.png" alt="" />
+              </div>
+              <div class="card-body">
+                <h3>Kunst</h3>
+                <div class="subjects">
+                  <span class="subject-chip">Kunst</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="course-card swipe-card" data-course="schwammstadt-ruhr">
+              <span class="swipe-badge nope">Weiter</span>
+              <span class="swipe-badge like">Merken</span>
+              <div class="card-symbol" style="--card-tint: 34,166,153" aria-hidden="true">
+                <img src="./assets/symbol-schwammstadt.png" alt="" />
+              </div>
+              <div class="card-body">
+                <h3>Schwammstadt Ruhr</h3>
+                <div class="subjects">
+                  <span class="subject-chip">Erdkunde</span>
+                  <span class="subject-chip">Biologie</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="course-card swipe-card" data-course="science">
+              <span class="swipe-badge nope">Weiter</span>
+              <span class="swipe-badge like">Merken</span>
+              <div class="card-symbol" style="--card-tint: 34,166,153" aria-hidden="true">
+                <img src="./assets/symbol-science.png" alt="" />
+              </div>
+              <div class="card-body">
+                <h3>Science</h3>
+                <div class="subjects">
+                  <span class="subject-chip">Biologie</span>
+                  <span class="subject-chip">Chemie</span>
+                </div>
+              </div>
+            </article>
+
+            <div class="empty-deck" id="emptyDeck">
+              <div>
+                <h3>Runde abgeschlossen</h3>
+                <p id="emptyDeckText">Die gemerkten Kurse ziehen gleich in die nächste Runde ein.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="swipe-controls" aria-label="Swipe-Aktionen">
+            <button class="swipe-btn nope" id="skipBtn" type="button" aria-label="Diesen Kurs überspringen">×</button>
+            <button class="swipe-btn undo" id="undoBtn" type="button" aria-label="Letzten Swipe rückgängig machen">↶</button>
+            <button class="swipe-btn like" id="likeBtn" type="button" aria-label="Diesen Kurs merken">♥</button>
+          </div>
+        </div>
+
+        <aside class="match-panel" aria-label="Live-Vorschau und nächste Runde">
+          <div>
+            <div class="eyebrow">Live-Vorschau</div>
+            <h3 id="matchTitle">Runde 1</h3>
+          </div>
+          <div class="preview-card">
+            <strong id="coursePreviewTitle">Kursvorschau</strong>
+            <p class="preview-text" id="coursePreviewText">Wähle einen Kurs aus, um den Text zu lesen.</p>
+          </div>
+          <div class="final-card" id="finalCard" hidden>
+            <div class="eyebrow">Finaler Match</div>
+            <h3 id="finalTitle">Noch offen</h3>
+          </div>
+          <ul class="match-list" id="matchList"></ul>
+          <p class="match-empty" id="matchEmpty">Noch ist niemand für die nächste Runde gesetzt. Swipe nach rechts, um Kurse weiterzulassen.</p>
+          <button class="btn primary" id="resetBtn" type="button">Neu starten</button>
+        </aside>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    const showCoursesBtn = document.getElementById("showCoursesBtn");
+    const landingScreen = document.getElementById("landingScreen");
+    const courseScreen = document.getElementById("courseScreen");
+    const backToLandingBtn = document.getElementById("backToLandingBtn");
+    const courseDeck = document.getElementById("courseDeck");
+    const courseCount = document.getElementById("courseCount");
+    const deckStatus = document.getElementById("deckStatus");
+    const deckProgress = document.getElementById("deckProgress");
+    const emptyDeck = document.getElementById("emptyDeck");
+    const emptyDeckText = document.getElementById("emptyDeckText");
+    const matchTitle = document.getElementById("matchTitle");
+    const matchList = document.getElementById("matchList");
+    const matchEmpty = document.getElementById("matchEmpty");
+    const coursePreviewTitle = document.getElementById("coursePreviewTitle");
+    const coursePreviewText = document.getElementById("coursePreviewText");
+    const finalCard = document.getElementById("finalCard");
+    const finalTitle = document.getElementById("finalTitle");
+    const skipBtn = document.getElementById("skipBtn");
+    const likeBtn = document.getElementById("likeBtn");
+    const undoBtn = document.getElementById("undoBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const courseCards = Array.from(courseDeck.querySelectorAll(".swipe-card"));
+    const totalCards = courseCards.length;
+    const shuffle = (items) => {
+      const shuffled = [...items];
+
+      for (let index = shuffled.length - 1; index > 0; index -= 1) {
+        const randomIndex = Math.floor(Math.random() * (index + 1));
+        [shuffled[index], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[index]];
+      }
+
+      return shuffled;
+    };
+    let roundNumber = 1;
+    let roundCards = shuffle(courseCards.map((card, index) => index));
+    let activeIndex = 0;
+    let nextRoundIndexes = [];
+    let swipeHistory = [];
+    let finalIndex = null;
+    let roundAdvanceTimer = null;
+    let dragState = null;
+
+    const reveal = (screen) => {
+      screen.classList.remove("revealed");
+      void screen.offsetWidth;
+      screen.classList.add("revealed");
+    };
+
+    const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+    const getCourseData = (card) => {
+      const image = card.querySelector("img");
+      return {
+        title: card.querySelector("h3").textContent.trim(),
+        id: card.dataset.course,
+        imageSrc: image.getAttribute("src"),
+      };
+    };
+
+    const coursePreviewTexts = {
+      "3d-druck": "Der Projektkurs „3D-Druck und digitale Konstruktion“ vermittelt grundlegende Kenntnisse im Bereich des digitalen Konstruierens und moderner Fertigungstechnologien. Die Schülerinnen und Schüler lernen den Umgang mit CAD-Programmen, 3D-Druckern sowie verschiedener Software zur Vorbereitung und Optimierung von Druckprojekten.\nIm Mittelpunkt steht die eigenständige Entwicklung und Herstellung von Modellen, Prototypen und technischen Bauteilen. Dabei planen, konstruieren und verbessern die Teilnehmenden ihre Projekte Schritt für Schritt und sammeln praktische Erfahrungen im Umgang mit technischen Geräten und Materialien.\nDer Kurs fördert kreatives Denken, technisches Verständnis, Teamarbeit sowie selbstständiges und problemlösendes Arbeiten. Die Leistungsbewertung erfolgt anhand der Mitarbeit, der Projektdokumentation und der Präsentation der Ergebnisse.",
+      "big-band": "Der Projektkurs „Big Band“ ist für alle Schülerinnen und Schüler, die Freude am gemeinsamen Musizieren haben. Voraussetzung ist, dass du bereits ein Instrument spielst und Noten lesen kannst. In der Big Band erarbeiten wir gemeinsam ein Programm, das wir zu verschiedenen Gelegenheiten, wie unserem Schulkonzert „Gustav Rockt“ oder dem Tag der offenen Tür präsentieren. Die Teilnahme an diesen Auftritten ist verpflichtend. Dabei lernst du nicht nur musikalisch dazu, sondern stärkst auch Teamarbeit, Rhythmusgefühl und Bühnenerfahrung. Wichtig ist die Bereitschaft, auch außerhalb der Schulzeit Zeit für Proben und Auftritte zu investieren.",
+      "darstellen-gestalten": "Darstellen & Gestalten\nIm Projektkurs Darstellen & Gestalten wird kreativ, experimentell und projektorientiert gearbeitet. Grundlage bilden die vier Ausdrucksbereiche Körpersprache, Bildsprache, Wortsprache und Musiksprache, die sowohl einzeln und vor allem vernetzt erkundet werden.\nDabei werden bestehende Werke und künstlerische Positionen analysiert, eigene Ideen ausgearbeitet, Texte und Szenen geschrieben sowie ganz eigene künstlerische Ausdrucksformen entwickelt.\nMögliche Formate sind unter anderem Theater- und Performanceprojekte, szenische Inszenierungen, Installationen oder interdisziplinäre Formate, die öffentlich präsentiert werden können.\nDer Projektkurs setzt die Bereitschaft voraus, künstlerische Prozesse aktiv mitzugestalten, neue Perspektiven einzunehmen und sich auf ungewohnte Arbeitsweisen einzulassen. Er fördert Kreativität, Eigeninitiative, Reflexionsfähigkeit sowie die Offenheit, persönliche Grenzen zu erweitern.\nDarstellen und Gestalten bedeutet hier nicht nur Ideen haben, sondern diese auch im Team umzusetzen.",
+      "dramaturgie": "In diesem Projektkurs eignen die Schülerinnen und Schüler sich zunächst Wissen über Theatergeschichte, -traditionen und Dramentheorie an. Dieses Wissen setzen sie danach im Schreiben eines eigenen Theaterstücks um. Hierzu bekommen sie verschiedene Kompetenzen vermittelt, die ihnen im Schreibprozess helfen sollen. Das Ziel ist es, dass jede Schülerin und jeder Schüler des Projektkurses am Ende des ersten Halbjahres ein fertiges Theaterstück geschrieben hat. Am Ende des zweiten Halbjahres soll es dann zu einer Aufführung eines oder mehrerer dieser Stücke kommen. Die Schülerinnen und Schüler gestalten diesen Prozess – mit Unterstützung der Lehrkraft – weitgehend selbst, führen also Regie, schauspielern und organisieren einen einfachen(!) Einsatz von Requisiten, Kostümen und Technik. Der Kurs ist sehr ergebnisoffen und braucht motivierte, engagierte und kreative Köpfe und Herzen.",
+      "gesang": "Der Projektkurs „Gesang“ richtet sich an Schüler:innen, die Interesse am Singen und an musikalischer Arbeit im Ensemble (z.B. Chor oder Bigband) haben. Voraussetzung ist die Bereitschaft, regelmäßig auch außerhalb der Unterrichtszeit zu üben und sich aktiv in die Probenarbeit einzubringen. Ziel des Kurses ist es, die eigene Stimme bewusster wahrzunehmen, weiterzuentwickeln und musikalisch einzusetzen. Geplant sind außerdem gemeinsame Exkursionen, beispielsweise zu Konzerten oder musikalischen Workshops, die den Unterricht ergänzen und vertiefen. Ein wichtiger und verpflichtender Bestandteil des Projektkurses ist die Vorbereitung und Mitgestaltung des Konzertes „Gustav Rockt“, bei dem die erarbeiteten Stücke öffentlich präsentiert werden. Wenn es sich ergibt, können weitere Auftritte dazu kommen.",
+      "ki": "„KI, Mensch und Verantwortung“ fragt danach, was Künstliche Intelligenz mit uns als Menschen macht.\nIm Projektkurs wird KI nicht nur theoretisch behandelt, sondern praktisch ausprobiert: Ihr nutzt KI-Tools zur Texterstellung, Bildgenerierung, Recherche, Analyse oder Präsentation und prüft dabei kritisch, was diese Systeme leisten – und was nicht.\nAus evangelischer Perspektive geht es um Grundfragen: Was bedeutet Menschenwürde, wenn Maschinen scheinbar denken? Was unterscheidet den Menschen von einer KI? Welche Rolle spielen Gewissen, Freiheit, Schuld, Verantwortung und das christliche Menschenbild?\nAn Beispielen aus Schule, Medien, Politik, Kirche, Arbeitswelt und Alltag werden Chancen und Risiken untersucht, etwa Fake News, Manipulation, Diskriminierung oder KI in Seelsorge und Bildung. Der Kurs verbindet eigenes Ausprobieren mit theologischer und ethischer Reflexion. Am Ende entsteht ein eigenes Projektprodukt, zum Beispiel Podcast, Erklärvideo, Ausstellung, Umfrage, KI-Experiment oder Diskussionsformat.",
+      "kunst": "Der Projektkurs im Fach Kunst gibt dir die Möglichkeit, an einem künstlerischen Anliegen deiner Wahl lange und intensiv zu arbeiten. Du wirst verschiedene Techniken wie z. B. Malerei, Druck, Collage, Pastell, Kohle erproben und dich individuell mit Künstlern, Epochen oder Stilen deiner Wahl beschäftigen können. Ziel ist es, deine individuellen Fähigkeiten im Bereich der Kunst gezielt zu nutzen, aber auch neue zu erwerben und dich aus deiner Komfortzone herauszubewegen. Wenn du viel Motivation, Eigeninitiative und Akribie mitbringst, wirst du im Projektkurs Kunst alle Möglichkeiten der Gustav nutzen können, um dein künstlerisches Projekt umzusetzen. In einer gemeinsamen kursinternen Ausstellung wirst du Gelegenheit haben, deinen Mitschülern deine Idee, den Prozess und die finale Umsetzung zu erläutern.",
+      "schwammstadt-ruhr": "„Schwammstadt Ruhr – Moderne und lebenswerte Städte der Zukunft“\nWie sieht die Stadt der Zukunft aus?\nHitzewellen, Starkregen und der Klimawandel verändern unsere Städte immer stärker – besonders im Ruhrgebiet. Gleichzeitig sollen Städte gesund, lebenswert und nachhaltig bleiben. Doch wie kann das gelingen?\nIm Projektkurs „Schwammstadt Ruhr – Moderne und lebenswerte Städte der Zukunft“ beschäftigt ihr euch mit aktuellen Fragen aus Biologie und Geographie und untersucht, wie moderne Stadtplanung Menschen und Umwelt schützen kann.\nDabei geht es unter anderem um:\n• das Konzept der Schwammstadt,\n• nachhaltige Stadtentwicklung,\n• urbane Gesundheit,\n• Begrünung von Städten,\n• Wasser- und Klimamanagement,\n• Biodiversität und Umweltforschung.\nIhr arbeitet praxisnah und wissenschaftlich:\nNeben Recherche und Teamarbeit führt ihr eigene Untersuchungen und Messungen im urbanen Raum (von der Schule über den Stadtteil bis an die Grenzen des Ruhrgebietes) durch, analysiert Stadtbereiche in Essen und entwickelt eigene Ideen für die Stadt der Zukunft.\nDas erwartet euch:\n• Projektarbeit in Gruppen\n• Exkursionen und Untersuchungen im Ruhrgebiet\n• Temperatur- und Umweltmessungen\n• Arbeit mit Karten und digitalen Daten\n• kreative Entwicklung eigener Stadtkonzepte\n• Präsentationen und moderne Forschungsmethoden\n• Evtl. werden Teile des Kurses als Kompaktveranstaltung gehalten\nFür wen ist der Kurs geeignet?\nFür Schülerinnen und Schüler, die Interesse haben an:\n• Klima und Umwelt,\n• Nachhaltigkeit,\n• Biologie und Geographie,\n• Stadtentwicklung,\n• Forschung und Zukunftsfragen.\nDer Projektkurs verbindet wissenschaftliches Arbeiten mit aktuellen gesellschaftlichen Themen und bietet viele Möglichkeiten für eigenständiges und kreatives Arbeiten.",
+      "science": "Der Kurs richtet sich an alle, die:\n• gerne praktisch arbeiten,\n• experimentieren und forschen möchten,\n• Interesse an Naturwissenschaften, Medizin oder Umwelt haben,\n• und naturwissenschaftliche Methoden selbst ausprobieren wollen.\nDann ist dieser Projektkurs genau das Richtige für dich! Hier arbeitest du praktisch, entwickelst eigene Experimente und lernst, wie Wissenschaft in der Realität funktioniert.\nGemeinsam tauchen wir in spannende Themen aus Chemie und Biologie ein. Im ersten Teil des Kurses plant und präsentiert ihr beeindruckende chemische Experimente, die ihr bei einer großen Show am Tag der offenen Tür vorstellt. Anschließend arbeitet ihr mit modernen biotechnologischen Methoden aus Medizin und Forensik und untersucht wissenschaftliche Fragestellungen wie: „Schwein oder nicht Schwein?“ in Lebensmitteln.\nExkursionen zu Universitäten und die Teilnahme an Wettbewerben machen diesen Kurs zu einem besonderen Erlebnis. Wer neugierig ist und Wissenschaft erleben möchte, ist hier genau richtig!"
+    };
+    const courseData = courseCards.map((card) => {
+      const data = getCourseData(card);
+      return {
+        ...data,
+        preview: coursePreviewTexts[data.id] || "Zu diesem Kurs liegt noch kein Vorschautext vor.",
+      };
+    });
+
+    const clearRoundTimer = () => {
+      if (!roundAdvanceTimer) return;
+      window.clearTimeout(roundAdvanceTimer);
+      roundAdvanceTimer = null;
+    };
+
+    const resetCard = (card) => {
+      card.classList.remove("is-gone", "is-hidden", "is-dragging", "is-top");
+      card.removeAttribute("data-swipe");
+      card.style.removeProperty("transform");
+      card.style.removeProperty("opacity");
+    };
+
+    const renderRoundList = () => {
+      matchList.innerHTML = "";
+
+      nextRoundIndexes.forEach((courseIndex) => {
+        const course = courseData[courseIndex];
+        const item = document.createElement("li");
+        const image = document.createElement("img");
+        const title = document.createElement("strong");
+
+        image.src = course.imageSrc;
+        image.alt = "";
+        title.textContent = course.title;
+        item.append(image, title);
+        matchList.append(item);
+      });
+
+      matchEmpty.hidden = nextRoundIndexes.length > 0 || finalIndex !== null;
+    };
+
+    const updatePreview = () => {
+      const activeCardIndex = finalIndex ?? roundCards[activeIndex] ?? nextRoundIndexes[0] ?? roundCards[0];
+      if (activeCardIndex === undefined) return;
+
+      const course = courseData[activeCardIndex];
+      coursePreviewTitle.textContent = course.title;
+      coursePreviewText.textContent = course.preview;
+    };
+
+    const showFinal = (courseIndex) => {
+      finalIndex = courseIndex;
+      const course = courseData[courseIndex];
+      finalTitle.textContent = course.title;
+      finalCard.hidden = false;
+      matchTitle.textContent = "Finaler Match";
+      emptyDeckText.textContent = "Der finale Match steht fest.";
+      updateDeck();
+    };
+
+    const startNextRound = (indexes) => {
+      clearRoundTimer();
+      roundNumber += 1;
+      roundCards = [...indexes];
+      activeIndex = 0;
+      nextRoundIndexes = [];
+      swipeHistory = [];
+      dragState = null;
+
+      courseCards.forEach(resetCard);
+      updateDeck();
+      getTopCard()?.focus({ preventScroll: true });
+    };
+
+    const completeRound = () => {
+      if (finalIndex !== null) return;
+      if (activeIndex < roundCards.length) return;
+
+      if (nextRoundIndexes.length === 1) {
+        showFinal(nextRoundIndexes[0]);
+        return;
+      }
+
+      if (nextRoundIndexes.length > 1) {
+        emptyDeckText.textContent = `${nextRoundIndexes.length} Kurse ziehen in Runde ${roundNumber + 1} ein.`;
+        roundAdvanceTimer = window.setTimeout(() => startNextRound(nextRoundIndexes), 950);
+        updateDeck();
+        return;
+      }
+
+      emptyDeckText.textContent = "Kein Kurs kam weiter. Diese Runde startet gleich noch einmal.";
+      roundAdvanceTimer = window.setTimeout(() => startNextRound(roundCards), 1100);
+      updateDeck();
+    };
+
+    const getRoundPosition = (cardIndex) => roundCards.indexOf(cardIndex);
+
+    const updateDeck = () => {
+      const remaining = finalIndex === null ? Math.max(roundCards.length - activeIndex, 0) : 0;
+
+      courseCards.forEach((card, cardIndex) => {
+        const position = getRoundPosition(cardIndex);
+        const stackIndex = position - activeIndex;
+        const inRound = position !== -1;
+        const isUpcoming = finalIndex === null && inRound && stackIndex >= 0 && stackIndex < 4;
+        const isAnimatingGone = inRound && position < activeIndex && card.classList.contains("is-gone");
+        const isTop = isUpcoming && stackIndex === 0;
+
+        card.classList.toggle("is-hidden", !isUpcoming && !isAnimatingGone);
+        card.classList.toggle("is-top", isTop);
+        card.setAttribute("aria-hidden", isUpcoming ? "false" : "true");
+        card.setAttribute("tabindex", isTop ? "0" : "-1");
+        card.style.setProperty("--stack-index", Math.max(stackIndex, 0));
+        card.style.zIndex = isUpcoming ? String(20 - stackIndex) : "0";
+
+        if (isTop && !card.classList.contains("is-gone")) {
+          card.style.removeProperty("transform");
+          card.style.removeProperty("opacity");
+          card.removeAttribute("data-swipe");
+        }
+      });
+
+      courseCount.textContent = finalIndex === null
+        ? `Runde ${roundNumber}: ${Math.min(activeIndex, roundCards.length)} von ${roundCards.length} geswiped`
+        : "Auswahl abgeschlossen";
+      deckStatus.textContent = finalIndex !== null
+        ? "Finaler Match"
+        : remaining === 1
+          ? "Noch 1 Karte"
+          : `Noch ${remaining} Karten`;
+      deckProgress.style.width = `${((roundCards.length - remaining) / roundCards.length) * 100}%`;
+      emptyDeck.classList.toggle("is-visible", remaining === 0);
+      skipBtn.disabled = remaining === 0 || finalIndex !== null;
+      likeBtn.disabled = remaining === 0 || finalIndex !== null;
+      undoBtn.disabled = swipeHistory.length === 0 || finalIndex !== null;
+
+      if (finalIndex === null) {
+        finalCard.hidden = true;
+        matchTitle.textContent = `Runde ${roundNumber}`;
+        emptyDeckText.textContent = nextRoundIndexes.length > 1
+          ? `${nextRoundIndexes.length} Kurse ziehen gleich in die nächste Runde ein.`
+          : nextRoundIndexes.length === 1
+            ? "Ein Kurs ist übrig geblieben."
+            : "Kein Kurs kam weiter. Die Runde startet neu.";
+      }
+
+      renderRoundList();
+      updatePreview();
+    };
+
+    const setViewHash = (hash) => {
+      const target = `${window.location.pathname}${window.location.search}${hash}`;
+      window.history.replaceState(null, "", target);
+    };
+
+    const showOverview = (updateHash = true) => {
+      courseScreen.setAttribute("hidden", "");
+      landingScreen.removeAttribute("hidden");
+      showCoursesBtn.setAttribute("aria-expanded", "false");
+
+      if (updateHash && window.location.hash === "#auswahl") {
+        setViewHash("");
+      }
+    };
+
+    const showSelection = (updateHash = true) => {
+      landingScreen.setAttribute("hidden", "");
+      courseScreen.removeAttribute("hidden");
+      showCoursesBtn.setAttribute("aria-expanded", "true");
+
+      if (updateHash && window.location.hash !== "#auswahl") {
+        setViewHash("#auswahl");
+      }
+
+      requestAnimationFrame(updateDeck);
+    };
+
+    showCoursesBtn.addEventListener("click", () => {
+      showSelection();
+      reveal(courseScreen);
+    });
+
+    backToLandingBtn.addEventListener("click", () => {
+      showOverview();
+      reveal(landingScreen);
+    });
+
+    const swipeCard = (direction) => {
+      if (finalIndex !== null || roundAdvanceTimer) return;
+
+      const cardIndex = roundCards[activeIndex];
+      const card = courseCards[cardIndex];
+      if (!card) return;
+
+      const liked = direction === "like";
+      swipeHistory.push({
+        activeIndex,
+        cardIndex,
+        direction,
+        nextRoundIndexes: [...nextRoundIndexes],
+      });
+
+      if (liked && !nextRoundIndexes.includes(cardIndex)) {
+        nextRoundIndexes.push(cardIndex);
+      }
+
+      card.classList.add("is-gone");
+      card.classList.remove("is-dragging");
+      card.dataset.swipe = liked ? "like" : "nope";
+      card.style.transform = `translate(${liked ? 130 : -130}%, -8%) rotate(${liked ? 18 : -18}deg)`;
+      card.style.opacity = "0";
+      activeIndex += 1;
+      updateDeck();
+
+      if (activeIndex >= roundCards.length) {
+        window.setTimeout(completeRound, 320);
+      }
+    };
+
+    const undoSwipe = () => {
+      const lastSwipe = swipeHistory.pop();
+      if (!lastSwipe || finalIndex !== null) return;
+
+      clearRoundTimer();
+      activeIndex = lastSwipe.activeIndex;
+      nextRoundIndexes = [...lastSwipe.nextRoundIndexes];
+      const card = courseCards[lastSwipe.cardIndex];
+      resetCard(card);
+
+      updateDeck();
+      card.focus({ preventScroll: true });
+    };
+
+    const resetDeck = () => {
+      clearRoundTimer();
+      roundNumber = 1;
+      roundCards = shuffle(courseCards.map((card, index) => index));
+      activeIndex = 0;
+      nextRoundIndexes = [];
+      swipeHistory = [];
+      finalIndex = null;
+      dragState = null;
+
+      courseCards.forEach(resetCard);
+      updateDeck();
+    };
+
+    const getTopCard = () => {
+      const cardIndex = roundCards[activeIndex];
+      return cardIndex === undefined ? null : courseCards[cardIndex];
+    };
+
+    courseDeck.addEventListener("pointerdown", (event) => {
+      const card = getTopCard();
+      if (!card || roundAdvanceTimer || !event.target.closest(".swipe-card")) return;
+
+      dragState = {
+        pointerId: event.pointerId,
+        card,
+        startX: event.clientX,
+        startY: event.clientY,
+        moved: false,
+      };
+      card.classList.add("is-dragging");
+      card.setPointerCapture(event.pointerId);
+    });
+
+    courseDeck.addEventListener("pointermove", (event) => {
+      if (!dragState || dragState.pointerId !== event.pointerId) return;
+
+      const deltaX = event.clientX - dragState.startX;
+      const deltaY = event.clientY - dragState.startY;
+      const tilt = clamp(deltaX / 12, -18, 18);
+      const intent = Math.abs(deltaX) > 48 ? (deltaX > 0 ? "like" : "nope") : "";
+
+      dragState.moved = dragState.moved || Math.abs(deltaX) + Math.abs(deltaY) > 10;
+      dragState.card.style.transform = `translate(${deltaX}px, ${deltaY}px) rotate(${tilt}deg)`;
+      dragState.card.dataset.swipe = intent;
+    });
+
+    const endDrag = (event) => {
+      if (!dragState || dragState.pointerId !== event.pointerId) return;
+      const deltaX = event.clientX - dragState.startX;
+      const direction = Math.abs(deltaX) > 105 ? (deltaX > 0 ? "like" : "nope") : "";
+      const card = dragState.card;
+
+      card.classList.remove("is-dragging");
+      if (card.hasPointerCapture(event.pointerId)) {
+        card.releasePointerCapture(event.pointerId);
+      }
+      dragState = null;
+
+      if (direction) {
+        swipeCard(direction);
+        return;
+      }
+
+      card.style.removeProperty("transform");
+      card.removeAttribute("data-swipe");
+    };
+
+    courseDeck.addEventListener("pointerup", endDrag);
+    courseDeck.addEventListener("pointercancel", endDrag);
+
+    courseCards.forEach((card) => {
+      card.setAttribute("role", "group");
+      card.setAttribute("aria-label", card.querySelector("h3").textContent.trim());
+      card.addEventListener("keydown", (event) => {
+        if (card !== getTopCard()) return;
+
+        if (event.key === "ArrowRight") {
+          event.preventDefault();
+          swipeCard("like");
+        }
+
+        if (event.key === "ArrowLeft") {
+          event.preventDefault();
+          swipeCard("nope");
+        }
+      });
+    });
+
+    skipBtn.addEventListener("click", () => swipeCard("nope"));
+    likeBtn.addEventListener("click", () => swipeCard("like"));
+    undoBtn.addEventListener("click", undoSwipe);
+    resetBtn.addEventListener("click", resetDeck);
+    updateDeck();
+
+    window.addEventListener("pageshow", () => {
+      if (window.location.hash === "#auswahl") {
+        showSelection(false);
+        return;
+      }
+
+      showOverview(false);
+    });
+  </script>
+</body>
+</html>

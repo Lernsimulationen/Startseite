@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900">
+  <rect width="1200" height="900" fill="#f8fbff"/>
+  <circle cx="180" cy="170" r="120" fill="#e6e9ff"/>
+  <circle cx="1020" cy="760" r="150" fill="#e0f8ef"/>
+  <rect x="120" y="110" width="960" height="680" rx="42" fill="#fffdf9"/>
+  <rect x="180" y="180" width="420" height="320" rx="34" fill="#dde7ff"/>
+  <rect x="240" y="230" width="300" height="220" rx="24" fill="#2c3d63"/>
+  <rect x="274" y="262" width="232" height="156" rx="16" fill="#f4f8ff"/>
+  <path d="M390 288h40v60l-20 30-20-30Z" fill="#7c96ff"/>
+  <rect x="652" y="200" width="360" height="140" rx="30" fill="#fff0e5"/>
+  <rect x="688" y="240" width="166" height="18" rx="9" fill="#ffc9a4"/>
+  <rect x="688" y="278" width="234" height="14" rx="7" fill="#ffffff"/>
+  <rect x="688" y="308" width="188" height="14" rx="7" fill="#ffffff"/>
+  <g transform="translate(640 404)">
+    <rect x="0" y="0" width="390" height="250" rx="34" fill="#eef9ff"/>
+    <rect x="44" y="44" width="132" height="132" rx="26" fill="#ffffff"/>
+    <path d="M110 70l42 24v48l-42 24-42-24V94Z" fill="#7c96ff"/>
+    <path d="M110 70 68 94l42 24 42-24Z" fill="#95e3d1"/>
+    <rect x="214" y="60" width="126" height="18" rx="9" fill="#d3e3ff"/>
+    <rect x="214" y="100" width="94" height="14" rx="7" fill="#ffffff"/>
+    <rect x="214" y="134" width="108" height="14" rx="7" fill="#ffffff"/>
+  </g>
+</svg>
