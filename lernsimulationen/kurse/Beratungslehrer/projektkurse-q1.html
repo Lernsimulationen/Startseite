@@ -828,16 +828,30 @@
       requestAnimationFrame(moveBelt);
     };
 
-    const showOverview = () => {
+    const setViewHash = (hash) => {
+      const target = `${window.location.pathname}${window.location.search}${hash}`;
+      window.history.replaceState(null, "", target);
+    };
+
+    const showOverview = (updateHash = true) => {
       courseScreen.setAttribute("hidden", "");
       landingScreen.removeAttribute("hidden");
       showCoursesBtn.setAttribute("aria-expanded", "false");
+
+      if (updateHash && window.location.hash === "#auswahl") {
+        setViewHash("");
+      }
     };
 
-    const showSelection = () => {
+    const showSelection = (updateHash = true) => {
       landingScreen.setAttribute("hidden", "");
       courseScreen.removeAttribute("hidden");
       showCoursesBtn.setAttribute("aria-expanded", "true");
+
+      if (updateHash && window.location.hash !== "#auswahl") {
+        setViewHash("#auswahl");
+      }
+
       requestAnimationFrame(layoutBelt);
     };
 
@@ -847,9 +861,7 @@
     });
 
     backToLandingBtn.addEventListener("click", () => {
-      courseScreen.setAttribute("hidden", "");
-      landingScreen.removeAttribute("hidden");
-      showCoursesBtn.setAttribute("aria-expanded", "false");
+      showOverview();
       reveal(landingScreen);
     });
 
@@ -933,11 +945,11 @@
 
     window.addEventListener("pageshow", () => {
       if (window.location.hash === "#auswahl") {
-        showSelection();
+        showSelection(false);
         return;
       }
 
-      showOverview();
+      showOverview(false);
     });
   </script>
 </body>
