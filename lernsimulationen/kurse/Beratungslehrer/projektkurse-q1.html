@@ -236,63 +236,67 @@
       line-height: 1.65;
     }
 
-    .course-grid{
+    .belt-window{
       position: relative;
-      height: var(--orbit-h, clamp(600px, 78vh, 820px));
-      min-height: 480px;
-      max-width: 1050px;
+      height: var(--belt-h, 390px);
       width: 100%;
-      margin: 0 auto;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.86), rgba(241,246,251,0.78)),
+        radial-gradient(circle at 50% 50%, rgba(34,166,153,0.12), transparent 42%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
       isolation: isolate;
-      overflow: visible;
     }
 
-    .course-grid::before{
+    .belt-window::before,
+    .belt-window::after{
       content: "";
       position: absolute;
-      left: 50%;
-      top: 50%;
-      width: var(--ring-size, 520px);
-      height: var(--ring-size, 520px);
-      transform: translate(-50%, -50%);
-      border: 1px dashed rgba(82, 101, 216, 0.28);
-      border-radius: 50%;
-      background:
-        radial-gradient(circle, rgba(255,255,255,0.92) 0 24%, rgba(34,166,153,0.08) 25% 31%, transparent 32%),
-        linear-gradient(135deg, rgba(82,101,216,0.08), rgba(34,166,153,0.08));
-      z-index: -1;
-    }
-
-    .orbit-center{
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: var(--center-size, 190px);
-      height: var(--center-size, 190px);
-      transform: translate(-50%, -50%);
-      border-radius: 50%;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,0.92);
-      box-shadow: 0 18px 45px rgba(50, 73, 95, 0.1);
-      display: grid;
-      place-items: center;
-      text-align: center;
-      padding: 22px;
+      top: 0;
+      bottom: 0;
+      width: clamp(42px, 12vw, 140px);
+      z-index: 4;
       pointer-events: none;
     }
 
-    .orbit-center strong{
-      display: block;
-      color: var(--ink);
-      font-size: 1.05rem;
+    .belt-window::before{
+      left: 0;
+      background:
+        linear-gradient(90deg, rgba(247,251,255,1), rgba(247,251,255,0));
     }
 
-    .orbit-center span{
-      display: block;
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 0.9rem;
-      line-height: 1.35;
+    .belt-window::after{
+      right: 0;
+      background:
+        linear-gradient(270deg, rgba(247,251,255,1), rgba(247,251,255,0));
+    }
+
+    .belt-guide{
+      position: absolute;
+      left: 28px;
+      right: 28px;
+      top: 50%;
+      height: 18px;
+      transform: translateY(-50%);
+      border-radius: 999px;
+      background:
+        repeating-linear-gradient(90deg, rgba(82,101,216,0.16) 0 18px, rgba(82,101,216,0.04) 18px 34px),
+        rgba(255,255,255,0.58);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.76);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .course-grid{
+      height: 100%;
+      display: flex;
+      align-items: center;
+      gap: var(--belt-gap, 22px);
+      width: max-content;
+      padding: 0 var(--belt-pad, 28px);
+      will-change: transform;
     }
 
     .course-card{
@@ -300,11 +304,18 @@
       overflow: hidden;
       display: grid;
       grid-template-rows: auto 1fr;
-      position: absolute;
+      position: relative;
+      flex: 0 0 var(--card-w, 220px);
       width: var(--card-w, 180px);
       height: var(--card-h, 270px);
-      will-change: transform;
-      transition: box-shadow 0.18s ease;
+      transition: box-shadow 0.18s ease, transform 0.18s ease;
+      cursor: pointer;
+    }
+
+    .course-card:hover,
+    .course-card:focus-within{
+      transform: translateY(-6px);
+      box-shadow: 0 26px 56px rgba(50, 73, 95, 0.18);
     }
 
     .card-symbol{
@@ -394,9 +405,8 @@
         grid-template-columns: 1fr;
       }
 
-      .course-grid{
-        max-width: 100%;
-        min-height: 500px;
+      .belt-window{
+        height: var(--belt-h, 330px);
       }
 
       h1{
@@ -434,11 +444,11 @@
         margin-bottom: 14px;
       }
 
-      .orbit-center span{
+      .subjects{
         display: none;
       }
 
-      .subjects{
+      .card-actions{
         display: none;
       }
 
@@ -448,15 +458,15 @@
         -webkit-line-clamp: 2;
         overflow: hidden;
       }
+    }
 
-      .course-card .btn{
-        font-size: 0;
-        padding-inline: 8px;
+    @media (prefers-reduced-motion: reduce){
+      .belt-window{
+        overflow-x: auto;
       }
 
-      .course-card .btn::after{
-        content: "Öffnen";
-        font-size: var(--card-btn-text, 0.7rem);
+      .course-grid{
+        transform: none !important;
       }
     }
   </style>
@@ -512,14 +522,9 @@
       </div>
       <p class="selection-note">Alle Projektkurse sind gleichwertig. Die Reihenfolge dient nur der Orientierung und sagt nichts darüber aus, welcher Kurs wichtiger, besser oder passender ist.</p>
 
-      <div class="course-grid" id="courseOrbit" aria-label="Gleichwertige Projektkursauswahl als rotierender Kreis">
-        <div class="orbit-center" aria-hidden="true">
-          <div>
-            <strong>gleichwertig</strong>
-            <span>alle Kurse stehen auf Augenhöhe</span>
-          </div>
-        </div>
-
+      <div class="belt-window" id="courseBelt" aria-label="Gleichwertige Projektkursauswahl als Fließband">
+        <div class="belt-guide" aria-hidden="true"></div>
+        <div class="course-grid" id="courseTrack">
         <article class="course-card">
           <div class="card-symbol" style="--card-tint: 82,101,216" aria-hidden="true">
             <img src="./assets/symbol-3d-druck.png" alt="" />
@@ -658,6 +663,7 @@
             </div>
           </div>
         </article>
+        </div>
       </div>
     </section>
 
@@ -668,11 +674,13 @@
     const landingScreen = document.getElementById("landingScreen");
     const courseScreen = document.getElementById("courseScreen");
     const backToLandingBtn = document.getElementById("backToLandingBtn");
-    const courseOrbit = document.getElementById("courseOrbit");
-    const courseCards = Array.from(courseOrbit.querySelectorAll(".course-card"));
+    const courseBelt = document.getElementById("courseBelt");
+    const courseTrack = document.getElementById("courseTrack");
+    const courseCards = Array.from(courseTrack.querySelectorAll(".course-card"));
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let orbitAngle = -Math.PI / 2;
-    let orbitPaused = false;
+    let beltOffset = 0;
+    let beltPaused = false;
+    let beltStep = 260;
     let lastFrame = performance.now();
 
     const reveal = (screen) => {
@@ -683,57 +691,55 @@
 
     const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
-    const layoutOrbit = () => {
-      const orbitWidth = courseOrbit.clientWidth;
+    const layoutBelt = () => {
+      const beltWidth = courseBelt.clientWidth;
       const viewportWidth = window.innerWidth;
       const isCompact = viewportWidth < 640;
       const isMedium = viewportWidth < 900;
-      const cardWidth = clamp(orbitWidth * (isCompact ? 0.24 : 0.16), isCompact ? 82 : isMedium ? 128 : 148, isCompact ? 118 : 190);
-      const cardHeight = clamp(cardWidth * (isCompact ? 1.46 : 1.5), isCompact ? 122 : isMedium ? 196 : 230, isCompact ? 172 : 270);
-      const orbitTop = courseOrbit.getBoundingClientRect().top;
-      const availableHeight = window.innerHeight - orbitTop - 28;
-      const orbitHeight = clamp(Math.max(availableHeight, orbitWidth * (isCompact ? 1.5 : isMedium ? 0.84 : 0.78)), isCompact ? 520 : isMedium ? 640 : 700, isCompact ? 680 : isMedium ? 760 : 860);
-      const centerSize = clamp(orbitWidth * (isCompact ? 0.25 : 0.18), isCompact ? 88 : 150, isCompact ? 112 : 190);
-      const cardPadding = clamp(cardWidth * 0.075, 8, 14);
-      const symbolHeight = clamp(cardHeight * 0.36, isCompact ? 56 : 82, isCompact ? 74 : 100);
-      const symbolImage = clamp(cardWidth * 0.38, isCompact ? 38 : 58, isCompact ? 50 : 76);
+      const visibleCards = isCompact ? 2.15 : isMedium ? 2.7 : 3.65;
+      const gap = clamp(beltWidth * 0.025, isCompact ? 12 : 18, 28);
+      const cardWidth = clamp((beltWidth - gap * (visibleCards - 1)) / visibleCards, isCompact ? 132 : isMedium ? 180 : 210, isCompact ? 176 : isMedium ? 230 : 260);
+      const cardHeight = clamp(cardWidth * 1.22, isCompact ? 188 : isMedium ? 250 : 286, isCompact ? 230 : isMedium ? 310 : 338);
+      const beltHeight = cardHeight + clamp(cardHeight * 0.22, 54, 82);
+      const cardPadding = clamp(cardWidth * 0.07, 10, 18);
+      const symbolHeight = clamp(cardHeight * 0.42, 82, 132);
+      const symbolImage = clamp(cardWidth * 0.42, 58, 94);
 
-      courseOrbit.style.setProperty("--card-w", `${cardWidth}px`);
-      courseOrbit.style.setProperty("--card-h", `${cardHeight}px`);
-      courseOrbit.style.setProperty("--orbit-h", `${orbitHeight}px`);
-      courseOrbit.style.setProperty("--center-size", `${centerSize}px`);
-      courseOrbit.style.setProperty("--card-pad", `${cardPadding}px`);
-      courseOrbit.style.setProperty("--symbol-h", `${symbolHeight}px`);
-      courseOrbit.style.setProperty("--symbol-img", `${symbolImage}px`);
-      courseOrbit.style.setProperty("--card-title", `${clamp(cardWidth / 175, 0.72, 1)}rem`);
-      courseOrbit.style.setProperty("--chip-text", `${clamp(cardWidth / 240, 0.58, 0.74)}rem`);
-      courseOrbit.style.setProperty("--card-btn-h", `${clamp(cardHeight * 0.14, 30, 38)}px`);
-      courseOrbit.style.setProperty("--card-btn-text", `${clamp(cardWidth / 230, 0.62, 0.84)}rem`);
+      courseBelt.style.setProperty("--belt-h", `${beltHeight}px`);
+      courseBelt.style.setProperty("--belt-gap", `${gap}px`);
+      courseBelt.style.setProperty("--belt-pad", `${Math.max(gap, 18)}px`);
+      courseBelt.style.setProperty("--card-w", `${cardWidth}px`);
+      courseBelt.style.setProperty("--card-h", `${cardHeight}px`);
+      courseBelt.style.setProperty("--card-pad", `${cardPadding}px`);
+      courseBelt.style.setProperty("--symbol-h", `${symbolHeight}px`);
+      courseBelt.style.setProperty("--symbol-img", `${symbolImage}px`);
+      courseBelt.style.setProperty("--card-title", `${clamp(cardWidth / 205, 0.82, 1.12)}rem`);
+      courseBelt.style.setProperty("--chip-text", `${clamp(cardWidth / 285, 0.64, 0.78)}rem`);
+      courseBelt.style.setProperty("--card-btn-h", `${clamp(cardHeight * 0.14, 34, 44)}px`);
+      courseBelt.style.setProperty("--card-btn-text", `${clamp(cardWidth / 285, 0.72, 0.88)}rem`);
 
-      const radius = Math.max(0, Math.min(orbitWidth / 2 - cardWidth / 2 - 6, orbitHeight / 2 - cardHeight / 2 - 6));
-      courseOrbit.style.setProperty("--ring-size", `${radius * 2}px`);
-
-      courseCards.forEach((card, index) => {
-        const angle = orbitAngle + (index / courseCards.length) * Math.PI * 2;
-        const x = orbitWidth / 2 + Math.cos(angle) * radius - cardWidth / 2;
-        const y = orbitHeight / 2 + Math.sin(angle) * radius - cardHeight / 2;
-        card.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-      });
+      beltStep = cardWidth + gap;
     };
 
-    const runOrbit = (time) => {
+    const moveBelt = (time) => {
       const delta = time - lastFrame;
       lastFrame = time;
 
-      if (!orbitPaused && !reducedMotion.matches && !courseScreen.hasAttribute("hidden")) {
-        orbitAngle += delta * 0.00008;
+      if (!beltPaused && !reducedMotion.matches && !courseScreen.hasAttribute("hidden")) {
+        beltOffset += delta * 0.035;
+
+        while (beltOffset >= beltStep) {
+          beltOffset -= beltStep;
+          courseTrack.append(courseTrack.querySelector(".course-card"));
+        }
       }
 
       if (!courseScreen.hasAttribute("hidden")) {
-        layoutOrbit();
+        layoutBelt();
+        courseTrack.style.transform = `translate3d(${-beltOffset}px, 0, 0)`;
       }
 
-      requestAnimationFrame(runOrbit);
+      requestAnimationFrame(moveBelt);
     };
 
     const showOverview = () => {
@@ -746,7 +752,7 @@
       landingScreen.setAttribute("hidden", "");
       courseScreen.removeAttribute("hidden");
       showCoursesBtn.setAttribute("aria-expanded", "true");
-      requestAnimationFrame(layoutOrbit);
+      requestAnimationFrame(layoutBelt);
     };
 
     showCoursesBtn.addEventListener("click", () => {
@@ -761,25 +767,44 @@
       reveal(landingScreen);
     });
 
-    courseOrbit.addEventListener("pointerenter", () => {
-      orbitPaused = true;
+    courseBelt.addEventListener("pointerenter", () => {
+      beltPaused = true;
     });
 
-    courseOrbit.addEventListener("pointerleave", () => {
-      orbitPaused = false;
+    courseBelt.addEventListener("pointerleave", () => {
+      beltPaused = false;
     });
 
-    courseOrbit.addEventListener("focusin", () => {
-      orbitPaused = true;
+    courseBelt.addEventListener("focusin", () => {
+      beltPaused = true;
     });
 
-    courseOrbit.addEventListener("focusout", () => {
-      orbitPaused = false;
+    courseBelt.addEventListener("focusout", () => {
+      beltPaused = false;
     });
 
-    window.addEventListener("resize", layoutOrbit);
-    reducedMotion.addEventListener("change", layoutOrbit);
-    requestAnimationFrame(runOrbit);
+    courseCards.forEach((card) => {
+      const link = card.querySelector("a");
+      if (!link) return;
+
+      card.setAttribute("role", "link");
+      card.setAttribute("tabindex", "0");
+
+      card.addEventListener("click", (event) => {
+        if (event.target.closest("a")) return;
+        link.click();
+      });
+
+      card.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        link.click();
+      });
+    });
+
+    window.addEventListener("resize", layoutBelt);
+    reducedMotion.addEventListener("change", layoutBelt);
+    requestAnimationFrame(moveBelt);
 
     window.addEventListener("pageshow", () => {
       if (window.location.hash === "#auswahl") {
