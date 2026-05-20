@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+        default-src 'self';
+        script-src 'self';
+        style-src 'self';
+        img-src 'self' data:;
+        font-src 'self';
+        connect-src 'none';
+        object-src 'none';
+        base-uri 'self';
+        form-action 'none';
+        frame-ancestors 'none';
+      "
+    />
+    <title>Agora Grossspiel</title>
+    <link rel="stylesheet" href="grossspiel.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-block">
+          <p class="eyebrow">Altgriechisch auf dem Bodenbrett</p>
+          <h1>Agora Grossspiel</h1>
+          <p class="tagline">Real wuerfeln. Real laufen. Digital begleiten.</p>
+        </div>
+
+        <div class="team-strip" aria-label="Teams">
+          <span class="team-chip red">Alpha</span>
+          <span class="team-chip blue">Beta</span>
+          <span class="team-chip green">Gamma</span>
+          <span class="team-chip gold">Delta</span>
+          <button id="newRoundButton" type="button" class="primary">Neue Runde</button>
+        </div>
+
+        <nav class="toolbar" aria-label="Hilfen">
+          <button type="button" class="tool-button panel-toggle" data-panel-target="rulesPanel">Regeln</button>
+          <button type="button" class="tool-button panel-toggle" data-panel-target="alphabetPanel">Alphabet</button>
+          <button type="button" class="tool-button panel-toggle" data-panel-target="logPanel">Protokoll</button>
+        </nav>
+      </header>
+
+      <main class="live-layout">
+        <section class="board-stage" aria-label="Digitale Abbildung des Realbretts">
+          <div id="board" class="board"></div>
+        </section>
+
+        <section class="director-panel" aria-label="Spielleitung">
+          <div class="turn-card">
+            <div class="turn-head">
+              <div id="teamBadge" class="team-badge red">Α</div>
+              <div>
+                <p class="tiny-label">Aktuelles Team</p>
+                <h2 id="teamName">Alpha</h2>
+              </div>
+            </div>
+
+            <div class="stepper">
+              <p class="tiny-label">Schaumstoffwuerfel</p>
+              <div id="dieButtons" class="die-buttons" aria-label="Gewuerfelte Zahl eintragen"></div>
+            </div>
+
+            <div id="statusCard" class="status-card">
+              <strong>Bereit</strong>
+              <span>Team Alpha wuerfelt real und traegt die Zahl hier ein.</span>
+            </div>
+
+            <div class="quick-actions">
+              <button id="manualNextButton" type="button" class="secondary">Team wechseln</button>
+              <button id="undoButton" type="button" class="secondary">Letzten Zug zurueck</button>
+            </div>
+          </div>
+
+          <section class="move-card">
+            <div class="compact-head">
+              <p class="tiny-label">Digitale Abbildung</p>
+              <strong id="moveLabel">Noch kein Zug</strong>
+            </div>
+            <p id="moveHint">
+              Wenn eine reale Figur bewegt wurde, waehlt hier dieselbe Figur aus.
+            </p>
+            <div id="pawnButtons" class="pawn-buttons"></div>
+          </section>
+        </section>
+
+        <aside class="team-rail">
+          <div id="teamList" class="team-list"></div>
+        </aside>
+      </main>
+
+      <section id="questionPopup" class="question-popup hidden" aria-live="polite">
+        <div class="question-card">
+          <div class="question-meta">
+            <span id="questionType">Aufgabe</span>
+            <span id="deckCount">520 im Stapel</span>
+          </div>
+          <p id="questionPrompt" class="question-prompt">Nach dem realen Wurf erscheint hier die Aufgabe.</p>
+          <div id="questionDisplay" class="greek-display">Α Β Γ Δ</div>
+          <div id="answerButtons" class="answers"></div>
+          <button id="continueButton" type="button" class="primary hidden">Weiter zum Zug</button>
+        </div>
+      </section>
+
+      <div id="overlayRoot" class="overlay-root hidden" aria-hidden="true">
+        <button type="button" class="overlay-backdrop" data-close-overlay aria-label="Overlay schliessen"></button>
+
+        <section id="rulesPanel" class="overlay-panel hidden">
+          <div class="overlay-head">
+            <h2>Grossspiel-Regeln</h2>
+            <button type="button" class="close-button" data-close-overlay>Schliessen</button>
+          </div>
+          <div class="rule-grid">
+            <p>Die Lernenden wuerfeln mit dem Schaumstoffwuerfel auf dem echten Bodenbrett.</p>
+            <p>Die gewuerfelte Zahl wird digital eingetragen, damit eine Aufgabe erscheint.</p>
+            <p>Nach der Antwort wird die reale Figur bewegt und dieselbe Figur digital markiert.</p>
+            <p>Mit 5 oder 6 darf eine Figur aus dem Haus auf das Startfeld.</p>
+            <p>Fremde Figuren auf dem Zielfeld werden real zurueck ins Haus gestellt und digital mitgefuehrt.</p>
+            <p>Die App wuerfelt nicht selbst; sie zeigt Fragen, Zughinweise und den Spielstand.</p>
+          </div>
+        </section>
+
+        <section id="alphabetPanel" class="overlay-panel hidden">
+          <div class="overlay-head">
+            <h2>Alphabettafel</h2>
+            <button type="button" class="close-button" data-close-overlay>Schliessen</button>
+          </div>
+          <div id="alphabetGrid" class="alphabet-grid"></div>
+        </section>
+
+        <section id="logPanel" class="overlay-panel hidden">
+          <div class="overlay-head">
+            <h2>Protokoll</h2>
+            <button type="button" class="close-button" data-close-overlay>Schliessen</button>
+          </div>
+          <ol id="logList" class="log-list"></ol>
+        </section>
+      </div>
+
+      <div id="flash" class="flash" aria-hidden="true"></div>
+    </div>
+
+    <script src="grossspiel.js"></script>
+  </body>
+</html>
