@@ -74,7 +74,7 @@ const QUESTION_TYPES = [
     title: "Buchstabenname",
     prompts: [
       "Wie heisst dieses Buchstabenpaar?",
-      "Welcher Name gehoert zu diesem Zeichen?",
+      "Welcher Name gehört zu diesem Zeichen?",
       "Wie nennt man diesen Buchstaben?",
       "Welcher Buchstabenname passt?",
     ],
@@ -83,20 +83,20 @@ const QUESTION_TYPES = [
     key: "lower",
     title: "Kleinschrift",
     prompts: [
-      "Welche Kleinschreibung gehoert zu {upper}?",
+      "Welche Kleinschreibung gehört zu {upper}?",
       "Welches kleine Zeichen passt zu {upper}?",
       "Wie schreibt man {upper} klein?",
-      "Welcher Kleinbuchstabe gehoert zu {upper}?",
+      "Welcher Kleinbuchstabe gehört zu {upper}?",
     ],
   },
   {
     key: "upper",
-    title: "Grossschrift",
+    title: "Großschrift",
     prompts: [
-      "Welche Grossschreibung gehoert zu {lower}?",
-      "Welches grosse Zeichen passt zu {lower}?",
-      "Wie schreibt man {lower} gross?",
-      "Welcher Grossbuchstabe gehoert zu {lower}?",
+      "Welche Großschreibung gehört zu {lower}?",
+      "Welches große Zeichen passt zu {lower}?",
+      "Wie schreibt man {lower} groß?",
+      "Welcher Großbuchstabe gehört zu {lower}?",
     ],
   },
   {
@@ -106,7 +106,7 @@ const QUESTION_TYPES = [
       "Wie klingt dieser Buchstabe ungefaehr?",
       "Welcher Laut passt zu diesem Zeichen?",
       "Wie spricht man diesen Buchstaben grob aus?",
-      "Welcher Lautwert gehoert zu diesem Buchstaben?",
+      "Welcher Lautwert gehört zu diesem Buchstaben?",
     ],
   },
   {
@@ -114,7 +114,7 @@ const QUESTION_TYPES = [
     title: "Zeichenbild",
     prompts: [
       "Wie sieht {name} aus?",
-      "Welches Zeichenpaar gehoert zu {name}?",
+      "Welches Zeichenpaar gehört zu {name}?",
       "Welche Schreibweise passt zu {name}?",
       "Womit schreibt man {name} im Alphabet?",
     ],
@@ -142,10 +142,10 @@ const MYTHOLOGY_QUESTIONS = [
     explanation: "Athene steht fuer Weisheit, Strategie und Handwerk.",
   },
   {
-    prompt: "Welcher Gott traegt den Dreizack?",
+    prompt: "Welcher Gott trägt den Dreizack?",
     options: ["Poseidon", "Apollon", "Hephaistos", "Hermes"],
     correct: "Poseidon",
-    explanation: "Poseidon ist der Meeresgott und traegt den Dreizack.",
+    explanation: "Poseidon ist der Meeresgott und trägt den Dreizack.",
   },
   {
     prompt: "Wer ist der Gott der Unterwelt?",
@@ -547,7 +547,7 @@ function buildQuestionOfType(type, letter, letterIndex, variant) {
       display: letter.upper,
       options: shuffle([letter.lower, ...distractors.map((entry) => entry.lower)]),
       correct: letter.lower,
-      explanation: `Zu ${letter.upper} gehoert ${letter.lower}.`,
+      explanation: `Zu ${letter.upper} gehört ${letter.lower}.`,
     };
   }
 
@@ -558,7 +558,7 @@ function buildQuestionOfType(type, letter, letterIndex, variant) {
       display: letter.lower,
       options: shuffle([letter.upper, ...distractors.map((entry) => entry.upper)]),
       correct: letter.upper,
-      explanation: `Zur Kleinschreibung ${letter.lower} gehoert ${letter.upper}.`,
+      explanation: `Zur Kleinschreibung ${letter.lower} gehört ${letter.upper}.`,
     };
   }
 
@@ -816,7 +816,7 @@ function renderMoveButtons() {
 
   if (state.phase !== "moving") {
     moveLabel.textContent = "Noch kein Zug";
-    moveHint.textContent = "Wenn eine reale Figur bewegt wurde, waehlt hier dieselbe Figur aus.";
+    moveHint.textContent = "Wenn eine reale Figur bewegt wurde, wählt hier dieselbe Figur aus.";
     return;
   }
 
@@ -893,7 +893,7 @@ function renderStatus() {
   deckCount.textContent = `${state.taskDeck.length} im Stapel`;
 
   if (state.phase === "waitingDie") {
-    statusCard.innerHTML = `<strong>Real wuerfeln</strong><span>${player.displayName} wuerfelt mit dem Schaumstoffwuerfel und traegt die Zahl ein.</span>`;
+    statusCard.innerHTML = `<strong>Real würfeln</strong><span>${player.displayName} würfelt mit dem Schaumstoffwürfel und trägt die Zahl ein.</span>`;
   } else if (state.phase === "answering") {
     statusCard.innerHTML = `<strong>Antwort waehlen</strong><span>Die Klasse entscheidet gemeinsam. Danach wird real gezogen.</span>`;
   } else {
@@ -964,7 +964,7 @@ function registerRealDie(value) {
   state.question = drawQuestion();
   state.answerCorrect = null;
   state.phase = "answering";
-  addLog(`${getCurrentPlayer().displayName} hat real eine ${value} gewuerfelt.`);
+  addLog(`${getCurrentPlayer().displayName} hat real eine ${value} gewürfelt.`);
   render();
 }
 
@@ -1024,7 +1024,7 @@ function applyMove(pawnIndex) {
   const from = player.pawns[pawnIndex];
   player.pawns[pawnIndex] = move.target;
   const capture = captureOn(move.target);
-  const detail = capture ? ` ${capture.displayName} stellt eine Figur real zurueck ins Haus.` : "";
+  const detail = capture ? ` ${capture.displayName} stellt eine Figur real zurück ins Haus.` : "";
   addLog(
     `${player.displayName} spiegelt Figur ${pawnIndex + 1}: ${formatProgress(from)} -> ${formatProgress(
       move.target
@@ -1033,7 +1033,7 @@ function applyMove(pawnIndex) {
 
   if (player.pawns.every((progress) => progress === 43)) {
     state.phase = "finished";
-    addLog(`${player.displayName} gewinnt das Grossspiel.`);
+    addLog(`${player.displayName} gewinnt das Großspiel.`);
     showFlash(`${player.displayName} gewinnt`);
   } else if (state.die === 6) {
     state.phase = "waitingDie";
@@ -1041,7 +1041,7 @@ function applyMove(pawnIndex) {
     state.question = null;
     state.answerCorrect = null;
     state.legalMoves = [];
-    addLog(`${player.displayName} darf wegen der 6 noch einmal real wuerfeln.`);
+    addLog(`${player.displayName} darf wegen der 6 noch einmal real würfeln.`);
   } else {
     advancePlayer();
   }
@@ -1100,7 +1100,7 @@ function undoLast() {
     return;
   }
   restore(previous);
-  showFlash("Letzter Schritt zurueckgenommen");
+  showFlash("Letzter Schritt zurückgenommen");
   render();
 }
 
@@ -1130,7 +1130,7 @@ function startNewGame() {
   state.taskDeck = createQuestionDeck();
   state.legalMoves = [];
   state.history = [];
-  state.log = ["Grossspiel gestartet. Das echte Bodenbrett ist die fuehrende Version."];
+  state.log = ["Großspiel gestartet. Das echte Bodenbrett ist die führende Version."];
   render();
 }
 
