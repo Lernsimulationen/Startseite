@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="Gesundheit und Pflege">
+  <rect width="160" height="160" rx="18" fill="#f7efe1"/>
+  <circle cx="80" cy="80" r="54" fill="#bb6d3a" opacity=".12"/>
+  <path d="M80 122s-46-26-46-60c0-17 13-29 29-29 9 0 16 4 21 11 5-7 12-11 21-11 16 0 29 12 29 29 0 34-54 60-54 60z" fill="#fff" stroke="#9f3d3d" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M80 54v42M59 75h42" stroke="#1f6f68" stroke-width="11" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SW-Simulation: Gerechter Staat</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="visual-panel" aria-label="Simulation">
+        <div class="state-map" aria-hidden="true">
+          <div class="congress-ring">
+            <span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div class="envelope">
+            <div class="envelope-flap"></div>
+            <div class="envelope-line"></div>
+          </div>
+          <div class="pillar pillar-a"></div>
+          <div class="pillar pillar-b"></div>
+          <div class="pillar pillar-c"></div>
+          <div class="pillar pillar-d"></div>
+          <div class="pillar pillar-e"></div>
+        </div>
+      </section>
+
+      <section class="learning-panel" aria-live="polite">
+        <div class="topbar">
+          <div>
+            <p class="kicker">Sozialwissenschaften</p>
+            <h1>Gründung eines gerechten Staates</h1>
+          </div>
+          <button class="icon-button" id="resetButton" type="button" title="Simulation neu starten" aria-label="Simulation neu starten">
+            <span aria-hidden="true">↻</span>
+          </button>
+        </div>
+
+        <div class="progress-wrap" aria-label="Fortschritt">
+          <div class="progress-track">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+          <p id="progressText">Phase 1 von 3</p>
+        </div>
+
+        <article class="card" id="contentCard"></article>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>

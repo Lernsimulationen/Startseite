@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="Wohnen">
+  <rect width="160" height="160" rx="18" fill="#f7efe1"/>
+  <circle cx="80" cy="80" r="54" fill="#d8a23a" opacity=".14"/>
+  <path d="M36 78l44-38 44 38" fill="none" stroke="#154f4b" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M48 76v48h64V76" fill="#fff" stroke="#154f4b" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M70 124V94h20v30" fill="#bb6d3a"/>
+  <path d="M58 88h18M94 88h18" stroke="#426d9f" stroke-width="7" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="Rente und Alterssicherung">
+  <rect width="160" height="160" rx="18" fill="#f7efe1"/>
+  <circle cx="80" cy="80" r="54" fill="#1f6f68" opacity=".12"/>
+  <circle cx="80" cy="57" r="18" fill="#fff" stroke="#154f4b" stroke-width="8"/>
+  <path d="M48 119c5-24 18-38 32-38s27 14 32 38" fill="#fff" stroke="#154f4b" stroke-width="8" stroke-linecap="round"/>
+  <path d="M104 96c12 0 22 9 22 21M126 117v15" stroke="#bb6d3a" stroke-width="8" stroke-linecap="round"/>
+  <path d="M59 126h42" stroke="#d8a23a" stroke-width="8" stroke-linecap="round"/>
+</svg>

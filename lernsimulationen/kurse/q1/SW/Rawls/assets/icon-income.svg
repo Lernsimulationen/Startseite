@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="Einkommen und Steuern">
+  <rect width="160" height="160" rx="18" fill="#f7efe1"/>
+  <circle cx="80" cy="80" r="54" fill="#1f6f68" opacity=".12"/>
+  <path d="M44 104h72" stroke="#154f4b" stroke-width="10" stroke-linecap="round"/>
+  <path d="M50 92V62h60v30" fill="#fff" stroke="#154f4b" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="80" cy="77" r="16" fill="#d8a23a" stroke="#9b6b19" stroke-width="5"/>
+  <path d="M80 67v20M72 74h16" stroke="#9b6b19" stroke-width="5" stroke-linecap="round"/>
+  <path d="M45 116c15-10 27-10 42 0 12 8 20 8 31 0" fill="none" stroke="#bb6d3a" stroke-width="7" stroke-linecap="round"/>
+</svg>

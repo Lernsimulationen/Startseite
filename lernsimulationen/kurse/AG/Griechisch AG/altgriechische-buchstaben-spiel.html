@@ -1,0 +1,1133 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Altgriechische Buchstaben - Lernspiel</title>
+  <style>
+    :root {
+      --ink: #243047;
+      --paper: #fffaf0;
+      --sun: #ffd166;
+      --coral: #ef476f;
+      --mint: #06d6a0;
+      --sky: #118ab2;
+      --violet: #7b61ff;
+      --deep: #073b4c;
+      --soft: #f2f7ff;
+      --wrong: #ff5a5f;
+      --right: #14b86a;
+      --shadow: 0 18px 45px rgba(36, 48, 71, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Trebuchet MS", "Segoe UI", Arial, sans-serif;
+      background:
+        radial-gradient(circle at 12% 15%, rgba(255, 209, 102, 0.55), transparent 28%),
+        radial-gradient(circle at 85% 12%, rgba(6, 214, 160, 0.35), transparent 24%),
+        linear-gradient(145deg, #fff7d7 0%, #dff7ff 48%, #fff0f6 100%);
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.62;
+    }
+
+    .app {
+      width: min(1180px, 100%);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: clamp(16px, 3vw, 34px);
+      display: flex;
+      align-items: stretch;
+    }
+
+    .screen {
+      display: none;
+      width: 100%;
+      min-height: calc(100vh - clamp(32px, 6vw, 68px));
+      animation: popIn 240ms ease-out;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    .menu {
+      align-items: center;
+      justify-content: center;
+    }
+
+    .menu-shell {
+      width: min(980px, 100%);
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 22px;
+    }
+
+    .hero {
+      padding: clamp(24px, 5vw, 52px);
+      color: #fff;
+      background:
+        linear-gradient(135deg, rgba(7, 59, 76, 0.92), rgba(17, 138, 178, 0.82)),
+        url("ai-hero-agora.jpg") center / cover;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -8% -34% 42%;
+      height: 190px;
+      background: rgba(255, 209, 102, 0.28);
+      transform: rotate(-8deg);
+    }
+
+    .hero h1,
+    .hero p {
+      position: relative;
+      z-index: 1;
+      max-width: 760px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.4rem, 7vw, 5.4rem);
+      line-height: 0.95;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      margin: 18px 0 0;
+      font-size: clamp(1.05rem, 2vw, 1.35rem);
+      line-height: 1.45;
+    }
+
+    .level-picks {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .pick {
+      min-height: 210px;
+      padding: 24px;
+      border: 4px solid rgba(255, 255, 255, 0.82);
+      border-radius: 8px;
+      color: #fff;
+      text-align: left;
+      box-shadow: var(--shadow);
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .pick:hover,
+    .pick:focus-visible {
+      transform: translateY(-4px);
+      box-shadow: 0 22px 48px rgba(36, 48, 71, 0.24);
+      outline: 4px solid rgba(255, 209, 102, 0.75);
+    }
+
+    .pick strong {
+      display: block;
+      font-size: clamp(1.8rem, 4vw, 2.7rem);
+      line-height: 1.05;
+    }
+
+    .pick span {
+      display: block;
+      margin-top: 12px;
+      font-size: 1.08rem;
+      line-height: 1.35;
+    }
+
+    .pick.level-one {
+      background: linear-gradient(135deg, var(--coral), #ff9f1c);
+    }
+
+    .pick.level-two {
+      background: linear-gradient(135deg, var(--sky), var(--violet));
+    }
+
+    .game {
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.8);
+      border: 3px solid rgba(255, 255, 255, 0.95);
+      border-radius: 8px;
+      box-shadow: 0 8px 26px rgba(36, 48, 71, 0.11);
+      backdrop-filter: blur(8px);
+    }
+
+    .menu-btn,
+    .help-btn,
+    .next-btn,
+    .check-btn {
+      min-height: 52px;
+      padding: 0 18px;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: 800;
+      box-shadow: 0 7px 0 rgba(0, 0, 0, 0.14);
+      transition: transform 130ms ease, box-shadow 130ms ease;
+    }
+
+    .menu-btn {
+      background: var(--deep);
+    }
+
+    .help-btn {
+      background: var(--violet);
+    }
+
+    .next-btn,
+    .check-btn {
+      background: var(--mint);
+      color: #053a34;
+    }
+
+    .menu-btn:hover,
+    .help-btn:hover,
+    .next-btn:hover,
+    .check-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 9px 0 rgba(0, 0, 0, 0.12);
+    }
+
+    .title-block {
+      min-width: 0;
+      text-align: center;
+    }
+
+    .title-block h2 {
+      margin: 0;
+      font-size: clamp(1.3rem, 3vw, 2rem);
+    }
+
+    .stars {
+      white-space: nowrap;
+      color: #7a4d00;
+      font-size: clamp(1.05rem, 2vw, 1.35rem);
+      font-weight: 900;
+    }
+
+    .stage {
+      flex: 1;
+      display: grid;
+      grid-template-columns: minmax(280px, 0.95fr) minmax(320px, 1.25fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .panel {
+      padding: clamp(16px, 3vw, 26px);
+      background: rgba(255, 255, 255, 0.86);
+      border: 3px solid rgba(255, 255, 255, 0.98);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .display-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 18px;
+      text-align: center;
+    }
+
+    .prompt {
+      min-height: 2.6em;
+      margin: 0;
+      color: #43506d;
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .letter-box {
+      position: relative;
+      width: min(360px, 100%);
+      aspect-ratio: 1 / 1;
+      margin: 0 auto;
+      display: grid;
+      place-items: center;
+      border: 6px solid #fff;
+      border-radius: 8px;
+      background: linear-gradient(160deg, #fff6ca, #dcfff4);
+      box-shadow: inset 0 0 0 8px rgba(17, 138, 178, 0.12), 0 18px 42px rgba(36, 48, 71, 0.16);
+      overflow: hidden;
+    }
+
+    .greek-letter {
+      color: var(--deep);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(8rem, 30vw, 15rem);
+      line-height: 1;
+      transform: translateY(-0.03em);
+      text-shadow: 0 6px 0 rgba(255, 209, 102, 0.55);
+    }
+
+    .cover-grid {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 5px;
+      padding: 5px;
+      pointer-events: none;
+    }
+
+    .cover-tile {
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      color: rgba(255, 255, 255, 0.9);
+      background: linear-gradient(135deg, #ef476f, #ffd166);
+      font-size: clamp(1.9rem, 6vw, 3.7rem);
+      font-weight: 900;
+      transition: opacity 500ms ease, transform 500ms ease;
+    }
+
+    .cover-tile.hidden {
+      opacity: 0;
+      transform: scale(0.82) rotate(4deg);
+    }
+
+    .timer {
+      height: 18px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(7, 59, 76, 0.12);
+    }
+
+    .timer-fill {
+      height: 100%;
+      width: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--mint), var(--sun), var(--coral));
+      transform-origin: left center;
+    }
+
+    .timer-fill.running {
+      animation: drain 10s linear forwards;
+    }
+
+    .keyboard-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .keyboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(108px, 1fr));
+      gap: 10px;
+    }
+
+    .key {
+      min-height: 58px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      color: #113247;
+      background: #ffffff;
+      border: 3px solid rgba(17, 138, 178, 0.2);
+      font-size: 1.02rem;
+      font-weight: 900;
+      box-shadow: 0 6px 0 rgba(17, 138, 178, 0.18);
+      transition: transform 100ms ease, border-color 150ms ease, background 150ms ease;
+    }
+
+    .key:hover,
+    .key:focus-visible {
+      transform: translateY(-2px);
+      border-color: var(--sky);
+      outline: 3px solid rgba(255, 209, 102, 0.65);
+    }
+
+    .key.correct {
+      color: #fff;
+      background: var(--right);
+      border-color: var(--right);
+      box-shadow: 0 6px 0 rgba(6, 110, 65, 0.28);
+    }
+
+    .key.wrong {
+      color: #fff;
+      background: var(--wrong);
+      border-color: var(--wrong);
+      box-shadow: 0 6px 0 rgba(145, 33, 37, 0.3);
+    }
+
+    .name-display {
+      min-height: 160px;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      border-radius: 8px;
+      color: var(--deep);
+      background: linear-gradient(135deg, #fff6ca, #e5f7ff);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2.5rem, 8vw, 5.5rem);
+      font-weight: 900;
+      letter-spacing: 0;
+      line-height: 1.08;
+      overflow: hidden;
+      text-align: center;
+      white-space: nowrap;
+      box-shadow: inset 0 0 0 7px rgba(123, 97, 255, 0.12);
+    }
+
+    .answer-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .answer {
+      width: 100%;
+      min-height: 64px;
+      padding: 10px 16px;
+      border: 4px solid rgba(17, 138, 178, 0.3);
+      border-radius: 8px;
+      color: var(--deep);
+      background: #fff;
+      font-size: clamp(1.4rem, 4vw, 2.2rem);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      box-shadow: inset 0 4px 0 rgba(36, 48, 71, 0.06);
+    }
+
+    .answer:focus {
+      outline: 4px solid rgba(255, 209, 102, 0.78);
+      border-color: var(--sky);
+    }
+
+    .slots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      min-height: 54px;
+      align-items: center;
+    }
+
+    .slot {
+      width: 46px;
+      height: 52px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      color: var(--deep);
+      background: #fff;
+      border: 3px solid rgba(123, 97, 255, 0.28);
+      font-size: 1.55rem;
+      font-weight: 900;
+    }
+
+    .letter-keyboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(54px, 1fr));
+      gap: 9px;
+    }
+
+    .letter-keyboard .key {
+      min-height: 56px;
+      font-size: 1.24rem;
+    }
+
+    .wide-key {
+      grid-column: span 2;
+    }
+
+    .feedback {
+      min-height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      color: #fff;
+      background: rgba(7, 59, 76, 0.72);
+      font-weight: 900;
+      text-align: center;
+      line-height: 1.25;
+    }
+
+    .feedback.good {
+      background: var(--right);
+    }
+
+    .feedback.bad {
+      background: var(--wrong);
+    }
+
+    .help-card {
+      display: none;
+      padding: 14px;
+      border-radius: 8px;
+      background: #fff;
+      border: 3px solid rgba(123, 97, 255, 0.25);
+      box-shadow: 0 10px 30px rgba(36, 48, 71, 0.12);
+    }
+
+    .help-card.visible {
+      display: block;
+    }
+
+    .help-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .help-item {
+      padding: 8px;
+      border-radius: 8px;
+      background: var(--soft);
+      text-align: center;
+      font-weight: 900;
+    }
+
+    .help-item .greek {
+      display: block;
+      color: var(--deep);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.6rem;
+      line-height: 1;
+    }
+
+    .confetti {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 20;
+    }
+
+    .piece {
+      position: absolute;
+      top: -24px;
+      width: 14px;
+      height: 18px;
+      border-radius: 4px;
+      animation: fall 1050ms ease-out forwards;
+    }
+
+    @keyframes popIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes drain {
+      from {
+        transform: scaleX(1);
+      }
+      to {
+        transform: scaleX(0);
+      }
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(110vh) rotate(520deg);
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .level-picks,
+      .stage {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .title-block {
+        order: -1;
+      }
+
+      .stars {
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .app {
+        padding: 12px;
+      }
+
+      .screen {
+        min-height: calc(100vh - 24px);
+      }
+
+      .keyboard {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .answer-row {
+        grid-template-columns: 1fr;
+      }
+
+      .name-display {
+        min-height: 130px;
+        padding: 14px;
+        font-size: clamp(2rem, 14vw, 3.4rem);
+      }
+
+      .menu-btn,
+      .help-btn,
+      .next-btn,
+      .check-btn,
+      .key {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section id="menuScreen" class="screen menu active" aria-labelledby="mainTitle">
+      <div class="menu-shell">
+        <div class="hero">
+          <h1 id="mainTitle">Altgriechische Buchstaben</h1>
+          <p>Wähle ein Level, sammle Sterne und werde sicherer im Erkennen und Übertragen griechischer Großbuchstaben.</p>
+        </div>
+
+        <div class="level-picks" aria-label="Levelauswahl">
+          <button class="pick level-one" data-start-level="1">
+            <strong>Level 1</strong>
+            <span>Verdeckte Buchstaben langsam aufdecken und den richtigen Namen antippen.</span>
+          </button>
+          <button class="pick level-two" data-start-level="2">
+            <strong>Level 2</strong>
+            <span>Griechische Namen lesen und mit der Bildschirmtastatur ins deutsche Alphabet übertragen.</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="levelOneScreen" class="screen game" aria-labelledby="levelOneTitle">
+      <header class="topbar">
+        <button class="menu-btn" data-menu>Hauptmenü</button>
+        <div class="title-block">
+          <h2 id="levelOneTitle">Level 1: Welcher Buchstabe ist das?</h2>
+        </div>
+        <div class="stars" id="starsOne">Sterne: 0</div>
+      </header>
+
+      <div class="stage">
+        <section class="panel display-panel">
+          <p class="prompt" id="levelOnePrompt">Tippe auf Start und beobachte, welche Kacheln verschwinden.</p>
+          <div class="letter-box" aria-live="polite">
+            <div class="greek-letter" id="mysteryLetter">Α</div>
+            <div class="cover-grid" id="coverGrid" aria-hidden="true"></div>
+          </div>
+          <div class="timer" aria-hidden="true"><div class="timer-fill" id="timerFill"></div></div>
+          <button class="next-btn" id="startLevelOne">Start / nächster Buchstabe</button>
+        </section>
+
+        <section class="panel keyboard-panel">
+          <div class="feedback" id="feedbackOne">Bereit?</div>
+          <div class="keyboard" id="nameKeyboard" aria-label="Buchstabennamen"></div>
+        </section>
+      </div>
+    </section>
+
+    <section id="levelTwoScreen" class="screen game" aria-labelledby="levelTwoTitle">
+      <header class="topbar">
+        <button class="menu-btn" data-menu>Hauptmenü</button>
+        <div class="title-block">
+          <h2 id="levelTwoTitle">Level 2: Namen transkribieren</h2>
+        </div>
+        <div class="stars" id="starsTwo">Sterne: 0</div>
+      </header>
+
+      <div class="stage">
+        <section class="panel display-panel">
+          <p class="prompt" id="levelTwoPrompt">Übertrage den Namen in lateinische Großbuchstaben.</p>
+          <div class="name-display" id="greekName" aria-live="polite">ΖΕΥΣ</div>
+          <div class="slots" id="answerSlots" aria-label="Antwortfelder"></div>
+          <div class="answer-row">
+            <input id="transcriptionInput" class="answer" type="text" readonly aria-label="Antwort">
+            <button class="check-btn" id="checkTranscription">Prüfen</button>
+          </div>
+          <button class="next-btn" id="nextName">Nächster Name</button>
+        </section>
+
+        <section class="panel keyboard-panel">
+          <div class="feedback" id="feedbackTwo">Nutze die Tastatur unten.</div>
+          <div class="letter-keyboard" id="latinKeyboard" aria-label="Lateinische Tastatur"></div>
+          <button class="help-btn" id="toggleHelp">Hilfe anzeigen</button>
+          <div class="help-card" id="helpCard">
+            <strong>Kleine Buchstabenhilfe</strong>
+            <div class="help-grid" id="helpGrid"></div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <div class="confetti" id="confettiLayer" aria-hidden="true"></div>
+
+  <script>
+    const alphabet = [
+      { greek: "Α", name: "Alpha", latin: "A" },
+      { greek: "Β", name: "Beta", latin: "B" },
+      { greek: "Γ", name: "Gamma", latin: "G" },
+      { greek: "Δ", name: "Delta", latin: "D" },
+      { greek: "Ε", name: "Epsilon", latin: "E" },
+      { greek: "Ζ", name: "Zeta", latin: "Z" },
+      { greek: "Η", name: "Eta", latin: "E" },
+      { greek: "Θ", name: "Theta", latin: "TH" },
+      { greek: "Ι", name: "Iota", latin: "I" },
+      { greek: "Κ", name: "Kappa", latin: "K" },
+      { greek: "Λ", name: "Lambda", latin: "L" },
+      { greek: "Μ", name: "My", latin: "M" },
+      { greek: "Ν", name: "Ny", latin: "N" },
+      { greek: "Ξ", name: "Xi", latin: "X" },
+      { greek: "Ο", name: "Omikron", latin: "O" },
+      { greek: "Π", name: "Pi", latin: "P" },
+      { greek: "Ρ", name: "Rho", latin: "R" },
+      { greek: "Σ", name: "Sigma", latin: "S" },
+      { greek: "Τ", name: "Tau", latin: "T" },
+      { greek: "Υ", name: "Ypsilon", latin: "Y" },
+      { greek: "Φ", name: "Phi", latin: "PH" },
+      { greek: "Χ", name: "Chi", latin: "CH" },
+      { greek: "Ψ", name: "Psi", latin: "PS" },
+      { greek: "Ω", name: "Omega", latin: "O" }
+    ];
+
+    const greekNames = [
+      { greek: "ΖΕΥΣ", answer: "ZEUS" },
+      { greek: "ΠΛΑΤΩΝ", answer: "PLATON" },
+      { greek: "ΟΜΗΡΟΣ", answer: "HOMER" },
+      { greek: "ΣΩΚΡΑΤΗΣ", answer: "SOKRATES" },
+      { greek: "ΑΘΗΝΑ", answer: "ATHENA" },
+      { greek: "ΑΠΟΛΛΩΝ", answer: "APOLLON" },
+      { greek: "ΔΗΜΗΤΗΡ", answer: "DEMETER" },
+      { greek: "ΑΡΙΣΤΟΤΕΛΗΣ", answer: "ARISTOTELES" }
+    ];
+
+    const latinKeys = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+    const state = {
+      levelOneScore: 0,
+      levelTwoScore: 0,
+      currentLetter: null,
+      currentName: null,
+      revealTimers: [],
+      levelOneLocked: true,
+      availableLetters: []
+    };
+
+    const els = {
+      menuScreen: document.querySelector("#menuScreen"),
+      levelOneScreen: document.querySelector("#levelOneScreen"),
+      levelTwoScreen: document.querySelector("#levelTwoScreen"),
+      mysteryLetter: document.querySelector("#mysteryLetter"),
+      coverGrid: document.querySelector("#coverGrid"),
+      timerFill: document.querySelector("#timerFill"),
+      startLevelOne: document.querySelector("#startLevelOne"),
+      nameKeyboard: document.querySelector("#nameKeyboard"),
+      feedbackOne: document.querySelector("#feedbackOne"),
+      starsOne: document.querySelector("#starsOne"),
+      greekName: document.querySelector("#greekName"),
+      answerSlots: document.querySelector("#answerSlots"),
+      transcriptionInput: document.querySelector("#transcriptionInput"),
+      latinKeyboard: document.querySelector("#latinKeyboard"),
+      checkTranscription: document.querySelector("#checkTranscription"),
+      nextName: document.querySelector("#nextName"),
+      feedbackTwo: document.querySelector("#feedbackTwo"),
+      starsTwo: document.querySelector("#starsTwo"),
+      toggleHelp: document.querySelector("#toggleHelp"),
+      helpCard: document.querySelector("#helpCard"),
+      helpGrid: document.querySelector("#helpGrid"),
+      confettiLayer: document.querySelector("#confettiLayer")
+    };
+
+    function initGame() {
+      bindNavigation();
+      renderNameKeyboard();
+      renderLatinKeyboard();
+      renderHelpGrid();
+      resetLetterPool();
+      createCoverTiles();
+      startNameRound();
+      updateScores();
+    }
+
+    function bindNavigation() {
+      document.querySelectorAll("[data-start-level]").forEach((button) => {
+        button.addEventListener("click", () => showScreen(Number(button.dataset.startLevel)));
+      });
+
+      document.querySelectorAll("[data-menu]").forEach((button) => {
+        button.addEventListener("click", () => {
+          stopRevealTimers();
+          showOnly(els.menuScreen);
+        });
+      });
+
+      els.startLevelOne.addEventListener("click", startLetterRound);
+      els.checkTranscription.addEventListener("click", checkTranscription);
+      els.nextName.addEventListener("click", startNameRound);
+      els.toggleHelp.addEventListener("click", toggleHelp);
+    }
+
+    function showScreen(level) {
+      showOnly(level === 1 ? els.levelOneScreen : els.levelTwoScreen);
+      if (level === 1 && !state.currentLetter) {
+        startLetterRound();
+      }
+      if (level === 2 && !state.currentName) {
+        startNameRound();
+      }
+    }
+
+    function showOnly(activeScreen) {
+      [els.menuScreen, els.levelOneScreen, els.levelTwoScreen].forEach((screen) => {
+        screen.classList.toggle("active", screen === activeScreen);
+      });
+    }
+
+    function renderNameKeyboard() {
+      els.nameKeyboard.innerHTML = "";
+      alphabet.forEach((letter) => {
+        const key = document.createElement("button");
+        key.className = "key";
+        key.type = "button";
+        key.textContent = letter.name;
+        key.addEventListener("click", () => chooseLetterName(letter, key));
+        els.nameKeyboard.appendChild(key);
+      });
+      setNameKeysEnabled(false);
+    }
+
+    function renderLatinKeyboard() {
+      els.latinKeyboard.innerHTML = "";
+      latinKeys.forEach((letter) => {
+        const key = document.createElement("button");
+        key.className = "key";
+        key.type = "button";
+        key.textContent = letter;
+        key.addEventListener("click", () => addLatinLetter(letter));
+        els.latinKeyboard.appendChild(key);
+      });
+
+      const backspace = document.createElement("button");
+      backspace.className = "key wide-key";
+      backspace.type = "button";
+      backspace.textContent = "Löschen";
+      backspace.addEventListener("click", removeLatinLetter);
+      els.latinKeyboard.appendChild(backspace);
+
+      const clear = document.createElement("button");
+      clear.className = "key wide-key";
+      clear.type = "button";
+      clear.textContent = "Neu";
+      clear.addEventListener("click", clearTranscription);
+      els.latinKeyboard.appendChild(clear);
+    }
+
+    function renderHelpGrid() {
+      els.helpGrid.innerHTML = "";
+      alphabet.forEach((letter) => {
+        const item = document.createElement("div");
+        item.className = "help-item";
+        item.innerHTML = `<span class="greek">${letter.greek}</span>${letter.name} -> ${letter.latin}`;
+        els.helpGrid.appendChild(item);
+      });
+    }
+
+    function createCoverTiles() {
+      els.coverGrid.innerHTML = "";
+      for (let index = 0; index < 9; index += 1) {
+        const tile = document.createElement("div");
+        tile.className = "cover-tile";
+        tile.textContent = "?";
+        els.coverGrid.appendChild(tile);
+      }
+    }
+
+    function startLetterRound() {
+      stopRevealTimers();
+      resetNameKeyStyles();
+      setNameKeysEnabled(true);
+      state.levelOneLocked = false;
+
+      if (state.availableLetters.length === 0) {
+        resetLetterPool();
+      }
+
+      state.currentLetter = drawRandom(state.availableLetters);
+      els.mysteryLetter.textContent = state.currentLetter.greek;
+      els.feedbackOne.className = "feedback";
+      els.feedbackOne.textContent = "Welche Taste passt zum verdeckten Buchstaben?";
+      els.startLevelOne.disabled = true;
+
+      createCoverTiles();
+      restartTimer();
+      revealTilesSlowly();
+    }
+
+    function revealTilesSlowly() {
+      const tiles = shuffle([...els.coverGrid.children]);
+      tiles.forEach((tile, index) => {
+        const timer = window.setTimeout(() => {
+          tile.classList.add("hidden");
+        }, 900 + index * 1000);
+        state.revealTimers.push(timer);
+      });
+    }
+
+    function chooseLetterName(letter, key) {
+      if (state.levelOneLocked || !state.currentLetter) {
+        return;
+      }
+
+      if (letter.name === state.currentLetter.name) {
+        state.levelOneLocked = true;
+        key.classList.add("correct");
+        setNameKeysEnabled(false);
+        revealAllTiles();
+        stopRevealTimers();
+        els.feedbackOne.className = "feedback good";
+        els.feedbackOne.textContent = `Richtig! Das ist ${letter.name}.`;
+        addScore("levelOneScore", 1);
+        playTone(660, 0.12);
+        playTone(880, 0.16, 0.08);
+        launchConfetti();
+        window.setTimeout(() => {
+          els.startLevelOne.disabled = false;
+          els.startLevelOne.focus();
+        }, 700);
+      } else {
+        key.classList.add("wrong");
+        key.disabled = true;
+        els.feedbackOne.className = "feedback bad";
+        els.feedbackOne.textContent = "Fast! Dieser Name passt nicht. Versuch eine andere Taste.";
+        playTone(180, 0.12);
+      }
+    }
+
+    function revealAllTiles() {
+      [...els.coverGrid.children].forEach((tile) => tile.classList.add("hidden"));
+      els.timerFill.classList.remove("running");
+    }
+
+    function restartTimer() {
+      els.timerFill.classList.remove("running");
+      void els.timerFill.offsetWidth;
+      els.timerFill.classList.add("running");
+    }
+
+    function stopRevealTimers() {
+      state.revealTimers.forEach((timer) => window.clearTimeout(timer));
+      state.revealTimers = [];
+      els.timerFill.classList.remove("running");
+    }
+
+    function setNameKeysEnabled(enabled) {
+      els.nameKeyboard.querySelectorAll("button").forEach((button) => {
+        button.disabled = !enabled;
+      });
+    }
+
+    function resetNameKeyStyles() {
+      els.nameKeyboard.querySelectorAll("button").forEach((button) => {
+        button.classList.remove("correct", "wrong");
+        button.disabled = false;
+      });
+    }
+
+    function startNameRound() {
+      state.currentName = greekNames[Math.floor(Math.random() * greekNames.length)];
+      els.greekName.textContent = state.currentName.greek;
+      fitGreekNameDisplay();
+      clearTranscription();
+      renderAnswerSlots();
+      els.feedbackTwo.className = "feedback";
+      els.feedbackTwo.textContent = "Tippe den Namen Buchstabe für Buchstabe ein.";
+      els.checkTranscription.disabled = false;
+    }
+
+    function fitGreekNameDisplay() {
+      els.greekName.style.fontSize = "";
+      window.requestAnimationFrame(() => {
+        let size = Number.parseFloat(window.getComputedStyle(els.greekName).fontSize);
+        const minSize = 28;
+
+        while (
+          size > minSize &&
+          (els.greekName.scrollWidth > els.greekName.clientWidth || els.greekName.scrollHeight > els.greekName.clientHeight)
+        ) {
+          size -= 2;
+          els.greekName.style.fontSize = `${size}px`;
+        }
+      });
+    }
+
+    function addLatinLetter(letter) {
+      if (!state.currentName) {
+        return;
+      }
+
+      const maxLength = state.currentName.answer.length;
+      if (els.transcriptionInput.value.length < maxLength) {
+        els.transcriptionInput.value += letter;
+        renderAnswerSlots();
+      }
+    }
+
+    function removeLatinLetter() {
+      els.transcriptionInput.value = els.transcriptionInput.value.slice(0, -1);
+      renderAnswerSlots();
+    }
+
+    function clearTranscription() {
+      els.transcriptionInput.value = "";
+      renderAnswerSlots();
+    }
+
+    function renderAnswerSlots() {
+      if (!state.currentName) {
+        return;
+      }
+
+      els.answerSlots.innerHTML = "";
+      const typed = els.transcriptionInput.value;
+      state.currentName.answer.split("").forEach((_, index) => {
+        const slot = document.createElement("div");
+        slot.className = "slot";
+        slot.textContent = typed[index] || "";
+        els.answerSlots.appendChild(slot);
+      });
+    }
+
+    function checkTranscription() {
+      const typed = els.transcriptionInput.value.toUpperCase();
+      if (typed === state.currentName.answer) {
+        els.feedbackTwo.className = "feedback good";
+        els.feedbackTwo.textContent = `Richtig! ${state.currentName.greek} wird ${state.currentName.answer} geschrieben.`;
+        addScore("levelTwoScore", 2);
+        playTone(700, 0.12);
+        playTone(940, 0.16, 0.08);
+        launchConfetti();
+        els.checkTranscription.disabled = true;
+        window.setTimeout(startNameRound, 1200);
+      } else {
+        els.feedbackTwo.className = "feedback bad";
+        els.feedbackTwo.textContent = "Da stimmt noch etwas nicht. Schau genau hin oder nutze die Hilfe.";
+        playTone(160, 0.14);
+      }
+    }
+
+    function toggleHelp() {
+      const isVisible = els.helpCard.classList.toggle("visible");
+      els.toggleHelp.textContent = isVisible ? "Hilfe ausblenden" : "Hilfe anzeigen";
+    }
+
+    function addScore(scoreKey, points) {
+      state[scoreKey] += points;
+      updateScores();
+    }
+
+    function updateScores() {
+      els.starsOne.textContent = `Sterne: ${state.levelOneScore}`;
+      els.starsTwo.textContent = `Sterne: ${state.levelTwoScore}`;
+    }
+
+    function resetLetterPool() {
+      state.availableLetters = [...alphabet];
+    }
+
+    function drawRandom(list) {
+      const index = Math.floor(Math.random() * list.length);
+      return list.splice(index, 1)[0];
+    }
+
+    function shuffle(items) {
+      return items
+        .map((value) => ({ value, sort: Math.random() }))
+        .sort((a, b) => a.sort - b.sort)
+        .map((item) => item.value);
+    }
+
+    function launchConfetti() {
+      const colors = ["#ffd166", "#ef476f", "#06d6a0", "#118ab2", "#7b61ff"];
+      for (let index = 0; index < 42; index += 1) {
+        const piece = document.createElement("span");
+        piece.className = "piece";
+        piece.style.left = `${Math.random() * 100}%`;
+        piece.style.background = colors[index % colors.length];
+        piece.style.animationDelay = `${Math.random() * 180}ms`;
+        piece.style.transform = `rotate(${Math.random() * 180}deg)`;
+        els.confettiLayer.appendChild(piece);
+        window.setTimeout(() => piece.remove(), 1400);
+      }
+    }
+
+    function playTone(frequency, duration, delay = 0) {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) {
+        return;
+      }
+
+      window.setTimeout(() => {
+        const audio = new AudioContext();
+        const oscillator = audio.createOscillator();
+        const gain = audio.createGain();
+        oscillator.frequency.value = frequency;
+        oscillator.type = "sine";
+        gain.gain.setValueAtTime(0.001, audio.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.18, audio.currentTime + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, audio.currentTime + duration);
+        oscillator.connect(gain);
+        gain.connect(audio.destination);
+        oscillator.start();
+        oscillator.stop(audio.currentTime + duration + 0.02);
+        oscillator.addEventListener("ended", () => audio.close());
+      }, delay * 1000);
+    }
+
+    initGame();
+  </script>
+</body>
+</html>
