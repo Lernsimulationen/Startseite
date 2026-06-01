@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="theme-color" content="#102f2a">
+  <title>Kirchendetektiv: Der Schlüssel zum alten Archiv</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <section class="screen active intro" id="introScreen">
+    <div class="intro-shade"></div>
+    <article class="intro-copy">
+      <span class="kicker">Geheime Nachricht aus der alten Kirche</span>
+      <h1>Der Schlüssel zum alten Archiv</h1>
+      <p class="lead">Pfarrer Falk hat einen alten Schlüsselbund und drei Teile einer rätselhaften Karte gefunden. Nur ein Schlüssel öffnet die verschlossene Archivtruhe. Auf dem Anhänger steht eine Frage:</p>
+      <blockquote>Warum bewahren Menschen besondere Zeichen und Orte auf?</blockquote>
+      <p>Zwölf Erinnerungsabzeichen ergänzen die Karte und zeigen das Muster des richtigen Schlüssels. Findet sie im Kirchenraum. Aber Vorsicht: Nicht alles ist eine echte Spur.</p>
+      <label class="time-option"><input type="checkbox" id="timeChallenge"> Freiwillige Zeit-Challenge: Schafft ihr den Auftrag in 40 Minuten?</label>
+      <button class="primary" data-action="show-avatars">Geheimauftrag annehmen</button>
+    </article>
+  </section>
+
+  <section class="screen avatar-screen" id="avatarScreen">
+    <header class="section-head"><span class="kicker">Wählt eure Spezialfähigkeit</span><h2>Wer begleitet euch?</h2><p>Jede Detektivfigur hilft auf eine andere Weise. Ihr könnt eure Wahl später nicht mehr ändern.</p></header>
+    <div class="avatar-grid" id="avatarGrid"></div>
+    <div class="center"><button class="primary" data-action="start-game">Mit dieser Figur starten</button></div>
+  </section>
+
+  <section class="screen game-screen" id="gameScreen">
+    <header class="game-bar">
+      <div><span class="kicker" id="roomKicker">Kapitel 1 von 3</span><strong id="roomTitle">Gemeinschaft entdecken</strong></div>
+      <div class="progress"><span id="progressText">0 / 12 Abzeichen</span><div class="track"><i id="progressFill"></i></div></div>
+      <button class="chest-button" data-action="open-chest" aria-label="Sammeltruhe öffnen">🧰 <b id="chestCount">0</b></button>
+      <span class="score-chip">★ <b id="scoreCount">0</b></span>
+      <span class="score-chip hidden" id="timerChip">⏱ <b id="timerText">40:00</b></span>
+      <button class="chest-button" data-action="download-protocol" aria-label="Lernprotokoll herunterladen">▣</button>
+    </header>
+    <div class="room-toolbar"><span>Finger bewegen: Lichtkegel · zwei Finger: Zoom</span><b id="zoomLabel">100 %</b><button data-action="hint">Hinweis</button><button data-action="use-power">Spezialfähigkeit</button></div>
+    <div class="room-viewport" id="roomViewport">
+      <div class="room-stage" id="roomStage"><img src="assets/church-room.png" alt="Kirchenraum zum Erkunden" draggable="false"><div class="flashlight" id="flashlight"></div><div id="hotspotLayer"></div></div>
+    </div>
+    <aside class="guide-card"><img class="small-avatar" id="guideAvatar" alt=""><div><strong id="guideName"></strong><p id="guideText">Tippt dort auf das Bild, wo ihr eine Spur vermutet.</p></div></aside>
+  </section>
+
+  <section class="screen challenge-screen" id="challengeScreen">
+    <header class="section-head compact"><span class="kicker" id="challengeKicker"></span><h2 id="challengeTitle"></h2><p id="challengeIntro"></p></header>
+    <div id="challengeBody"></div>
+  </section>
+</main>
+
+<dialog id="dialog"><article class="dialog-card">
+  <div class="dialog-speakers"><img class="speaker-avatar" id="dialogAvatar" alt=""><img class="speaker-avatar pastor" src="assets/pastor-falk.png" alt="Pfarrer Falk"></div>
+  <span class="kicker" id="dialogKicker"></span><h2 id="dialogTitle"></h2><p id="dialogText"></p>
+  <div id="dialogTask"></div>
+</article></dialog>
+
+<dialog id="chestDialog"><article class="dialog-card">
+  <button class="close" data-action="close-chest" aria-label="Schließen">×</button><span class="kicker">Sammeltruhe</span><h2>Eure Erinnerungsabzeichen</h2>
+  <p>Jede gelöste Aufgabe legt ein Erinnerungsabzeichen in die Truhe.</p><div class="chest-grid" id="chestGrid"></div>
+</article></dialog>
+
+<dialog id="gameDialog"><article class="dialog-card game-dialog">
+  <span class="kicker">Ermittlungsaufgabe</span><h2 id="gameTitle"></h2><p id="gameIntro"></p><div id="gameBody"></div>
+</article></dialog>
+
+<script src="data.js"></script><script src="app.js"></script>
+</body></html>
