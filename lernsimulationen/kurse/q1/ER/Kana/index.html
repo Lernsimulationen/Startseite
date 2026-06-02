@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Zeichen lesen - Die Hochzeit zu Kana</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <section class="start-screen" id="startScreen">
+    <div class="start-card">
+      <div class="start-copy">
+        <p class="eyebrow">Q1 Evangelische Religionslehre</p>
+        <h1>Zeichen lesen</h1>
+        <p class="start-lead">Untersuche die Hochzeit zu Kana Schritt für Schritt: textnah, historisch aufmerksam und theologisch reflektiert.</p>
+        <div class="learning-goals">
+          <article><b>Beobachten</b><span>Auffällige Textspuren in Joh 2,1-11 präzise wahrnehmen.</span></article>
+          <article><b>Einordnen</b><span>Historische Indizien vorsichtig von Beweisen unterscheiden.</span></article>
+          <article><b>Deuten</b><span>Die Weinverwandlung als johanneisches Zeichen erschließen.</span></article>
+        </div>
+        <p class="time-note">Bearbeitungszeit: etwa 20 bis 30 Minuten</p>
+        <div class="start-actions">
+          <button class="primary-button" id="startButton" type="button">Analyse beginnen</button>
+          <button class="quiet-button hidden" id="resumeButton" type="button">Gespeicherten Stand fortsetzen</button>
+          <a class="quiet-link" href="../index.html">&larr; Zur Modulübersicht</a>
+        </div>
+      </div>
+      <img src="assets/images/kana-hero.jpg" alt="Illustration eines abendlichen Hochzeitsfestes in Kana mit steinernen Krügen">
+    </div>
+  </section>
+
+  <header class="topbar">
+    <a class="back-link" href="../index.html">&larr; Q1 ER</a>
+    <div class="topbar-title">
+      <span>Historisch-kritische Textarbeit</span>
+      <strong>Die Hochzeit zu Kana</strong>
+    </div>
+    <button class="quiet-button mobile-only" id="textToggleButton" type="button" aria-controls="textPanel" aria-expanded="false">Bibeltext</button>
+    <button class="quiet-button" id="restartButton" type="button">Neu beginnen</button>
+  </header>
+
+  <main class="app-shell">
+    <aside class="text-panel" id="textPanel">
+      <div class="text-heading">
+        <div>
+          <p class="eyebrow">Lutherbibel 1912</p>
+          <h1>Johannes 2,1-11</h1>
+        </div>
+        <button class="close-text mobile-only" id="textCloseButton" type="button" aria-label="Bibeltext schließen">&times;</button>
+      </div>
+      <p class="aside-intro">Beobachte genau: Gute Deutung beginnt beim Text. Der goldene Marker zeigt, wo du gerade genauer hinschauen solltest.</p>
+      <div class="scripture" id="scripture">
+        <p data-verse="1"><b>1</b> Und am dritten Tage ward eine Hochzeit zu Kana in Galiläa; und die Mutter Jesu war da.</p>
+        <p data-verse="2"><b>2</b> Jesus aber und seine Jünger wurden auch auf die Hochzeit geladen.</p>
+        <p data-verse="3"><b>3</b> Und da es an Wein gebrach, spricht die Mutter Jesu zu ihm: Sie haben nicht Wein.</p>
+        <p data-verse="4"><b>4</b> Jesus spricht zu ihr: Weib, was habe ich mit dir zu schaffen? Meine Stunde ist noch nicht gekommen.</p>
+        <p data-verse="5"><b>5</b> Seine Mutter spricht zu den Dienern: Was er euch sagt, das tut.</p>
+        <p data-verse="6"><b>6</b> Es standen aber daselbst sechs steinerne Wasserkrüge nach der Weise der jüdischen Reinigung, und ging in je einen zwei oder drei Maß.</p>
+        <p data-verse="7"><b>7</b> Jesus spricht zu ihnen: Füllet die Wasserkrüge mit Wasser! Und sie füllten sie bis obenan.</p>
+        <p data-verse="8"><b>8</b> Und er spricht zu ihnen: Schöpfet nun und bringet's dem Speisemeister! Und sie brachten's.</p>
+        <p data-verse="9"><b>9</b> Als aber der Speisemeister kostete den Wein, der Wasser gewesen war, und wußte nicht, von wannen er kam (die Diener aber wußten's, die das Wasser geschöpft hatten), ruft der Speisemeister den Bräutigam</p>
+        <p data-verse="10"><b>10</b> und spricht zu ihm: Jedermann gibt zuerst guten Wein, und wenn sie trunken geworden sind, alsdann den geringeren; du hast den guten Wein bisher behalten.</p>
+        <p data-verse="11"><b>11</b> Das ist das erste Zeichen, das Jesus tat, geschehen zu Kana in Galiläa, und offenbarte seine Herrlichkeit. Und seine Jünger glaubten an ihn.</p>
+      </div>
+    </aside>
+
+    <section class="learning-panel">
+      <section class="kana-hero" aria-label="Stilisierte Kana-Szene">
+        <div>
+          <p class="eyebrow">Ein Fest. Eine Irritation. Ein Zeichen.</p>
+          <h1>Zeichen lesen</h1>
+          <p>Folge den Textspuren von der Beobachtung zur begründeten Deutung.</p>
+        </div>
+        <img class="kana-hero-image" src="assets/images/kana-hero.jpg" alt="Illustration eines abendlichen Hochzeitsfestes in Kana mit steinernen Krügen">
+      </section>
+
+      <div class="progress-wrap">
+        <div class="progress-meta">
+          <span id="stageLabel">Station 1 von 5</span>
+          <span id="progressText">0 %</span>
+        </div>
+        <div class="progress-track"><span id="progressBar"></span></div>
+        <ol class="stage-nav" id="stageNav" aria-label="Lernfortschritt"></ol>
+      </div>
+
+      <article class="dialogue-card">
+        <div class="teacher-row">
+          <div class="teacher-avatar">L</div>
+          <div>
+            <p class="eyebrow">Dein Lernbegleiter</p>
+            <h2 id="stageTitle"></h2>
+          </div>
+        </div>
+        <p class="teacher-message" id="teacherMessage"></p>
+        <div class="focus-box" id="focusBox"></div>
+        <figure class="station-visual hidden" id="stationVisual">
+          <img id="stationVisualImage" src="" alt="">
+          <figcaption id="stationVisualCaption"></figcaption>
+        </figure>
+        <div class="method-box hidden" id="methodBox"></div>
+        <div class="feedback hidden" id="feedback" aria-live="polite"></div>
+        <div class="info-box hidden" id="infoBox"></div>
+        <div class="bonus-box hidden" id="bonusBox"></div>
+
+        <form id="answerForm">
+          <div class="writing-grid">
+            <div>
+              <label for="observationInput">1. Beobachtung</label>
+              <textarea id="observationInput" rows="4" placeholder="Was fällt dir im Text auf?" required></textarea>
+            </div>
+            <div>
+              <label for="interpretationInput">2. Deutung</label>
+              <textarea id="interpretationInput" rows="4" placeholder="Wie deutest du deine Beobachtung?" required></textarea>
+            </div>
+          </div>
+          <div class="form-footer">
+            <span class="answer-hint">Kurze Gedanken sind willkommen. Du kannst sie nach dem Impuls ergänzen oder direkt sichern.</span>
+            <button class="primary-button" type="submit">Gedanken festhalten</button>
+          </div>
+        </form>
+
+        <section class="conversation">
+          <p class="eyebrow">Gesprächsverlauf</p>
+          <div class="conversation-list" id="conversationList">
+            <p class="empty-note">Dein erster Gedanke eröffnet das Gespräch.</p>
+          </div>
+        </section>
+
+        <div class="next-row hidden" id="nextRow">
+          <p id="nextNote"></p>
+          <button class="primary-button" id="nextButton" type="button">Nächste Station</button>
+        </div>
+      </article>
+
+      <details class="notebook" open>
+        <summary>
+          <span>
+            <span class="eyebrow">Protokollvorschau</span>
+            <strong>Mein Erkenntnisweg</strong>
+          </span>
+          <span class="summary-hint">ein- oder ausklappen</span>
+        </summary>
+        <div id="notesList" class="notes-list"><p class="empty-note">Hier erscheinen deine gesicherten Zwischenergebnisse.</p></div>
+      </details>
+    </section>
+  </main>
+
+  <section class="finish-screen hidden" id="finishScreen">
+    <div class="finish-card">
+      <p class="eyebrow">Analyse abgeschlossen</p>
+      <h2>Du hast das Zeichen gelesen.</h2>
+      <p>Formuliere zum Abschluss dein eigenes Fazit. Es steht anschließend an erster Stelle deines Lernprotokolls.</p>
+      <img class="finish-image" src="assets/images/sign-summary.jpg" alt="Illustration mit sechs Krügen, einem Weinkelch und einem leeren Wegweiser">
+      <label for="synthesisInput">Deine Synthese: Warum ist Kana für Johannes ein Zeichen und nicht bloß ein Wunder?</label>
+      <textarea id="synthesisInput" rows="4" placeholder="Mein Fazit ..."></textarea>
+      <button class="primary-button synthesis-button" id="saveSynthesisButton" type="button">Fazit sichern</button>
+      <div class="feedback hidden" id="synthesisFeedback" aria-live="polite"></div>
+      <div class="summary-list" id="summaryList"></div>
+      <div class="finish-actions hidden" id="finishActions">
+        <button class="primary-button" id="downloadButton" type="button">Lernprotokoll herunterladen</button>
+        <button class="quiet-button" id="printButton" type="button">Protokoll drucken</button>
+        <button class="quiet-button" id="finishRestartButton" type="button">Neu beginnen</button>
+        <a class="quiet-link" href="../index.html">Zur Modulübersicht</a>
+      </div>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
