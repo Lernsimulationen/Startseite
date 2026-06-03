@@ -9,6 +9,13 @@
       <div class="unlock-burst hidden" id="unlockBurst" aria-live="polite"></div>
       <button class="comic-button fullscreen-button" id="fullscreenMap" type="button">Karte Vollbild</button>
       <div class="map-title"><p class="comic-kicker">Bergpredigt</p><h1>Lernweg</h1></div>
+      <div class="map-fog-html" aria-hidden="true">
+        <span class="map-fog-patch fog-nazareth" data-fog="nazareth"></span>
+        <span class="map-fog-patch fog-berg" data-fog="berg"></span>
+        <span class="map-fog-patch fog-kapernaum" data-fog="kapernaum"></span>
+        <span class="map-fog-patch fog-see" data-fog="see"></span>
+        <span class="map-fog-patch fog-tiberias" data-fog="tiberias"></span>
+      </div>
       <svg class="galilee-map" viewBox="0 0 900 700" role="img" aria-labelledby="mapTitle mapDesc">
         <title id="mapTitle">Interaktive Lernkarte zur Bergpredigt</title><desc id="mapDesc">Fünf Themenstationen werden farbig, wenn Gruppen die zugehörigen Aufgaben lösen. Eine illustrierte Jesus-Figur wandert entlang der Lernroute weiter.</desc>
         <defs><clipPath id="medallionClip"><circle r="47"/></clipPath></defs>
@@ -54,5 +61,6 @@
   <section class="finale-overlay hidden" id="boardFinale" role="dialog" aria-modal="true" aria-labelledby="finaleTitle">
     <article class="finale-card"><p class="comic-kicker">Gemeinsames Finale</p><h1 id="finaleTitle">Die Bergpredigt leuchtet!</h1><p>Ihr habt fünf Perspektiven der Bergpredigt erschlossen: wirksames Handeln, Frieden, Vertrauen, Perspektivwechsel und Wege aus der Vergeltung.</p><h2>Plenumsfrage</h2><p class="final-question">Welche Station fordert unsere heutige Gesellschaft am stärksten heraus und warum?</p><button class="comic-button" id="closeFinale">Karte weiter betrachten</button></article>
   </section>
+  <div class="version-badge">Version v13</div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="shared.js"></script><script src="tafel.js"></script>
 </body></html>
