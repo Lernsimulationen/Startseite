@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="de">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Gruppen-Tablet | Bergpredigt-Expedition</title><link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="style.css"></head>
+<body>
+  <header class="topbar"><a class="back-link" href="index.html">← Auswahl</a><span class="brand">Bergpredigt-Expedition · Tablet</span><span class="status-pill"><i class="status-dot"></i><span id="connectionLabel">Startet ...</span></span></header>
+  <main class="tablet-shell">
+    <section class="tablet-hero"><img src="assets/images/tablet-expedition.webp" srcset="assets/images/tablet-expedition-720.webp 720w, assets/images/tablet-expedition.webp 1662w" sizes="(max-width: 650px) 100vw, 520px" alt="Vier Jugendliche lösen gemeinsam eine Aufgabe an einer Karte von Galiläa"><div><p class="comic-kicker">Gruppenmission</p><h1>Auf nach Galiläa!</h1><p>Löst pro Ort drei Aufgaben. Erst dann wandert Jesus auf der Tafelkarte zur nächsten Station weiter.</p></div></section>
+    <section class="group-card" id="groupSetup"><h2>Welche Gruppe seid ihr?</h2><p>Nutzt nur eine anonyme Kennung, zum Beispiel <b>gruppe-3</b>. Bitte keine Namen eingeben.</p><p class="session-note">Sitzung: <b id="sessionLabel"></b></p><form class="group-row" id="groupForm"><label class="sr-only" for="groupInput">Anonyme Gruppen-ID</label><input class="group-input" id="groupInput" required maxlength="24" pattern="[a-zA-Z0-9_-]{2,24}" placeholder="z. B. gruppe-3" autocomplete="off"><button class="comic-button" type="submit">Los geht's!</button></form></section>
+    <section class="hidden" id="missionArea"><div class="group-row"><b id="groupLabel"></b><button class="comic-button change-group" id="changeGroup" type="button">Gruppe wechseln</button></div><div class="tablet-progress" id="tabletProgress"></div><article class="task-card" id="taskCard"></article></section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="shared.js"></script><script src="tablet.js"></script>
+</body></html>

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="de">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Tafelkarte | Bergpredigt-Expedition</title><link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="style.css"></head>
+<body>
+  <header class="topbar"><a class="back-link" href="index.html">← Auswahl</a><span class="brand">Bergpredigt-Expedition · Tafel</span><span class="status-pill"><i class="status-dot"></i><span id="connectionLabel">Startet ...</span></span></header>
+  <main class="board-layout">
+    <section class="map-card">
+      <img class="map-backdrop" src="assets/images/galilaea-expedition-map-v3.webp" alt="">
+      <div class="unlock-burst hidden" id="unlockBurst" aria-live="polite"></div>
+      <div class="map-title"><p class="comic-kicker">Unsere Lernreise</p><h1>Galiläa</h1></div>
+      <svg class="galilee-map" viewBox="0 0 900 700" role="img" aria-labelledby="mapTitle mapDesc">
+        <title id="mapTitle">Interaktive Lernkarte von Galiläa</title><desc id="mapDesc">Fünf Stationen werden farbig, wenn Gruppen die zugehörigen Aufgaben lösen. Eine illustrierte Jesus-Figur wandert entlang der Route weiter.</desc>
+        <defs><clipPath id="medallionClip"><circle r="47"/></clipPath></defs>
+        <path class="route-base" d="M163 582C179 562 194 541 210 525C305 451 363 375 423 317C490 252 528 211 571 189C632 243 667 329 674 403C654 452 625 482 581 499"/>
+        <path class="expedition-route" id="expeditionRoute" pathLength="100" d="M163 582C179 562 194 541 210 525C305 451 363 375 423 317C490 252 528 211 571 189C632 243 667 329 674 403C654 452 625 482 581 499"/>
+        <g class="route-dots"><circle cx="210" cy="525" r="6"/><circle cx="423" cy="317" r="6"/><circle cx="571" cy="189" r="6"/><circle cx="674" cy="403" r="6"/><circle cx="581" cy="499" r="6"/></g>
+        <g class="landmarks" aria-hidden="true">
+          <g transform="translate(125 443)"><path d="M0 30h58V4L29-16 0 4Zm13 0V11h13v19m8 0V7h13v23"/><path d="M22-5h14"/></g>
+          <g transform="translate(354 222)"><path d="m0 54 31-51 18 28 16-20 29 43Z"/><path d="m31 3 8 21 10 7"/></g>
+          <g transform="translate(720 315)"><path d="M0 28c20 8 48 8 68 0l-10 18H10Z"/><path d="M34-14v43m0-40 23 29H34Z"/></g>
+          <g transform="translate(264 569)"><ellipse cx="28" cy="22" rx="27" ry="10"/><path d="M1 22v19c0 12 54 12 54 0V22M14 10h29M19 4h19"/></g>
+          <g transform="translate(694 515)"><path d="M4 47c33-3 44-23 53-51M20 38c-10-18-7-28 2-34m12 25c-8-17-4-27 6-33m7 19c-4-13 1-21 10-25"/><ellipse cx="14" cy="29" rx="8" ry="4" transform="rotate(35 14 29)"/><ellipse cx="33" cy="20" rx="8" ry="4" transform="rotate(35 33 20)"/><ellipse cx="51" cy="7" rx="8" ry="4" transform="rotate(35 51 7)"/></g>
+        </g>
+        <g class="map-compass" transform="translate(788 114)"><circle r="57"/><path d="M0-46 12-9 0 0-12-9Z"/><path d="M0 46-12 9 0 0 12 9Z"/><path d="M-46 0-9-12 0 0-9 12Z"/><path d="M46 0 9 12 0 0 9-12Z"/><text y="-65">N</text></g>
+        <g class="sector" data-sector="kapernaum" transform="translate(571 189)"><circle class="sector-shadow" r="62"/><circle class="sector-ring" r="57"/><image class="sector-art" href="assets/images/station-kapernaum-salt.webp" x="-49" y="-49" width="98" height="98" clip-path="url(#medallionClip)"/><text class="sector-label" text-anchor="middle" y="84">Kapernaum</text><text class="sector-check" x="38" y="-34">✓</text></g>
+        <g class="sector" data-sector="berg" transform="translate(423 317)"><circle class="sector-shadow" r="66"/><circle class="sector-ring" r="61"/><image class="sector-art" href="assets/images/station-berg-beatitudes.webp" x="-53" y="-53" width="106" height="106" clip-path="url(#medallionClip)"/><text class="sector-label" text-anchor="middle" y="89">Berg der Lehre</text><text class="sector-check" x="41" y="-37">✓</text></g>
+        <g class="sector" data-sector="see" transform="translate(674 403)"><circle class="sector-shadow" r="59"/><circle class="sector-ring" r="54"/><image class="sector-art" href="assets/images/station-see-trust.webp" x="-46" y="-46" width="92" height="92" clip-path="url(#medallionClip)"/><text class="sector-label" text-anchor="middle" y="81">See Genezareth</text><text class="sector-check" x="35" y="-31">✓</text></g>
+        <g class="sector" data-sector="nazareth" transform="translate(210 525)"><circle class="sector-shadow" r="60"/><circle class="sector-ring" r="55"/><image class="sector-art" href="assets/images/station-nazareth-golden-rule.webp" x="-47" y="-47" width="94" height="94" clip-path="url(#medallionClip)"/><text class="sector-label" text-anchor="middle" y="82">Nazareth</text><text class="sector-check" x="36" y="-32">✓</text></g>
+        <g class="sector" data-sector="tiberias" transform="translate(581 499)"><circle class="sector-shadow" r="61"/><circle class="sector-ring" r="56"/><image class="sector-art" href="assets/images/station-tiberias-peace.webp" x="-48" y="-48" width="96" height="96" clip-path="url(#medallionClip)"/><text class="sector-label" text-anchor="middle" y="83">Tiberias</text><text class="sector-check" x="37" y="-33">✓</text></g>
+        <g class="jesus-walker" id="jesusWalker" transform="translate(137 490)"><ellipse cx="24" cy="92" rx="28" ry="10"/><image href="assets/images/jesus-walking-map.webp" x="-8" y="-25" width="68" height="122"/><g class="walker-label"><rect x="-20" y="-52" width="92" height="24" rx="12"/><text x="26" y="-35">Unterwegs</text></g></g>
+      </svg>
+      <div class="map-cartouche"><b>Expeditionsroute</b><span>Folgt den Spuren der Bergpredigt</span></div>
+    </section>
+    <aside class="side-panel">
+      <section class="panel"><p class="comic-kicker">Live-Fortschritt</p><h2><span id="doneCount">0</span> / 5 Stationen</h2><div class="progress-track"><div class="progress-bar" id="progressBar"></div></div><div class="sector-list" id="sectorList"></div></section>
+      <section class="panel"><h2>So geht's</h2><p>Die Gruppen bearbeiten an jedem Ort drei Aufgaben. Sobald ein Stationsblock geschafft ist, leuchtet der Ort auf und Jesus wandert auf der Route weiter.</p><p class="session-note">Sitzung: <b id="sessionLabel"></b></p></section>
+      <section class="panel landmark-key"><h2>Kartensymbole</h2><p><b>Dorf</b><span>Lebenswelt und Gemeinschaft</span></p><p><b>Berg</b><span>Lehre und Perspektivwechsel</span></p><p><b>Boot</b><span>Vertrauen in unsicherer Lage</span></p><p><b>Brunnen</b><span>Teilhabe und Gerechtigkeit</span></p><p><b>Olivenzweig</b><span>Frieden und Versöhnung</span></p></section>
+      <section class="panel privacy-note"><b>Datenschutz:</b> Es werden nur eine frei gewählte <code>gruppen_id</code>, der Sektor und der Status <code>erledigt</code> gespeichert. Keine Namen, E-Mails oder personenbezogenen Daten.</section>
+    </aside>
+  </main>
+  <section class="finale-overlay hidden" id="boardFinale" role="dialog" aria-modal="true" aria-labelledby="finaleTitle">
+    <article class="finale-card"><p class="comic-kicker">Gemeinsames Finale</p><h1 id="finaleTitle">Galiläa leuchtet!</h1><p>Ihr habt fünf Perspektiven der Bergpredigt erschlossen: wirksames Handeln, Frieden, Vertrauen, Perspektivwechsel und Wege aus der Vergeltung.</p><h2>Plenumsfrage</h2><p class="final-question">Welche Station fordert unsere heutige Gesellschaft am stärksten heraus und warum?</p><button class="comic-button" id="closeFinale">Karte weiter betrachten</button></article>
+  </section>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="shared.js"></script><script src="tafel.js"></script>
+</body></html>
