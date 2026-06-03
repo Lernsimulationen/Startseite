@@ -1,6 +1,6 @@
 const SECTORS = [
   {id:"nazareth",name:"Nazareth",title:"Goldene Regel",mode:"single",art:"assets/images/station-nazareth-golden-rule.webp"},
-  {id:"berg",name:"Berg der Lehre",title:"Seligpreisungen",mode:"all",art:"assets/images/station-berg-beatitudes.webp"},
+  {id:"berg",name:"Berg der Seligpreisungen",title:"Seligpreisungen",mode:"all",art:"assets/images/station-berg-beatitudes.webp"},
   {id:"kapernaum",name:"Kapernaum",title:"Salz der Erde",mode:"single",art:"assets/images/station-kapernaum-salt.webp"},
   {id:"see",name:"See Genezareth",title:"Vom Sorgen",mode:"all",art:"assets/images/station-see-trust.webp"},
   {id:"tiberias",name:"Tiberias",title:"Friedensstifter",mode:"all",art:"assets/images/station-tiberias-peace.webp"}
