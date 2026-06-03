@@ -21,7 +21,8 @@ Deno.serve(async (request) => {
     && /^[a-z0-9_-]{2,24}$/.test(payload.gruppen_id)
     && ["kapernaum", "berg", "see", "nazareth", "tiberias", "finale", "control"].includes(payload.sektor)
     && payload.status === "erledigt"
-    && ["solved", "manual", "finale", "lock", "unlock"].includes(payload.event_type);
+    && ["solved", "manual", "finale", "lock", "unlock", "groups", "phase", "prompt"].includes(payload.event_type)
+    && (payload.payload == null || (typeof payload.payload === "string" && payload.payload.length <= 420));
   if (!valid) return reply({ error: "invalid_payload" }, 400);
 
   const teacherEvent = payload.event_type !== "solved" || payload.sektor === "finale" || payload.sektor === "control";

@@ -8,23 +8,27 @@ create table if not exists public.fortschritt (
   gruppen_id text not null check (gruppen_id ~ '^[a-z0-9_-]{2,24}$'),
   sektor text not null check (sektor in ('kapernaum', 'berg', 'see', 'nazareth', 'tiberias', 'finale', 'control')),
   status text not null check (status = 'erledigt'),
-  event_type text not null default 'solved' check (event_type in ('solved', 'manual', 'finale', 'lock', 'unlock')),
+  event_type text not null default 'solved' check (event_type in ('solved', 'manual', 'finale', 'lock', 'unlock', 'groups', 'phase', 'prompt')),
+  payload text check (payload is null or char_length(payload) <= 420),
   created_at timestamptz not null default now()
 );
 
 -- Migration einer älteren Testtabelle:
 alter table public.fortschritt add column if not exists session_id text;
 alter table public.fortschritt add column if not exists event_type text not null default 'solved';
+alter table public.fortschritt add column if not exists payload text;
 update public.fortschritt set session_id = 'legacy-test' where session_id is null;
 alter table public.fortschritt alter column session_id set not null;
 alter table public.fortschritt drop constraint if exists fortschritt_session_id_check;
 alter table public.fortschritt drop constraint if exists fortschritt_sektor_check;
 alter table public.fortschritt drop constraint if exists fortschritt_status_check;
 alter table public.fortschritt drop constraint if exists fortschritt_event_type_check;
+alter table public.fortschritt drop constraint if exists fortschritt_payload_check;
 alter table public.fortschritt add constraint fortschritt_session_id_check check (session_id ~ '^[a-z0-9-]{6,32}$');
 alter table public.fortschritt add constraint fortschritt_sektor_check check (sektor in ('kapernaum', 'berg', 'see', 'nazareth', 'tiberias', 'finale', 'control'));
 alter table public.fortschritt add constraint fortschritt_status_check check (status = 'erledigt');
-alter table public.fortschritt add constraint fortschritt_event_type_check check (event_type in ('solved', 'manual', 'finale', 'lock', 'unlock'));
+alter table public.fortschritt add constraint fortschritt_event_type_check check (event_type in ('solved', 'manual', 'finale', 'lock', 'unlock', 'groups', 'phase', 'prompt'));
+alter table public.fortschritt add constraint fortschritt_payload_check check (payload is null or char_length(payload) <= 420);
 delete from public.fortschritt a using public.fortschritt b
 where a.id > b.id
   and a.session_id = b.session_id
@@ -61,7 +65,8 @@ create policy "Anon darf erledigte Stationen eintragen" on public.fortschritt
     and gruppen_id ~ '^[a-z0-9_-]{2,24}$'
     and sektor in ('kapernaum', 'berg', 'see', 'nazareth', 'tiberias', 'finale', 'control')
     and status = 'erledigt'
-    and event_type in ('solved', 'manual', 'finale', 'lock', 'unlock')
+    and event_type in ('solved', 'manual', 'finale', 'lock', 'unlock', 'groups', 'phase', 'prompt')
+    and (payload is null or char_length(payload) <= 420)
   );
 
 -- Falls die Tabelle noch nicht zur Realtime-Publikation gehört:

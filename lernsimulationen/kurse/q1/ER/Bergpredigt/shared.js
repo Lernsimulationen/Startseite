@@ -1,9 +1,9 @@
 const SECTORS = [
-  {id:"nazareth",name:"Nazareth",title:"Goldene Regel",icon:"♥",art:"assets/images/station-nazareth-golden-rule.webp"},
-  {id:"berg",name:"Berg der Lehre",title:"Seligpreisungen",icon:"☀",art:"assets/images/station-berg-beatitudes.webp"},
-  {id:"kapernaum",name:"Kapernaum",title:"Salz der Erde",icon:"✦",art:"assets/images/station-kapernaum-salt.webp"},
-  {id:"see",name:"See Genezareth",title:"Vom Sorgen",icon:"≈",art:"assets/images/station-see-trust.webp"},
-  {id:"tiberias",name:"Tiberias",title:"Friedensstifter",icon:"☮",art:"assets/images/station-tiberias-peace.webp"}
+  {id:"nazareth",name:"Nazareth",title:"Goldene Regel",mode:"single",art:"assets/images/station-nazareth-golden-rule.webp"},
+  {id:"berg",name:"Berg der Lehre",title:"Seligpreisungen",mode:"all",art:"assets/images/station-berg-beatitudes.webp"},
+  {id:"kapernaum",name:"Kapernaum",title:"Salz der Erde",mode:"single",art:"assets/images/station-kapernaum-salt.webp"},
+  {id:"see",name:"See Genezareth",title:"Vom Sorgen",mode:"all",art:"assets/images/station-see-trust.webp"},
+  {id:"tiberias",name:"Tiberias",title:"Friedensstifter",mode:"all",art:"assets/images/station-tiberias-peace.webp"}
 ];
 const LOCAL_KEY = "bergpredigt-fortschritt-v2";
 const ACTIVE_SESSION_KEY = "bergpredigt-active-session";
@@ -18,13 +18,21 @@ function setActiveSession(sessionId){localStorage.setItem(ACTIVE_SESSION_KEY,san
 function sessionUrl(page,sessionId){const url=new URL(page,location.href);url.searchParams.set("session",sanitizeSession(sessionId));return url.href}
 function getLocalRows(){try{return JSON.parse(localStorage.getItem(LOCAL_KEY)||"[]")}catch{return[]}}
 function saveLocalRow(row){const saved={...row,created_at:new Date().toISOString()};const rows=getLocalRows();rows.push(saved);localStorage.setItem(LOCAL_KEY,JSON.stringify(rows));window.dispatchEvent(new CustomEvent("berg-local-progress",{detail:saved}))}
-async function readProgress(db,sessionId){if(!db)return getLocalRows().filter(row=>row.session_id===sessionId);const {data,error}=await db.from("fortschritt").select("session_id,gruppen_id,sektor,status,event_type,created_at").eq("session_id",sessionId);if(error)throw error;return data}
+async function readProgress(db,sessionId){if(!db)return getLocalRows().filter(row=>row.session_id===sessionId);const {data,error}=await db.from("fortschritt").select("session_id,gruppen_id,sektor,status,event_type,payload,created_at").eq("session_id",sessionId);if(error)throw error;return data}
 async function markDone(db,row,options={}){const payload={event_type:"solved",...row};if(!db){saveLocalRow(payload);return}if(window.BERG_CONFIG?.EDGE_FUNCTION_URL){const response=await fetch(window.BERG_CONFIG.EDGE_FUNCTION_URL,{method:"POST",headers:{"content-type":"application/json","apikey":window.BERG_CONFIG.SUPABASE_ANON_KEY,"authorization":`Bearer ${window.BERG_CONFIG.SUPABASE_ANON_KEY}`,...(options.teacherPin?{"x-teacher-pin":options.teacherPin}:{})},body:JSON.stringify(payload)});if(!response.ok)throw new Error(`Edge Function: ${response.status}`);return}const {error}=await db.from("fortschritt").insert(payload);if(error)throw error}
 function controlRows(rows){return rows.filter(row=>row.sektor==="control").sort((a,b)=>new Date(a.created_at)-new Date(b.created_at))}
 function isSessionLocked(rows){const last=controlRows(rows).filter(row=>row.event_type==="lock"||row.event_type==="unlock").at(-1);return last?.event_type==="lock"}
 function controlLabel(rows){return isSessionLocked(rows)?"Expedition gesperrt":"Expedition offen"}
-function completedSectorIds(rows){return new Set(rows.filter(row=>row.status==="erledigt"&&row.sektor!=="finale"&&row.sektor!=="control").map(row=>row.sektor))}
+function groupTargetFromRows(rows){const last=controlRows(rows).filter(row=>row.event_type==="groups").at(-1),match=last?.gruppen_id?.match(/^gruppen-(\d+)$/);return match?Math.max(1,Math.min(12,Number(match[1]))):4}
+function activePhase(rows){const last=controlRows(rows).filter(row=>row.event_type==="phase").at(-1);return last?.payload||"Startphase"}
+function activePrompt(rows){return controlRows(rows).filter(row=>row.event_type==="prompt"&&row.payload).at(-1)?.payload||""}
+function sectorRequirement(sector,rows){return sector?.mode==="all"?groupTargetFromRows(rows):1}
+function sectorGroupCounts(rows){const counts=new Map();rows.filter(row=>row.status==="erledigt"&&row.sektor!=="finale"&&row.sektor!=="control"&&row.gruppen_id!=="lehrkraft").forEach(row=>{if(!counts.has(row.sektor))counts.set(row.sektor,new Set());counts.get(row.sektor).add(row.gruppen_id)});return counts}
+function sectorCompletion(rows){const counts=sectorGroupCounts(rows),manual=new Set(rows.filter(row=>row.gruppen_id==="lehrkraft"&&row.status==="erledigt"&&row.sektor!=="control"&&row.sektor!=="finale").map(row=>row.sektor));return new Map(SECTORS.map(sector=>{const required=sectorRequirement(sector,rows),count=counts.get(sector)?.size||0,complete=manual.has(sector)||count>=required;return[sector.id,{count,required,complete,ratio:Math.min(1,count/required)}]}))}
+function completedSectorIds(rows){const completion=sectorCompletion(rows);return new Set([...completion].filter(([,value])=>value.complete).map(([id])=>id))}
 function finaleRequested(rows){return rows.some(row=>row.sektor==="finale"&&row.status==="erledigt")}
+function bossFinaleReady(rows){const completion=sectorCompletion(rows),groups=sectorGroupCounts(rows).get("tiberias")?.size||0,target=groupTargetFromRows(rows);return SECTORS.every(sector=>completion.get(sector.id)?.complete)&&groups>=target}
+function escapeHtml(value){return String(value||"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]))}
 function setConnectionStatus(text,isLive=false){const label=document.getElementById("connectionLabel"),dot=document.querySelector(".status-dot");if(label)label.textContent=text;if(dot)dot.classList.toggle("live",isLive)}
 function registerOffline(){if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{})}
 registerOffline();
