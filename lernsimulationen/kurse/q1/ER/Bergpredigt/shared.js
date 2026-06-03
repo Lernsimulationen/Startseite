@@ -1,9 +1,9 @@
 const SECTORS = [
-  {id:"nazareth",name:"Nazareth",title:"Goldene Regel",mode:"single",art:"assets/images/station-nazareth-golden-rule.webp"},
-  {id:"berg",name:"Berg der Seligpreisungen",title:"Seligpreisungen",mode:"all",art:"assets/images/station-berg-beatitudes.webp"},
-  {id:"kapernaum",name:"Kapernaum",title:"Salz der Erde",mode:"single",art:"assets/images/station-kapernaum-salt.webp"},
-  {id:"see",name:"See Genezareth",title:"Vom Sorgen",mode:"all",art:"assets/images/station-see-trust.webp"},
-  {id:"tiberias",name:"Tiberias",title:"Friedensstifter",mode:"all",art:"assets/images/station-tiberias-peace.webp"}
+  {id:"nazareth",name:"Goldene Regel",title:"Perspektivwechsel",mode:"single",art:"assets/images/station-nazareth-golden-rule.webp"},
+  {id:"berg",name:"Seligpreisungen",title:"Zuspruch und Gerechtigkeit",mode:"all",art:"assets/images/station-berg-beatitudes.webp"},
+  {id:"kapernaum",name:"Salz und Licht",title:"Wirksam handeln",mode:"single",art:"assets/images/station-kapernaum-salt.webp"},
+  {id:"see",name:"Sorge und Vertrauen",title:"Verantwortlich leben",mode:"all",art:"assets/images/station-see-trust.webp"},
+  {id:"tiberias",name:"Feindesliebe",title:"Frieden stiften",mode:"all",art:"assets/images/station-tiberias-peace.webp"}
 ];
 const LOCAL_KEY = "bergpredigt-fortschritt-v2";
 const ACTIVE_SESSION_KEY = "bergpredigt-active-session";
