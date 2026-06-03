@@ -1,6 +1,61 @@
 const db=createDb();
-let sessionId=getActiveSession()||randomSession(),rows=[],liveChannel=null,teacherPin="",locked=false,groupTarget=4;
+let sessionId=getActiveSession()||randomSession(),rows=[],liveChannel=null,teacherPin="",locked=false,groupTarget=4,teacherTasks=[],teacherTaskIndex=0;
 setActiveSession(sessionId);
+
+async function loadTeacherTasks(){
+  try{
+    const text=await fetch("tablet.js",{cache:"no-store"}).then(response=>response.text()),match=text.match(/const TASKS=(\[[\s\S]*?\n\]);/);
+    teacherTasks=match?Function(`"use strict";return (${match[1]});`)():[];
+  }catch(error){
+    console.error(error);
+    teacherTasks=[];
+  }
+  renderTeacherTaskSelect();
+  renderTeacherTask();
+}
+
+function taskSolution(task){
+  if(!task)return "";
+  if(task.type==="choice")return task.answers?.[task.correct]||"";
+  if(task.type==="mark")return (task.correct||[]).map(index=>task.answers[index]).join(" · ");
+  if(task.type==="order")return (task.correct||[]).join(" → ");
+  if(task.type==="match"||task.type==="matrix")return (task.items||[]).map(([statement,category])=>`${statement} = ${category}`).join(" · ");
+  if(task.type==="evidence")return `These: ${task.claims?.[task.correct?.[0]]||""} · Beleg: ${task.evidence?.[task.correct?.[1]]||""}`;
+  if(task.type==="reflection")return `Offene Gruppennotiz, mindestens ${task.minChars} Zeichen.`;
+  return "Keine Musterlösung hinterlegt.";
+}
+
+function taskTypeLabel(type){
+  return {choice:"Einzelauswahl",mark:"Mehrfachauswahl",order:"Reihenfolge",match:"Zuordnung",matrix:"Einordnung",evidence:"These und Beleg",reflection:"Reflexion"}[type]||type;
+}
+
+function renderTeacherTaskSelect(){
+  const select=document.getElementById("teacherTaskSelect");
+  if(!select)return;
+  select.innerHTML=teacherTasks.length?teacherTasks.map((task,index)=>{
+    const sector=SECTORS.find(item=>item.id===task.sector),part=teacherTasks.slice(0,index+1).filter(item=>item.sector===task.sector).length;
+    return `<option value="${index}">${index+1}. ${escapeHtml(sector?.name||task.sector)} · Teil ${part}: ${escapeHtml(task.title)}</option>`;
+  }).join(""):"<option>Keine Aufgaben gefunden</option>";
+  select.value=String(Math.min(teacherTaskIndex,Math.max(0,teacherTasks.length-1)));
+}
+
+function renderTeacherTask(){
+  const view=document.getElementById("teacherTaskView");
+  if(!view)return;
+  if(!teacherTasks.length){
+    view.innerHTML="<p>Die Aufgaben konnten noch nicht geladen werden.</p>";
+    return;
+  }
+  teacherTaskIndex=Math.max(0,Math.min(teacherTaskIndex,teacherTasks.length-1));
+  const task=teacherTasks[teacherTaskIndex],sector=SECTORS.find(item=>item.id===task.sector),part=teacherTasks.slice(0,teacherTaskIndex+1).filter(item=>item.sector===task.sector).length,total=teacherTasks.filter(item=>item.sector===task.sector).length;
+  document.getElementById("teacherTaskSelect").value=String(teacherTaskIndex);
+  view.innerHTML=`<p class="comic-kicker">${escapeHtml(sector?.name||task.sector)} · Teil ${part}/${total}</p><h3>${escapeHtml(task.title)}</h3><p class="session-state">${escapeHtml(taskTypeLabel(task.type))}</p><p><b>Situation:</b> ${escapeHtml(task.story)}</p><p class="source">${escapeHtml(task.source)}</p><p><b>Auftrag:</b> ${escapeHtml(task.question)}</p><details open><summary>Musterlösung anzeigen</summary><p>${escapeHtml(taskSolution(task))}</p></details><details><summary>Hinweis für Gruppen</summary><p>${escapeHtml(task.hint||"")}</p></details>`;
+}
+
+function stepTeacherTask(delta){
+  teacherTaskIndex=Math.max(0,Math.min(teacherTaskIndex+delta,teacherTasks.length-1));
+  renderTeacherTask();
+}
 
 function renderLinks(){
   const tablet=sessionUrl("tablet.html",sessionId),board=sessionUrl("tafel.html",sessionId);
@@ -67,7 +122,7 @@ async function sendPrompt(){
 }
 function subscribe(){if(!db)return;if(liveChannel)db.removeChannel(liveChannel);liveChannel=db.channel(`teacher-${sessionId}`).on("postgres_changes",{event:"INSERT",schema:"public",table:"fortschritt",filter:`session_id=eq.${sessionId}`},()=>refresh()).subscribe()}
 async function startSession(){sessionId=randomSession();rows=[];setActiveSession(sessionId);history.replaceState({}, "", `?session=${sessionId}`);renderLinks();renderGroups();subscribe();await saveGroupCount();await setPhase("Einzelarbeit")}
-function openDashboard(){document.getElementById("teacherLogin").classList.add("hidden");document.getElementById("teacherDashboard").classList.remove("hidden");renderLinks();refresh();subscribe()}
+function openDashboard(){document.getElementById("teacherLogin").classList.add("hidden");document.getElementById("teacherDashboard").classList.remove("hidden");renderLinks();loadTeacherTasks();refresh();subscribe()}
 
 document.getElementById("pinForm").addEventListener("submit",event=>{event.preventDefault();teacherPin=document.getElementById("pinInput").value;if(teacherPin!==String(window.BERG_CONFIG?.TEACHER_PIN||"2468")){document.getElementById("pinError").classList.remove("hidden");return}openDashboard()});
 document.getElementById("newSession").addEventListener("click",startSession);
@@ -76,5 +131,8 @@ document.getElementById("toggleLock").addEventListener("click",toggleLock);
 document.getElementById("startFinale").addEventListener("click",sendFinale);
 document.getElementById("sendPrompt").addEventListener("click",sendPrompt);
 document.querySelectorAll("[data-phase]").forEach(button=>button.addEventListener("click",()=>setPhase(button.dataset.phase)));
+document.getElementById("prevTeacherTask").addEventListener("click",()=>stepTeacherTask(-1));
+document.getElementById("nextTeacherTask").addEventListener("click",()=>stepTeacherTask(1));
+document.getElementById("teacherTaskSelect").addEventListener("change",event=>{teacherTaskIndex=Number(event.target.value)||0;renderTeacherTask()});
 document.getElementById("copyTabletUrl").addEventListener("click",async()=>{const field=document.getElementById("tabletUrl");try{await navigator.clipboard.writeText(field.value);document.getElementById("copyTabletUrl").textContent="Link kopiert"}catch{field.focus();field.select()}});
 setConnectionStatus(db?"Live verbunden":"Demo-Modus",Boolean(db));
