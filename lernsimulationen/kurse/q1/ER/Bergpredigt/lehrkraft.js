@@ -21,7 +21,7 @@ function taskSolution(task){
   if(task.type==="order")return (task.correct||[]).join(" → ");
   if(task.type==="match"||task.type==="matrix")return (task.items||[]).map(([statement,category])=>`${statement} = ${category}`).join(" · ");
   if(task.type==="evidence")return `These: ${task.claims?.[task.correct?.[0]]||""} · Beleg: ${task.evidence?.[task.correct?.[1]]||""}`;
-  if(task.type==="reflection")return `Offene Gruppennotiz, mindestens ${task.minChars} Zeichen.`;
+  if(task.type==="reflection")return "Offene Gruppennotiz ohne Zeichenminimum.";
   return "Keine Musterlösung hinterlegt.";
 }
 
