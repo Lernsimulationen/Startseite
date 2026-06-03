@@ -19,12 +19,12 @@ Deno.serve(async (request) => {
   const valid = payload
     && /^[a-z0-9-]{6,32}$/.test(payload.session_id)
     && /^[a-z0-9_-]{2,24}$/.test(payload.gruppen_id)
-    && ["kapernaum", "berg", "see", "nazareth", "tiberias", "finale"].includes(payload.sektor)
+    && ["kapernaum", "berg", "see", "nazareth", "tiberias", "finale", "control"].includes(payload.sektor)
     && payload.status === "erledigt"
-    && ["solved", "manual", "finale"].includes(payload.event_type);
+    && ["solved", "manual", "finale", "lock", "unlock"].includes(payload.event_type);
   if (!valid) return reply({ error: "invalid_payload" }, 400);
 
-  const teacherEvent = payload.event_type !== "solved" || payload.sektor === "finale";
+  const teacherEvent = payload.event_type !== "solved" || payload.sektor === "finale" || payload.sektor === "control";
   if (teacherEvent && request.headers.get("x-teacher-pin") !== Deno.env.get("TEACHER_PIN")) {
     return reply({ error: "teacher_auth_required" }, 403);
   }

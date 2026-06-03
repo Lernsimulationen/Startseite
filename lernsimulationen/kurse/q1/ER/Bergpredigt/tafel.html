@@ -22,6 +22,13 @@
           <g transform="translate(694 515)"><path d="M4 47c33-3 44-23 53-51M20 38c-10-18-7-28 2-34m12 25c-8-17-4-27 6-33m7 19c-4-13 1-21 10-25"/><ellipse cx="14" cy="29" rx="8" ry="4" transform="rotate(35 14 29)"/><ellipse cx="33" cy="20" rx="8" ry="4" transform="rotate(35 33 20)"/><ellipse cx="51" cy="7" rx="8" ry="4" transform="rotate(35 51 7)"/></g>
         </g>
         <g class="map-compass" transform="translate(788 114)"><circle r="57"/><path d="M0-46 12-9 0 0-12-9Z"/><path d="M0 46-12 9 0 0 12 9Z"/><path d="M-46 0-9-12 0 0-9 12Z"/><path d="M46 0 9 12 0 0 9-12Z"/><text y="-65">N</text></g>
+        <g class="fog-layer" id="fogLayer" aria-hidden="true">
+          <g class="fog-cloud" data-fog="nazareth" transform="translate(210 525)"><ellipse rx="118" ry="70"/><ellipse cx="-48" cy="-12" rx="48" ry="36"/><ellipse cx="45" cy="8" rx="58" ry="41"/><text text-anchor="middle" y="9">?</text></g>
+          <g class="fog-cloud" data-fog="berg" transform="translate(423 317)"><ellipse rx="126" ry="76"/><ellipse cx="-55" cy="-15" rx="52" ry="38"/><ellipse cx="52" cy="10" rx="61" ry="43"/><text text-anchor="middle" y="9">?</text></g>
+          <g class="fog-cloud" data-fog="kapernaum" transform="translate(571 189)"><ellipse rx="118" ry="70"/><ellipse cx="-47" cy="-13" rx="48" ry="36"/><ellipse cx="47" cy="9" rx="57" ry="40"/><text text-anchor="middle" y="9">?</text></g>
+          <g class="fog-cloud" data-fog="see" transform="translate(674 403)"><ellipse rx="118" ry="70"/><ellipse cx="-48" cy="-12" rx="48" ry="36"/><ellipse cx="45" cy="8" rx="58" ry="41"/><text text-anchor="middle" y="9">?</text></g>
+          <g class="fog-cloud" data-fog="tiberias" transform="translate(581 499)"><ellipse rx="118" ry="70"/><ellipse cx="-48" cy="-12" rx="48" ry="36"/><ellipse cx="45" cy="8" rx="58" ry="41"/><text text-anchor="middle" y="9">?</text></g>
+        </g>
         <g class="sector" data-sector="kapernaum" transform="translate(571 189)"><circle class="sector-shadow" r="62"/><circle class="sector-ring" r="57"/><image class="sector-art" href="assets/images/station-kapernaum-salt.webp" x="-49" y="-49" width="98" height="98" clip-path="url(#medallionClip)"/><text class="sector-label" text-anchor="middle" y="84">Kapernaum</text><text class="sector-check" x="38" y="-34">✓</text></g>
         <g class="sector" data-sector="berg" transform="translate(423 317)"><circle class="sector-shadow" r="66"/><circle class="sector-ring" r="61"/><image class="sector-art" href="assets/images/station-berg-beatitudes.webp" x="-53" y="-53" width="106" height="106" clip-path="url(#medallionClip)"/><text class="sector-label" text-anchor="middle" y="89">Berg der Lehre</text><text class="sector-check" x="41" y="-37">✓</text></g>
         <g class="sector" data-sector="see" transform="translate(674 403)"><circle class="sector-shadow" r="59"/><circle class="sector-ring" r="54"/><image class="sector-art" href="assets/images/station-see-trust.webp" x="-46" y="-46" width="92" height="92" clip-path="url(#medallionClip)"/><text class="sector-label" text-anchor="middle" y="81">See Genezareth</text><text class="sector-check" x="35" y="-31">✓</text></g>
@@ -38,6 +45,7 @@
       <section class="panel privacy-note"><b>Datenschutz:</b> Es werden nur eine frei gewählte <code>gruppen_id</code>, der Sektor und der Status <code>erledigt</code> gespeichert. Keine Namen, E-Mails oder personenbezogenen Daten.</section>
     </aside>
   </main>
+  <section class="lock-overlay hidden" id="boardLock" aria-live="polite"><article><p class="comic-kicker">Pause</p><h1>Expedition gesperrt</h1><p>Die Lehrkraft hat die Gruppenphase kurz angehalten.</p></article></section>
   <section class="finale-overlay hidden" id="boardFinale" role="dialog" aria-modal="true" aria-labelledby="finaleTitle">
     <article class="finale-card"><p class="comic-kicker">Gemeinsames Finale</p><h1 id="finaleTitle">Galiläa leuchtet!</h1><p>Ihr habt fünf Perspektiven der Bergpredigt erschlossen: wirksames Handeln, Frieden, Vertrauen, Perspektivwechsel und Wege aus der Vergeltung.</p><h2>Plenumsfrage</h2><p class="final-question">Welche Station fordert unsere heutige Gesellschaft am stärksten heraus und warum?</p><button class="comic-button" id="closeFinale">Karte weiter betrachten</button></article>
   </section>
