@@ -5,6 +5,19 @@ const SECTORS = [
   {id:"see",name:"Sorge und Vertrauen",title:"Verantwortlich leben",mode:"all",art:"assets/images/station-see-trust.webp"},
   {id:"tiberias",name:"Feindesliebe",title:"Frieden stiften",mode:"all",art:"assets/images/station-tiberias-peace.webp"}
 ];
+const APP_VERSION = "v16";
+const WORK_MODES = {
+  cooperative:{id:"cooperative",name:"Kooperativ",hint:"Stationen öffnen sich erst, wenn alle Gruppen ihren Beitrag geliefert haben."},
+  standard:{id:"standard",name:"Nicht kooperativ",hint:"Eine Gruppe kann eine Station für die Karte freischalten."}
+};
+const AVATARS = [
+  {id:"laterne",name:"Laterne",pos:"0% 0%"},
+  {id:"olive",name:"Olivenzweig",pos:"50% 0%"},
+  {id:"bergpfad",name:"Bergpfad",pos:"100% 0%"},
+  {id:"schriftrolle",name:"Schriftrolle",pos:"0% 100%"},
+  {id:"salzlicht",name:"Salz und Licht",pos:"50% 100%"},
+  {id:"frieden",name:"Frieden",pos:"100% 100%"}
+];
 const LOCAL_KEY = "bergpredigt-fortschritt-v2";
 const ACTIVE_SESSION_KEY = "bergpredigt-active-session";
 const SESSION_PATTERN = /^[a-z0-9-]{6,32}$/;
@@ -26,12 +39,15 @@ function controlLabel(rows){return isSessionLocked(rows)?"Expedition gesperrt":"
 function groupTargetFromRows(rows){const last=controlRows(rows).filter(row=>row.event_type==="groups").at(-1),match=last?.gruppen_id?.match(/^gruppen-(\d+)$/);return match?Math.max(1,Math.min(12,Number(match[1]))):4}
 function activePhase(rows){const last=controlRows(rows).filter(row=>row.event_type==="phase").at(-1);return last?.payload||"Startphase"}
 function activePrompt(rows){return controlRows(rows).filter(row=>row.event_type==="prompt"&&row.payload).at(-1)?.payload||""}
-function sectorRequirement(sector,rows){return sector?.mode==="all"?groupTargetFromRows(rows):1}
+function activeWorkMode(rows){const last=controlRows(rows).filter(row=>row.event_type==="manual"&&String(row.payload||"").startsWith("mode:")).at(-1),mode=String(last?.payload||"mode:standard").replace("mode:","");return WORK_MODES[mode]?mode:"standard"}
+function groupAvatarsFromRows(rows){const avatars=new Map();controlRows(rows).filter(row=>row.event_type==="manual"&&String(row.payload||"").startsWith("avatar:")).forEach(row=>{const avatar=String(row.payload).replace("avatar:","");if(AVATARS.some(item=>item.id===avatar)&&row.gruppen_id!=="lehrkraft")avatars.set(row.gruppen_id,avatar)});return avatars}
+function avatarById(id){return AVATARS.find(avatar=>avatar.id===id)||AVATARS[0]}
+function sectorRequirement(sector,rows){return activeWorkMode(rows)==="cooperative"?groupTargetFromRows(rows):1}
 function sectorGroupCounts(rows){const counts=new Map();rows.filter(row=>row.status==="erledigt"&&row.sektor!=="finale"&&row.sektor!=="control"&&row.gruppen_id!=="lehrkraft").forEach(row=>{if(!counts.has(row.sektor))counts.set(row.sektor,new Set());counts.get(row.sektor).add(row.gruppen_id)});return counts}
 function sectorCompletion(rows){const counts=sectorGroupCounts(rows),manual=new Set(rows.filter(row=>row.gruppen_id==="lehrkraft"&&row.status==="erledigt"&&row.sektor!=="control"&&row.sektor!=="finale").map(row=>row.sektor));return new Map(SECTORS.map(sector=>{const required=sectorRequirement(sector,rows),count=counts.get(sector)?.size||0,complete=manual.has(sector)||count>=required;return[sector.id,{count,required,complete,ratio:Math.min(1,count/required)}]}))}
 function completedSectorIds(rows){const completion=sectorCompletion(rows);return new Set([...completion].filter(([,value])=>value.complete).map(([id])=>id))}
 function finaleRequested(rows){return rows.some(row=>row.sektor==="finale"&&row.status==="erledigt")}
-function bossFinaleReady(rows){const completion=sectorCompletion(rows),groups=sectorGroupCounts(rows).get("tiberias")?.size||0,target=groupTargetFromRows(rows);return SECTORS.every(sector=>completion.get(sector.id)?.complete)&&groups>=target}
+function bossFinaleReady(rows){const completion=sectorCompletion(rows),groups=sectorGroupCounts(rows).get("tiberias")?.size||0,target=activeWorkMode(rows)==="cooperative"?groupTargetFromRows(rows):1;return SECTORS.every(sector=>completion.get(sector.id)?.complete)&&groups>=target}
 function escapeHtml(value){return String(value||"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]))}
 function setConnectionStatus(text,isLive=false){const label=document.getElementById("connectionLabel"),dot=document.querySelector(".status-dot");if(label)label.textContent=text;if(dot)dot.classList.toggle("live",isLive)}
 function registerOffline(){if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{})}

@@ -67,6 +67,7 @@ function renderLinks(){
 
 function groupMap(){
   const groups=new Map();
+  groupAvatarsFromRows(rows).forEach((avatar,group)=>groups.set(group,new Set()));
   rows.filter(row=>row.sektor!=="finale"&&row.sektor!=="control"&&row.gruppen_id!=="lehrkraft").forEach(row=>{
     if(!groups.has(row.gruppen_id))groups.set(row.gruppen_id,new Set());
     groups.get(row.gruppen_id).add(row.sektor);
@@ -84,15 +85,17 @@ function renderAnalytics(groups,completion){
 function renderGroups(){
   locked=isSessionLocked(rows);
   groupTarget=groupTargetFromRows(rows)||groupTarget;
-  const phase=activePhase(rows),prompt=activePrompt(rows),groups=groupMap(),completion=sectorCompletion(rows);
+  const phase=activePhase(rows),prompt=activePrompt(rows),groups=groupMap(),completion=sectorCompletion(rows),workMode=activeWorkMode(rows),avatars=groupAvatarsFromRows(rows);
   document.getElementById("groupCountInput").value=groupTarget;
-  document.getElementById("sessionState").textContent=`${controlLabel(rows)} · ${groupTarget} ${groupTarget===1?"Gruppe":"Gruppen"}`;
+  document.getElementById("workModeSelect").value=workMode;
+  document.getElementById("workModeHint").textContent=WORK_MODES[workMode].hint;
+  document.getElementById("sessionState").textContent=`${controlLabel(rows)} · ${WORK_MODES[workMode].name} · ${groupTarget} ${groupTarget===1?"Gruppe":"Gruppen"}`;
   document.getElementById("sessionState").classList.toggle("locked",locked);
   document.getElementById("phaseState").textContent=`Aktuelle Phase: ${phase}`;
   document.getElementById("promptInput").placeholder=prompt?`Letzter Auftrag: ${prompt}`:"Kurzen Auftrag an alle Tablets senden ...";
   document.getElementById("toggleLock").textContent=locked?"Expedition entsperren":"Expedition sperren";
   document.getElementById("toggleLock").classList.toggle("unlock-button",locked);
-  document.getElementById("teacherGroups").innerHTML=groups.size?[...groups].map(([group,sectors])=>`<div class="group-progress"><b>${group}</b><span>${sectors.size} / ${SECTORS.length}</span><div class="mini-track"><i style="width:${sectors.size/SECTORS.length*100}%"></i></div></div>`).join(""):"<p>Noch keine Gruppe hat eine Station abgeschlossen.</p>";
+  document.getElementById("teacherGroups").innerHTML=groups.size?[...groups].map(([group,sectors])=>{const avatar=avatarById(avatars.get(group));return `<div class="group-progress"><b><span class="avatar-token tiny" style="--avatar-pos:${avatar.pos}"></span>${escapeHtml(group)}</b><span>${sectors.size} / ${SECTORS.length}</span><div class="mini-track"><i style="width:${sectors.size/SECTORS.length*100}%"></i></div></div>`}).join(""):"<p>Noch keine Gruppe hat eine Station abgeschlossen.</p>";
   document.getElementById("teacherGroups").innerHTML+=`<div class="coop-summary">${SECTORS.map(sector=>{const state=completion.get(sector.id);return `<span class="${state.complete?"done":""}">${sector.name}: ${state.count}/${state.required}</span>`}).join("")}</div>`;
   renderAnalytics(groups,completion);
   const ready=bossFinaleReady(rows);
@@ -112,6 +115,7 @@ async function sendFinale(){
 }
 async function toggleLock(){const next=locked?"unlock":"lock";await markDone(db,{session_id:sessionId,gruppen_id:"lehrkraft",sektor:"control",status:"erledigt",event_type:next},{teacherPin});await refresh()}
 async function saveGroupCount(){groupTarget=Math.max(1,Math.min(12,Number(document.getElementById("groupCountInput").value)||1));await markDone(db,{session_id:sessionId,gruppen_id:`gruppen-${groupTarget}`,sektor:"control",status:"erledigt",event_type:"groups"},{teacherPin});await refresh()}
+async function saveWorkMode(){const mode=WORK_MODES[document.getElementById("workModeSelect").value]?.id||"standard";await markDone(db,{session_id:sessionId,gruppen_id:"lehrkraft",sektor:"control",status:"erledigt",event_type:"manual",payload:`mode:${mode}`},{teacherPin});await refresh()}
 async function setPhase(phase){await markDone(db,{session_id:sessionId,gruppen_id:"lehrkraft",sektor:"control",status:"erledigt",event_type:"phase",payload:phase},{teacherPin});await refresh()}
 async function sendPrompt(){
   const input=document.getElementById("promptInput"),payload=input.value.trim().slice(0,420);
@@ -121,12 +125,13 @@ async function sendPrompt(){
   await refresh();
 }
 function subscribe(){if(!db)return;if(liveChannel)db.removeChannel(liveChannel);liveChannel=db.channel(`teacher-${sessionId}`).on("postgres_changes",{event:"INSERT",schema:"public",table:"fortschritt",filter:`session_id=eq.${sessionId}`},()=>refresh()).subscribe()}
-async function startSession(){sessionId=randomSession();rows=[];setActiveSession(sessionId);history.replaceState({}, "", `?session=${sessionId}`);renderLinks();renderGroups();subscribe();await saveGroupCount();await setPhase("Einzelarbeit")}
+async function startSession(){const wantedMode=document.getElementById("workModeSelect").value||"standard";sessionId=randomSession();rows=[];setActiveSession(sessionId);history.replaceState({}, "", `?session=${sessionId}`);renderLinks();renderGroups();document.getElementById("workModeSelect").value=wantedMode;subscribe();await saveGroupCount();await saveWorkMode();await setPhase("Einzelarbeit")}
 function openDashboard(){document.getElementById("teacherLogin").classList.add("hidden");document.getElementById("teacherDashboard").classList.remove("hidden");renderLinks();loadTeacherTasks();refresh();subscribe()}
 
 document.getElementById("pinForm").addEventListener("submit",event=>{event.preventDefault();teacherPin=document.getElementById("pinInput").value;if(teacherPin!==String(window.BERG_CONFIG?.TEACHER_PIN||"2468")){document.getElementById("pinError").classList.remove("hidden");return}openDashboard()});
 document.getElementById("newSession").addEventListener("click",startSession);
 document.getElementById("saveGroupCount").addEventListener("click",saveGroupCount);
+document.getElementById("saveWorkMode").addEventListener("click",saveWorkMode);
 document.getElementById("toggleLock").addEventListener("click",toggleLock);
 document.getElementById("startFinale").addEventListener("click",sendFinale);
 document.getElementById("sendPrompt").addEventListener("click",sendPrompt);
