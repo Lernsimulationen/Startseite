@@ -9,15 +9,8 @@
       <div class="unlock-burst hidden" id="unlockBurst" aria-live="polite"></div>
       <button class="comic-button fullscreen-button" id="fullscreenMap" type="button">Karte Vollbild</button>
       <div class="map-title"><p class="comic-kicker">Bergpredigt</p><h1>Lernweg</h1></div>
-      <div class="map-fog-html" aria-hidden="true">
-        <span class="map-fog-patch fog-nazareth" data-fog="nazareth"></span>
-        <span class="map-fog-patch fog-berg" data-fog="berg"></span>
-        <span class="map-fog-patch fog-kapernaum" data-fog="kapernaum"></span>
-        <span class="map-fog-patch fog-see" data-fog="see"></span>
-        <span class="map-fog-patch fog-tiberias" data-fog="tiberias"></span>
-      </div>
       <svg class="galilee-map" viewBox="0 0 900 700" role="img" aria-labelledby="mapTitle mapDesc">
-        <title id="mapTitle">Interaktive Lernkarte zur Bergpredigt</title><desc id="mapDesc">Fünf Themenstationen werden farbig, wenn Gruppen die zugehörigen Aufgaben lösen. Eine illustrierte Jesus-Figur wandert entlang der Lernroute weiter.</desc>
+        <title id="mapTitle">Interaktive Lernkarte zur Bergpredigt</title><desc id="mapDesc">Fünf Themenstationen werden farbig, wenn Gruppen die zugehörigen Aufgaben lösen. Gruppenavatare zeigen den Arbeitsfortschritt auf der Lernroute.</desc>
         <defs><clipPath id="medallionClip"><circle r="47"/></clipPath></defs>
         <path class="route-base" d="M86 610C139 593 192 555 238 505C289 450 320 386 386 345C451 304 505 292 548 244C609 291 676 314 704 375C683 443 636 489 584 527"/>
         <path class="expedition-route" id="expeditionRoute" pathLength="100" d="M86 610C139 593 192 555 238 505C289 450 320 386 386 345C451 304 505 292 548 244C609 291 676 314 704 375C683 443 636 489 584 527"/>
@@ -28,40 +21,23 @@
         <g class="sector" data-sector="see" transform="translate(704 375)"><circle class="sector-shadow" r="59"/><circle class="sector-ring" r="54"/><image class="sector-art" href="assets/images/station-see-trust.webp" x="-46" y="-46" width="92" height="92" clip-path="url(#medallionClip)"/><text class="sector-label" text-anchor="middle" y="81">Sorge und Vertrauen</text><text class="sector-check" x="35" y="-31">✓</text></g>
         <g class="sector" data-sector="nazareth" transform="translate(238 505)"><circle class="sector-shadow" r="60"/><circle class="sector-ring" r="55"/><image class="sector-art" href="assets/images/station-nazareth-golden-rule.webp" x="-47" y="-47" width="94" height="94" clip-path="url(#medallionClip)"/><text class="sector-label" text-anchor="middle" y="82">Goldene Regel</text><text class="sector-check" x="36" y="-32">✓</text></g>
         <g class="sector" data-sector="tiberias" transform="translate(584 527)"><circle class="sector-shadow" r="61"/><circle class="sector-ring" r="56"/><image class="sector-art" href="assets/images/station-tiberias-peace.webp" x="-48" y="-48" width="96" height="96" clip-path="url(#medallionClip)"/><text class="sector-label" text-anchor="middle" y="83">Feindesliebe</text><text class="sector-check" x="37" y="-33">✓</text></g>
-        <g class="fog-layer" id="fogLayer" aria-hidden="true">
-          <g class="fog-zone fog-a" data-fog="nazareth">
-            <ellipse cx="82" cy="560" rx="150" ry="88"/><ellipse cx="182" cy="620" rx="185" ry="88"/><ellipse cx="275" cy="505" rx="190" ry="96"/><ellipse cx="350" cy="610" rx="150" ry="72"/>
-          </g>
-          <g class="fog-zone fog-b" data-fog="berg">
-            <ellipse cx="115" cy="350" rx="145" ry="78"/><ellipse cx="275" cy="388" rx="185" ry="92"/><ellipse cx="418" cy="330" rx="190" ry="100"/><ellipse cx="468" cy="465" rx="160" ry="80"/>
-          </g>
-          <g class="fog-zone fog-c" data-fog="kapernaum">
-            <ellipse cx="310" cy="165" rx="170" ry="82"/><ellipse cx="500" cy="225" rx="205" ry="98"/><ellipse cx="640" cy="160" rx="175" ry="82"/><ellipse cx="745" cy="260" rx="155" ry="76"/>
-          </g>
-          <g class="fog-zone fog-b" data-fog="see">
-            <ellipse cx="610" cy="338" rx="168" ry="86"/><ellipse cx="735" cy="382" rx="190" ry="98"/><ellipse cx="825" cy="300" rx="145" ry="78"/><ellipse cx="785" cy="498" rx="160" ry="82"/>
-          </g>
-          <g class="fog-zone fog-a" data-fog="tiberias">
-            <ellipse cx="420" cy="555" rx="170" ry="82"/><ellipse cx="570" cy="525" rx="190" ry="92"/><ellipse cx="700" cy="600" rx="190" ry="86"/><ellipse cx="835" cy="560" rx="145" ry="74"/>
-          </g>
-        </g>
         <g class="start-marker" transform="translate(86 610)"><circle r="22"/><text text-anchor="middle" y="6">Start</text></g>
-        <g class="jesus-walker" id="jesusWalker" transform="translate(123 493)"><ellipse cx="24" cy="92" rx="28" ry="10"/><image href="assets/images/jesus-walking-map.webp" x="-8" y="-25" width="68" height="122"/><g class="walker-label"><rect x="-20" y="-52" width="92" height="24" rx="12"/><text x="26" y="-35">Start</text></g></g>
       </svg>
       <div class="group-avatar-layer" id="groupAvatarLayer" aria-hidden="true"></div>
       <div class="map-cartouche"><b>Lernroute</b><span>Didaktische Stationen, keine exakte Pilgerroute</span></div>
     </section>
     <aside class="side-panel">
       <section class="panel"><p class="comic-kicker">Live-Fortschritt</p><h2><span id="doneCount">0</span> / 5 Stationen</h2><p class="session-note"><span id="groupTargetLabel">1 Gruppe</span> im Spiel</p><div class="progress-track"><div class="progress-bar" id="progressBar"></div></div><div class="sector-list" id="sectorList"></div></section>
-      <section class="panel"><h2>So geht's</h2><p>Manche Orte öffnen sich erst, wenn alle Gruppen ihren Teil gelöst haben. Sobald Jesus einen Abschnitt erreicht, löst sich der Nebel dort sichtbar auf.</p><p class="session-note">Sitzung: <b id="sessionLabel"></b></p></section>
+      <section class="panel avatar-progress-panel"><h2>Gruppenreise</h2><div class="avatar-progress-list" id="avatarProgressList"></div></section>
+      <section class="panel"><h2>So geht's</h2><p>Je nach Modus öffnen Gruppen Stationen gemeinsam oder eigenständig. Die Gruppenavatare zeigen, wie weit jede Gruppe auf der Lernroute ist.</p><p class="session-note">Sitzung: <b id="sessionLabel"></b></p></section>
       <section class="panel map-note"><h2>Fachlicher Hinweis</h2><p>Die Karte ist eine Lernlandschaft zur Bergpredigt. Sie zeigt keine Städtefolge, sondern fünf zentrale Themen aus Mt 5-7: Perspektivwechsel, Seligpreisungen, Salz und Licht, Vertrauen sowie Feindesliebe.</p></section>
       <section class="panel privacy-note"><b>Datenschutz:</b> Es werden nur eine frei gewählte <code>gruppen_id</code>, der Sektor und der Status <code>erledigt</code> gespeichert. Keine Namen, E-Mails oder personenbezogenen Daten.</section>
     </aside>
   </main>
   <section class="lock-overlay hidden" id="boardLock" aria-live="polite"><article><p class="comic-kicker">Pause</p><h1>Expedition gesperrt</h1><p>Die Lehrkraft hat die Gruppenphase kurz angehalten.</p></article></section>
   <section class="finale-overlay hidden" id="boardFinale" role="dialog" aria-modal="true" aria-labelledby="finaleTitle">
-    <article class="finale-card"><p class="comic-kicker">Gemeinsames Finale</p><h1 id="finaleTitle">Die Bergpredigt leuchtet!</h1><p>Ihr habt fünf Perspektiven der Bergpredigt erschlossen: wirksames Handeln, Frieden, Vertrauen, Perspektivwechsel und Wege aus der Vergeltung.</p><h2>Plenumsfrage</h2><p class="final-question">Welche Station fordert unsere heutige Gesellschaft am stärksten heraus und warum?</p><button class="comic-button" id="closeFinale">Karte weiter betrachten</button></article>
+<article class="finale-card"><p class="comic-kicker">Gemeinsames Finale</p><h1 id="finaleTitle">Die Bergpredigt leuchtet!</h1><p>Ihr habt fünf Perspektiven der Bergpredigt erschlossen: wirksames Handeln, Frieden, Vertrauen, Perspektivwechsel und Wege aus der Vergeltung.</p><h2>Leitfrage</h2><p class="final-question">Welche Aussage der Bergpredigt ist heute am unbequemsten, aber am wichtigsten?</p><button class="comic-button" id="closeFinale">Karte weiter betrachten</button></article>
   </section>
-  <div class="version-badge">Version v17</div>
+<div class="version-badge">Version v19</div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="shared.js"></script><script src="tafel.js"></script>
 </body></html>
