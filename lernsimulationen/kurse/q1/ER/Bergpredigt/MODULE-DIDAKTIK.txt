@@ -1,5 +1,31 @@
 Bergpredigt-Expedition: Serious-Game-Lernmodule
-Version: v27
+Version: v28
+
+Update v28:
+Seligpreisungen Spiel 2 wurde vertieft: Die Gruppen ordnen nun nicht mehr allgemeine Deutungen zu, sondern zuerst die genaue Verheißung aus Mt 5,6-9. Dadurch wird das Spiel stärker textgebunden und weniger ratbar. Die Zuordnungsspiele nutzen nun ein einheitliches Kartenbank-Design: Karten werden abgelegt, wieder gelöst und erst durch Bibeltextprüfung tragfähig.
+
+Das Wimmelbild im Vaterunser-Modul ist nun ein KI-generiertes Bildasset. Die Aufgabe verlangt eine Unterscheidung zwischen passenden Zeichen und Ablenkungen: Brot, offene Hände, Waage und betende Gruppe werden als Bezüge zu Mt 6 gelesen; Schatztruhe und verschlossene Tür sind bewusst problematische oder ablenkende Zeichen.
+
+Argumentkarten haben eine klarere Funktion: Sie sind keine Belohnung und kein Zusatzspiel, sondern Belegkarten für die Plenumsarena. Gruppen wählen damit eine Position zur Leitfrage und müssen ihre Karte mit Bibeltext, Sammelkarten und Spielentscheidungen begründen.
+
+Punkte sind als Kompasspunkte präzisiert. Sie sind keine Note. Sie erzeugen ein Klassenprofil aus Frieden, Gerechtigkeit und Vertrauen. Dieses Profil soll an der Tafel ausgewertet werden: Wo entscheidet die Klasse stark? Wo bleibt ein Wert schwach? Welche Bibelstellen erklären diese Verschiebung?
+
+Kritische Durchsicht aus Sicht eines Oberstudienrats:
+Die Spiele sind dann fachlich stark, wenn sie nicht nur richtige Klicks erzeugen, sondern Deutungsoperationen erzwingen. Besonders tragfähig sind Aufgaben, in denen die Lernenden erst den Luthertext identifizieren und danach eine ethische Konsequenz ableiten. Reine Wiedererkennung ist für eine gymnasiale Lerngruppe zu schwach; deshalb sind Zuordnung, Wimmelbild und Finale jetzt stärker auf Textbeleg, begründete Auswahl und Plenumstransfer ausgerichtet. Weiter zu beobachten bleibt, ob die Multiple-Choice- und Kurzentscheidungsformate im Unterrichtsgespräch nachgearbeitet werden. Sie sollten nicht als Endpunkt, sondern als Diagnose für die gemeinsame Auslegung dienen.
+
+Prüfung aller Spiele nach fachlicher Funktion:
+1. Seligpreisungen-Puzzle: Gut als Einstieg, weil die Reihenfolge im Text gesucht werden muss. Es aktiviert Genauigkeit, bleibt aber reproduktiv und braucht danach Deutung.
+2. Seligpreisungs-Karten: Jetzt stärker, weil zuerst die Verheißungen textnah zugeordnet werden. Der Lerneffekt liegt in der Unterscheidung von fromm klingender Meinung und biblischem Wortlaut.
+3. Seligpreisungen-Fallentscheidung: Didaktisch wertvoll, wenn die Lehrkraft im Plenum fragt, ob Frieden ohne Gerechtigkeit überhaupt Frieden ist.
+4. Antithesen-Zuordnung: Fachlich geeignet, weil die Struktur "Ihr habt gehört / Ich aber sage" sichtbar wird. Die Aufgabe sollte mit der Frage verbunden werden, ob Jesus Gebote verschärft oder vertieft.
+5. Moralquest Streit im Tor: Stark für ethisches Urteilen. Wichtig ist die Nachbesprechung: Die Lösung vermeidet Rache und Verharmlosung zugleich.
+6. Dialog Feindesliebe: Anspruchsvoll, weil Feindesliebe nicht als Naivität missverstanden werden darf. Schutz, Wahrheit und Verzicht auf Vergeltung müssen zusammen gelesen werden.
+7. Vaterunser-Puzzle: Sinnvoll, weil die Gebetsstruktur von Gottes Namen/Reich/Willen zu Brot, Schuld und Bewahrung sichtbar wird.
+8. Vaterunser-Wimmelbild: Visuell stark und fachlich nutzbar, wenn die Lernenden nicht nur klicken, sondern jedes Zeichen mit Mt 6 begründen. Schatztruhe und Tür sind notwendige Ablenkungen.
+9. Vertrauensquest: Sehr geeignet für Transfer, weil Vertrauen nicht Passivität bedeutet. Teilen, Schuld und Gottes Gerechtigkeit werden verbunden.
+10. Goldene-Regel-Wort-Rätsel: Schnell, aber funktional als begrifflicher Schlüssel. Der Begriff Perspektivwechsel muss danach an Mt 7,12 zurückgebunden werden.
+11. Haus auf Fels und Sand: Tragfähig, weil es die Logik Hören -> Tun -> Fundament -> Bewährung ordnet. Hier entsteht der Brückenschlag zur gesamten Bergpredigt.
+12. RPG-Finalquest: Didaktisch der wichtigste Transferpunkt. Es bündelt Selbstprüfung, Schutz Schwächerer, Perspektivwechsel und tragfähiges Handeln. Die Tafel sollte hier als Debattenraum genutzt werden, nicht nur als Ergebnisanzeige.
 
 Update v27:
 Die Lernspiele sind nicht mehr als lange Einzelabfragen angelegt, sondern wechseln bewusst zwischen Puzzle, Kurzfragen, Dialog, Wimmelbild, Wort-Rätsel, Zuordnung und RPG-Entscheidung. Dadurch entstehen verschiedene kognitive Zugänge: Textordnung, Wahrnehmung, Begriffsbildung, moralisches Abwägen und Transfer.
