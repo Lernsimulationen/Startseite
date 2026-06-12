@@ -45,13 +45,13 @@
         <div id="teacherAnalytics"></div>
       </section>
       <section class="panel teacher-module-panel">
-        <h2>Stationsmodule bearbeiten</h2>
+        <h2>Lernmodule bearbeiten</h2>
         <p class="privacy-note">Diese Modultexte steuern die Rahmung auf den Tablets und in der Lehrkraftansicht. Die fachlichen Prüfaufgaben bleiben als gesicherte Musteraufgaben erhalten.</p>
         <label class="module-field"><span>Modul</span><select id="moduleSelect"></select></label>
-        <label class="module-field"><span>Titel</span><input id="moduleTitleInput" maxlength="70"></label>
-        <label class="module-field"><span>Lernziel</span><textarea id="moduleObjectiveInput" maxlength="130"></textarea></label>
-        <label class="module-field"><span>Erzählrahmen für Gruppen</span><textarea id="moduleNarrativeInput" maxlength="135"></textarea></label>
-        <label class="module-field"><span>Lehrkraft-Impuls</span><textarea id="moduleTeacherMoveInput" maxlength="115"></textarea></label>
+        <label class="module-field"><span>Titel</span><input id="moduleTitleInput" maxlength="58"></label>
+        <label class="module-field"><span>Lernziel</span><textarea id="moduleObjectiveInput" maxlength="92"></textarea></label>
+        <label class="module-field"><span>Erzählrahmen für Gruppen</span><textarea id="moduleNarrativeInput" maxlength="96"></textarea></label>
+        <label class="module-field"><span>Lehrkraft-Impuls</span><textarea id="moduleTeacherMoveInput" maxlength="80"></textarea></label>
         <div class="teacher-actions"><button class="comic-button" id="saveModule" type="button">Modul speichern</button><button class="comic-button change-group" id="resetModule" type="button">Standard wiederherstellen</button></div>
         <p class="feedback bad hidden" id="moduleError"></p>
       </section>
@@ -72,13 +72,29 @@
         <p class="privacy-note">Keine Namen oder personenbezogenen Daten eintragen.</p>
       </section>
       <section class="panel">
+        <h2>Feedbackkarte nach Station</h2>
+        <label class="module-field"><span>Station</span><select id="feedbackSectorSelect"></select></label>
+        <textarea class="prompt-input" id="feedbackInput" maxlength="300" placeholder="Kurzes Feedback, das nach der Station auf Tablets erscheint ..."></textarea>
+        <button class="comic-button" id="sendFeedback" type="button">Feedback speichern</button>
+        <p class="privacy-note">Bleibt anonym und gilt für diese Sitzung.</p>
+      </section>
+      <section class="panel teacher-gallery-panel">
+        <h2>Produktgalerie</h2>
+        <p class="privacy-note">Anonyme Merksätze der Gruppen. Vor dem Vorlesen bitte fachlich prüfen.</p>
+        <div class="product-gallery" id="productGallery"></div>
+      </section>
+      <section class="panel teacher-diagnostics-panel">
+        <h2>Diagnose</h2>
+        <p class="privacy-note">Gezählt werden nur Fehlversuche nach Station und Aufgabentyp, keine Namen.</p>
+        <div id="diagnosticsView"></div>
+      </section>
+      <section class="panel">
         <h2>Weglogik</h2>
         <div class="idea-list">
-          <p><b>1. Hören:</b> Seligpreisungen als Zuspruch und Umwertung.</p>
-          <p><b>2. Wirken:</b> Salz und Licht als Verantwortung in der Welt.</p>
-          <p><b>3. Prüfen:</b> Feindesliebe als radikale Ethik ohne Schutzlosigkeit.</p>
-          <p><b>4. Abwägen:</b> Sorge und Vertrauen zwischen Gelassenheit und Verantwortung.</p>
-          <p><b>5. Bündeln:</b> Goldene Regel als Transfer in heutige Entscheidungen.</p>
+          <p><b>1. Zuspruch:</b> Seligpreisungen als Umwertung von Stärke, Armut, Frieden und Gerechtigkeit.</p>
+          <p><b>2. Zuspitzung:</b> Antithesen als Tiefenprüfung von Gewalt, Wahrhaftigkeit, Vergeltung und Feindesliebe.</p>
+          <p><b>3. Vertrauen:</b> Vaterunser als Sprache von Reich Gottes, Brot, Schuld und Bewahrung.</p>
+          <p><b>4. Entscheidung:</b> Goldene Regel und Haus auf Fels als Transfer ins tragfähige Handeln.</p>
         </div>
       </section>
       <section class="panel">
@@ -88,7 +104,7 @@
       </section>
     </section>
   </main>
-  <div class="version-badge">Version v20</div>
+  <div class="version-badge">Version v23</div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="shared.js"></script><script src="lehrkraft.js"></script>
 </body>
 </html>

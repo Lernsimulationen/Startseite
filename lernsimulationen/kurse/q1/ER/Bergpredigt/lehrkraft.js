@@ -16,17 +16,17 @@ async function loadTeacherTasks(){
 
 function taskSolution(task){
   if(!task)return "";
-  if(task.type==="choice")return task.answers?.[task.correct]||"";
-  if(task.type==="mark")return(task.correct||[]).map(index=>task.answers[index]).join(" · ");
-  if(task.type==="order")return(task.correct||[]).join(" → ");
-  if(task.type==="match"||task.type==="matrix")return(task.items||[]).map(([statement,category])=>`${statement} = ${category}`).join(" · ");
+  if(["choice","case","conflict","decode","rpg","trust"].includes(task.type))return task.answers?.[task.correct]||"";
+  if(["mark","quest"].includes(task.type))return(task.correct||[]).map(index=>task.answers[index]).join(" · ");
+  if(["order","sort","puzzle","logic"].includes(task.type))return(task.correct||[]).join(" → ");
+  if(["match","matrix","cards","compass"].includes(task.type))return(task.items||[]).map(([statement],index)=>`${statement} = ${task.correct?.[index]||""}`).join(" · ");
   if(task.type==="evidence")return`These: ${task.claims?.[task.correct?.[0]]||""} · Beleg: ${task.evidence?.[task.correct?.[1]]||""}`;
   if(task.type==="reflection")return"Offene Gruppennotiz ohne Zeichenminimum.";
   return"Keine Musterlösung hinterlegt.";
 }
 
 function taskTypeLabel(type){
-  return{choice:"Einzelauswahl",mark:"Mehrfachauswahl",order:"Reihenfolge",match:"Zuordnung",matrix:"Einordnung",evidence:"These und Beleg",reflection:"Reflexion"}[type]||type;
+  return{choice:"Einzelauswahl",mark:"Mehrfachauswahl",order:"Reihenfolge",match:"Zuordnung",matrix:"Einordnung",evidence:"These und Beleg",reflection:"Reflexion",sort:"Seligpreisungen ordnen",cards:"Karten deuten",case:"Fall anwenden",quest:"Moralquest",conflict:"Konfliktkarten",puzzle:"Vaterunser-Puzzle",compass:"Bitten-Kompass",trust:"Vertrauensquest",decode:"Entschlüsselung",logic:"Logikrätsel",rpg:"RPG-Finalquest"}[type]||type;
 }
 
 function renderTeacherTaskSelect(){
@@ -62,6 +62,12 @@ function renderModuleSelect(){
   if(!select)return;
   select.innerHTML=SECTORS.map((sector,index)=>`<option value="${sector.id}">${index+1}. ${escapeHtml(sector.name)}</option>`).join("");
   select.value=currentModuleId;
+}
+function renderFeedbackSelect(){
+  const select=document.getElementById("feedbackSectorSelect");
+  if(!select)return;
+  select.innerHTML=SECTORS.map(sector=>`<option value="${sector.id}">${escapeHtml(sector.name)}</option>`).join("");
+  select.value=SECTORS[0].id;
 }
 
 function renderModuleEditor(){
@@ -99,6 +105,18 @@ function renderAnalytics(groups,completion){
   const ready=sectorGroupCounts(rows).get("nazareth")?.size||0,target=effectiveGroupTargetFromRows(rows);
   document.getElementById("teacherAnalytics").innerHTML=`<div class="analytics-grid"><span><b>${activeGroups}</b> aktive Gruppen</span><span><b>${excludedGroups(rows).size}</b> ausgeschlossen</span><span><b>${avg}</b> Ø Stationen</span><span><b>${ready}/${target}</b> finale Beiträge</span><span><b>${bottleneck?.sector.name||"n/a"}</b> Engstelle</span></div>`;
 }
+function renderProductGallery(){
+  const gallery=document.getElementById("productGallery");
+  if(!gallery)return;
+  const products=productRows(rows).slice(-18).reverse();
+  gallery.innerHTML=products.length?products.map(item=>{const sector=SECTORS.find(s=>s.id===item.sector);return`<article><p class="comic-kicker">${escapeHtml(sector?.name||item.sector)}</p><p>${escapeHtml(item.text)}</p><small>${escapeHtml(item.group)}</small></article>`}).join(""):"<p>Noch keine Merksätze eingegangen.</p>";
+}
+function renderDiagnostics(){
+  const view=document.getElementById("diagnosticsView");
+  if(!view)return;
+  const diagnostics=diagnosticSummary(rows);
+  view.innerHTML=diagnostics.length?`<div class="diagnostic-list">${diagnostics.map(item=>{const sector=SECTORS.find(s=>s.id===item.sector);return`<div><b>${escapeHtml(sector?.name||item.sector)} · ${escapeHtml(taskTypeLabel(item.type))}</b><span>${item.count} Fehlversuche · ${item.groups.size} Gruppen</span></div>`}).join("")}</div>`:"<p>Keine Fehlversuche gemeldet.</p>";
+}
 
 function renderGroups(){
   locked=isSessionLocked(rows);
@@ -120,13 +138,15 @@ function renderGroups(){
   document.getElementById("teacherGroups").innerHTML+=`<div class="coop-summary">${SECTORS.map(sector=>{const state=completion.get(sector.id);return`<span class="${state.complete?"done":""}">${sector.name}: ${state.count}/${state.required}</span>`}).join("")}</div>`;
   document.querySelectorAll("[data-group-toggle]").forEach(button=>button.addEventListener("click",()=>toggleGroupExclusion(button.dataset.groupToggle)));
   renderAnalytics(groups,completion);
+  renderProductGallery();
+  renderDiagnostics();
   const ready=bossFinaleReady(rows);
   document.getElementById("finaleGate").classList.toggle("hidden",ready);
   document.getElementById("startFinale").disabled=!ready;
   const done=completedSectorIds(rows);
   document.getElementById("manualUnlock").innerHTML=SECTORS.map(sector=>`<button class="comic-button ${done.has(sector.id)?"done-button":""}" data-unlock="${sector.id}" ${done.has(sector.id)?"disabled":""}>${done.has(sector.id)?"✓ ":""}${sector.name}</button>`).join("");
   document.querySelectorAll("[data-unlock]").forEach(button=>button.addEventListener("click",()=>unlock(button.dataset.unlock)));
-  renderModuleEditor();
+  if(!document.activeElement?.closest?.(".teacher-module-panel"))renderModuleEditor();
   renderTeacherTask();
 }
 
@@ -148,6 +168,13 @@ async function sendPrompt(){
   input.value="";
   await refresh();
 }
+async function sendFeedback(){
+  const sector=document.getElementById("feedbackSectorSelect").value,text=document.getElementById("feedbackInput").value.trim().replace(/\s+/g," ").slice(0,300);
+  if(!sector||!text)return;
+  await markDone(db,{session_id:sessionId,gruppen_id:"lehrkraft",sektor:"control",status:"erledigt",event_type:"prompt",payload:`feedback:${sector}:${text}`},{teacherPin});
+  document.getElementById("feedbackInput").value="";
+  await refresh();
+}
 async function toggleGroupExclusion(group){
   const action=isGroupExcluded(rows,group)?"include":"exclude";
   await markDone(db,{session_id:sessionId,gruppen_id:group,sektor:"control",status:"erledigt",event_type:"groups",payload:`group:${action}`},{teacherPin});
@@ -155,12 +182,12 @@ async function toggleGroupExclusion(group){
 }
 async function saveModule(){
   const error=document.getElementById("moduleError"),data={
-    title:document.getElementById("moduleTitleInput").value.trim().slice(0,70),
-    objective:document.getElementById("moduleObjectiveInput").value.trim().slice(0,130),
-    narrative:document.getElementById("moduleNarrativeInput").value.trim().slice(0,135),
-    teacherMove:document.getElementById("moduleTeacherMoveInput").value.trim().slice(0,115)
+    title:document.getElementById("moduleTitleInput").value.trim().slice(0,58),
+    objective:document.getElementById("moduleObjectiveInput").value.trim().slice(0,92),
+    narrative:document.getElementById("moduleNarrativeInput").value.trim().slice(0,96),
+    teacherMove:document.getElementById("moduleTeacherMoveInput").value.trim().slice(0,80)
   };
-  const encoded=encodeURIComponent(JSON.stringify(data)),payload=`module:${currentModuleId}:${encoded}`;
+  const payload=`module:${currentModuleId}:${JSON.stringify(data)}`;
   if(payload.length>420){error.textContent="Das Modul ist noch zu lang. Bitte die Texte etwas kürzen.";error.classList.remove("hidden");return}
   await markDone(db,{session_id:sessionId,gruppen_id:`module-${currentModuleId}`,sektor:"control",status:"erledigt",event_type:"groups",payload},{teacherPin});
   await refresh();
@@ -171,7 +198,7 @@ async function resetModule(){
 }
 function subscribe(){if(!db)return;if(liveChannel)db.removeChannel(liveChannel);liveChannel=db.channel(`teacher-${sessionId}`).on("postgres_changes",{event:"INSERT",schema:"public",table:"fortschritt",filter:`session_id=eq.${sessionId}`},()=>refresh()).subscribe()}
 async function startSession(){const wantedMode=document.getElementById("workModeSelect").value||"standard";sessionId=randomSession();rows=[];setActiveSession(sessionId);history.replaceState({},"",`?session=${sessionId}`);renderLinks();renderGroups();document.getElementById("workModeSelect").value=wantedMode;subscribe();await saveGroupCount();await saveWorkMode();await setPhase("Einzelarbeit")}
-function openDashboard(){document.getElementById("teacherLogin").classList.add("hidden");document.getElementById("teacherDashboard").classList.remove("hidden");renderLinks();renderModuleSelect();loadTeacherTasks();refresh();subscribe()}
+function openDashboard(){document.getElementById("teacherLogin").classList.add("hidden");document.getElementById("teacherDashboard").classList.remove("hidden");renderLinks();renderModuleSelect();renderFeedbackSelect();loadTeacherTasks();refresh();subscribe()}
 
 document.getElementById("pinForm").addEventListener("submit",event=>{event.preventDefault();teacherPin=document.getElementById("pinInput").value;if(teacherPin!==String(window.BERG_CONFIG?.TEACHER_PIN||"2468")){document.getElementById("pinError").classList.remove("hidden");return}openDashboard()});
 document.getElementById("newSession").addEventListener("click",startSession);
@@ -180,6 +207,7 @@ document.getElementById("saveWorkMode").addEventListener("click",saveWorkMode);
 document.getElementById("toggleLock").addEventListener("click",toggleLock);
 document.getElementById("startFinale").addEventListener("click",sendFinale);
 document.getElementById("sendPrompt").addEventListener("click",sendPrompt);
+document.getElementById("sendFeedback").addEventListener("click",sendFeedback);
 document.querySelectorAll("[data-phase]").forEach(button=>button.addEventListener("click",()=>setPhase(button.dataset.phase)));
 document.getElementById("prevTeacherTask").addEventListener("click",()=>stepTeacherTask(-1));
 document.getElementById("nextTeacherTask").addEventListener("click",()=>stepTeacherTask(1));

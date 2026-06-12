@@ -1,0 +1,143 @@
+Bergpredigt-Expedition: Serious-Game-Lernmodule
+Version: v23
+
+Kurzidee
+Die App inszeniert die Bergpredigt nicht als lineares Arbeitsblatt, sondern als kooperatives Serious Game. Gruppen arbeiten an vier Modulen, die an Mt 5-7 orientiert sind. Jedes Modul enthält drei Lernspiele mit steigender Schwierigkeit. Die Spiele sind bewusst nur mithilfe des Bibeltextes lösbar: Die Gruppen müssen Textsignale erkennen, deuten und auf Entscheidungssituationen anwenden.
+
+Die Tafel hat einen echten Mehrwert:
+- Sie zeigt nicht nur, welche Module abgeschlossen wurden.
+- Sie aggregiert anonym die Klassenwerte Frieden, Gerechtigkeit und Vertrauen.
+- Sie zeigt freigeschaltete Sammelkarten.
+- Sie sammelt Merksätze und Argumentkarten für das Plenum.
+- Sie übersetzt Fehlversuche als didaktische Diagnose: "Hier müssen wir gemeinsam genauer hinschauen."
+
+
+SPIELMECHANIK
+
+Werte
+1. Frieden: Wird gestärkt, wenn Gruppen Versöhnung, Gewaltunterbrechung und Feindesliebe tragfähig deuten.
+2. Gerechtigkeit: Wird gestärkt, wenn Gruppen Unrecht erkennen, Schutzperspektiven einbeziehen und Verantwortung formulieren.
+3. Vertrauen: Wird gestärkt, wenn Gruppen Zuspruch, Gebet, Versorgung und Handeln aus Vertrauen verstehen.
+
+Ränge
+Die Gruppen steigen über Punkte vom Suchenden zum Felsbauer auf:
+Suchender -> Hörender -> Brückenbauer -> Friedensstifter -> Felsbauer.
+
+Sammelkarten
+Die Gruppen sammeln:
+- Seligpreisungs-Karten
+- Gleichnis-Karten
+- Tugend-Karten
+
+Die Karten sind nicht nur Belohnung, sondern Gesprächsanlässe: Sie bündeln zentrale Denkbewegungen der Bergpredigt.
+
+
+MODUL 1: SELIGPREISUNGEN
+
+Bibeltextbasis
+Mt 5,3-12
+
+Didaktische Leitidee
+Die Seligpreisungen eröffnen die Bergpredigt mit Zuspruch und Umwertung. Lernende sollen erkennen: Jesus beginnt nicht mit moralischem Leistungsdruck, sondern mit einer neuen Sicht auf Menschen, die arm, leidend, sanftmütig, barmherzig oder friedensstiftend sind.
+
+Spiel 1: Seligpreisungen ordnen
+Die Gruppen bringen ausgewählte Seligpreisungen in Textnähe-Reihenfolge. Dadurch müssen sie den Bibeltext tatsächlich nutzen.
+
+Spiel 2: Seligpreisungs-Karten deuten
+Die Gruppen ordnen Begriffen wie Gerechtigkeit, Barmherzigkeit und Frieden tragfähige Deutungen zu.
+
+Spiel 3: Fallentscheidung am Berg
+Die Gruppen übertragen die Seligpreisungen auf eine soziale Entscheidung: Wie geht man mit Ausgrenzung, Schutz und gerechter Klärung um?
+
+Tafel-Mehrwert
+Die Klasse sieht, ob vor allem Frieden, Gerechtigkeit oder Vertrauen gestärkt wurde. Im Plenum kann gefragt werden: Ist "selig" eher Trost, Anspruch oder Umwertung?
+
+
+MODUL 2: ANTITHESEN
+
+Bibeltextbasis
+Mt 5,21-48
+
+Didaktische Leitidee
+Die Antithesen zeigen Jesu Zuspitzung: "Ihr habt gehört ... ich aber sage euch." Es geht nicht um Regelverschärfung als Selbstzweck, sondern um die Wurzel von Gewalt, Unwahrhaftigkeit, Vergeltung und Feindschaft.
+
+Spiel 1: "Ihr habt gehört / Ich aber sage"-Zuordnung
+Die Gruppen ordnen Jesu Zuspitzungen den Themen Töten, Schwören, Vergeltung und Feindesliebe zu.
+
+Spiel 2: Moralquest Streit im Tor
+Die Gruppen wählen mehrere Schritte, die Schutz, Wahrheit und Versöhnung verbinden.
+
+Spiel 3: Konfliktkarten Feindesliebe
+Die Gruppen entscheiden zwischen Rache, Verharmlosung, Beschämung und einer anspruchsvollen Friedenskarte.
+
+Tafel-Mehrwert
+Die anonymen Entscheidungen erzeugen Gesprächsstoff: Wo wird Frieden mit Verharmlosung verwechselt? Wo braucht Gerechtigkeit klare Grenzen?
+
+
+MODUL 3: VATERUNSER
+
+Bibeltextbasis
+Mt 6,9-13
+
+Didaktische Leitidee
+Das Vaterunser wird nicht als auswendig zu lernender Text behandelt, sondern als Struktur von Vertrauen und Verantwortung: Gottes Name, Reich und Wille; dann Brot, Schuld, Versuchung und Rettung.
+
+Spiel 1: Vaterunser-Puzzle
+Die Gruppen ordnen zentrale Bitten in eine sinnvolle Reihenfolge.
+
+Spiel 2: Bitten-Kompass
+Die Gruppen deuten Bitten als Hoffnung, Versorgung, Vergebung und Bewahrung.
+
+Spiel 3: Vertrauensquest
+Die Gruppen prüfen, wie Vertrauen konkret wird, ohne Verantwortung aufzugeben.
+
+Tafel-Mehrwert
+Der Klassen-Kompass zeigt, ob Vertrauen nur als Gefühl verstanden wurde oder mit gerechtem und friedlichem Handeln verbunden wird.
+
+
+MODUL 4: GOLDENE REGEL UND HAUS AUF FELS/SAND
+
+Bibeltextbasis
+Mt 7,12 und Mt 7,24-27
+
+Didaktische Leitidee
+Die Goldene Regel bündelt den Perspektivwechsel. Das Gleichnis vom Haus auf Fels und Sand bündelt den Unterschied zwischen Hören und Tun. Damit eignet sich das Modul als Abschluss und Transfer.
+
+Spiel 1: Goldene Regel entschlüsseln
+Die Gruppen identifizieren die tragfähige Deutung: aktiver Perspektivwechsel.
+
+Spiel 2: Haus auf Fels und Sand als Logikrätsel
+Die Gruppen ordnen die Gleichnislogik: hören, tun, auf Fels bauen, Sturm bestehen.
+
+Spiel 3: RPG-Finalquest Felsbauer
+Die Gruppen treffen eine komplexe Entscheidung zu Konflikt, Ressourcen und Ausgrenzung.
+
+Tafel-Mehrwert
+Im Finale erscheinen zwei Positionen zur Leitfrage:
+1. Die Bergpredigt ist ein realistischer Kompass für gerechtes Handeln.
+2. Die Bergpredigt ist eine radikale Zumutung, die unsere Maßstäbe stört.
+
+Gruppen senden anonym Argumentkarten. Die Lehrkraft kann daraus ein Plenumsgespräch moderieren.
+
+
+KRITISCHE DIDAKTISCHE EINORDNUNG
+
+Stärken
+- Die Spiele erzwingen Textbezug, weil richtige Lösungen an konkrete Bibelstellen gebunden sind.
+- Die Tafel schafft gemeinsame Sichtbarkeit ohne personenbezogene Daten.
+- Moralpunkte dienen nicht als billige Belohnung, sondern machen Deutungsschwerpunkte sichtbar.
+- Kooperativer Modus stärkt Interdependenz: Ein Modul gilt erst als geöffnet, wenn alle aktiven Gruppen beigetragen haben.
+
+Risiken
+- Gamification darf die Bergpredigt nicht trivialisieren. Deshalb braucht jede Auswertung eine Plenumsfrage.
+- "Frieden" darf nicht mit Konfliktvermeidung gleichgesetzt werden. Die Diagnose und Antithesen-Spiele halten Schutz und Gerechtigkeit mit im Blick.
+- Die Goldene Regel kann oberflächlich als "nett sein" missverstanden werden. Das Fels/Sand-Modul zwingt zum Handeln und Prüfen.
+
+Lehrkraft-Hinweise
+- Nach Modul 1 klären: Wer wird in den Seligpreisungen überraschend stark gemacht?
+- Nach Modul 2 klären: Wo schützt Feindesliebe vor Rache, ohne Unrecht zu verharmlosen?
+- Nach Modul 3 klären: Was heißt Vertrauen, wenn es um Brot, Schuld und Bewahrung geht?
+- Nach Modul 4 klären: Welche Entscheidung wäre Fels, welche wäre Sand?
+
+Datenschutz
+Die App speichert keine Namen, E-Mails oder personenbezogenen Daten. Genutzt werden nur session_id, gruppen_id, sektor, status, event_type und kurze payloads für Punkte, Karten, Produkte oder Debattenbeiträge. Ausgeschlossene Gruppen zählen nicht in Klassenwerte, Kartenfortschritt und kooperative Öffnung hinein.
