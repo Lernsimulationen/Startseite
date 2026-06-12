@@ -43,7 +43,7 @@ const DEBATE_FINALE={
     "Gerechtigkeit ist in der Bergpredigt ein roter Faden."
   ]
 };
-const APP_VERSION="v26";
+const APP_VERSION="v27";
 const WORK_MODES={
   cooperative:{id:"cooperative",name:"Kooperativ",hint:"Module öffnen sich erst, wenn alle aktiven Gruppen ihren Beitrag geliefert haben."},
   standard:{id:"standard",name:"Nicht kooperativ",hint:"Eine aktive Gruppe kann ein Modul für die Tafel freischalten."}
@@ -79,8 +79,9 @@ function excludedGroups(rows){const excluded=new Set();controlRows(rows).filter(
 function isGroupExcluded(rows,groupId){return excludedGroups(rows).has(groupId)}
 function effectiveGroupTargetFromRows(rows){return Math.max(1,groupTargetFromRows(rows)-excludedGroups(rows).size)}
 function activePhase(rows){const last=controlRows(rows).filter(row=>row.event_type==="phase").at(-1);return last?.payload||"Startphase"}
-function activePrompt(rows){return controlRows(rows).filter(row=>row.event_type==="prompt"&&row.payload&&!/^(feedback|product|miss|score|card|debate):/.test(String(row.payload))).at(-1)?.payload||""}
+function activePrompt(rows){return controlRows(rows).filter(row=>row.event_type==="prompt"&&row.payload&&!/^(feedback|product|miss|score|card|debate|focus):/.test(String(row.payload))).at(-1)?.payload||""}
 function activeWorkMode(rows){const last=controlRows(rows).filter(row=>row.event_type==="manual"&&String(row.payload||"").startsWith("mode:")).at(-1),mode=String(last?.payload||"mode:standard").replace("mode:","");return WORK_MODES[mode]?mode:"standard"}
+function activeFocus(rows){const focus=controlRows(rows).filter(row=>row.event_type==="prompt"&&String(row.payload||"").startsWith("focus:")).at(-1);return String(focus?.payload||"").replace("focus:","")}
 function groupAvatarsFromRows(rows){const avatars=new Map(),excluded=excludedGroups(rows);controlRows(rows).filter(row=>row.event_type==="manual"&&String(row.payload||"").startsWith("avatar:")).forEach(row=>{const avatar=String(row.payload).replace("avatar:","");if(AVATARS.some(item=>item.id===avatar)&&row.gruppen_id!=="lehrkraft"&&!excluded.has(row.gruppen_id))avatars.set(row.gruppen_id,avatar)});return avatars}
 function avatarById(id){return AVATARS.find(avatar=>avatar.id===id)||AVATARS[0]}
 function sectorRequirement(sector,rows){return activeWorkMode(rows)==="cooperative"?effectiveGroupTargetFromRows(rows):1}
@@ -92,7 +93,7 @@ function bossFinaleReady(rows){const completion=sectorCompletion(rows),groups=se
 function moduleOverrides(rows){const overrides=new Map();controlRows(rows).filter(row=>row.event_type==="groups"&&String(row.payload||"").startsWith("module:")).forEach(row=>{const payload=String(row.payload||""),rest=payload.slice("module:".length),separator=rest.indexOf(":"),id=rest.slice(0,separator),raw=rest.slice(separator+1);if(!id)return;if(raw==="reset"){overrides.delete(id);return}try{overrides.set(id,JSON.parse(raw))}catch{try{overrides.set(id,JSON.parse(decodeURIComponent(raw)))}catch{}}});return overrides}
 function moduleFor(id,rows=[]){const base=DEFAULT_MODULES.find(module=>module.id===id)||DEFAULT_MODULES[0],override=moduleOverrides(rows).get(id)||{};return{...base,...override}}
 function sortTasksByLearningPath(tasks){const order=new Map(SECTORS.map((sector,index)=>[sector.id,index]));return tasks.sort((a,b)=>(order.get(a.sector)??99)-(order.get(b.sector)??99)||((a.difficulty||1)-(b.difficulty||1)))}
-function taskSkillLabel(task){return{sort:"Ordnen",cards:"Karten deuten",case:"Fall anwenden",match:"Zuordnen",quest:"Moralquest",conflict:"Konfliktkarten",puzzle:"Puzzle",compass:"Bitten-Kompass",trust:"Vertrauensquest",decode:"Entschlüsseln",logic:"Logikrätsel",rpg:"Finalquest"}[task?.type]||"Spiel bearbeiten"}
+function taskSkillLabel(task){return{sort:"Ordnen",cards:"Karten deuten",case:"Fall anwenden",match:"Zuordnen",quest:"Moralquest",conflict:"Konfliktkarten",puzzle:"Puzzle",compass:"Bitten-Kompass",trust:"Vertrauensquest",decode:"Entschlüsseln",logic:"Logikrätsel",rpg:"Finalquest",mini:"Kurzentscheidungen",word:"Wort-Rätsel",dialog:"Dialog",wimmel:"Wimmelbild"}[task?.type]||"Spiel bearbeiten"}
 function rankForScore(total){return RANKS.slice().reverse().find(rank=>total>=rank.min)||RANKS[0]}
 function parseScorePayload(payload){const parts=String(payload||"").split(":");if(parts[0]!=="score")return null;const values={frieden:0,gerechtigkeit:0,vertrauen:0};String(parts[2]||"").split(",").forEach(pair=>{const[key,value]=pair.split("=");if(key in values)values[key]=Number(value)||0});return{taskId:parts[1],values}}
 function scoreRows(rows){const excluded=excludedGroups(rows);return rows.filter(row=>row.event_type==="prompt"&&String(row.payload||"").startsWith("score:")&&!excluded.has(row.gruppen_id)).map(row=>({group:row.gruppen_id,...parseScorePayload(row.payload)})).filter(item=>item.values)}

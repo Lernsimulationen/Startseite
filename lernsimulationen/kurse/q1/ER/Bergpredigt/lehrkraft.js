@@ -17,6 +17,10 @@ async function loadTeacherTasks(){
 function taskSolution(task){
   if(!task)return "";
   if(["choice","case","conflict","decode","rpg","trust"].includes(task.type))return task.answers?.[task.correct]||"";
+  if(task.type==="mini")return(task.questions||[]).map(item=>item.answers[item.correct]).join(" · ");
+  if(task.type==="word")return task.answer||"";
+  if(task.type==="dialog")return task.answers?.[task.correct]||"";
+  if(task.type==="wimmel")return(task.hotspots||[]).filter(item=>item.correct).map(item=>item.label).join(" · ");
   if(["mark","quest"].includes(task.type))return(task.correct||[]).map(index=>task.answers[index]).join(" · ");
   if(["order","sort","puzzle","logic"].includes(task.type))return(task.correct||[]).join(" → ");
   if(["match","matrix","cards","compass"].includes(task.type))return(task.items||[]).map(([statement],index)=>`${statement} = ${task.correct?.[index]||""}`).join(" · ");
@@ -26,7 +30,7 @@ function taskSolution(task){
 }
 
 function taskTypeLabel(type){
-  return{choice:"Einzelauswahl",mark:"Mehrfachauswahl",order:"Reihenfolge",match:"Zuordnung",matrix:"Einordnung",evidence:"These und Beleg",reflection:"Reflexion",sort:"Seligpreisungen ordnen",cards:"Karten deuten",case:"Fall anwenden",quest:"Moralquest",conflict:"Konfliktkarten",puzzle:"Vaterunser-Puzzle",compass:"Bitten-Kompass",trust:"Vertrauensquest",decode:"Entschlüsselung",logic:"Logikrätsel",rpg:"RPG-Finalquest"}[type]||type;
+  return{choice:"Einzelauswahl",mark:"Mehrfachauswahl",order:"Reihenfolge",match:"Zuordnung",matrix:"Einordnung",evidence:"These und Beleg",reflection:"Reflexion",sort:"Seligpreisungen ordnen",cards:"Karten deuten",case:"Fall anwenden",quest:"Moralquest",conflict:"Konfliktkarten",puzzle:"Puzzle-Spiel",compass:"Bitten-Kompass",trust:"Vertrauensquest",decode:"Entschlüsselung",logic:"Logikrätsel",rpg:"RPG-Finalquest",mini:"Kurzfragen-Sequenz",word:"Wort-Rätsel",dialog:"Dialogspiel",wimmel:"Wimmelbild"}[type]||type;
 }
 
 function renderTeacherTaskSelect(){
@@ -144,14 +148,15 @@ function renderGroups(){
   document.getElementById("finaleGate").classList.toggle("hidden",ready);
   document.getElementById("startFinale").disabled=!ready;
   const done=completedSectorIds(rows);
-  document.getElementById("manualUnlock").innerHTML=SECTORS.map(sector=>`<button class="comic-button ${done.has(sector.id)?"done-button":""}" data-unlock="${sector.id}" ${done.has(sector.id)?"disabled":""}>${done.has(sector.id)?"✓ ":""}${sector.name}</button>`).join("");
-  document.querySelectorAll("[data-unlock]").forEach(button=>button.addEventListener("click",()=>unlock(button.dataset.unlock)));
+  const focus=activeFocus(rows);
+  document.getElementById("manualUnlock").innerHTML=SECTORS.map(sector=>`<button class="comic-button ${focus===sector.id?"done-button":""}" data-focus="${sector.id}">${focus===sector.id?"Fokus: ":""}${sector.name}</button>`).join("");
+  document.querySelectorAll("[data-focus]").forEach(button=>button.addEventListener("click",()=>setBoardFocus(button.dataset.focus)));
   if(!document.activeElement?.closest?.(".teacher-module-panel"))renderModuleEditor();
   renderTeacherTask();
 }
 
 async function refresh(){rows=await readProgress(db,sessionId);renderGroups()}
-async function unlock(sector){await markDone(db,{session_id:sessionId,gruppen_id:"lehrkraft",sektor,status:"erledigt",event_type:"manual"},{teacherPin});await refresh()}
+async function setBoardFocus(sector){await markDone(db,{session_id:sessionId,gruppen_id:"lehrkraft",sektor:"control",status:"erledigt",event_type:"prompt",payload:`focus:${sector}`},{teacherPin});const module=moduleFor(sector,rows);await markDone(db,{session_id:sessionId,gruppen_id:"lehrkraft",sektor:"control",status:"erledigt",event_type:"prompt",payload:`Tafel-Fokus: ${module.title}. Prüft eure Karten und sucht einen Bibelbeleg.`},{teacherPin});await refresh()}
 async function sendFinale(){
   if(!bossFinaleReady(rows)){document.getElementById("finaleGate").classList.remove("hidden");return}
   await markDone(db,{session_id:sessionId,gruppen_id:"lehrkraft",sektor:"finale",status:"erledigt",event_type:"finale"},{teacherPin});
