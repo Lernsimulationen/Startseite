@@ -43,7 +43,7 @@ const DEBATE_FINALE={
     "Gerechtigkeit ist in der Bergpredigt ein roter Faden."
   ]
 };
-const APP_VERSION="v24";
+const APP_VERSION="v25";
 const WORK_MODES={
   cooperative:{id:"cooperative",name:"Kooperativ",hint:"Module öffnen sich erst, wenn alle aktiven Gruppen ihren Beitrag geliefert haben."},
   standard:{id:"standard",name:"Nicht kooperativ",hint:"Eine aktive Gruppe kann ein Modul für die Tafel freischalten."}
