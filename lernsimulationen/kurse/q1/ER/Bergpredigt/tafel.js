@@ -1,5 +1,5 @@
 const db=createDb();let rows=[],doneIds=new Set(),completion=new Map(),sessionId=getActiveSession()||randomSession(),finale=false,locked=false,groupTarget=1,refreshing=false;
-const AVATAR_POINTS=[[10,88],[28,72],[60,37],[81,58],[63,80]];
+const AVATAR_POINTS=[[51,64],[42,60],[60,40],[80,61],[62,82]];
 setActiveSession(sessionId);document.getElementById("sessionLabel").textContent=sessionId;
 function celebrate(sector){const burst=document.getElementById("unlockBurst"),map=document.querySelector(".map-card");burst.innerHTML=`<i>✦</i><i>•</i><b>PLING!</b><span>${sector.name} ist freigeschaltet.</span><i>✦</i><i>•</i>`;burst.classList.remove("hidden");map.classList.add("map-celebrate");setTimeout(()=>{burst.classList.add("hidden");map.classList.remove("map-celebrate")},1800)}
 function showFinale(){document.getElementById("boardFinale").classList.remove("hidden")}

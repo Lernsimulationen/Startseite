@@ -5,25 +5,23 @@
   <header class="topbar"><a class="back-link" href="index.html">← Auswahl</a><span class="brand">Bergpredigt-Expedition · Tafel</span><span class="status-pill"><i class="status-dot"></i><span id="connectionLabel">Startet ...</span></span></header>
   <main class="board-layout">
     <section class="map-card">
-      <img class="map-backdrop" src="assets/images/galilaea-expedition-map-v3.webp" alt="">
+      <img class="map-backdrop" src="assets/images/sermon-mount-board-v1.webp" alt="">
       <div class="unlock-burst hidden" id="unlockBurst" aria-live="polite"></div>
       <button class="comic-button fullscreen-button" id="fullscreenMap" type="button">Karte Vollbild</button>
-      <div class="map-title"><p class="comic-kicker">Bergpredigt</p><h1>Lernweg</h1></div>
+      <div class="map-title"><p class="comic-kicker">Bergpredigt</p><h1>Am Hang</h1></div>
       <svg class="galilee-map" viewBox="0 0 900 700" role="img" aria-labelledby="mapTitle mapDesc">
-        <title id="mapTitle">Interaktive Lernkarte zur Bergpredigt</title><desc id="mapDesc">Vier Themenmodule werden farbig, wenn Gruppen die zugehörigen Aufgaben lösen. Gruppenavatare zeigen den Arbeitsfortschritt auf der Lernroute.</desc>
+        <title id="mapTitle">Interaktive Tafel zur Bergpredigt</title><desc id="mapDesc">Vier Themenmodule liegen als Gesprächskreis über einer Bergpredigt-Szene am Hang. Gruppenavatare zeigen den Arbeitsfortschritt der Gruppen.</desc>
         <defs><clipPath id="medallionClip"><circle r="47"/></clipPath></defs>
-        <path class="route-base" d="M92 618C172 596 205 548 254 500C328 427 418 352 542 260C637 303 729 333 731 407C733 489 664 533 571 558"/>
-        <path class="expedition-route" id="expeditionRoute" pathLength="100" d="M92 618C172 596 205 548 254 500C328 427 418 352 542 260C637 303 729 333 731 407C733 489 664 533 571 558"/>
-        <g class="route-dots"><circle cx="92" cy="618" r="8"/><circle cx="254" cy="500" r="6"/><circle cx="542" cy="260" r="6"/><circle cx="731" cy="407" r="6"/><circle cx="571" cy="558" r="6"/></g>
-        <g class="map-compass" transform="translate(788 114)"><circle r="57"/><path d="M0-46 12-9 0 0-12-9Z"/><path d="M0 46-12 9 0 0 12 9Z"/><path d="M-46 0-9-12 0 0-9 12Z"/><path d="M46 0 9 12 0 0 9-12Z"/><text y="-65">N</text></g>
-        <g class="sector" data-sector="berg" transform="translate(254 500)"><circle class="sector-shadow" r="66"/><circle class="sector-ring" r="61"/><image class="sector-art" href="assets/images/station-berg-beatitudes.webp" x="-53" y="-53" width="106" height="106" clip-path="url(#medallionClip)"/><text class="sector-label" text-anchor="middle" y="89">Seligpreisungen</text><text class="sector-check" x="41" y="-37">✓</text></g>
-        <g class="sector" data-sector="tiberias" transform="translate(542 260)"><circle class="sector-shadow" r="61"/><circle class="sector-ring" r="56"/><image class="sector-art" href="assets/images/station-tiberias-peace.webp" x="-48" y="-48" width="96" height="96" clip-path="url(#medallionClip)"/><text class="sector-label" text-anchor="middle" y="83">Antithesen</text><text class="sector-check" x="37" y="-33">✓</text></g>
-        <g class="sector" data-sector="see" transform="translate(731 407)"><circle class="sector-shadow" r="59"/><circle class="sector-ring" r="54"/><image class="sector-art" href="assets/images/station-see-trust.webp" x="-46" y="-46" width="92" height="92" clip-path="url(#medallionClip)"/><text class="sector-label" text-anchor="middle" y="81">Vaterunser</text><text class="sector-check" x="35" y="-31">✓</text></g>
-        <g class="sector" data-sector="nazareth" transform="translate(571 558)"><circle class="sector-shadow" r="60"/><circle class="sector-ring" r="55"/><image class="sector-art" href="assets/images/station-nazareth-golden-rule.webp" x="-47" y="-47" width="94" height="94" clip-path="url(#medallionClip)"/><text class="sector-label" text-anchor="middle" y="82">Goldene Regel</text><text class="sector-check" x="36" y="-32">✓</text></g>
-        <g class="start-marker" transform="translate(92 618)"><circle r="22"/><text text-anchor="middle" y="6">Start</text></g>
+        <circle class="route-base insight-ring" cx="560" cy="445" r="190"/>
+        <circle class="expedition-route insight-ring" id="expeditionRoute" pathLength="100" cx="560" cy="445" r="190"/>
+        <g class="map-compass theme-seal" transform="translate(792 112)"><circle r="57"/><text y="-8">Mt</text><text y="24">5-7</text></g>
+        <g class="sector" data-sector="berg" transform="translate(375 430)"><circle class="sector-shadow" r="66"/><circle class="sector-ring" r="61"/><image class="sector-art" href="assets/images/station-berg-beatitudes.webp" x="-53" y="-53" width="106" height="106" clip-path="url(#medallionClip)"/><text class="sector-label" text-anchor="middle" y="89">Seligpreisungen</text><text class="sector-check" x="41" y="-37">✓</text></g>
+        <g class="sector" data-sector="tiberias" transform="translate(540 275)"><circle class="sector-shadow" r="61"/><circle class="sector-ring" r="56"/><image class="sector-art" href="assets/images/station-tiberias-peace.webp" x="-48" y="-48" width="96" height="96" clip-path="url(#medallionClip)"/><text class="sector-label" text-anchor="middle" y="83">Antithesen</text><text class="sector-check" x="37" y="-33">✓</text></g>
+        <g class="sector" data-sector="see" transform="translate(724 430)"><circle class="sector-shadow" r="59"/><circle class="sector-ring" r="54"/><image class="sector-art" href="assets/images/station-see-trust.webp" x="-46" y="-46" width="92" height="92" clip-path="url(#medallionClip)"/><text class="sector-label" text-anchor="middle" y="81">Vaterunser</text><text class="sector-check" x="35" y="-31">✓</text></g>
+        <g class="sector" data-sector="nazareth" transform="translate(555 590)"><circle class="sector-shadow" r="60"/><circle class="sector-ring" r="55"/><image class="sector-art" href="assets/images/station-nazareth-golden-rule.webp" x="-47" y="-47" width="94" height="94" clip-path="url(#medallionClip)"/><text class="sector-label" text-anchor="middle" y="82">Goldene Regel</text><text class="sector-check" x="36" y="-32">✓</text></g>
       </svg>
       <div class="group-avatar-layer" id="groupAvatarLayer" aria-hidden="true"></div>
-      <div class="map-cartouche"><b>Lernroute</b><span>Didaktische Stationen, keine exakte Pilgerroute</span></div>
+      <div class="map-cartouche"><b>Lehrkreis</b><span>Ein Ort der Bergpredigt, vier Deutungszugänge</span></div>
     </section>
     <aside class="side-panel">
       <section class="panel"><p class="comic-kicker">Live-Fortschritt</p><h2><span id="doneCount">0</span> / 4 Module</h2><p class="session-note"><span id="groupTargetLabel">1 Gruppe</span> im Spiel</p><div class="progress-track"><div class="progress-bar" id="progressBar"></div></div><div class="sector-list" id="sectorList"></div></section>
@@ -31,15 +29,15 @@
       <section class="panel shared-card-panel"><h2>Kartenwand</h2><div id="cardWall"></div></section>
       <section class="panel shared-plenum-panel"><h2>Plenumsarena</h2><div id="plenumArena"></div></section>
       <section class="panel avatar-progress-panel"><h2>Gruppenreise</h2><div class="avatar-progress-list" id="avatarProgressList"></div></section>
-      <section class="panel"><h2>So geht's</h2><p>Je nach Modus öffnen Gruppen Stationen gemeinsam oder eigenständig. Die Gruppenavatare zeigen, wie weit jede Gruppe auf der Lernroute ist.</p><p class="session-note">Sitzung: <b id="sessionLabel"></b></p></section>
-      <section class="panel map-note"><h2>Fachlicher Hinweis</h2><p>Die Karte ist eine Lernlandschaft zur Bergpredigt. Sie zeigt keine historische Städtefolge, sondern eine innere Dramaturgie aus Mt 5-7: Zuspruch, Antithesen, Gebet/Vertrauen und ethische Bündelung.</p></section>
+      <section class="panel"><h2>So geht's</h2><p>Je nach Modus öffnen Gruppen Module gemeinsam oder eigenständig. Die Gruppenavatare zeigen, wie weit jede Gruppe im Lehrkreis ist.</p><p class="session-note">Sitzung: <b id="sessionLabel"></b></p></section>
+      <section class="panel map-note"><h2>Fachlicher Hinweis</h2><p>Die Tafel zeigt bewusst einen Ort: Die Bergpredigt wird als gemeinsamer Lehrraum gelesen. Die vier Module ordnen Mt 5-7 didaktisch: Zuspruch, Antithesen, Gebet/Vertrauen und ethische Bündelung.</p></section>
       <section class="panel privacy-note"><b>Datenschutz:</b> Es werden nur eine frei gewählte <code>gruppen_id</code>, der Sektor und der Status <code>erledigt</code> gespeichert. Keine Namen, E-Mails oder personenbezogenen Daten.</section>
     </aside>
   </main>
   <section class="lock-overlay hidden" id="boardLock" aria-live="polite"><article><p class="comic-kicker">Pause</p><h1>Expedition gesperrt</h1><p>Die Lehrkraft hat die Gruppenphase kurz angehalten.</p></article></section>
   <section class="finale-overlay hidden" id="boardFinale" role="dialog" aria-modal="true" aria-labelledby="finaleTitle">
-<article class="finale-card"><p class="comic-kicker">Gemeinsames Finale</p><h1 id="finaleTitle">Felsbauer-Finale!</h1><p>Ihr habt den Lernweg erschlossen: Zuspruch hören, Konflikte prüfen, Vertrauen beten und Perspektivwechsel tun.</p><h2>Leitfrage</h2><p class="final-question">Welche Aussage der Bergpredigt ist heute am unbequemsten, aber am wichtigsten?</p><button class="comic-button" id="closeFinale">Karte weiter betrachten</button></article>
+<article class="finale-card"><p class="comic-kicker">Gemeinsames Finale</p><h1 id="finaleTitle">Felsbauer-Finale!</h1><p>Ihr habt den Lehrkreis erschlossen: Zuspruch hören, Konflikte prüfen, Vertrauen beten und Perspektivwechsel tun.</p><h2>Leitfrage</h2><p class="final-question">Welche Aussage der Bergpredigt ist heute am unbequemsten, aber am wichtigsten?</p><button class="comic-button" id="closeFinale">Tafel weiter betrachten</button></article>
   </section>
-<div class="version-badge">Version v23</div>
+<div class="version-badge">Version v24</div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="shared.js"></script><script src="tafel.js"></script>
 </body></html>

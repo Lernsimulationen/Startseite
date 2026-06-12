@@ -14,7 +14,7 @@ const RANKS=[
   {name:"Felsbauer",min:110}
 ];
 const DEFAULT_MODULES=[
-  {id:"berg",title:"Modul 1: Seligpreisungen ordnen",objective:"Die Lernenden erschließen Zuspruch und Umwertung in Mt 5,3-12.",narrative:"Am Berg beginnt der Lernweg mit Menschen, die Jesus selig nennt, obwohl sie nicht stark wirken.",teacherMove:"Auf den Zuspruch vor jeder Forderung achten lassen.",product:"Eine Seligpreisung als heutige Zumutung deuten."},
+  {id:"berg",title:"Modul 1: Seligpreisungen ordnen",objective:"Die Lernenden erschließen Zuspruch und Umwertung in Mt 5,3-12.",narrative:"Am Berg beginnt der Lehrkreis mit Menschen, die Jesus selig nennt, obwohl sie nicht stark wirken.",teacherMove:"Auf den Zuspruch vor jeder Forderung achten lassen.",product:"Eine Seligpreisung als heutige Zumutung deuten."},
   {id:"tiberias",title:"Modul 2: Antithesen prüfen",objective:"Die Lernenden unterscheiden alte Konfliktlogiken und Jesu Zuspitzung.",narrative:"Jetzt wird es unbequem: Jesus stellt Gewalt, Vergeltung und Feindschaft in Frage.",teacherMove:"Die Spannung zwischen Schutz, Wahrheit und Versöhnung offenhalten.",product:"Eine Konfliktentscheidung begründet treffen."},
   {id:"see",title:"Modul 3: Vaterunser puzzeln",objective:"Die Lernenden erschließen Bitten des Vaterunsers als Vertrauens- und Handlungssprache.",narrative:"Am See wird aus Hören ein Beten: Was dürfen Menschen erwarten, erbitten und verantworten?",teacherMove:"Gebet nicht als Flucht aus Verantwortung, sondern als Ausrichtung lesen.",product:"Eine Bitte mit einer Alltagssituation verbinden."},
   {id:"nazareth",title:"Modul 4: Goldene Regel und Felsbau",objective:"Die Lernenden bündeln die Bergpredigt in Perspektivwechsel und tragfähigem Handeln.",narrative:"Am Ende zeigt sich, ob die Worte auf Fels oder auf Sand gebaut sind.",teacherMove:"Transfer ins Urteil führen: Welche Entscheidung trägt wirklich?",product:"Eine begründete Felsbauer-Entscheidung."}
@@ -43,7 +43,7 @@ const DEBATE_FINALE={
     "Gerechtigkeit ist in der Bergpredigt ein roter Faden."
   ]
 };
-const APP_VERSION="v23";
+const APP_VERSION="v24";
 const WORK_MODES={
   cooperative:{id:"cooperative",name:"Kooperativ",hint:"Module öffnen sich erst, wenn alle aktiven Gruppen ihren Beitrag geliefert haben."},
   standard:{id:"standard",name:"Nicht kooperativ",hint:"Eine aktive Gruppe kann ein Modul für die Tafel freischalten."}

@@ -1,5 +1,5 @@
 Bergpredigt-Expedition: Serious-Game-Lernmodule
-Version: v23
+Version: v24
 
 Kurzidee
 Die App inszeniert die Bergpredigt nicht als lineares Arbeitsblatt, sondern als kooperatives Serious Game. Gruppen arbeiten an vier Modulen, die an Mt 5-7 orientiert sind. Jedes Modul enthält drei Lernspiele mit steigender Schwierigkeit. Die Spiele sind bewusst nur mithilfe des Bibeltextes lösbar: Die Gruppen müssen Textsignale erkennen, deuten und auf Entscheidungssituationen anwenden.
