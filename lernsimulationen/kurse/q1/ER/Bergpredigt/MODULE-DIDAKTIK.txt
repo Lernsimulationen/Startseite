@@ -1,5 +1,20 @@
 Bergpredigt-Expedition: Serious-Game-Lernmodule
-Version: v28
+Version: v29
+
+Update v29:
+Die Kompasspunkte sind nun funktional: Das Finale wird erst freigegeben, wenn die Module abgeschlossen sind und alle drei Klassenwerte Frieden, Gerechtigkeit und Vertrauen den Zielwert erreichen. Dadurch sind Punkte keine Deko mehr, sondern ein Unterrichtssteuerungsinstrument. Wenn ein Wert schwach bleibt, zeigt die Tafel einen konkreten Nacharbeitsauftrag.
+
+Die Kartenwand wurde repariert und didaktisch geschärft. Karten werden nach Typ und Name gruppiert, mehrfach gesammelte Karten werden gezählt, und die Anzeige zeigt, wie viele Gruppen eine Karte als Beleg nutzen können. Funktion: Karten liefern Material für die Plenumsargumentation.
+
+Die Plenumsarena ist nun live im Dashboard und im Finale sichtbar. Argumentkarten, Merksätze und Stolperstellen laufen dort zusammen. Das Finale ist damit nicht nur ein Popup, sondern eine echte Auswertungsphase.
+
+Das Wimmelbild wurde durch ein dichteres KI-Wimmelbild ersetzt. Die Suchbegriffe stehen nicht mehr direkt im Bild; Labels erscheinen erst nach Auswahl. Die Aufgabe verlangt nun die Unterscheidung zwischen passenden Zeichen und Ablenkungen.
+
+Die Goldene Regel wurde ausgebaut: Spiel 1 ist nun ein Buchstaben-Rätsel mit Textfragen zu Mt 7,12. Das Lösungswort wird schrittweise freigeschaltet. Spiel 2 nutzt ein Fundament-Design für Haus auf Fels und Sand statt einer einfachen Dropdown-Reihenfolge.
+
+Restprüfung:
+Aktiv funktional sind: Supabase-Fortschritt, Gruppenmodus, Gruppenausschluss, Sperre, Tafel-Fokus, Kartenwand, Kompass-Gate, Plenumsarena, Wimmelbild, Buchstaben-Rätsel, Fundament-Spiel, Lehrkraft-Aufgabenansicht und Diagnose über Fehlversuche.
+Als technische Altlast bleiben im CSS noch deaktivierte Selektoren aus früheren Nebel-/Jesus-Versionen. Sie sind durch spätere Regeln ausgeschaltet und haben keinen sichtbaren Effekt, sollten bei einer späteren CSS-Datei-Aufräumrunde aber vollständig entfernt werden.
 
 Update v28:
 Seligpreisungen Spiel 2 wurde vertieft: Die Gruppen ordnen nun nicht mehr allgemeine Deutungen zu, sondern zuerst die genaue Verheißung aus Mt 5,6-9. Dadurch wird das Spiel stärker textgebunden und weniger ratbar. Die Zuordnungsspiele nutzen nun ein einheitliches Kartenbank-Design: Karten werden abgelegt, wieder gelöst und erst durch Bibeltextprüfung tragfähig.
