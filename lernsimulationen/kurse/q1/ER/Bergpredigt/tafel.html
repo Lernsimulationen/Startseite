@@ -25,12 +25,12 @@
     </section>
     <aside class="side-panel">
       <section class="panel"><p class="comic-kicker">Live-Fortschritt</p><h2><span id="doneCount">0</span> / 4 Module</h2><p class="session-note"><span id="groupTargetLabel">1 Gruppe</span> im Spiel</p><div class="progress-track"><div class="progress-bar" id="progressBar"></div></div><div class="sector-list" id="sectorList"></div></section>
-      <section class="panel shared-value-panel"><h2>Klassen-Kompass</h2><div id="classCompass"></div></section>
       <section class="panel shared-card-panel"><h2>Kartenwand</h2><div id="cardWall"></div></section>
       <section class="panel shared-plenum-panel"><h2>Plenumsarena</h2><div id="plenumArena"></div></section>
       <section class="panel avatar-progress-panel"><h2>Gruppenreise</h2><div class="avatar-progress-list" id="avatarProgressList"></div></section>
       <section class="panel"><h2>So geht's</h2><p>Je nach Modus öffnen Gruppen Module gemeinsam oder eigenständig. Die Gruppenavatare zeigen, wie weit jede Gruppe im Lehrkreis ist.</p><p class="session-note">Sitzung: <b id="sessionLabel"></b></p></section>
       <section class="panel map-note"><h2>Fachlicher Hinweis</h2><p>Die Tafel zeigt bewusst einen Ort: Die Bergpredigt wird als gemeinsamer Lehrraum gelesen. Die vier Module ordnen Mt 5-7 didaktisch: Zuspruch, Antithesen, Gebet/Vertrauen und ethische Bündelung.</p></section>
+      <section class="panel" id="glossaryPanel"></section>
       <section class="panel privacy-note"><b>Datenschutz:</b> Es werden nur eine frei gewählte <code>gruppen_id</code>, der Sektor und der Status <code>erledigt</code> gespeichert. Keine Namen, E-Mails oder personenbezogenen Daten.</section>
     </aside>
   </main>
@@ -39,6 +39,6 @@
   <section class="finale-overlay hidden" id="boardFinale" role="dialog" aria-modal="true" aria-labelledby="finaleTitle">
 <article class="finale-card"><p class="comic-kicker">Gemeinsames Finale</p><h1 id="finaleTitle">Felsbauer-Finale!</h1><p>Ihr habt den Lehrkreis erschlossen: Zuspruch hören, Konflikte prüfen, Vertrauen beten und Perspektivwechsel tun.</p><div class="finale-live-arena" id="finaleLiveArena"></div><button class="comic-button" id="closeFinale">Tafel weiter betrachten</button></article>
   </section>
-<div class="version-badge">Version v30</div>
+<div class="version-badge">Version v33</div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="shared.js"></script><script src="tafel.js"></script>
 </body></html>

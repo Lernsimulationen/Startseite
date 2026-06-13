@@ -149,9 +149,9 @@ function renderGroups(){
   renderAnalytics(groups,completion);
   renderProductGallery();
   renderDiagnostics();
-  const ready=bossFinaleReady(rows),weak=compassWeakValues(rows);
+  const ready=bossFinaleReady(rows);
   document.getElementById("finaleGate").classList.toggle("hidden",ready);
-  document.getElementById("finaleGate").textContent=weak.length?`Finale noch gesperrt: Klassen-Kompass nacharbeiten bei ${weak.map(key=>VALUE_LABELS[key]).join(", ")}.`:"Finale startet erst, wenn alle aktiven Gruppen die Module abgeschlossen haben.";
+  document.getElementById("finaleGate").textContent="Finale startet erst, wenn alle aktiven Gruppen die Module abgeschlossen haben.";
   document.getElementById("startFinale").disabled=!ready;
   const done=completedSectorIds(rows);
   const focus=activeFocus(rows);
