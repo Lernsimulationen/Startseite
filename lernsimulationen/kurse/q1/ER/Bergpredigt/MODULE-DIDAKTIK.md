@@ -1,6 +1,10 @@
 # Bergpredigt-Expedition: Serious-Game-Lernmodule
 
-Version: v33
+Version: v34
+
+## Update v34
+
+Die Rahmenerzählung ist jetzt eine durchgehende Konflikterzählung über alle vier Kapitel: Eine Ausgrenzung aus Kapitel 1 setzt sich in Kapitel 2 als Chat-Streit fort, hängt in Kapitel 3 mit einer alten Schuld und knappen Ressourcen zusammen und wird im Felsbauer-Finale gebündelt entschieden. Das Rahmenerzählungs-Popup öffnet sich nur noch automatisch beim Wechsel in ein neues Kapitel (nicht mehr bei jedem Spiel) und kann jederzeit über "Rahmenerzählung anzeigen" erneut geöffnet werden. Die Tafel zeigt zusätzlich ein "Bisher geschah"-Panel mit dem aktuellen Stand der Rahmenerzählung je Kapitel. In den Erfolgstexten der anspruchsvollsten Aufgaben sind die vier Fachbegriffe jetzt anklickbar und öffnen ein Glossar-Popup mit der Definition. Jedes der zwölf Spiele hat einen zweiten, konkreteren Hinweis, der nach dem dritten Fehlversuch zusätzlich angezeigt wird. Die Plenumsarena trennt Merksätze und Vertiefungsbeiträge jetzt in getrennten Bereichen. Bibeltext-Hilfen und Aufgabenstellungen können per Sprachausgabe (Web Speech API) vorgelesen werden. Im Felsbauer-Finale sehen Gruppen zu Beginn eine Übersicht ihrer bisher gesammelten Belegkarten als Argumentationshilfe. Die Tafel bietet einen Export-Button, der Merksätze, Vertiefungsbeiträge, Debattenbeiträge, Stolperstellen und Sammelkarten als Textdatei herunterlädt.
 
 ## Update v33
 

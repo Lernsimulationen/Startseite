@@ -42,7 +42,22 @@ const GLOSSARY=[
   {term:"Antithese von Hören und Tun",definition:"Das Gleichnis vom Hausbau spitzt zu: Nicht das Zustimmen zu Jesu Worten trägt, sondern das Umsetzen im Handeln."}
 ];
 function glossaryMarkup(open=false){return`<details class="bible-panel glossary-panel"${open?" open":""}><summary>Fachbegriffe-Glossar</summary><dl>${GLOSSARY.map(item=>`<dt>${escapeHtml(item.term)}</dt><dd>${escapeHtml(item.definition)}</dd>`).join("")}</dl></details>`}
-const APP_VERSION="v33";
+const GLOSSARY_MATCHES=[
+  {index:0,terms:["eschatologischen Vorbehalt","eschatologische Vorbehalt","eschatologischer Vorbehalt"]},
+  {index:1,terms:["Gesinnungsethik","Verantwortungsethik"]},
+  {index:2,terms:["Indikativ","Imperativ"]},
+  {index:3,terms:["Antithese von Hören und Tun"]}
+];
+function glossaryLinkMarkup(text){let html=escapeHtml(text);GLOSSARY_MATCHES.forEach(({index,terms})=>{terms.forEach(term=>{const escTerm=escapeHtml(term);html=html.split(escTerm).join(`<button class="glossary-term" type="button" data-glossary="${index}">${escTerm}</button>`)})});return html}
+const FRAME_OPENING="Ihr sitzt mit eurer Lerngruppe im Kreis am Hang. Die Bergpredigt wird hier nicht als Wanderweg erzählt, sondern als Lehrraum: Während die Rede aus Mt 5-7 erklingt, erinnert sich eure Gruppe an eine Situation aus dem Schulalltag, die genau dazu passt. Was in einem Kapitel beginnt, wirkt im nächsten weiter - bis zum gemeinsamen Finale.";
+const STORY_CHAPTERS={
+  berg:{intro:"Kapitel 1 beginnt mit Zuspruch: Jesus nennt Menschen selig, die sonst leicht übersehen werden. Eure Erinnerung: Seit ein paar Tagen grenzt eure Lerngruppe ein Mitglied aus, weil es bei einem Streit 'die falsche Seite' genommen hat - bisher hat niemand offen dazu Position bezogen.",continue:"Die Ausgrenzung ist noch ungeklärt - aber die Seligpreisungen zeigen, wessen Perspektive zählt, auch wenn sie gerade übersehen wird.",recap:"Die Ausgrenzung eines Gruppenmitglieds wurde benannt - aufgelöst ist sie noch nicht."},
+  tiberias:{intro:"Kapitel 2 wird unbequem: Jesus fragt nach der Wurzel von Konflikten. Eure Erinnerung: Der Streit, der zur Ausgrenzung führte, lief über einen Klassenchat - eine Beleidigung, Häme, ein 'Wir gegen die'. Bisher hat niemand benannt, was eigentlich passiert ist.",continue:"Zorn, Vergeltung und Versöhnung entscheiden jetzt, ob der Chat-Streit weiter eskaliert oder geklärt wird.",recap:"Der Chat-Streit hinter der Ausgrenzung wurde aufgearbeitet: Zorn, Wahrheit und Versöhnung wurden gegeneinander abgewogen."},
+  see:{intro:"Kapitel 3 macht aus Hören ein Beten. Eure Erinnerung: Aus dem Chat-Streit ist eine alte Schuld offengeblieben - eine Entschuldigung, die nie kam. Gleichzeitig muss eure Gruppe knappes Material für ein gemeinsames Projekt fair aufteilen, ausgerechnet mit den Beteiligten von damals.",continue:"Vertrauen, Schuld und Versorgung gehören zusammen - das Vaterunser prüft, ob eure Gruppe das zusammendenkt.",recap:"Die alte Schuld wurde angesprochen, knappe Ressourcen wurden nach Vertrauen und Gerechtigkeit verteilt."},
+  nazareth:{intro:"Kapitel 4 bündelt alles: die Ausgrenzung aus Kapitel 1, den ungeklärten Chat-Streit aus Kapitel 2 und die alte Schuld samt knappen Ressourcen aus Kapitel 3. Goldene Regel und Felsbau verlangen jetzt eine Entscheidung, die wirklich trägt.",continue:"Hören allein reicht nicht mehr - jetzt zeigt sich, ob eure Lerngruppe aus der ganzen Geschichte tragfähig handelt.",recap:"Im Felsbauer-Finale wurde entschieden, wie aus Ausgrenzung, Chat-Streit, alter Schuld und knappen Ressourcen tragfähiges Handeln wird."}
+};
+function storyRecapMarkup(doneIds){return`<h2>Bisher geschah</h2><div class="story-recap">${SECTORS.map((sector,index)=>{const chapter=STORY_CHAPTERS[sector.id],done=doneIds.has(sector.id);return`<p class="${done?"done":"pending"}"><b>Kapitel ${index+1} - ${escapeHtml(sector.name)}:</b> ${done?escapeHtml(chapter.recap):"noch offen"}</p>`}).join("")}</div>`}
+const APP_VERSION="v34";
 const WORK_MODES={
   cooperative:{id:"cooperative",name:"Kooperativ",hint:"Module öffnen sich erst, wenn alle aktiven Gruppen ihren Beitrag geliefert haben."},
   standard:{id:"standard",name:"Nicht kooperativ",hint:"Eine aktive Gruppe kann ein Modul für die Tafel freischalten."}
