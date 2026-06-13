@@ -18,10 +18,14 @@ function taskSolution(task){
   if(!task)return "";
   if(["choice","case","conflict","decode","rpg","trust"].includes(task.type))return task.answers?.[task.correct]||"";
   if(task.type==="mini")return(task.questions||[]).map(item=>item.answers[item.correct]).join(" · ");
+  if(task.type==="levels")return(task.levels||[]).map(item=>item.answers[item.correct]).join(" · ");
   if(task.type==="word")return task.answer||"";
   if(task.type==="unlockword")return`${(task.challenges||[]).map(item=>item.answers[item.correct]).join(" · ")} → ${task.answer||""}`;
   if(task.type==="dialog")return task.answers?.[task.correct]||"";
+  if(task.type==="chat")return(task.chat||[]).map(item=>item.choices[item.correct]).join(" · ");
   if(task.type==="wimmel")return(task.hotspots||[]).filter(item=>item.correct).map(item=>item.label).join(" · ");
+  if(task.type==="path")return(task.steps||[]).map(item=>item.answers[item.correct]).join(" · ");
+  if(task.type==="finalquest")return(task.phases||[]).map(item=>item.answers[item.correct]).join(" · ");
   if(["mark","quest"].includes(task.type))return(task.correct||[]).map(index=>task.answers[index]).join(" · ");
   if(["order","sort","puzzle","logic"].includes(task.type))return(task.correct||[]).join(" → ");
   if(["match","matrix","cards","compass"].includes(task.type))return(task.items||[]).map(([statement],index)=>`${statement} = ${task.correct?.[index]||""}`).join(" · ");
@@ -31,7 +35,7 @@ function taskSolution(task){
 }
 
 function taskTypeLabel(type){
-  return{choice:"Einzelauswahl",mark:"Mehrfachauswahl",order:"Reihenfolge",match:"Zuordnung",matrix:"Einordnung",evidence:"These und Beleg",reflection:"Reflexion",sort:"Seligpreisungen ordnen",cards:"Karten deuten",case:"Fall anwenden",quest:"Moralquest",conflict:"Konfliktkarten",puzzle:"Puzzle-Spiel",compass:"Bitten-Kompass",trust:"Vertrauensquest",decode:"Entschlüsselung",logic:"Logikrätsel",rpg:"RPG-Finalquest",mini:"Kurzfragen-Sequenz",word:"Wort-Rätsel",unlockword:"Buchstaben freischalten",dialog:"Dialogspiel",wimmel:"Wimmelbild"}[type]||type;
+  return{choice:"Einzelauswahl",mark:"Mehrfachauswahl",order:"Reihenfolge",match:"Zuordnung",matrix:"Einordnung",evidence:"These und Beleg",reflection:"Reflexion",sort:"Seligpreisungen ordnen",cards:"Karten deuten",case:"Fall anwenden",quest:"Moralquest",conflict:"Konfliktkarten",puzzle:"Puzzle-Spiel",compass:"Bitten-Kompass",trust:"Vertrauensquest",decode:"Entschlüsselung",logic:"Logikrätsel",rpg:"RPG-Finalquest",mini:"Kurzfragen-Sequenz",levels:"Levelspiel",word:"Wort-Rätsel",unlockword:"Buchstaben freischalten",dialog:"Dialogspiel",chat:"Chat-Simulation",wimmel:"Wimmelbild",path:"Mehrstufiger Lernpfad",finalquest:"Finalquest mit Begründung"}[type]||type;
 }
 
 function renderTeacherTaskSelect(){

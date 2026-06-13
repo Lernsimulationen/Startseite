@@ -1,5 +1,22 @@
 Bergpredigt-Expedition: Serious-Game-Lernmodule
-Version: v29
+Version: v30
+
+Update v30:
+Der Aufgabenplan aus dem PDF "Aufgabenplan zur Überarbeitung und Erweiterung der Lernspiele" wurde umgesetzt.
+
+Allgemeines Aufgabenlayout:
+Im Tablet-Aufgabenbereich werden nun der Bibeltext, die eigentliche Aufgabenstellung und das Spiel angezeigt. Rahmenerzählungen, didaktische Hinweise und Kontexttexte erscheinen nicht mehr direkt in der Aufgabe, sondern in einem vollflächigen Popup. Dieses Popup öffnet beim Start einer neuen Aufgabe und kann über "Rahmenerzählung anzeigen" erneut geöffnet werden.
+
+Didaktische Vertiefung:
+Seligpreisungen Spiel 3 wurde als Levelspiel neu aufgebaut. Die bisher unklare erste Frage wurde ersetzt und das Spiel führt nun von Textsignal über Entscheidung bis zum Alltagstransfer.
+
+Antithesen Spiel 3 wurde als Messenger-Chat neu entwickelt. Nachrichten erscheinen schrittweise, Entscheidungen öffnen den weiteren Verlauf, falsche Antworten werden sichtbar als problematische Reaktion markiert.
+
+Das Wimmelbild wurde interaktiv erweitert. Fundstellen sind nicht mehr als sichtbare Buttons gestaltet. Richtige Funde werden hervorgehoben und in einen separaten Lösungsbereich gelegt; falsche Klicks werden nur kurz und dezent markiert.
+
+Vaterunser Spiel 3 ist nun ein mehrstufiger Lernpfad zu Brot, Schuld, Gerechtigkeit und Reflexion. Ziel ist nicht Auswendiglernen, sondern das Verstehen einzelner Bitten als Entscheidungslogik.
+
+Goldene Regel Spiel 1 nutzt Hilfsfragen, die das Schlüsselwort schrittweise aus Mt 7,12 erschließen. Es enthält zusätzliche Transferlevel. Goldene Regel Spiel 3 wurde als Finalquest mit mehreren Entscheidungsphasen und Begründungsfeld überarbeitet.
 
 Update v29:
 Die Kompasspunkte sind nun funktional: Das Finale wird erst freigegeben, wenn die Module abgeschlossen sind und alle drei Klassenwerte Frieden, Gerechtigkeit und Vertrauen den Zielwert erreichen. Dadurch sind Punkte keine Deko mehr, sondern ein Unterrichtssteuerungsinstrument. Wenn ein Wert schwach bleibt, zeigt die Tafel einen konkreten Nacharbeitsauftrag.
