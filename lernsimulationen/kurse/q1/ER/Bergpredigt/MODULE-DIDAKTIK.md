@@ -1,6 +1,14 @@
 # Bergpredigt-Expedition: Serious-Game-Lernmodule
 
-Version: v35
+Version: v37
+
+## Update v37
+
+Jede Gruppe kann auf dem Tablet über den neuen Button "Protokoll herunterladen" ein chronologisches Protokoll ihrer Sitzung als Textdatei speichern: mit Zeitstempeln für gewählten Avatar, abgeschlossene Stationen, Fehlversuche, gesammelte Belegkarten, Merksätze, Vertiefungsbeiträge und Debattenbeiträge. Die Datei kann z. B. bei Microsoft Teams hochgeladen werden, damit die Lehrkraft die Gruppenarbeit bewerten kann. Zusätzlich enthält der bestehende Tafel-Export jetzt denselben Zeitstempel-Bericht für jede Gruppe in einem Abschnitt "Protokoll je Gruppe" - so hat die Lehrkraft eine zentrale Gesamtübersicht, auch wenn einzelne Gruppen ihr Protokoll nicht selbst hochladen.
+
+## Update v36
+
+Fachliche Überarbeitung von vier Aufgaben in den Modulen 1-4. Modul 1 (Seligpreisungen anwenden) erhält ein neues Level "Verheißung und Wirklichkeit", das vor der Nennung des Fachbegriffs fragt, warum Jesus von einer noch ausstehenden Zukunft spricht - der eschatologische Vorbehalt ergibt sich jetzt aus dieser Leitfrage, statt unvermittelt zu erscheinen. Modul 2 (Chat: Feindesliebe ohne Naivität) unterscheidet jetzt konsequent zwischen Versöhnungsbereitschaft (eigenes Handeln, das die Bergpredigt fordert) und tatsächlicher Versöhnung (ein Ergebnis, das nicht garantiert werden kann) - die Erfolgstexte formulieren das ausdrücklich. Modul 3 (Vaterunser-Lernpfad) erhält eine vorgeschaltete Pfadkarte "Gottesbild", die nach Heiligung des Namens, Reich Gottes und Gottes Willen fragt, bevor Brot, Schuld und Gerechtigkeit folgen - das Vaterunser wird so zuerst als Gottesverhältnis und dann als Handlungssprache erschlossen. Modul 4 (Finalquest: Felsbauer) nennt als Fachbegriff jetzt "Orthopraxie" (rechtes Handeln als Kriterium gelebten Glaubens, im Unterschied zur Orthodoxie) statt der zuvor unscharfen "Antithese von Hören und Tun"; das Glossar wurde entsprechend angepasst.
 
 ## Update v35
 

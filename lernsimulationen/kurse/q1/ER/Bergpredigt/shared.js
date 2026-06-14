@@ -39,14 +39,14 @@ const GLOSSARY=[
   {term:"Eschatologischer Vorbehalt",definition:"Eine Verheißung der Seligpreisungen ('sie werden ...') gilt im Glauben schon jetzt, ist in der Wirklichkeit aber noch nicht vollständig sichtbar."},
   {term:"Gesinnungsethik / Verantwortungsethik",definition:"Gesinnungsethik prüft, ob eine Handlung der eigenen Überzeugung oder Norm entspricht. Verantwortungsethik fragt zusätzlich nach den Folgen für die Betroffenen."},
   {term:"Indikativ und Imperativ",definition:"Im Vaterunser beschreibt der Indikativ, was Gott tut (er sorgt), der Imperativ, wozu das verpflichtet (wir handeln entsprechend) - Theologie wird zur Ethik."},
-  {term:"Antithese von Hören und Tun",definition:"Das Gleichnis vom Hausbau spitzt zu: Nicht das Zustimmen zu Jesu Worten trägt, sondern das Umsetzen im Handeln."}
+  {term:"Orthopraxie",definition:"Rechtes Handeln als Kriterium gelebten Glaubens, im Unterschied zur Orthodoxie (rechter Lehre). Das Gleichnis vom Hausbau spitzt zu: Nicht das Zustimmen zu Jesu Worten trägt, sondern das Umsetzen im Handeln."}
 ];
 function glossaryMarkup(open=false){return`<details class="bible-panel glossary-panel"${open?" open":""}><summary>Fachbegriffe-Glossar</summary><dl>${GLOSSARY.map(item=>`<dt>${escapeHtml(item.term)}</dt><dd>${escapeHtml(item.definition)}</dd>`).join("")}</dl></details>`}
 const GLOSSARY_MATCHES=[
   {index:0,terms:["eschatologischen Vorbehalt","eschatologische Vorbehalt","eschatologischer Vorbehalt"]},
   {index:1,terms:["Gesinnungsethik","Verantwortungsethik"]},
   {index:2,terms:["Indikativ","Imperativ"]},
-  {index:3,terms:["Antithese von Hören und Tun"]}
+  {index:3,terms:["Orthopraxie"]}
 ];
 function glossaryLinkMarkup(text){let html=escapeHtml(text);GLOSSARY_MATCHES.forEach(({index,terms})=>{terms.forEach(term=>{const escTerm=escapeHtml(term);html=html.split(escTerm).join(`<button class="glossary-term" type="button" data-glossary="${index}">${escTerm}</button>`)})});return html}
 const FRAME_OPENING="Ihr sitzt mit eurer Lerngruppe im Kreis am Hang. Die Bergpredigt wird hier nicht als Wanderweg erzählt, sondern als Lehrraum: Während die Rede aus Mt 5-7 erklingt, erinnert sich eure Gruppe an eine Situation aus dem Schulalltag, die genau dazu passt. Was in einem Kapitel beginnt, wirkt im nächsten weiter - bis zum gemeinsamen Finale.";
@@ -70,7 +70,7 @@ const ETHIK_KOMPASS={
 };
 function ethikKompassPanelMarkup(){return`<p class="comic-kicker">Leitfrage</p><h3>${escapeHtml(ETHIK_KOMPASS.question)}</h3><p class="compass-intro">${escapeHtml(ETHIK_KOMPASS.intro)}</p>`}
 function ethikKompassClosingMarkup(){return`<div class="ethik-kompass-task"><p class="comic-kicker">Abschlussauftrag</p><h3>Bergpredigt für heute</h3><p>${escapeHtml(ETHIK_KOMPASS.closingTask)}</p></div>`}
-const APP_VERSION="v35";
+const APP_VERSION="v37";
 const WORK_MODES={
   cooperative:{id:"cooperative",name:"Kooperativ",hint:"Module öffnen sich erst, wenn alle aktiven Gruppen ihren Beitrag geliefert haben."},
   standard:{id:"standard",name:"Nicht kooperativ",hint:"Eine aktive Gruppe kann ein Modul für die Tafel freischalten."}
@@ -128,6 +128,10 @@ function feedbackFor(sector,rows=[]){return feedbackOverrides(rows).get(sector)|
 function productRows(rows){const excluded=excludedGroups(rows);return rows.filter(row=>row.event_type==="prompt"&&String(row.payload||"").startsWith("product:")&&!excluded.has(row.gruppen_id)).map(row=>{const payload=String(row.payload),rest=payload.slice("product:".length),separator=rest.indexOf(":"),sector=rest.slice(0,separator),text=rest.slice(separator+1);return{sector,text,group:row.gruppen_id,created_at:row.created_at}}).filter(item=>item.sector&&item.text)}
 function diagnosticRows(rows){return rows.filter(row=>row.event_type==="prompt"&&String(row.payload||"").startsWith("miss:")).map(row=>{const[,taskIndex,type,sector]=String(row.payload).split(":");return{taskIndex:Number(taskIndex),type,sector,group:row.gruppen_id,created_at:row.created_at}}).filter(item=>Number.isFinite(item.taskIndex)&&item.type&&item.sector)}
 function diagnosticSummary(rows){const summary=new Map();diagnosticRows(rows).forEach(item=>{const key=`${item.sector}:${item.type}`;if(!summary.has(key))summary.set(key,{sector:item.sector,type:item.type,count:0,groups:new Set()});const entry=summary.get(key);entry.count++;entry.groups.add(item.group)});return[...summary.values()].sort((a,b)=>b.count-a.count)}
+function groupProtocolRows(rows,groupId){return rows.filter(row=>row.gruppen_id===groupId&&row.sektor!=="finale").sort((a,b)=>new Date(a.created_at)-new Date(b.created_at))}
+function formatProtocolTime(value){const date=new Date(value);return Number.isNaN(date.getTime())?"--:--:--":date.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit",second:"2-digit"})}
+function groupProtocolEntries(rows,groupId){return groupProtocolRows(rows,groupId).map(row=>{const time=formatProtocolTime(row.created_at),payload=String(row.payload||"");if(row.event_type==="manual"&&payload.startsWith("avatar:"))return`${time} - Gruppenavatar gewählt: ${avatarById(payload.replace("avatar:","")).name}`;if(row.status==="erledigt"&&row.sektor!=="control"){const sector=SECTORS.find(s=>s.id===row.sektor);return`${time} - Station abgeschlossen: ${sector?.name||row.sektor}`}if(payload.startsWith("card:")){const parts=payload.split(":"),type=parts[1],name=parts.slice(2).join(":");return`${time} - Belegkarte gesammelt (${type}): ${name}`}if(payload.startsWith("product:")){const rest=payload.slice("product:".length),sep=rest.indexOf(":"),sector=rest.slice(0,sep),text=rest.slice(sep+1);if(sector==="vertiefung")return`${time} - Vertiefungsbeitrag: ${text}`;const sectorObj=SECTORS.find(s=>s.id===sector);return`${time} - Merksatz (${sectorObj?.name||sector}): ${text}`}if(payload.startsWith("debate:")){const parts=payload.split(":"),side=Number(parts[1]),text=parts.slice(2).join(":"),label=side===2?"Eigene Position":`Position ${side+1}`;return`${time} - Debattenbeitrag (${label}): ${text}`}if(payload.startsWith("miss:")){const[,taskIdx,type,sector]=payload.split(":"),sectorObj=SECTORS.find(s=>s.id===sector),idx=Number(taskIdx);return`${time} - Fehlversuch bei Aufgabe ${Number.isFinite(idx)?idx+1:"?"} (${sectorObj?.name||sector}, ${taskSkillLabel({type})})`}return null}).filter(Boolean)}
+function groupProtocolText(rows,sessionId,groupId){const entries=groupProtocolEntries(rows,groupId);return[`Bergpredigt-Expedition - Protokoll Gruppe ${groupId} · Sitzung ${sessionId}`,`Erstellt am ${new Date().toLocaleString("de-DE")}`,"",...(entries.length?entries:["(noch keine Einträge)"])].join("\n")}
 function escapeHtml(value){return String(value||"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]))}
 function setConnectionStatus(text,isLive=false){const label=document.getElementById("connectionLabel"),dot=document.querySelector(".status-dot");if(label)label.textContent=text;if(dot)dot.classList.toggle("live",isLive)}
 function registerOffline(){if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{})}
