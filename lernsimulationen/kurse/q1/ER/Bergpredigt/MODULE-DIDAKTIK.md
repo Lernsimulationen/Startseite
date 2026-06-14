@@ -1,6 +1,10 @@
 # Bergpredigt-Expedition: Serious-Game-Lernmodule
 
-Version: v34
+Version: v35
+
+## Update v35
+
+Die Expedition erhält eine übergreifende Rahmenerzählung auf Kursebene, den "Ethik-Kompass": Die Leitfrage "Wofür lohnt es sich zu leben und zu handeln?" steht auf der Startseite und führt die vier Module als vier Kompass-Nadeln ein (Seligpreisungen: Wessen Perspektive zählt? / Antithesen: Wo beginnt Verantwortung? / Vaterunser: Worauf gründet Vertrauen? / Goldene Regel: Wie wird aus Worten Handeln?). Auf den Tablets erscheint die passende Kompass-Nadel jeweils zu Beginn eines Moduls im Rahmenerzählungs-Popup, getrennt von der bisherigen Konflikterzählung. Im Debatten-Finale und auf der Tafel führt ein neuer Abschlussauftrag "Bergpredigt für heute" die Leitfrage zu einem gemeinsamen Klassen-Produkt: Die Klasse formuliert auf Basis ihrer exportierten Merksätze und ihrer eigenen Debattenposition 3-5 moderne Sätze, die alle vier Kompass-Nadeln aufgreifen.
 
 ## Update v34
 

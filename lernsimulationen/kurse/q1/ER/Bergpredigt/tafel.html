@@ -2,7 +2,7 @@
 <html lang="de">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Tafelkarte | Bergpredigt-Expedition</title><link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="style.css"></head>
 <body class="board-page">
-  <header class="topbar"><a class="back-link" href="index.html">← Auswahl</a><span class="brand">Bergpredigt-Expedition · Tafel</span><span class="status-pill"><i class="status-dot"></i><span id="connectionLabel">Startet ...</span></span></header>
+  <header class="topbar"><a class="back-link" href="index.html">← Auswahl</a><span class="brand">Bergpredigt-Expedition · Tafel</span><span class="session-note">Sitzung <b id="sessionLabel"></b></span><button class="comic-button export-button mini-action" id="exportResults" type="button">Export</button><span class="status-pill"><i class="status-dot"></i><span id="connectionLabel">Startet ...</span></span></header>
   <main class="board-layout">
     <section class="map-card">
       <img class="map-backdrop" src="assets/images/sermon-mount-board-v1.webp" alt="">
@@ -24,22 +24,18 @@
       <div class="map-cartouche"><b>Lehrkreis</b><span>Ein Ort der Bergpredigt, vier Deutungszugänge</span></div>
     </section>
     <aside class="side-panel">
-      <section class="panel"><p class="comic-kicker">Live-Fortschritt</p><h2><span id="doneCount">0</span> / 4 Module</h2><p class="session-note"><span id="groupTargetLabel">1 Gruppe</span> im Spiel</p><div class="progress-track"><div class="progress-bar" id="progressBar"></div></div><div class="sector-list" id="sectorList"></div></section>
+      <section class="panel"><p class="comic-kicker">Live-Fortschritt</p><h2><span id="doneCount">0</span> / 4 Module</h2><p class="session-note"><span id="groupTargetLabel">1 Gruppe</span> im Spiel · <span id="activeGroupsLabel">0 Gruppen aktiv</span></p><div class="progress-track"><div class="progress-bar" id="progressBar"></div></div><div class="sector-list" id="sectorList"></div></section>
       <section class="panel shared-card-panel"><h2>Kartenwand</h2><div id="cardWall"></div></section>
       <section class="panel shared-plenum-panel"><h2>Plenumsarena</h2><div id="plenumArena"></div></section>
-      <section class="panel avatar-progress-panel"><h2>Gruppenreise</h2><div class="avatar-progress-list" id="avatarProgressList"></div></section>
-      <section class="panel"><h2>So geht's</h2><p>Je nach Modus öffnen Gruppen Module gemeinsam oder eigenständig. Die Gruppenavatare zeigen, wie weit jede Gruppe im Lehrkreis ist.</p><p class="session-note">Sitzung: <b id="sessionLabel"></b></p><button class="comic-button export-button" id="exportResults" type="button">Ergebnisse exportieren</button></section>
-      <section class="panel map-note"><h2>Fachlicher Hinweis</h2><p>Die Tafel zeigt bewusst einen Ort: Die Bergpredigt wird als gemeinsamer Lehrraum gelesen. Die vier Module ordnen Mt 5-7 didaktisch: Zuspruch, Antithesen, Gebet/Vertrauen und ethische Bündelung.</p></section>
       <section class="panel" id="storyPanel"></section>
       <section class="panel" id="glossaryPanel"></section>
-      <section class="panel privacy-note"><b>Datenschutz:</b> Es werden nur eine frei gewählte <code>gruppen_id</code>, der Sektor und der Status <code>erledigt</code> gespeichert. Keine Namen, E-Mails oder personenbezogenen Daten.</section>
     </aside>
   </main>
   <button class="comic-button finale-reopen hidden" id="reopenFinale" type="button">Finale erneut anzeigen</button>
   <section class="lock-overlay hidden" id="boardLock" aria-live="polite"><article><p class="comic-kicker">Pause</p><h1>Expedition gesperrt</h1><p>Die Lehrkraft hat die Gruppenphase kurz angehalten.</p></article></section>
   <section class="finale-overlay hidden" id="boardFinale" role="dialog" aria-modal="true" aria-labelledby="finaleTitle">
-<article class="finale-card"><p class="comic-kicker">Gemeinsames Finale</p><h1 id="finaleTitle">Felsbauer-Finale!</h1><p>Ihr habt den Lehrkreis erschlossen: Zuspruch hören, Konflikte prüfen, Vertrauen beten und Perspektivwechsel tun.</p><div class="finale-live-arena" id="finaleLiveArena"></div><button class="comic-button" id="closeFinale">Tafel weiter betrachten</button></article>
+<article class="finale-card"><p class="comic-kicker">Gemeinsames Finale</p><h1 id="finaleTitle">Felsbauer-Finale!</h1><p>Ihr habt den Lehrkreis erschlossen: Zuspruch hören, Konflikte prüfen, Vertrauen beten und Perspektivwechsel tun.</p><div class="finale-live-arena" id="finaleLiveArena"></div><div id="ethikKompassClosing"></div><button class="comic-button" id="closeFinale">Tafel weiter betrachten</button></article>
   </section>
-<div class="version-badge">Version v34</div>
+<div class="version-badge">Version v35</div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="shared.js"></script><script src="tafel.js"></script>
 </body></html>

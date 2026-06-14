@@ -57,7 +57,20 @@ const STORY_CHAPTERS={
   nazareth:{intro:"Kapitel 4 bündelt alles: die Ausgrenzung aus Kapitel 1, den ungeklärten Chat-Streit aus Kapitel 2 und die alte Schuld samt knappen Ressourcen aus Kapitel 3. Goldene Regel und Felsbau verlangen jetzt eine Entscheidung, die wirklich trägt.",continue:"Hören allein reicht nicht mehr - jetzt zeigt sich, ob eure Lerngruppe aus der ganzen Geschichte tragfähig handelt.",recap:"Im Felsbauer-Finale wurde entschieden, wie aus Ausgrenzung, Chat-Streit, alter Schuld und knappen Ressourcen tragfähiges Handeln wird."}
 };
 function storyRecapMarkup(doneIds){return`<h2>Bisher geschah</h2><div class="story-recap">${SECTORS.map((sector,index)=>{const chapter=STORY_CHAPTERS[sector.id],done=doneIds.has(sector.id);return`<p class="${done?"done":"pending"}"><b>Kapitel ${index+1} - ${escapeHtml(sector.name)}:</b> ${done?escapeHtml(chapter.recap):"noch offen"}</p>`}).join("")}</div>`}
-const APP_VERSION="v34";
+const ETHIK_KOMPASS={
+  question:"Wofür lohnt es sich zu leben und zu handeln?",
+  intro:"Diese Leitfrage begleitet den ganzen Kurs. Die Bergpredigt-Expedition untersucht vier Antworten Jesu darauf - als vier Kompass-Nadeln. Am Ende führt die Klasse alle vier Nadeln in einer eigenen \"Bergpredigt für heute\" zusammen.",
+  needles:{
+    berg:"Kompass-Nadel 1 - Seligpreisungen: Wessen Perspektive zählt?",
+    tiberias:"Kompass-Nadel 2 - Antithesen: Wo beginnt Verantwortung?",
+    see:"Kompass-Nadel 3 - Vaterunser: Worauf gründet Vertrauen?",
+    nazareth:"Kompass-Nadel 4 - Goldene Regel: Wie wird aus Worten Handeln?"
+  },
+  closingTask:"Schreibauftrag \"Bergpredigt für heute\": Formuliert gemeinsam 3-5 kurze, heutige Sätze, die zusammen eure Antwort auf die Leitfrage geben. Nutzt eure exportierten Merksätze und eure Position aus dem Debatten-Finale als Material - jede Kompass-Nadel sollte mindestens einmal vorkommen."
+};
+function ethikKompassPanelMarkup(){return`<p class="comic-kicker">Leitfrage</p><h3>${escapeHtml(ETHIK_KOMPASS.question)}</h3><p class="compass-intro">${escapeHtml(ETHIK_KOMPASS.intro)}</p>`}
+function ethikKompassClosingMarkup(){return`<div class="ethik-kompass-task"><p class="comic-kicker">Abschlussauftrag</p><h3>Bergpredigt für heute</h3><p>${escapeHtml(ETHIK_KOMPASS.closingTask)}</p></div>`}
+const APP_VERSION="v35";
 const WORK_MODES={
   cooperative:{id:"cooperative",name:"Kooperativ",hint:"Module öffnen sich erst, wenn alle aktiven Gruppen ihren Beitrag geliefert haben."},
   standard:{id:"standard",name:"Nicht kooperativ",hint:"Eine aktive Gruppe kann ein Modul für die Tafel freischalten."}
