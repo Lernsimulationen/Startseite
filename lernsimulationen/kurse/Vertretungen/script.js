@@ -46,8 +46,8 @@ const categories = [
   },
   {
     id: "zinsen",
-    name: "Schuldenbremse",
-    hint: "Zinsen zahlen, weniger neue Schulden",
+    name: "Schulden/Zinsen",
+    hint: "Zinsen zahlen, neue Schulden begrenzen",
     icon: "Z",
     color: "#8a6b3d",
     value: 14,
@@ -58,8 +58,10 @@ const categories = [
 const events = [
   {
     title: "Marode Brücken",
-    text: "Mehrere Brücken müssen schneller saniert werden. Ohne Geld für Verkehr sinkt die Stabilität.",
+    text: "Mehrere Brücken müssen schneller saniert werden. Im echten Staat teilen sich Bund, Länder und Gemeinden solche Aufgaben; hier entscheidet ihr vereinfacht für den Bund.",
     icon: "V",
+    image: "assets/event-bridges.jpg",
+    imageAlt: "Ingenieure prüfen eine beschädigte Brücke, während Fahrgäste an einer Haltestelle warten.",
     focus: "verkehr",
     effects: [
       ["Verkehr ab 18 Mrd.", "+ Stabilität"],
@@ -75,8 +77,10 @@ const events = [
   },
   {
     title: "Viele Eltern fordern bessere Schulen",
-    text: "Digitalisierung, Gebäude und Lehrkräfte kosten Geld. Bildungsausgaben wirken besonders langfristig.",
+    text: "Digitalisierung, Gebäude und Lehrkräfte kosten Geld. Bildung liegt oft bei den Ländern, aber der Bund kann Programme und Forschung fördern.",
     icon: "B",
+    image: "assets/event-education.jpg",
+    imageAlt: "Schülerinnen und Schüler arbeiten mit Tablets in einem modernen Klassenraum.",
     focus: "bildung",
     effects: [
       ["Bildung ab 22 Mrd.", "+ Zukunft"],
@@ -89,8 +93,10 @@ const events = [
   },
   {
     title: "Energiepreise steigen",
-    text: "Haushalte mit wenig Geld brauchen Hilfe. Gleichzeitig soll Energie sauberer werden.",
+    text: "Haushalte mit wenig Geld brauchen Hilfe. Gleichzeitig soll Energie sauberer und unabhängiger werden: kurzfristige Entlastung und langfristiger Umbau konkurrieren.",
     icon: "E",
+    image: "assets/event-energy.jpg",
+    imageAlt: "Eine Familie spricht mit einer Energieberaterin über Solaranlage und Stromkosten.",
     focus: "soziales",
     effects: [
       ["Soziales ab 26 Mrd.", "+ Zufriedenheit"],
@@ -104,8 +110,10 @@ const events = [
   },
   {
     title: "Unsichere Weltlage",
-    text: "Der Bund soll mehr in Schutz und Verteidigung investieren. Zu starke Kürzungen fallen schnell auf.",
+    text: "Der Bund ist für Verteidigung zuständig und unterstützt Bevölkerungsschutz. Mehr Sicherheit kostet Geld, kann aber andere Wünsche verdrängen.",
     icon: "!",
+    image: "assets/event-security.jpg",
+    imageAlt: "Einsatzkräfte und Verwaltung planen ruhig an einer Karte den Bevölkerungsschutz.",
     focus: "sicherheit",
     effects: [
       ["Sicherheit ab 18 Mrd.", "+ Stabilität"],
@@ -136,6 +144,7 @@ const els = {
   barStable: document.querySelector("#barStable"),
   barDebt: document.querySelector("#barDebt"),
   eventIcon: document.querySelector("#eventIcon"),
+  eventImage: document.querySelector("#eventImage"),
   eventTitle: document.querySelector("#eventTitle"),
   eventText: document.querySelector("#eventText"),
   eventEffects: document.querySelector("#eventEffects"),
@@ -234,6 +243,8 @@ function renderEvent() {
   const event = events[state.round];
   els.roundText.textContent = `${state.round + 1} / ${events.length}`;
   els.eventIcon.textContent = event.icon;
+  els.eventImage.src = event.image;
+  els.eventImage.alt = event.imageAlt;
   els.eventTitle.textContent = event.title;
   els.eventText.textContent = event.text;
   els.eventEffects.innerHTML = event.effects
@@ -321,7 +332,7 @@ function showResult() {
   const debtPenalty = state.debt > 70 ? "Die hohen neuen Schulden machen den nächsten Haushalt schwieriger." : "Die Schulden bleiben diskutierbar, aber nicht kostenlos.";
 
   els.resultTitle.textContent = average >= 70 ? "Starker Kompromiss" : average >= 52 ? "Knapp tragfähiger Haushalt" : "Schwieriger Haushalt";
-  els.resultText.textContent = `${debtPenalty} Euer Ergebnis zeigt: Im Bundeshaushalt konkurrieren gute Ziele miteinander.`;
+  els.resultText.textContent = `${debtPenalty} Euer Ergebnis zeigt: Der Bundeshaushalt ist ein politischer Plan mit begrenzten Einnahmen, wichtigen Ausgaben und echten Zielkonflikten.`;
   els.resultGrid.innerHTML = [
     ["Zufriedenheit", state.score.people],
     ["Zukunft", state.score.future],

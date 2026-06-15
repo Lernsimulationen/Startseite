@@ -23,8 +23,8 @@ body {
   font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   color: var(--ink);
   background:
-    radial-gradient(circle at 10% 10%, rgba(239, 189, 63, 0.18), transparent 24rem),
-    linear-gradient(135deg, #eef6f2 0%, #faf3df 50%, #edf2f8 100%);
+    radial-gradient(circle at 10% 10%, rgba(239, 189, 63, 0.16), transparent 24rem),
+    linear-gradient(135deg, #eef6f2 0%, #fbf4e6 48%, #edf2f8 100%);
 }
 
 button,
@@ -117,7 +117,7 @@ output {
 
 .hero-band {
   display: grid;
-  grid-template-columns: minmax(240px, 0.95fr) minmax(280px, 1fr);
+  grid-template-columns: minmax(320px, 1.1fr) minmax(280px, 0.9fr);
   align-items: center;
   gap: clamp(18px, 4vw, 50px);
   padding: 24px clamp(18px, 4vw, 42px);
@@ -125,15 +125,19 @@ output {
 }
 
 .budget-visual {
-  min-height: 210px;
-  display: grid;
-  place-items: center;
+  margin: 0;
+  min-height: 260px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #e7edf4;
 }
 
-.budget-visual svg {
-  width: min(100%, 430px);
-  height: auto;
-  filter: drop-shadow(0 12px 18px rgba(37, 50, 77, 0.13));
+.budget-visual img,
+.event-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .mission-copy {
@@ -151,6 +155,37 @@ output {
   font-size: 0.9rem;
   font-weight: 800;
   border-radius: 6px;
+}
+
+.concept-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--line);
+  background: #f8faf7;
+}
+
+.concept-strip div {
+  min-height: 92px;
+  padding: 18px clamp(14px, 2vw, 24px);
+  border-right: 1px solid var(--line);
+}
+
+.concept-strip div:last-child {
+  border-right: 0;
+}
+
+.concept-strip strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.concept-strip span,
+.panel-note {
+  color: var(--muted);
+  line-height: 1.35;
 }
 
 .status-grid {
@@ -220,6 +255,15 @@ output {
   min-height: 430px;
 }
 
+.event-image {
+  height: 184px;
+  margin: 0 0 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
 .event-panel .eyebrow {
   color: #f6cd62;
 }
@@ -234,7 +278,7 @@ output {
   height: 68px;
   display: grid;
   place-items: center;
-  margin-bottom: 22px;
+  margin-bottom: 18px;
   background: #f6cd62;
   color: #25324d;
   font-size: 2rem;
@@ -259,6 +303,12 @@ output {
 
 .budget-panel {
   background: var(--paper);
+}
+
+.panel-note {
+  max-width: 440px;
+  margin: -4px 0 0;
+  font-size: 0.92rem;
 }
 
 output {
@@ -437,8 +487,18 @@ dialog::backdrop {
 
 @media (max-width: 860px) {
   .hero-band,
-  .board {
+  .board,
+  .concept-strip {
     grid-template-columns: 1fr;
+  }
+
+  .concept-strip div {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .concept-strip div:last-child {
+    border-bottom: 0;
   }
 
   .status-grid,
