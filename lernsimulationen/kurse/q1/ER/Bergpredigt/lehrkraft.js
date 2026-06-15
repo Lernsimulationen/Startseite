@@ -117,7 +117,7 @@ function teacherFinalQuestMarkup(task){
 
 function teacherWimmelMarkup(task){
   const targets=(task.hotspots||[]).filter(spot=>spot.correct);
-  return`<div class="wimmel-brief"><p><b>Diese Symbole sucht ihr:</b></p><div class="wimmel-targets">${targets.map((spot,index)=>`<span data-target="${index}"><i>${escapeHtml(spot.symbol||"•")}</i>${escapeHtml(spot.label)}</span>`).join("")}</div></div><div class="wimmel-progress"><b id="teacherWimmelCount">0</b><span> / ${targets.length} Funde</span></div><div class="wimmel-game" role="group" aria-label="KI-Wimmelbild"><img class="wimmel-image" src="${escapeHtml(task.image)}" alt="Comic-Wimmelbild zur Bergpredigt und zum Vaterunser">${targets.map((spot,index)=>`<button class="wimmel-spot" type="button" data-index="${index}" data-symbol="${escapeHtml(spot.symbol||"•")}" data-label="${escapeHtml(spot.label)}" data-correct="true" style="--x:${spot.x}%;--y:${spot.y}%" aria-label="${escapeHtml(spot.label)} finden"><span>${escapeHtml(spot.label)}</span></button>`).join("")}</div><div class="found-shelf" aria-live="polite"><b>Fund-Regal</b><div>${targets.map((spot,index)=>`<span class="shelf-slot" data-shelf="${index}"><i>${escapeHtml(spot.symbol||"•")}</i><small>${escapeHtml(spot.label)}</small></span>`).join("")}</div></div>`;
+  return`<div class="wimmel-brief"><p><b>Diese Symbole sucht ihr:</b></p><div class="wimmel-targets">${targets.map((spot,index)=>`<span data-target="${index}"><i>${escapeHtml(spot.symbol||"•")}</i>${escapeHtml(spot.label)}</span>`).join("")}</div></div><div class="wimmel-progress"><b id="teacherWimmelCount">0</b><span> / ${targets.length} Funde</span></div><div class="wimmel-game" role="group" aria-label="KI-Wimmelbild"><img class="wimmel-image" src="${escapeHtml(task.image)}" alt="Comic-Wimmelbild zur Bergpredigt und zum Vaterunser">${targets.map((spot,index)=>`<button class="wimmel-spot" type="button" data-index="${index}" data-symbol="${escapeHtml(spot.symbol||"•")}" data-label="${escapeHtml(spot.label)}" data-correct="true" style="--x:${spot.x}%;--y:${spot.y}%" aria-label="${escapeHtml(spot.label)} finden"><span>${escapeHtml(spot.label)}</span></button>`).join("")}</div><div class="found-shelf" aria-live="polite"><b>Fund-Regal</b><div>${targets.map((spot,index)=>`<span class="shelf-slot" data-shelf="${index}"><i>${escapeHtml(spot.symbol||"•")}</i><small>${escapeHtml(spot.label)}</small></span>`).join("")}</div></div><label class="reflection-label wimmel-reason"><span>Begründung für die Tafel</span><textarea id="teacherWimmelReason" placeholder="Erklärt kurz: Wie passen Brot, Gebet, Waage und offene Hände zu Mt 6?"></textarea><small>In der echten Tabletansicht erscheint diese Begründung anonym auf der Tafel.</small></label>`;
 }
 
 function teacherAnswerMarkup(task){
@@ -144,7 +144,7 @@ function teacherPreviewCorrect(task,root){
     return task.challenges.every((_,index)=>checkedCorrect(`teacher-unlock-${index}`))&&valid.includes(answer);
   }
   if(task.type==="chat")return task.chat.every((_,index)=>root.querySelector(`[data-chat-step="${index}"] .chat-choice.selected`)?.dataset.correct==="true");
-  if(task.type==="wimmel")return[...root.querySelectorAll(".wimmel-spot")].every(button=>button.classList.contains("found"));
+  if(task.type==="wimmel")return Boolean(root.querySelector("#teacherWimmelReason")?.value.trim())&&[...root.querySelectorAll(".wimmel-spot")].every(button=>button.classList.contains("found"));
   if(task.type==="path")return task.steps.every((_,index)=>checkedCorrect(`teacher-path-${index}`));
   if(task.type==="finalquest")return task.phases.every((_,index)=>checkedCorrect(`teacher-final-${index}`));
   if(task.type==="quest"){const inputs=[...root.querySelectorAll('input[name="teacher-answer"]')];return inputs.some(input=>input.checked)&&inputs.every(input=>input.checked===(input.dataset.correct==="true"))}
@@ -195,6 +195,7 @@ function teacherShowPreviewSolution(task,root){
   root.querySelectorAll(".puzzle-piece,.match-token,.logic-stone").forEach(button=>button.disabled=true);
   root.querySelectorAll(".chat-step").forEach(step=>{step.classList.remove("hidden");step.classList.add("revealed");step.querySelector(".chat-bubble.system")?.classList.remove("hidden");step.querySelectorAll(".chat-choice").forEach(choice=>{choice.classList.toggle("selected",choice.dataset.correct==="true");choice.disabled=choice.dataset.correct==="true"})});
   root.querySelectorAll(".wimmel-spot").forEach(button=>{button.classList.add("found");button.disabled=true});
+  const reason=root.querySelector("#teacherWimmelReason");if(reason)reason.value="Brot steht für die Bitte um das tägliche Leben; die betende Gruppe für Vertrauen; die Waage für Gottes Gerechtigkeit; offene Hände für Vergebung und Teilen.";
   const word=root.querySelector('[name="teacher-word-answer"]');if(word)word.value=task.answer||"";
   root.querySelectorAll(".letter-safe span").forEach((span,index)=>span.textContent=(root.querySelector(".letter-safe")?.dataset.word||"")[index]||"");
   root.querySelector("#teacherPreviewFeedback").className="feedback good";

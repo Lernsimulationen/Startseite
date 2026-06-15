@@ -79,6 +79,32 @@
 .teacher-product-preview{display:grid;gap:.35rem;margin:1rem 0;padding:.75rem;border:3px dashed var(--line);border-radius:16px;background:#fff4ce}
 .teacher-product-preview textarea{min-height:88px;padding:.75rem;border:3px solid var(--line);border-radius:12px;background:white;font:inherit}
 .teacher-tablet-preview .feedback.hidden{display:none!important}
+.wimmel-reason{margin-top:.9rem;padding:.75rem;border:3px dashed var(--line);border-radius:18px;background:#fff4ce}
+.wimmel-reason-wall{display:grid;gap:.55rem}
+.wimmel-reason-wall article{padding:.65rem;border:3px solid var(--line);border-radius:16px;background:#fffdf8;box-shadow:3px 4px 0 #26323c33}
+.wimmel-reason-wall b{display:inline-block;margin-bottom:.25rem;padding:.18rem .45rem;border:2px solid var(--line);border-radius:999px;background:#dff0f1;font-size:.7rem;text-transform:uppercase}
+.wimmel-reason-wall p{margin:0;line-height:1.38;font-weight:800}
+.board-page .shared-wimmel-panel{overflow:auto}
+
+.board-page .side-panel{position:absolute;z-index:20;inset:0;width:auto;height:auto;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;overflow:visible;transform:none;transition:none;pointer-events:none}
+.board-page .side-panel.open{transform:none}
+.board-page .side-panel>.panel{position:absolute;left:var(--float-x,18px);top:var(--float-y,18px);display:none;width:var(--float-w,min(440px,45vw));height:var(--float-h,min(390px,64vh));min-width:260px;min-height:190px;max-width:calc(100vw - 24px);max-height:calc(100vh - 88px);padding:.6rem;resize:both;overflow:auto;pointer-events:auto;border:4px solid var(--line);border-radius:20px;background:var(--paper);box-shadow:8px 10px 0 #26323c77}
+.board-page .side-panel>.panel.active{display:block}
+.panel-window-bar{position:sticky;top:-.6rem;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin:-.6rem -.6rem .55rem;padding:.45rem .55rem;border-bottom:3px solid var(--line);border-radius:16px 16px 0 0;background:#fff4ce;cursor:move;touch-action:none;font-weight:900}
+.panel-window-bar span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.panel-window-bar button{cursor:pointer;padding:.12rem .45rem;border:2px solid var(--line);border-radius:9px;background:#ffd5c8;color:var(--ink);font-weight:900}
+.side-panel-close{position:absolute;right:.75rem;top:.75rem;display:none;pointer-events:auto;background:#ffd5c8;color:var(--ink)}
+.side-panel.open .side-panel-close{display:block}
+.board-page .side-panel>.panel[data-panel="progress"]{--float-x:16px;--float-y:16px;--float-w:min(430px,42vw);--float-h:min(430px,70vh)}
+.board-page .side-panel>.panel[data-panel="terms"]{--float-x:64px;--float-y:72px;--float-w:min(470px,48vw);--float-h:min(390px,62vh)}
+.board-page .side-panel>.panel[data-panel="plenum"]{--float-x:120px;--float-y:118px;--float-w:min(660px,68vw);--float-h:min(530px,74vh)}
+.board-page .side-panel>.panel[data-panel="wimmel"]{--float-x:180px;--float-y:52px;--float-w:min(560px,58vw);--float-h:min(460px,68vh)}
+.board-page .side-panel>.panel[data-panel="story"]{--float-x:220px;--float-y:168px;--float-w:min(480px,50vw);--float-h:min(430px,66vh)}
+.board-page .side-panel>.panel:nth-of-type(3),.board-page .side-panel>.panel:nth-of-type(4){grid-column:auto;grid-row:auto}
+.board-page .card-wall{max-height:none;overflow:auto}
+.board-page .product-ticker span:nth-child(n+3),.board-page .diagnostic-ticker span:nth-child(n+2),.board-page .notes-ticker span:nth-child(n+3),.board-page .miss-log small:nth-child(n+4){display:block}
+.finale-reopen{position:fixed;left:.75rem;bottom:.75rem;right:auto;z-index:35;padding:.48rem .7rem;background:var(--purple);font-size:.76rem;box-shadow:3px 4px 0 var(--line)}
+@media(max-width:900px){.board-page .side-panel>.panel{width:min(92vw,520px);height:min(62vh,460px);max-height:calc(100vh - 72px)}.board-toolbar{left:.5rem;right:.5rem;max-width:none}.finale-reopen{bottom:4.25rem}}
 .export-button{background:var(--purple)}
 .notes-ticker span{background:#eadcf2}
 #notesText{width:100%;min-height:160px;margin:.6rem 0;padding:.75rem;border:3px solid var(--line);border-radius:12px;background:#fffdf8;font:inherit;line-height:1.45;resize:vertical}
