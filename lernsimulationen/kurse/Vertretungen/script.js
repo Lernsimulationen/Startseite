@@ -256,7 +256,7 @@ function calculateRound(values) {
   });
 
   const savings = values.zinsen - categories.find((category) => category.id === "zinsen").value;
-  const newDebt = clamp(Math.round(16 - savings * 1.4), 0, 32);
+  const newDebt = clamp(Math.round(8 - savings * 1.2), 0, 26);
   score.people += Math.max(0, 18 - values.zinsen) * 0.35;
   score.stable -= newDebt * 0.45;
 
