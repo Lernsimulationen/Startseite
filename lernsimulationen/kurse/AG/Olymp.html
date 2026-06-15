@@ -195,6 +195,13 @@
         .god-symbol-img {
             width: 100%; height: 100%; object-fit: cover; display: block;
         }
+        .sealed-symbol {
+            width: 100%; height: 100%; border-radius: inherit;
+            display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(circle at 35% 30%, #fef3c7, #92400e 48%, #111827 100%);
+            color: #fef3c7; font-weight: 900; font-size: 1.6rem;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.45);
+        }
         @media (min-width: 768px) {
             .god-circle { width: 72px; height: 72px; border-width: 4px; }
             .god-avatar-container { width: 100px; }
@@ -294,6 +301,7 @@
         }
         .tile:hover .icon-wrapper { transform: scale(1.1); background: #1e293b; }
         .tile-symbol-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .tile .sealed-symbol { font-size: 2rem; }
 
         /* Typography */
         .tile-label { font-weight: 800; color: #334155; font-size: 1rem; letter-spacing: -0.025em; }
@@ -342,6 +350,9 @@
             width: 5rem; height: 5rem; border-radius: 50%; overflow: hidden;
             border: 4px solid #facc15; box-shadow: 0 12px 28px rgba(15,23,42,0.25);
             margin-bottom: 1.25rem; background: #111827;
+        }
+        .modal-god-symbol.sealed {
+            border-color: #c0842f; background: #111827;
         }
         
         .option-btn {
@@ -594,60 +605,60 @@
 
         const GOD_DOSSIERS = {
             zeus: {
-                text: "Zeus steht im Zentrum der olympischen Ordnung. Nach dem Mythos wollte Kronos seine Kinder verschlingen; Rhea rettete Zeus und versteckte ihn auf der Insel Kreta. Später stürzte Zeus Kronos und wurde Herrscher über Himmel, Wetter und göttliche Gesetze. Sein wichtigstes Zeichen ist der Blitz, mit dem er Macht und Urteil sichtbar macht.",
-                note: "Merke dir: Mutter Rhea, Zuflucht Kreta, Symbol Blitz."
+                text: "Zeus steht im Zentrum der olympischen Ordnung. Nach dem Mythos wollte Kronos seine Kinder verschlingen; gerettet wurde Zeus ausgerechnet von der Mutter, die Kronos täuschte. Versteckt wurde das Kind auf einer großen Insel südlich des griechischen Festlands. Später herrscht Zeus über Himmel, Wetter und göttliche Gesetze. Sein Zeichen gehört zu Gewitter und göttlichem Urteil.",
+                note: "Nutze die Hinweise: rettende Mutter, griechische Insel, Wetterzeichen am Himmel."
             },
             hera: {
-                text: "Hera ist Königin des Olymp und Göttin von Ehe, Familie und königlicher Würde. Sie erscheint oft mit Krone oder Thron, weil sie nicht nur Begleiterin des Zeus, sondern selbst Herrscherin ist. Der Pfau gilt als ihr heiliges Tier. In vielen Sagen reagiert Hera streng auf Treuebruch; Io gehört zu den Figuren, die sie aus Eifersucht verfolgt.",
-                note: "Merke dir: Hera = Götterkönigin, Krone, Pfau, Sage um Io."
+                text: "Hera ist Königin des Olymp und Göttin von Ehe, Familie und königlicher Würde. Achte deshalb auf ein Zeichen, das zu Herrschaft und Thron passt. Ihr heiliges Tier ist besonders an den prächtigen Augenmustern im Schwanz zu erkennen. In einer Eifersuchtssage verfolgt Hera eine Geliebte des Zeus, deren Name auffallend kurz ist: nur zwei Buchstaben.",
+                note: "Nutze die Hinweise: Königin, prächtiger Federschmuck, sehr kurzer Name."
             },
             poseidon: {
-                text: "Poseidon beherrscht das Meer, Stürme und Erdbeben. Mit seinem Dreizack kann er Wellen auftürmen und die Erde erschüttern; im Spiel steht der Anker als klares Meeressymbol für ihn. In Mythen wird Poseidon auch mit Pferden verbunden, die er aus der Kraft des Meeres erschaffen haben soll. Atlantis gilt als sagenhaftes, versunkenes Reich.",
-                note: "Merke dir: Meer, Erdbeben, Pferd, Atlantis, Symbol im Spiel: Anker."
+                text: "Poseidon beherrscht das Meer, Stürme und Erdbeben. Sein Bereich ist alles, was mit Wellen, Schiffen und Tiefe verbunden ist; wähle bei den Symbolen also das deutlichste Meereszeichen. In Mythen wird ihm auch ein Tier zugeschrieben, das für Schnelligkeit, Mähne und Hufe steht. Das gesuchte Reich im Wort-Orakel ist eine berühmte versunkene Inselwelt aus der Sage.",
+                note: "Nutze die Hinweise: Meeressymbol, Hufe und Mähne, versunkene Sagenwelt."
             },
             demeter: {
-                text: "Demeter ist Göttin des Getreides, der Fruchtbarkeit und der Jahreszeiten. Ihre Tochter Persephone wird von Hades geraubt; Demeters Trauer erklärt im Mythos, warum die Erde zeitweise unfruchtbar wird. Wenn Persephone zurückkehrt, wächst wieder neues Leben. In Eleusis wurden besondere Mysterien zu Demeter und Persephone gefeiert.",
-                note: "Merke dir: Getreide, Persephone, Eleusis, Wachstum."
+                text: "Demeter ist Göttin des Getreides, der Fruchtbarkeit und der Jahreszeiten. Im zentralen Mythos verliert sie ihre Tochter an die Unterwelt; die Trauer der Mutter erklärt, warum die Erde zeitweise unfruchtbar wird. Bei den Symbolen passt nicht Feuer oder Wasser, sondern das, was auf Feldern reift. Der Ort ihrer Mysterien war ein Heiligtum nahe Athen.",
+                note: "Nutze die Hinweise: Tochter in der Unterwelt, Feldfrucht, Heiligtum bei Athen."
             },
             athena: {
-                text: "Athena verbindet Weisheit mit kluger Verteidigung. Sie entspringt dem Kopf des Zeus, was ihre Nähe zu Verstand, Strategie und Planung erklärt. Ihr Schild steht nicht für blinde Gewalt, sondern für Schutz, Ordnung und überlegte Stärke. Athen verdankt ihr im Mythos den Olivenbaum, ein Zeichen für Frieden, Nahrung und Wohlstand.",
-                note: "Merke dir: Kopf des Zeus, Schild, Weisheit, Olivenbaum."
+                text: "Athena verbindet Weisheit mit kluger Verteidigung. Ihre Geburt geschieht an dem Körperteil des Zeus, das für Denken, Planen und Verstand steht. Das passende Symbol schützt, statt anzugreifen. Athen verdankt ihr im Mythos einen nützlichen Baum, dessen Früchte Öl liefern und dessen Zweige Frieden bedeuten.",
+                note: "Nutze die Hinweise: Denken, Schutz statt Angriff, Baum mit Ölfrüchten."
             },
             ares: {
-                text: "Ares verkörpert die wilde, gefährliche Seite des Krieges. Anders als Athena steht er weniger für Strategie, sondern für Kampfeslust und Streit. Seine Begleiterin Eris bringt Zwietracht und Konflikte. Schwert und Speer passen deshalb zu ihm; Sparta, berühmt für militärische Härte, verehrte ihn besonders.",
-                note: "Merke dir: Krieg, Eris, Schwert, Sparta."
+                text: "Ares verkörpert die wilde, gefährliche Seite des Krieges. Anders als Athena steht er weniger für Strategie, sondern für Kampfeslust und Streit. Seine ständige Begleiterin ist eine Göttin, deren Aufgabe Zwietracht und Konflikt ist. Als Werkzeug passt etwas aus der Waffenwelt. Die gesuchte Stadt ist für militärische Härte und strenge Erziehung berühmt.",
+                note: "Nutze die Hinweise: Streitgöttin, Waffe, kriegerische Stadt."
             },
             apollo: {
-                text: "Apollon ist Gott des Lichts, der Musik, der Heilkunst und der Weissagung. Die Sonne passt zu ihm, weil sie Klarheit und Ordnung bringt. Im Musikwettstreit besiegt er Pan und zeigt damit seine Nähe zur Kunst. Besonders berühmt ist sein Orakel in Delphi, wo Menschen göttlichen Rat suchten.",
-                note: "Merke dir: Licht, Musik, Pan, Delphi, Sonne."
+                text: "Apollon ist Gott des Lichts, der Musik, der Heilkunst und der Weissagung. Bei den Symbolen passt der Himmelskörper, der den Tag hell macht. Im Musikwettstreit besiegt er einen Naturgott mit Hirtenflöte und Hörnern. Sein berühmtestes Orakel lag an einem Heiligtum in Mittelgriechenland; Menschen reisten dorthin, um göttlichen Rat zu suchen.",
+                note: "Nutze die Hinweise: Tageslicht, Hirtenflöte, berühmtes Orakelheiligtum."
             },
             hephaestus: {
-                text: "Hephaistos ist der göttliche Schmied und Meister der Werkstatt. Er fertigt Waffen, Schmuck und kunstvolle Geräte für Götter und Helden. Sein Werkzeug ist der Hammer. In einer bekannten Sage fängt er Ares und Aphrodite mit einem unsichtbaren Netz. Seine Werkstatt wird oft unter einem Vulkan gedacht, besonders unter dem Ätna.",
-                note: "Merke dir: Schmied, Hammer, Netz, Ätna."
+                text: "Hephaistos ist der göttliche Schmied und Meister der Werkstatt. Er fertigt Waffen, Schmuck und kunstvolle Geräte für Götter und Helden. Bei den Symbolen passt das Werkzeug, mit dem Metall auf dem Amboss geformt wird. In einer bekannten Sage fängt er zwei Liebende mit einem unsichtbaren Netz. Seine Werkstatt wird oft unter einem berühmten Vulkan auf Sizilien gedacht.",
+                note: "Nutze die Hinweise: Schmiedehandwerk, unsichtbares Netz, Vulkan auf Sizilien."
             },
             hermes: {
-                text: "Hermes ist Götterbote, Grenzgänger und Beschützer der Reisenden. Er ist schnell, listig und beweglich; Flügel oder Federn erinnern an seine Geschwindigkeit. Schon als junger Gott stiehlt er Apollon Rinder und beweist damit seinen Erfindungsgeist. Sein besonderer Stab heißt Caduceus.",
-                note: "Merke dir: Götterbote, Rinder, Flügel/Feder, Caduceus."
+                text: "Hermes ist Götterbote, Grenzgänger und Beschützer der Reisenden. Er ist schnell, listig und beweglich; beim Symbol hilft dir etwas, das an Fliegen erinnert. Schon als junger Gott stiehlt er Apollon eine ganze Herde von Nutztieren. Sein besonderer Botenstab hat einen lateinischen Namen, der mit C beginnt und oft mit zwei Schlangen dargestellt wird.",
+                note: "Nutze die Hinweise: Flugzeichen, gestohlene Herde, Botenstab mit C."
             },
             artemis: {
-                text: "Artemis ist Göttin der Jagd, der Wildnis und des Mondes. Sie schützt Tiere und junge Menschen, kann aber auch streng sein, wenn ihre Regeln verletzt werden. Der Jäger Aktaion wird in einen Hirsch verwandelt, nachdem er Artemis beleidigt oder heimlich beobachtet hat. Bogen, Mond und Jagd gehören deshalb zu ihr.",
-                note: "Merke dir: Mond, Jagd, Aktaion wird Hirsch."
+                text: "Artemis ist Göttin der Wildnis und der nächtlichen Himmelswelt. Sie schützt Tiere und junge Menschen, kann aber streng sein, wenn ihre Regeln verletzt werden. Der Jäger Aktaion wird in ein scheues Waldtier mit Geweih verwandelt. Als Beschäftigung passt zu ihr das Verfolgen von Wild mit Bogen und Pfeil.",
+                note: "Nutze die Hinweise: Nacht-Himmelskörper, Geweih, Bogen und Wildnis."
             },
             aphrodite: {
-                text: "Aphrodite ist Göttin der Liebe, Schönheit und Anziehungskraft. Der goldene Apfel spielt im Urteil des Paris eine wichtige Rolle: Paris überreicht ihn Aphrodite. Ihre Geburt aus Meerschaum verbindet sie mit dem Meer und mit einer schimmernden, geheimnisvollen Schönheit. Im Spiel steht das Herz für ihre Macht.",
-                note: "Merke dir: Paris, goldener Apfel, Herz, Meerschaum."
+                text: "Aphrodite ist Göttin der Liebe, Schönheit und Anziehungskraft. Der goldene Apfel spielt in einem berühmten Schönheitsurteil eine wichtige Rolle; überreicht wird er von einem trojanischen Prinzen. Bei den Symbolen passt das allgemein bekannte Zeichen für Liebe. Ihre Geburt wird mit weiß schäumendem Meerwasser verbunden.",
+                note: "Nutze die Hinweise: trojanischer Prinz, Liebeszeichen, schäumendes Meer."
             },
             dionysus: {
-                text: "Dionysos ist Gott des Weines, der Feste, der Verwandlung und des Theaters. Er bringt Freude, Rausch und Ausbruch aus dem Alltag, kann aber auch gefährlich werden. König Midas erhält durch ihn die Gabe, alles in Gold zu verwandeln. Aus Feiern zu Ehren des Dionysos entwickelte sich das griechische Theater.",
-                note: "Merke dir: Wein, Midas, Gold, Theater."
+                text: "Dionysos ist Gott der Feste, der Verwandlung und der Bühne. Er bringt Freude und Ausbruch aus dem Alltag, kann aber auch gefährlich werden. In einer Sage erhält ein König die unpraktische Gabe, alles in Gold zu verwandeln. Aus Festen zu Ehren des Dionysos entwickelte sich eine Kunstform mit Masken, Chor und Schauspiel.",
+                note: "Nutze die Hinweise: Goldgabe, Festgetränk, Masken und Schauspiel."
             },
             hestia: {
-                text: "Hestia wacht über Herdfeuer, Haus und Gemeinschaft. Ihr Bereich ist leiser als der vieler anderer Gottheiten, aber für das Zusammenleben sehr wichtig: Ohne Feuer kein warmes Haus, kein Essen, keine gemeinsame Mitte. Im Tempel durfte ihr Feuer niemals erlöschen. Ihr Kernwort ist Heim.",
-                note: "Merke dir: Herdfeuer, Tempelfeuer, Gemeinschaft, Heim."
+                text: "Hestia wacht über Herd, Haus und Gemeinschaft. Ihr Bereich ist leiser als der vieler anderer Gottheiten, aber für das Zusammenleben sehr wichtig: Ohne Wärme keine Mahlzeit und keine gemeinsame Mitte. Im Tempel durfte die heilige Flamme niemals erlöschen. Das Wort-Orakel sucht den vertrauten Ort, an dem Menschen wohnen und zusammenkommen.",
+                note: "Nutze die Hinweise: Herd, heilige Flamme, vertrauter Wohnort."
             },
             hades: {
-                text: "Hades ist Herrscher der Unterwelt, nicht einfach ein böser Gott. Er wacht über das Reich der Toten und über Grenzen, die Lebende normalerweise nicht überschreiten. Der Fluss Lethe steht für Vergessen. Kerberos, der dreiköpfige Hund, bewacht den Eingang zur Unterwelt. Dunkle Schlüssel und Kronen passen zu seiner verschlossenen Macht.",
-                note: "Merke dir: Unterwelt, Lethe, Kerberos, Sterblichkeit."
+                text: "Hades ist Herrscher der Unterwelt, nicht einfach ein böser Gott. Er wacht über das Reich der Toten und über Grenzen, die Lebende normalerweise nicht überschreiten. Einer der Unterweltflüsse steht für Vergessen. Der Eingang wird von einem Hund bewacht, der nicht nur einen Kopf hat. Bei den Symbolen passt das deutlichste Zeichen der Sterblichkeit.",
+                note: "Nutze die Hinweise: Vergessen, mehrköpfiger Wachhund, Sterblichkeit."
             }
         };
 
@@ -668,6 +679,19 @@
 
         function getGodSymbolPath(god) {
             return `assets/symbol-${god.id}.png`;
+        }
+
+        function appendSealedSymbol(parent) {
+            const sealed = el('div', 'sealed-symbol', '?');
+            parent.appendChild(sealed);
+        }
+
+        function appendGodSymbol(parent, god, className) {
+            const img = document.createElement('img');
+            img.className = className;
+            img.src = getGodSymbolPath(god);
+            img.alt = `${god.name} Symbol`;
+            parent.appendChild(img);
         }
 
         // --- DOM HELPER ---
@@ -692,11 +716,8 @@
                 
                 const circle = el('div', `god-circle ${isFullySolved ? god.cssClass : ''}`);
                 
-                const img = document.createElement('img');
-                img.className = 'god-symbol-img';
-                img.src = getGodSymbolPath(god);
-                img.alt = `${god.name} Symbol`;
-                circle.appendChild(img);
+                if (isFullySolved) appendGodSymbol(circle, god, 'god-symbol-img');
+                else appendSealedSymbol(circle);
                 wrapper.appendChild(circle);
                 
                 const label = el('div', 'god-label', god.name);
@@ -721,11 +742,7 @@
                 if (isFullySolved) {
                     const iconWrapper = el('div', 'icon-wrapper');
                     iconWrapper.style.cssText = "background:#dcfce7; border-color:#86efac; color:#16a34a;";
-                    const img = document.createElement('img');
-                    img.className = 'tile-symbol-img';
-                    img.src = getGodSymbolPath(god);
-                    img.alt = `${god.name} Symbol`;
-                    iconWrapper.appendChild(img);
+                    appendGodSymbol(iconWrapper, god, 'tile-symbol-img');
                     content.appendChild(iconWrapper);
                     
                     const nameDiv = el('div', 'tile-label', god.name);
@@ -737,11 +754,7 @@
                     tile.appendChild(bg);
                     
                     const iconWrapper = el('div', 'icon-wrapper');
-                    const img = document.createElement('img');
-                    img.className = 'tile-symbol-img';
-                    img.src = getGodSymbolPath(god);
-                    img.alt = `${god.name} Symbol`;
-                    iconWrapper.appendChild(img);
+                    appendSealedSymbol(iconWrapper);
                     content.appendChild(iconWrapper);
                     
                     const label = el('span', 'tile-label', god.name);
@@ -794,9 +807,10 @@
             document.getElementById('feedback-msg').className = 'msg-box';
             document.getElementById('riddle-progress-display').textContent = `Aufgabe ${3 - available.length + 1} von 3`;
             document.getElementById('riddle-text').textContent = challenge.question;
-            const symbolImg = document.getElementById('modal-god-symbol-img');
-            symbolImg.src = getGodSymbolPath(god);
-            symbolImg.alt = `${god.name} Symbolbild`;
+            const symbolFrame = document.querySelector('.modal-god-symbol');
+            symbolFrame.classList.add('sealed');
+            symbolFrame.replaceChildren();
+            appendSealedSymbol(symbolFrame);
 
             const dossier = document.getElementById('god-dossier');
             dossier.replaceChildren();
