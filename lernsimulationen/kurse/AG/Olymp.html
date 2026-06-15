@@ -8,15 +8,18 @@
     <!-- SECURITY: CSP Configuration -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'nonce-S3cur3N0nc3V4lu3'; object-src 'none'; base-uri 'none'; connect-src 'none'; media-src 'none'; frame-src 'none'; form-action 'none'; frame-ancestors 'none';">
     
-    <title>Die Olympischen Götter - Lernspiel (Secure)</title>
+    <title>Olymp: Rat der Götter - Vertretungsstunde</title>
 
     <style>
         /* --- CSS VARIABLES & RESET --- */
         :root {
-            --bg-color: #f0f9ff;
-            --text-color: #1e293b;
-            --primary: #2563eb;
-            --secondary: #f59e0b;
+            --bg-color: #0b1224;
+            --text-color: #172033;
+            --primary: #1d4ed8;
+            --secondary: #fbbf24;
+            --ink: #0f172a;
+            --parchment: #fff8e7;
+            --storm: #172554;
             --danger: #ef4444;
             --success: #10b981;
             --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
@@ -29,7 +32,9 @@
         body {
             margin: 0;
             font-family: system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-color);
+            background:
+                radial-gradient(circle at top left, rgba(251, 191, 36, 0.22), transparent 34rem),
+                linear-gradient(180deg, #0b1224 0%, #18233f 42%, #f5efe1 42%, #f8fafc 100%);
             color: var(--text-color);
             min-height: 100vh;
             display: flex;
@@ -75,7 +80,7 @@
 
         /* Header */
         header {
-            background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
+            background: linear-gradient(135deg, #111827 0%, #1e3a8a 48%, #78350f 100%);
             color: white; padding: 1rem; box-shadow: var(--shadow-lg);
             border-bottom: 4px solid var(--secondary); z-index: 50;
         }
@@ -83,8 +88,8 @@
             max-width: 80rem; margin: 0 auto;
             display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;
         }
-        .title-area h1 { margin: 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.025em; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        .title-area p { margin: 0.25rem 0 0; color: #bfdbfe; font-size: 0.875rem; font-weight: 500; }
+        .title-area h1 { margin: 0; font-size: 1.5rem; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .title-area p { margin: 0.25rem 0 0; color: #fde68a; font-size: 0.875rem; font-weight: 500; }
         .controls { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
 
         /* Buttons */
@@ -126,26 +131,51 @@
             display: flex; flex-direction: column; gap: 2rem;
         }
 
+        .mission-panel {
+            color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 1.25rem;
+            padding: 1.5rem; box-shadow: var(--shadow-lg); overflow: hidden;
+            background:
+                linear-gradient(135deg, rgba(15,23,42,0.92), rgba(30,58,138,0.78)),
+                url('assets/olymp-drama.png') center 42% / cover;
+        }
+        .mission-panel h2 { margin: 0 0 0.75rem; font-size: clamp(1.7rem, 4vw, 3rem); line-height: 1.05; }
+        .mission-panel p { max-width: 56rem; margin: 0; color: #e0f2fe; line-height: 1.65; font-weight: 500; }
+        .lesson-steps {
+            display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem;
+            margin-top: 1.25rem;
+        }
+        .lesson-step {
+            background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 0.75rem; padding: 0.9rem; backdrop-filter: blur(4px);
+        }
+        .lesson-step strong { display: block; color: #fef3c7; margin-bottom: 0.35rem; }
+        .lesson-step span { color: #dbeafe; font-size: 0.9rem; line-height: 1.45; }
+        @media (max-width: 760px) { .lesson-steps { grid-template-columns: 1fr; } }
+
         /* Olymp Area */
         .olymp-stage {
-            background-color: #f8fafc; border: 4px solid white; border-radius: 1.5rem;
+            background-color: #111827; border: 4px solid rgba(255,255,255,0.88); border-radius: 1.5rem;
             overflow: hidden; box-shadow: var(--shadow-lg); position: relative;
             width: 100%; aspect-ratio: 16 / 9;
             transition: transform 0.3s;
         }
         .olymp-bg {
             position: absolute; inset: 0;
-            background-image: url('background.jpg'), linear-gradient(to bottom, #bae6fd, #e0f2fe, #f0f9ff);
+            background-image: url('assets/olymp-drama.png'), linear-gradient(to bottom, #1e3a8a, #f0f9ff);
             background-size: cover; background-position: center; background-repeat: no-repeat;
         }
-        .olymp-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.15); pointer-events: none; }
+        .olymp-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(180deg, rgba(15,23,42,0.05), rgba(15,23,42,0.22));
+            pointer-events: none;
+        }
         
         .olymp-title {
             position: absolute; top: 1.5rem; left: 1.5rem; z-index: 20;
-            background: rgba(255,255,255,0.95); padding: 0.75rem 1.25rem; border-radius: 1rem;
+            background: rgba(15,23,42,0.86); padding: 0.75rem 1.25rem; border-radius: 1rem;
             box-shadow: var(--shadow); font-weight: 800; color: #1e3a8a;
             display: flex; align-items: center; gap: 0.75rem; font-size: 1.1rem;
-            border: 1px solid #e2e8f0;
+            border: 1px solid rgba(251,191,36,0.45); color: #fef3c7;
         }
 
         /* God Avatars */
@@ -273,19 +303,28 @@
         
         /* Modal & Rest */
         .modal-card {
-            background: white; width: 100%; max-width: 32rem; border-radius: 1.5rem;
+            background: white; width: 100%; max-width: 44rem; border-radius: 1.5rem;
             overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
             border: 1px solid #e2e8f0; transform: scale(0.95); transition: transform 0.2s;
         }
         .modal-backdrop.active .modal-card { transform: scale(1); }
 
         .modal-header { 
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); 
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 70%, #92400e 100%);
             padding: 2rem 1.5rem 1.5rem; text-align: center; position: relative; 
             border-bottom: 1px solid #bfdbfe;
         }
-        .modal-header h2 { color: #1e3a8a; letter-spacing: -0.025em; margin: 0; font-size: 1.5rem; }
+        .modal-header h2 { color: white; margin: 0; font-size: 1.5rem; }
         .modal-body { padding: 2rem; display: flex; flex-direction: column; align-items: center; }
+        .god-dossier {
+            width: 100%; box-sizing: border-box; margin: 0 0 1.25rem;
+            background: linear-gradient(135deg, #fff8e7, #ffffff);
+            border: 1px solid #facc15; border-left: 5px solid #f59e0b;
+            border-radius: 0.75rem; padding: 1rem 1.1rem; color: #334155;
+            line-height: 1.55; box-shadow: var(--shadow-sm);
+        }
+        .god-dossier strong { display:block; color:#78350f; margin-bottom:0.35rem; }
+        .god-dossier span { font-size: 0.95rem; }
         
         .option-btn {
             width: 100%; padding: 1rem; background: white; color: #334155;
@@ -308,12 +347,16 @@
 
         /* Win Screen */
         .win-screen {
-            position: fixed; inset: 0; background: rgba(30,58,138,0.95); z-index: 200; 
+            position: fixed; inset: 0; background: rgba(15,23,42,0.94); z-index: 200; 
             display: none; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(5px);
         }
         .win-card {
-            background: white; padding: 3rem; border-radius: 1.5rem; max-width: 40rem; 
+            background: white; padding: 2rem; border-radius: 1.5rem; max-width: 44rem; 
             text-align: center; border: 8px solid #fcd34d; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+        }
+        .win-art {
+            width: 100%; max-height: 260px; object-fit: cover; border-radius: 1rem;
+            margin-bottom: 1.5rem; box-shadow: var(--shadow-lg);
         }
 
         /* Animations */
@@ -382,8 +425,8 @@
     <header>
         <div class="header-content">
             <div class="title-area">
-                <h1>Die Olympischen Götter</h1>
-                <p>Schul-Edition (Secure Mode)</p>
+                <h1>Olymp: Rat der Götter</h1>
+                <p>Vertretungsstunde Griechische Mythologie</p>
             </div>
             <div class="controls">
                 <div class="status-badge">
@@ -398,6 +441,20 @@
     </header>
 
     <main>
+        <section class="mission-panel">
+            <h2>Der Olymp ruft zur Vertretungsmission</h2>
+            <p>
+                Ein Sturm hat die Namen, Zeichen und Geschichten der olympischen Gottheiten durcheinandergebracht.
+                Arbeite dich Gottheit für Gottheit durch die Prüfungen. Lies im Aufgabenfenster zuerst das Dossier:
+                Darin stehen alle Hinweise, die du brauchst, um Wissen, Symbol und Wort-Orakel zu lösen.
+            </p>
+            <div class="lesson-steps" aria-label="Arbeitsauftrag">
+                <div class="lesson-step"><strong>1. Lesen</strong><span>Öffne eine Prüfung und lies das Götterdossier aufmerksam.</span></div>
+                <div class="lesson-step"><strong>2. Entscheiden</strong><span>Nutze die Hinweise für Quiz, Symbol-Auswahl und Buchstabenrätsel.</span></div>
+                <div class="lesson-step"><strong>3. Sichern</strong><span>Wenn alle 14 Gottheiten versammelt sind, lade die Statistik als Nachweis herunter.</span></div>
+            </div>
+        </section>
+
         <section class="olymp-stage">
             <div class="olymp-bg"></div>
             <div class="olymp-overlay"></div>
@@ -412,8 +469,8 @@
 
         <section>
             <div class="section-header">
-                <h2>Die Prüfungen</h2>
-                <span>(Wissen • Symbole • Wörter)</span>
+                <h2>Prüfungen des Rates</h2>
+                <span>(Dossier lesen • Wissen prüfen • Symbol erkennen • Orakelwort legen)</span>
             </div>
             <div id="grid-container" class="grid-container"></div>
         </section>
@@ -432,6 +489,7 @@
                 <div style="width:4.5rem; height:4.5rem; background:#f1f5f9; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-bottom:1.5rem; border:4px solid white; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); color:#64748b;">
                     <div id="game-icon-container" style="width:2.5rem; height:2.5rem;"></div>
                 </div>
+                <div id="god-dossier" class="god-dossier"></div>
                 <p id="riddle-text" style="text-align:center; margin-bottom:2rem; font-size:1.125rem; color:#334155; line-height:1.6; font-family:serif; font-style:italic;"></p>
                 <div id="game-container" style="width:100%; display:flex; flex-direction:column; align-items:center; gap:1rem;"></div>
                 <div id="feedback-msg" class="msg-box" style="margin-top:1.5rem; min-height:1.5rem; font-weight:bold; text-align:center;"></div>
@@ -441,8 +499,9 @@
 
     <div id="win-screen" class="win-screen">
         <div class="win-card">
+            <img class="win-art" src="assets/olymp-finale.png" alt="Goldenes Orakel auf dem Olymp">
             <h2 style="font-size:3rem; margin:0 0 1rem 0; color:#1e3a8a; font-weight:900;">Olymp komplett!</h2>
-            <p style="font-size:1.25rem; color:#475569;">Hervorragend! Du hast alle Götter versammelt.</p>
+            <p style="font-size:1.25rem; color:#475569;">Der Rat ist wieder vollständig. Lade deine Statistik als Stunden-Nachweis herunter.</p>
             <div style="display:flex; justify-content:center; gap:1.5rem; margin:2rem 0; color:#f59e0b;">
                <div style="width:48px;height:48px;"><svg class="icon-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
                <div style="width:48px;height:48px;"><svg class="icon-svg" viewBox="0 0 24 24"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"></path></svg></div>
@@ -511,6 +570,23 @@
             { id: 'hestia', name: 'Hestia', title: 'Herdfeuer', x: 62, y: 85, cssClass: 'bg-amber', icon: 'flame', challenges: [{ type: 'quiz', question: "Was darf niemals im Tempel erlöschen?", options: ["Das Licht", "Das Feuer", "Die Hoffnung"], correct: "Das Feuer" }, { type: 'symbol', question: "Ich wärme das Haus mit...", correctIcon: 'flame', wrongIcons: ['snowflake', 'wind'] }, { type: 'word', question: "Ich bin der Mittelpunkt im...", word: "HEIM" }] },
             { id: 'hades', name: 'Hades', title: 'Unterwelt', x: 50, y: 85, cssClass: 'bg-gray', icon: 'skull', challenges: [{ type: 'quiz', question: "Wie heißt der Fluss des Vergessens?", options: ["Styx", "Lethe", "Acheron"], correct: "Lethe" }, { type: 'symbol', question: "Ein Symbol der Sterblichkeit:", correctIcon: 'skull', wrongIcons: ['heart', 'smile'] }, { type: 'word', question: "Wie heißt mein dreiköpfiger Hund?", word: "KERBEROS" }] }
         ];
+
+        const GOD_DOSSIERS = {
+            zeus: "Zeus ist der Göttervater. Seine Mutter Rhea rettete ihn vor Kronos und versteckte ihn auf Kreta. Sein Zeichen ist der Blitz.",
+            hera: "Hera gilt als Göttermutter und Königin des Olymp. Ihr Herrschaftszeichen ist die Krone. Der Pfau ist ihr heilig; in einer Sage verfolgt sie Io aus Eifersucht.",
+            poseidon: "Poseidon herrscht über das Meer und kann die Erde erbeben lassen. Sein Machtzeichen ist der Dreizack; im Spiel steht dafür der Anker. Er erschuf das Pferd, und Atlantis gilt als versunkenes Reich.",
+            demeter: "Demeter ist Göttin der Fruchtbarkeit und des Getreides. Ihre Tochter heißt Persephone. Ihre berühmten Mysterien wurden in Eleusis gefeiert.",
+            athena: "Athena ist Göttin der Weisheit und der klugen Verteidigung. Sie entsprang dem Kopf des Zeus. Ihr Schutzzeichen ist der Schild; Athen schenkte sie den Olivenbaum.",
+            ares: "Ares ist der Kriegsgott. Seine Begleiterin ist Eris, die Göttin des Streits. Schwert und Speer passen zu ihm; Sparta verehrte ihn besonders.",
+            apollo: "Apollon ist Gott des Lichts, der Musik und der Weissagung. Im Musikwettstreit besiegte er Pan. Sein Zeichen ist die Sonne; sein berühmtes Orakel stand in Delphi.",
+            hephaestus: "Hephaistos ist der Schmiedegott. Er arbeitet mit Hammer und Amboss. In einer Sage fängt er Ares und Aphrodite in einem unsichtbaren Netz; seine Werkstatt liegt unter dem Ätna.",
+            hermes: "Hermes ist der schnelle Götterbote. Flügel und Federn erinnern an seine Bewegung. Er stahl Apollon Rinder, und sein besonderer Stab heißt Caduceus.",
+            artemis: "Artemis ist Göttin der Jagd und des Mondes. Sie verwandelte den Jäger Aktaion in einen Hirsch. Ihre liebste Beschäftigung ist die Jagd.",
+            aphrodite: "Aphrodite ist Göttin der Liebe und Schönheit. Paris überreichte ihr den goldenen Apfel. Ihr Symbol ist das Herz; sie wurde aus Meerschaum geboren.",
+            dionysus: "Dionysos ist Gott des Weines, des Festes und des Theaters. König Midas verwandelte durch ihn alles in Gold. Aus seinen Festen entwickelte sich das Theater.",
+            hestia: "Hestia wacht über Herdfeuer, Heim und Gemeinschaft. Im Tempel durfte ihr Feuer niemals erlöschen. Der Mittelpunkt ihres Bereichs ist das Heim.",
+            hades: "Hades herrscht über die Unterwelt. Der Fluss des Vergessens heißt Lethe. Ein Totenschädel erinnert an Sterblichkeit, und sein dreiköpfiger Hund heißt Kerberos."
+        };
 
         const GOD_IDS = GODS_DATA.map(g => g.id);
         const STORAGE_KEY = 'olymp_secure_progress';
@@ -600,7 +676,7 @@
                     iconWrapper.appendChild(iconDiv);
                     content.appendChild(iconWrapper);
                     
-                    const label = el('span', 'tile-label', 'Aufgaben');
+                    const label = el('span', 'tile-label', god.name);
                     content.appendChild(label);
                     
                     const progressBg = el('div', 'progress-bar-bg');
@@ -650,6 +726,12 @@
             document.getElementById('feedback-msg').className = 'msg-box';
             document.getElementById('riddle-progress-display').textContent = `Aufgabe ${3 - available.length + 1} von 3`;
             document.getElementById('riddle-text').textContent = challenge.question;
+            const dossier = document.getElementById('god-dossier');
+            dossier.replaceChildren();
+            const dossierTitle = el('strong', null, `${god.name}: Dossier für die Vertretungsstunde`);
+            const dossierText = el('span', null, GOD_DOSSIERS[god.id] || "Lies die Frage genau und nutze die Hinweise in der Aufgabe.");
+            dossier.appendChild(dossierTitle);
+            dossier.appendChild(dossierText);
             
             const container = document.getElementById('game-container');
             while (container.firstChild) container.removeChild(container.firstChild);
@@ -659,14 +741,14 @@
             
             let typeIcon = 'brain-circuit';
             if (challenge.type === 'quiz') {
-                titleEl.textContent = "Wissens-Duell";
+                titleEl.textContent = `${god.name}: Wissens-Duell`;
                 renderQuiz(challenge, container);
             } else if (challenge.type === 'symbol') {
-                titleEl.textContent = "Symbol-Jagd";
+                titleEl.textContent = `${god.name}: Symbol-Jagd`;
                 typeIcon = 'eye';
                 renderSymbolGame(challenge, container);
             } else if (challenge.type === 'word') {
-                titleEl.textContent = "Wort-Orakel";
+                titleEl.textContent = `${god.name}: Wort-Orakel`;
                 typeIcon = 'type';
                 renderWordGame(challenge, container);
             }

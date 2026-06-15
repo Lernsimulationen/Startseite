@@ -460,6 +460,7 @@ const questionType = document.querySelector("#questionType");
 const deckCount = document.querySelector("#deckCount");
 const questionPrompt = document.querySelector("#questionPrompt");
 const questionDisplay = document.querySelector("#questionDisplay");
+const questionCoach = document.querySelector("#questionCoach");
 const answerButtons = document.querySelector("#answerButtons");
 const continueButton = document.querySelector("#continueButton");
 const pawnButtons = document.querySelector("#pawnButtons");
@@ -731,7 +732,7 @@ function createBoard() {
 
   const center = document.createElement("div");
   center.className = "center-field";
-  center.innerHTML = "<strong>Agora</strong>";
+  center.innerHTML = "<strong>Olymp</strong>";
   placeOnGrid(center, { x: 5, y: 5 });
   board.append(center);
 
@@ -791,14 +792,17 @@ function renderQuestion() {
 
   if (!state.question) {
     questionType.textContent = "Aufgabe";
-    questionPrompt.textContent = "Nach dem realen Wurf erscheint hier die Aufgabe.";
+    questionPrompt.textContent = "Nach dem Wurf erscheint hier die Aufgabe.";
     questionDisplay.textContent = "Α Β Γ Δ";
+    questionCoach.textContent = "Sprecht erst kurz im Team, dann wählt eine Antwort.";
     return;
   }
 
   questionType.textContent = state.question.typeTitle;
   questionPrompt.textContent = state.question.prompt;
   questionDisplay.textContent = state.question.display;
+  questionCoach.textContent =
+    "Eine Person liest vor. Das Team entscheidet gemeinsam und begründet die Wahl in einem Satz.";
 
   state.question.options.forEach((option) => {
     const button = document.createElement("button");
@@ -816,24 +820,27 @@ function renderMoveButtons() {
 
   if (state.phase !== "moving") {
     moveLabel.textContent = "Noch kein Zug";
-    moveHint.textContent = "Wenn eine reale Figur bewegt wurde, wählt hier dieselbe Figur aus.";
+    moveHint.textContent =
+      "Nach einer richtigen Antwort bewegt ihr erst die echte Figur und markiert danach denselben Zug hier.";
     return;
   }
 
   if (!state.legalMoves.length) {
-    moveLabel.textContent = "Kein moeglicher Zug";
-    moveHint.textContent = "Das reale Team kann nicht ziehen. Danach wird zum naechsten Team gewechselt.";
+    moveLabel.textContent = "Kein möglicher Zug";
+    moveHint.textContent =
+      "Das Team kann mit dieser Zahl nicht ziehen. Lest den Hinweis vor und gebt an das nächste Team ab.";
     const button = document.createElement("button");
     button.type = "button";
     button.className = "secondary";
-    button.textContent = "Naechstes Team";
+    button.textContent = "Nächstes Team";
     button.addEventListener("click", nextTurn);
     pawnButtons.append(button);
     return;
   }
 
   moveLabel.textContent = `Real ${state.die} Feld(er) ziehen`;
-  moveHint.textContent = "Tippt die Figur an, die auf dem echten Bodenbrett bewegt wurde.";
+  moveHint.textContent =
+    "Bewegt zuerst die Figur auf dem echten Brett. Tippt dann hier dieselbe Figur an.";
 
   state.legalMoves.forEach(({ pawnIndex, target }) => {
     const button = document.createElement("button");
@@ -893,11 +900,11 @@ function renderStatus() {
   deckCount.textContent = `${state.taskDeck.length} im Stapel`;
 
   if (state.phase === "waitingDie") {
-    statusCard.innerHTML = `<strong>Real würfeln</strong><span>${player.displayName} würfelt mit dem Schaumstoffwürfel und trägt die Zahl ein.</span>`;
+    statusCard.innerHTML = `<strong>Würfeln</strong><span>${player.displayName} würfelt, trägt die Zahl ein und bekommt sofort eine Olymp-Aufgabe.</span>`;
   } else if (state.phase === "answering") {
-    statusCard.innerHTML = `<strong>Antwort waehlen</strong><span>Die Klasse entscheidet gemeinsam. Danach wird real gezogen.</span>`;
+    statusCard.innerHTML = `<strong>Antwort wählen</strong><span>Lest die Frage laut. Das Team berät kurz und klickt dann die gemeinsame Antwort.</span>`;
   } else {
-    statusCard.innerHTML = `<strong>Real bewegen</strong><span>Bewegt die Figur auf dem Bodenbrett und bildet denselben Zug digital ab.</span>`;
+    statusCard.innerHTML = `<strong>Figur bewegen</strong><span>Spiegelt den Zug erst auf dem echten Brett und danach auf dem digitalen Olymp-Pfad.</span>`;
   }
 
   undoButton.disabled = state.history.length === 0;
@@ -981,11 +988,13 @@ function answerQuestion(option) {
   if (state.answerCorrect) {
     addLog(`Richtig: ${state.question.explanation}`);
     showFlash("Richtig beantwortet");
-    continueButton.textContent = "Real bewegen";
+    questionCoach.textContent = `${state.question.explanation} Jetzt dürft ihr ziehen.`;
+    continueButton.textContent = "Figur bewegen";
   } else {
-    addLog(`Nicht ganz: ${state.question.explanation} Kein Zug; das naechste Team ist dran.`);
+    addLog(`Nicht ganz: ${state.question.explanation} Kein Zug; das nächste Team ist dran.`);
     showFlash("Kein Zug");
-    continueButton.textContent = "Naechstes Team";
+    questionCoach.textContent = `${state.question.explanation} Merkt euch den Hinweis; danach ist das nächste Team dran.`;
+    continueButton.textContent = "Nächstes Team";
   }
 
   continueButton.classList.remove("hidden");
@@ -1033,7 +1042,7 @@ function applyMove(pawnIndex) {
 
   if (player.pawns.every((progress) => progress === 43)) {
     state.phase = "finished";
-    addLog(`${player.displayName} gewinnt das Großspiel.`);
+    addLog(`${player.displayName} gewinnt die Olymp-Mission.`);
     showFlash(`${player.displayName} gewinnt`);
   } else if (state.die === 6) {
     state.phase = "waitingDie";
@@ -1041,7 +1050,7 @@ function applyMove(pawnIndex) {
     state.question = null;
     state.answerCorrect = null;
     state.legalMoves = [];
-    addLog(`${player.displayName} darf wegen der 6 noch einmal real würfeln.`);
+    addLog(`${player.displayName} darf wegen der 6 noch einmal würfeln.`);
   } else {
     advancePlayer();
   }
@@ -1130,7 +1139,7 @@ function startNewGame() {
   state.taskDeck = createQuestionDeck();
   state.legalMoves = [];
   state.history = [];
-  state.log = ["Großspiel gestartet. Das echte Bodenbrett ist die führende Version."];
+  state.log = ["Olymp-Mission gestartet. Das echte Brett und diese Seite werden gemeinsam geführt."];
   render();
 }
 

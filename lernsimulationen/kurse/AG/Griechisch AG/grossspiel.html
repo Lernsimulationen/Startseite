@@ -18,16 +18,16 @@
         frame-ancestors 'none';
       "
     />
-    <title>Agora Großspiel</title>
+    <title>Olymp-Mission | Vertretungsstunde</title>
     <link rel="stylesheet" href="grossspiel.css" />
   </head>
   <body>
     <div class="app-shell">
       <header class="topbar">
         <div class="brand-block">
-          <p class="eyebrow">Altgriechisch auf dem Bodenbrett</p>
-          <h1>Agora Großspiel</h1>
-          <p class="tagline">Real würfeln. Real laufen. Digital begleiten.</p>
+          <p class="eyebrow">Vertretungsstunde Altgriechisch</p>
+          <h1>Olymp-Mission</h1>
+          <p class="tagline">Ein Brettspiel über Alphabet, Mythen und Teamentscheidungen.</p>
         </div>
 
         <div class="team-strip" aria-label="Teams">
@@ -39,7 +39,8 @@
         </div>
 
         <nav class="toolbar" aria-label="Hilfen">
-          <button type="button" class="tool-button panel-toggle" data-panel-target="rulesPanel">Regeln</button>
+          <button type="button" class="tool-button panel-toggle" data-panel-target="rulesPanel">Ablauf</button>
+          <button type="button" class="tool-button panel-toggle" data-panel-target="missionPanel">Auftrag</button>
           <button type="button" class="tool-button panel-toggle" data-panel-target="alphabetPanel">Alphabet</button>
           <button type="button" class="tool-button panel-toggle" data-panel-target="logPanel">Protokoll</button>
         </nav>
@@ -51,6 +52,23 @@
         </section>
 
         <section class="director-panel" aria-label="Spielleitung">
+          <section class="briefing-card" aria-label="Arbeitsauftrag">
+            <div>
+              <p class="tiny-label">Startauftrag</p>
+              <h2>Besteigt gemeinsam den Olymp</h2>
+            </div>
+            <p>
+              Lest jede Frage laut, entscheidet im Team und begründet eure Antwort kurz.
+              Richtig: Figur bewegen. Falsch: Runde abgeben und Erklärung merken.
+            </p>
+            <div class="lesson-steps" aria-label="Stundenablauf">
+              <span>1. Teams bilden</span>
+              <span>2. Würfeln</span>
+              <span>3. Frage lösen</span>
+              <span>4. Zug spiegeln</span>
+            </div>
+          </section>
+
           <div class="turn-card">
             <div class="turn-head">
               <div id="teamBadge" class="team-badge red">Α</div>
@@ -61,13 +79,13 @@
             </div>
 
             <div class="stepper">
-              <p class="tiny-label">Schaumstoffwürfel</p>
+              <p class="tiny-label">Würfelzahl eintragen</p>
               <div id="dieButtons" class="die-buttons" aria-label="Gewürfelte Zahl eintragen"></div>
             </div>
 
             <div id="statusCard" class="status-card">
               <strong>Bereit</strong>
-              <span>Team Alpha würfelt real und trägt die Zahl hier ein.</span>
+              <span>Team Alpha würfelt und trägt die Zahl hier ein. Die App führt euch durch die Stunde.</span>
             </div>
 
             <div class="quick-actions">
@@ -78,11 +96,11 @@
 
           <section class="move-card">
             <div class="compact-head">
-              <p class="tiny-label">Digitale Abbildung</p>
+              <p class="tiny-label">Zug auf dem Olymppfad</p>
               <strong id="moveLabel">Noch kein Zug</strong>
             </div>
             <p id="moveHint">
-              Wenn eine reale Figur bewegt wurde, wählt hier dieselbe Figur aus.
+              Nach einer richtigen Antwort bewegt ihr erst die echte Figur und markiert danach denselben Zug hier.
             </p>
             <div id="pawnButtons" class="pawn-buttons"></div>
           </section>
@@ -97,11 +115,12 @@
         <div class="question-card">
           <div class="question-meta">
             <span id="questionType">Aufgabe</span>
-            <span id="deckCount">520 im Stapel</span>
+            <span id="deckCount">Aufgabenstapel</span>
           </div>
-          <p id="questionPrompt" class="question-prompt">Nach dem realen Wurf erscheint hier die Aufgabe.</p>
+          <p id="questionPrompt" class="question-prompt">Nach dem Wurf erscheint hier die Aufgabe.</p>
           <div id="questionDisplay" class="greek-display">Α Β Γ Δ</div>
           <div id="answerButtons" class="answers"></div>
+          <p id="questionCoach" class="question-coach">Sprecht erst kurz im Team, dann wählt eine Antwort.</p>
           <button id="continueButton" type="button" class="primary hidden">Weiter zum Zug</button>
         </div>
       </section>
@@ -111,16 +130,51 @@
 
         <section id="rulesPanel" class="overlay-panel hidden">
           <div class="overlay-head">
-            <h2>Großspiel-Regeln</h2>
+            <h2>Ablauf der Vertretungsstunde</h2>
             <button type="button" class="close-button" data-close-overlay>Schließen</button>
           </div>
           <div class="rule-grid">
-            <p>Die Lernenden würfeln mit dem Schaumstoffwürfel auf dem echten Bodenbrett.</p>
-            <p>Die gewürfelte Zahl wird digital eingetragen, damit eine Aufgabe erscheint.</p>
-            <p>Nach der Antwort wird die reale Figur bewegt und dieselbe Figur digital markiert.</p>
-            <p>Mit 5 oder 6 darf eine Figur aus dem Haus auf das Startfeld.</p>
-            <p>Fremde Figuren auf dem Zielfeld werden real zurück ins Haus gestellt und digital mitgeführt.</p>
-            <p>Die App würfelt nicht selbst; sie zeigt Fragen, Zughinweise und den Spielstand.</p>
+            <p><strong>Material:</strong> ein reales Spielbrett mit Figuren, ein Würfel und diese Seite auf Beamer oder Tablet.</p>
+            <p><strong>Start:</strong> Bildet bis zu vier Teams. Alpha beginnt, danach geht es im Uhrzeigersinn weiter.</p>
+            <p><strong>Jeder Zug:</strong> Würfeln, Zahl eintippen, Aufgabe laut lesen, gemeinsam entscheiden.</p>
+            <p><strong>Richtig:</strong> Die Figur wird auf dem echten Brett bewegt und der Zug digital gespiegelt.</p>
+            <p><strong>Falsch:</strong> Die Erklärung wird gelesen. Das Team bewegt keine Figur und das nächste Team ist dran.</p>
+            <p><strong>Ins Spiel kommen:</strong> Mit 5 oder 6 darf eine Figur aus dem Haus auf das Startfeld.</p>
+            <p><strong>Schlagen:</strong> Landet ihr auf einer fremden Figur, kommt sie zurück ins Haus.</p>
+            <p><strong>Ziel:</strong> Wer zuerst alle vier Figuren oben im Zielbereich hat, gewinnt die Olymp-Mission.</p>
+          </div>
+        </section>
+
+        <section id="missionPanel" class="overlay-panel hidden">
+          <div class="overlay-head">
+            <h2>Arbeitsauftrag</h2>
+            <button type="button" class="close-button" data-close-overlay>Schließen</button>
+          </div>
+          <div class="mission-copy">
+            <article>
+              <p class="tiny-label">Für die Klasse</p>
+              <h3>Heute spielt ihr selbstständig.</h3>
+              <p>
+                Eure Aufgabe ist nicht nur zu gewinnen. Ihr sollt griechische Buchstaben wiedererkennen,
+                Mythenwissen nutzen und eure Antworten im Team begründen.
+              </p>
+            </article>
+            <article>
+              <p class="tiny-label">Rollen</p>
+              <h3>Wechselt nach jedem Zug.</h3>
+              <p>
+                Eine Person würfelt, eine liest vor, eine moderiert die Teamentscheidung,
+                eine bewegt die Figur. Danach wechseln die Rollen im Team.
+              </p>
+            </article>
+            <article>
+              <p class="tiny-label">Fairplay</p>
+              <h3>Erklärung zählt.</h3>
+              <p>
+                Bei Unsicherheit darf das Team kurz beraten. Die Antwort gilt erst,
+                wenn sie eingeloggt wurde. Die Erklärung danach wird laut vorgelesen.
+              </p>
+            </article>
           </div>
         </section>
 
