@@ -129,3 +129,17 @@
 .ethik-kompass-recap p{margin:0;font-size:.85rem;line-height:1.4}
 .ethik-kompass-task{margin:1rem 0;padding:.85rem;border:3px dashed var(--line);border-radius:16px;background:#eadcf2;text-align:left}
 .ethik-kompass-task h3{margin:.2rem 0;font-size:1.8rem}
+
+/* Finaler Tafel-Fenster-Override: muss nach den alten Drawer-Regeln stehen. */
+.board-page .side-panel{position:absolute;z-index:20;inset:0;display:block;width:auto;height:auto;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;overflow:visible;transform:none;transition:none;pointer-events:none}
+.board-page .side-panel.open{transform:none}
+.board-page .side-panel>.panel{position:absolute;left:var(--float-x,18px);top:var(--float-y,18px);display:none;width:var(--float-w,min(440px,45vw));height:var(--float-h,min(390px,64vh));min-width:260px;min-height:190px;max-width:calc(100vw - 24px);max-height:calc(100vh - 88px);padding:.6rem;resize:both;overflow:auto;pointer-events:auto;border:4px solid var(--line);border-radius:20px;background:var(--paper);box-shadow:8px 10px 0 #26323c77}
+.board-page .side-panel>.panel.active{display:block}
+.board-page .side-panel>.panel[data-panel="progress"]{--float-x:16px;--float-y:16px;--float-w:min(430px,42vw);--float-h:min(430px,70vh)}
+.board-page .side-panel>.panel[data-panel="terms"]{--float-x:64px;--float-y:72px;--float-w:min(470px,48vw);--float-h:min(390px,62vh)}
+.board-page .side-panel>.panel[data-panel="plenum"]{--float-x:120px;--float-y:118px;--float-w:min(660px,68vw);--float-h:min(530px,74vh)}
+.board-page .side-panel>.panel[data-panel="wimmel"]{--float-x:180px;--float-y:52px;--float-w:min(560px,58vw);--float-h:min(460px,68vh)}
+.board-page .side-panel>.panel[data-panel="story"]{--float-x:220px;--float-y:168px;--float-w:min(480px,50vw);--float-h:min(430px,66vh)}
+.side-panel-close{position:absolute;right:.75rem;top:.75rem;display:none;pointer-events:auto;background:#ffd5c8;color:var(--ink);align-self:auto}
+.side-panel.open .side-panel-close{display:block}
+@media(max-width:900px){.board-page .side-panel>.panel{width:min(92vw,520px);height:min(62vh,460px);max-height:calc(100vh - 72px)}}
