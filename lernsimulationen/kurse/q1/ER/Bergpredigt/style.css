@@ -68,6 +68,17 @@
 @keyframes wimmelFly{0%{transform:translate(0,0) scale(.7) rotate(-8deg);opacity:1}80%{opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(1.05) rotate(8deg);opacity:0}}
 @keyframes shelfPop{0%{transform:scale(.85)}70%{transform:scale(1.08)}100%{transform:scale(1)}}
 @media(max-width:680px){.wimmel-targets,.found-shelf>div{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.teacher-tablet-preview{display:block;max-width:980px;margin:.8rem auto 0;padding:1.15rem;border:4px solid var(--line);border-radius:22px;background:var(--paper);box-shadow:var(--soft-shadow)}
+.teacher-tablet-preview .station-header{flex-wrap:wrap}
+.teacher-preview-pill{padding:.3rem .6rem;border:3px solid var(--line);border-radius:999px;background:#fff4ce;font-size:.75rem;font-weight:900;text-transform:uppercase}
+.teacher-tablet-preview .bible-panel,.teacher-tablet-preview .story-panel,.teacher-tablet-preview .teacher-solution-box{margin:.75rem 0;padding:.75rem;border:3px solid #26323c33;border-radius:16px;background:#fffdf8}
+.teacher-tablet-preview .bible-panel summary,.teacher-tablet-preview .teacher-solution-box summary{cursor:pointer;font-weight:900}
+.teacher-tablet-preview .bible-panel p{line-height:1.55}.teacher-tablet-preview .bible-panel mark{padding:.05rem .18rem;border-radius:6px;background:#ffd86a}
+.teacher-preview-actions{display:flex;flex-wrap:wrap;gap:.6rem}.teacher-preview-actions .comic-button{flex:1;min-width:180px}
+.teacher-product-preview{display:grid;gap:.35rem;margin:1rem 0;padding:.75rem;border:3px dashed var(--line);border-radius:16px;background:#fff4ce}
+.teacher-product-preview textarea{min-height:88px;padding:.75rem;border:3px solid var(--line);border-radius:12px;background:white;font:inherit}
+.teacher-tablet-preview .feedback.hidden{display:none!important}
 .export-button{background:var(--purple)}
 .notes-ticker span{background:#eadcf2}
 #notesText{width:100%;min-height:160px;margin:.6rem 0;padding:.75rem;border:3px solid var(--line);border-radius:12px;background:#fffdf8;font:inherit;line-height:1.45;resize:vertical}
