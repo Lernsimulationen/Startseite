@@ -51,6 +51,23 @@
 .glossary-term{padding:.05rem .3rem;border:2px solid var(--blue);border-radius:8px;background:#dff0f1;color:var(--blue);font-weight:900;cursor:pointer;font-size:.95em;line-height:1.2}
 .speak-button{margin:.4rem 0}
 .product-card .module-context{margin-top:0}
+.wimmel-brief{display:grid;gap:.35rem;margin:.55rem 0 .75rem;padding:.75rem;border:3px solid var(--line);border-radius:18px;background:#fff4ce;box-shadow:3px 4px 0 #26323c33}
+.wimmel-brief p{margin:0;font-weight:900}.wimmel-targets{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.45rem}
+.wimmel-targets span,.shelf-slot{display:grid;justify-items:center;gap:.2rem;padding:.45rem;border:3px solid var(--line);border-radius:14px;background:#fffdf8;font-weight:900;text-align:center}
+.wimmel-targets i,.shelf-slot i{display:grid;place-items:center;width:2.3rem;height:2.3rem;border:3px solid var(--line);border-radius:50%;background:#dff0f1;font-style:normal;font-size:1.35rem}
+.wimmel-targets span.found{background:#d9f0ce;border-color:var(--green-dark);transform:rotate(-.5deg)}
+.wimmel-game{position:relative}.wimmel-spot{display:grid;place-items:center;width:54px;height:54px;border:0;background:transparent;box-shadow:none}
+.wimmel-spot:after{content:"";width:20px;height:20px;border:3px solid #fff8;border-radius:50%;background:#ffffff08;box-shadow:0 0 0 0 #fff0;transition:.2s}
+.wimmel-spot:hover:after,.wimmel-spot:focus-visible:after{background:#fff4ce88;box-shadow:0 0 0 8px #fff4ce55;outline:none}
+.wimmel-spot.found{pointer-events:none;background:transparent!important;border:0!important;box-shadow:none!important;animation:none}
+.wimmel-spot.found:after{content:"✓";width:34px;height:34px;display:grid;place-items:center;border:3px solid var(--green-dark);border-radius:50%;background:#d9f0cecc;color:var(--green-dark);font-weight:900;box-shadow:0 0 0 7px #d9f0ce55}
+.found-shelf{display:grid;gap:.45rem;margin-top:.7rem;padding:.75rem;border:4px solid #573a25;border-radius:18px;background:linear-gradient(#d9b16f,#9f6d3b);box-shadow:5px 6px 0 #26323c55}
+.found-shelf>b{font:1.6rem/1 "Bangers";letter-spacing:.04em;color:#573a25;text-shadow:1px 1px 0 #fff4ce}.found-shelf>div{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.5rem}
+.shelf-slot{min-height:84px;background:#fff4cedd;opacity:.58;filter:grayscale(1)}.shelf-slot.filled{opacity:1;filter:none;background:#d9f0ce;animation:shelfPop .45s ease both}.shelf-slot small{font-size:.68rem;line-height:1.1}
+.wimmel-flyer{position:fixed;z-index:80;left:0;top:0;display:grid;place-items:center;width:44px;height:44px;margin:-22px 0 0 -22px;border:3px solid var(--line);border-radius:50%;background:#fff4ce;font-size:1.45rem;box-shadow:4px 5px 0 #26323c55;pointer-events:none;animation:wimmelFly .7s cubic-bezier(.2,.75,.25,1) forwards}
+@keyframes wimmelFly{0%{transform:translate(0,0) scale(.7) rotate(-8deg);opacity:1}80%{opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(1.05) rotate(8deg);opacity:0}}
+@keyframes shelfPop{0%{transform:scale(.85)}70%{transform:scale(1.08)}100%{transform:scale(1)}}
+@media(max-width:680px){.wimmel-targets,.found-shelf>div{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .export-button{background:var(--purple)}
 .notes-ticker span{background:#eadcf2}
 #notesText{width:100%;min-height:160px;margin:.6rem 0;padding:.75rem;border:3px solid var(--line);border-radius:12px;background:#fffdf8;font:inherit;line-height:1.45;resize:vertical}

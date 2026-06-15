@@ -45,13 +45,13 @@ const categories = [
     weights: { people: 0.1, future: 1.05, stable: 0.2 }
   },
   {
-    id: "zinsen",
-    name: "Schulden/Zinsen",
-    hint: "Zinsen zahlen, neue Schulden begrenzen",
-    icon: "Z",
+    id: "reserve",
+    name: "Reserve/Kredite",
+    hint: "Puffer bilden, neue Kredite vermeiden",
+    icon: "R",
     color: "#8a6b3d",
     value: 14,
-    weights: { people: -0.15, future: 0.35, stable: 0.9 }
+    weights: { people: -0.2, future: 0.35, stable: 0.85 }
   }
 ];
 
@@ -266,9 +266,9 @@ function calculateRound(values) {
     score.stable += diff * category.weights.stable;
   });
 
-  const savings = values.zinsen - categories.find((category) => category.id === "zinsen").value;
-  const newDebt = clamp(Math.round(8 - savings * 1.2), 0, 26);
-  score.people += Math.max(0, 18 - values.zinsen) * 0.35;
+  const reserve = values.reserve - categories.find((category) => category.id === "reserve").value;
+  const newDebt = clamp(Math.round(8 - reserve * 1.2), 0, 26);
+  score.people += Math.max(0, 18 - values.reserve) * 0.3;
   score.stable -= newDebt * 0.45;
 
   events[state.round].apply(values, score);
