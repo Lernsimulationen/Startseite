@@ -1,6 +1,14 @@
 # Bergpredigt-Expedition: Serious-Game-Lernmodule
 
-Version: v37
+Version: v39
+
+## Update v39
+
+Die Kartenwand an der Tafel zeigt jetzt nicht mehr die Belegkarten, sondern die vier Fachbegriffe des Kurses: Nach jedem abgeschlossenen Modul wird der zugehörige Fachbegriff mit Definition freigeschaltet, die übrigen bleiben als verdeckte Karten sichtbar. Das separate Fachbegriffe-Glossar-Panel an der Tafel entfällt dafür. Die Leitfrage des Ethik-Kompass ist jetzt Teil des Live-Fortschritt-Panels statt eines eigenen Bereichs. In der Plenumsarena entfallen die Anzeige von "Position 1/Position 2/eigene differenzierte Position" (das Debatten-Finale auf dem Tablet bleibt unverändert bestehen) sowie die Vertiefungsbeiträge, da diese ohne didaktische Funktion waren. Das Tafelmodul wurde entsprechend in ein vierspaltiges Layout (Live-Fortschritt mit Leitfrage, Fachbegriffe, Plenumsarena, Rückblick) überführt. Stattdessen erhält jede Gruppe auf dem Tablet pro Modul einen "Notizblock"-Button, der ein Pop-up mit einem persistenten Notizfeld öffnet; die Notizen können optional als "Notizen der Gruppen" an die Tafel gesendet werden. Die Expeditionsroute auf der Tafelkarte und die Position der Gruppen-Avatare aktualisieren sich jetzt nach jedem einzelnen Spiel (statt nur nach jedem Modul), sodass der Fortschritt der Gruppen auf dem Bergpredigt-Bild durchgehend sichtbar wird.
+
+## Update v38
+
+Die Rahmenerzählung erscheint nicht mehr als Pop-up, das verschwindet, sondern als aufklappbares Feld direkt in der Aufgabenkarte jedes Spiels - beim ersten Spiel eines Moduls geöffnet, danach eingeklappt, aber jederzeit während der Aufgabe einsehbar (inklusive Vorlesen-Funktion). So bleibt der Bezug zwischen Rahmengeschichte und aktuellem Auftrag während der Bearbeitung sichtbar.
 
 ## Update v37
 

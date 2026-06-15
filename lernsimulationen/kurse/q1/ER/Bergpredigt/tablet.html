@@ -19,12 +19,12 @@
   <section class="prompt-popup hidden" id="feedbackPopup" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
     <article><p class="comic-kicker">Lehrkraft-Feedback</p><h1 id="feedbackTitle">Station gesichert</h1><p id="feedbackPopupText"></p><button class="comic-button" id="closeFeedbackPopup" type="button">Weiterdenken</button></article>
   </section>
-  <section class="prompt-popup story-popup hidden" id="storyPopup" role="dialog" aria-modal="true" aria-labelledby="storyPopupTitle">
-    <article><p class="comic-kicker">Rahmenerzählung</p><h1 id="storyPopupTitle">Auftrag</h1><p id="storyPopupText"></p><button class="comic-button" id="closeStoryPopup" type="button">Aufgabe starten</button></article>
-  </section>
   <section class="prompt-popup hidden" id="glossaryTermPopup" role="dialog" aria-modal="true" aria-labelledby="glossaryTermTitle">
     <article><p class="comic-kicker">Fachbegriff</p><h1 id="glossaryTermTitle">Begriff</h1><p id="glossaryTermText"></p><button class="comic-button" id="closeGlossaryTermPopup" type="button">Verstanden</button></article>
   </section>
-<div class="version-badge">Version v37</div>
+  <section class="prompt-popup hidden" id="notesPopup" role="dialog" aria-modal="true" aria-labelledby="notesTitle">
+    <article><p class="comic-kicker">Notizblock</p><h1 id="notesTitle">Modul-Notizen</h1><textarea id="notesText" maxlength="500" placeholder="Eure Notizen zu diesem Modul ..."></textarea><div class="task-actions"><button class="comic-button" id="sendNotes" type="button">An Tafel senden</button><button class="comic-button mini-action" id="closeNotesPopup" type="button">Schließen</button></div></article>
+  </section>
+<div class="version-badge">Version v39</div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="shared.js"></script><script src="tablet.js"></script>
 </body></html>
