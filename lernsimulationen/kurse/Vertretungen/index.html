@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Haushaltsmission 7</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <section class="game-shell" aria-labelledby="gameTitle">
+      <div class="topbar">
+        <div>
+          <p class="eyebrow">Vertretungsstunde | Politik/Wirtschaft</p>
+          <h1 id="gameTitle">Haushaltsmission 7</h1>
+        </div>
+        <div class="round-pill" aria-live="polite">
+          <span>Runde</span>
+          <strong id="roundText">1 / 4</strong>
+        </div>
+      </div>
+
+      <section class="hero-band">
+        <div class="budget-visual" aria-hidden="true">
+          <svg viewBox="0 0 420 280" role="img">
+            <defs>
+              <linearGradient id="coinGlow" x1="0" x2="1">
+                <stop offset="0" stop-color="#f5c84b"/>
+                <stop offset="1" stop-color="#f18f3b"/>
+              </linearGradient>
+            </defs>
+            <rect x="18" y="42" width="384" height="206" rx="24" fill="#f6f2e8"/>
+            <path d="M52 214h316" stroke="#25324d" stroke-width="8" stroke-linecap="round"/>
+            <path d="M92 196V116M158 196V84M224 196V132M290 196V98M356 196V146" stroke="#49907b" stroke-width="18" stroke-linecap="round"/>
+            <circle cx="105" cy="78" r="32" fill="url(#coinGlow)"/>
+            <circle cx="105" cy="78" r="20" fill="none" stroke="#8d5b17" stroke-width="5"/>
+            <path d="M198 48c35 24 52 60 44 110 42-7 80 5 116 36" fill="none" stroke="#dc5f46" stroke-width="9" stroke-linecap="round"/>
+            <path d="M192 48l46 4-21 38" fill="none" stroke="#dc5f46" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+            <g fill="#25324d">
+              <circle cx="77" cy="226" r="9"/>
+              <circle cx="338" cy="226" r="9"/>
+            </g>
+          </svg>
+        </div>
+        <div class="mission-copy">
+          <p class="tag">Ihr seid das Haushaltskabinett.</p>
+          <p>Verteilt 100 Milliarden Spielgeld so, dass Deutschland handlungsfähig bleibt. Jede Runde bringt ein neues Problem aus dem Alltag der Politik.</p>
+        </div>
+      </section>
+
+      <section class="status-grid" aria-label="Kennzahlen">
+        <div class="meter-card">
+          <span>Zufriedenheit</span>
+          <strong id="scorePeople">50</strong>
+          <div class="meter"><i id="barPeople"></i></div>
+        </div>
+        <div class="meter-card">
+          <span>Zukunft</span>
+          <strong id="scoreFuture">50</strong>
+          <div class="meter"><i id="barFuture"></i></div>
+        </div>
+        <div class="meter-card">
+          <span>Stabilität</span>
+          <strong id="scoreStable">50</strong>
+          <div class="meter"><i id="barStable"></i></div>
+        </div>
+        <div class="meter-card debt">
+          <span>Neue Schulden</span>
+          <strong><span id="debtText">0</span> Mrd.</strong>
+          <div class="meter debt-meter"><i id="barDebt"></i></div>
+        </div>
+      </section>
+
+      <section class="board">
+        <article class="event-panel">
+          <div class="event-icon" id="eventIcon" aria-hidden="true">!</div>
+          <p class="eyebrow">Aktuelle Lage</p>
+          <h2 id="eventTitle">Start der Haushaltsberatungen</h2>
+          <p id="eventText">Alle Ministerien melden Wünsche an. Ihr müsst entscheiden, welche Aufgaben der Bund sofort finanziert.</p>
+          <div class="event-effects" id="eventEffects"></div>
+        </article>
+
+        <article class="budget-panel">
+          <div class="budget-head">
+            <div>
+              <p class="eyebrow">Bundeshaushalt</p>
+              <h2>100 Mrd. verteilen</h2>
+            </div>
+            <output id="remainingText" for="budgetInputs">0 übrig</output>
+          </div>
+          <div id="budgetInputs" class="budget-list"></div>
+          <div class="actions">
+            <button id="autoBalance" type="button" class="secondary">Ausgleichen</button>
+            <button id="submitBudget" type="button">Haushalt beschließen</button>
+          </div>
+        </article>
+      </section>
+
+      <section class="ledger" aria-label="Haushaltsnotizen">
+        <h2>Notizen aus dem Kabinett</h2>
+        <ol id="ledgerList"></ol>
+      </section>
+    </section>
+
+    <dialog id="resultDialog">
+      <div class="dialog-content">
+        <p class="eyebrow">Auswertung</p>
+        <h2 id="resultTitle">Haushalt beschlossen</h2>
+        <p id="resultText"></p>
+        <div class="result-grid" id="resultGrid"></div>
+        <div class="reflection">
+          <h3>Diskussionsfragen</h3>
+          <ul>
+            <li>Welche Ausgabe war euch am wichtigsten, obwohl sie nicht sofort beliebt war?</li>
+            <li>Woran merkt man, dass Politik aus Zielkonflikten besteht?</li>
+            <li>Welche Entscheidung würdet ihr nach der Auswertung ändern?</li>
+          </ul>
+        </div>
+        <button id="restartGame" type="button">Neue Runde starten</button>
+      </div>
+    </dialog>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

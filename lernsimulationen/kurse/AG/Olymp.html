@@ -192,6 +192,9 @@
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
             position: relative; overflow: hidden;
         }
+        .god-symbol-img {
+            width: 100%; height: 100%; object-fit: cover; display: block;
+        }
         @media (min-width: 768px) {
             .god-circle { width: 72px; height: 72px; border-width: 4px; }
             .god-avatar-container { width: 100px; }
@@ -234,11 +237,11 @@
         /* --- UPGRADED CARD DESIGN --- */
         .tile {
             aspect-ratio: 3/4; 
-            background: var(--card-gradient); 
+            background: linear-gradient(160deg, #fff8e7 0%, #ffffff 44%, #eef2ff 100%); 
             border-radius: 1.25rem;
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
-            border: 1px solid #e2e8f0; 
-            border-bottom: 5px solid #cbd5e1; /* 3D Look */
+            border: 1px solid #e7c873; 
+            border-bottom: 5px solid #b45309;
             position: relative; overflow: hidden; cursor: pointer;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -280,15 +283,17 @@
         .icon-wrapper {
             width: 3.5rem; height: 3.5rem; 
             border-radius: 50%; 
-            background: #eff6ff; 
+            background: #111827; 
             color: #3b82f6;
             display: flex; align-items: center; justify-content: center;
             margin-bottom: 1rem;
             border: 2px solid #bfdbfe;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             transition: all 0.3s;
+            overflow: hidden;
         }
-        .tile:hover .icon-wrapper { transform: scale(1.1); background: #dbeafe; }
+        .tile:hover .icon-wrapper { transform: scale(1.1); background: #1e293b; }
+        .tile-symbol-img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
         /* Typography */
         .tile-label { font-weight: 800; color: #334155; font-size: 1rem; letter-spacing: -0.025em; }
@@ -310,7 +315,9 @@
         .modal-backdrop.active .modal-card { transform: scale(1); }
 
         .modal-header { 
-            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 70%, #92400e 100%);
+            background:
+                linear-gradient(135deg, rgba(15,23,42,0.92) 0%, rgba(30,58,138,0.84) 70%, rgba(146,64,14,0.9) 100%),
+                url('assets/olymp-drama.png') center 35% / cover;
             padding: 2rem 1.5rem 1.5rem; text-align: center; position: relative; 
             border-bottom: 1px solid #bfdbfe;
         }
@@ -325,6 +332,17 @@
         }
         .god-dossier strong { display:block; color:#78350f; margin-bottom:0.35rem; }
         .god-dossier span { font-size: 0.95rem; }
+        .dossier-note {
+            width: 100%; box-sizing: border-box; margin: -0.25rem 0 1.25rem;
+            color: #475569; font-size: 0.92rem; line-height: 1.5;
+            background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 0.75rem;
+            padding: 0.85rem 1rem;
+        }
+        .modal-god-symbol {
+            width: 5rem; height: 5rem; border-radius: 50%; overflow: hidden;
+            border: 4px solid #facc15; box-shadow: 0 12px 28px rgba(15,23,42,0.25);
+            margin-bottom: 1.25rem; background: #111827;
+        }
         
         .option-btn {
             width: 100%; padding: 1rem; background: white; color: #334155;
@@ -447,11 +465,13 @@
                 Ein Sturm hat die Namen, Zeichen und Geschichten der olympischen Gottheiten durcheinandergebracht.
                 Arbeite dich Gottheit für Gottheit durch die Prüfungen. Lies im Aufgabenfenster zuerst das Dossier:
                 Darin stehen alle Hinweise, die du brauchst, um Wissen, Symbol und Wort-Orakel zu lösen.
+                Ziel der Stunde ist nicht nur ein fertiger Spielstand, sondern ein sicherer Überblick: Wer ist die Gottheit,
+                wofür steht sie, welches Symbol passt zu ihr und welche Sage gehört dazu?
             </p>
             <div class="lesson-steps" aria-label="Arbeitsauftrag">
                 <div class="lesson-step"><strong>1. Lesen</strong><span>Öffne eine Prüfung und lies das Götterdossier aufmerksam.</span></div>
                 <div class="lesson-step"><strong>2. Entscheiden</strong><span>Nutze die Hinweise für Quiz, Symbol-Auswahl und Buchstabenrätsel.</span></div>
-                <div class="lesson-step"><strong>3. Sichern</strong><span>Wenn alle 14 Gottheiten versammelt sind, lade die Statistik als Nachweis herunter.</span></div>
+                <div class="lesson-step"><strong>3. Sichern</strong><span>Wenn alle 14 Gottheiten versammelt sind, lade die Statistik als Nachweis herunter und notiere drei neue Fakten.</span></div>
             </div>
         </section>
 
@@ -486,10 +506,11 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div style="width:4.5rem; height:4.5rem; background:#f1f5f9; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-bottom:1.5rem; border:4px solid white; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); color:#64748b;">
-                    <div id="game-icon-container" style="width:2.5rem; height:2.5rem;"></div>
+                <div class="modal-god-symbol">
+                    <img id="modal-god-symbol-img" class="god-symbol-img" src="" alt="">
                 </div>
                 <div id="god-dossier" class="god-dossier"></div>
+                <div id="dossier-note" class="dossier-note"></div>
                 <p id="riddle-text" style="text-align:center; margin-bottom:2rem; font-size:1.125rem; color:#334155; line-height:1.6; font-family:serif; font-style:italic;"></p>
                 <div id="game-container" style="width:100%; display:flex; flex-direction:column; align-items:center; gap:1rem;"></div>
                 <div id="feedback-msg" class="msg-box" style="margin-top:1.5rem; min-height:1.5rem; font-weight:bold; text-align:center;"></div>
@@ -572,20 +593,62 @@
         ];
 
         const GOD_DOSSIERS = {
-            zeus: "Zeus ist der Göttervater. Seine Mutter Rhea rettete ihn vor Kronos und versteckte ihn auf Kreta. Sein Zeichen ist der Blitz.",
-            hera: "Hera gilt als Göttermutter und Königin des Olymp. Ihr Herrschaftszeichen ist die Krone. Der Pfau ist ihr heilig; in einer Sage verfolgt sie Io aus Eifersucht.",
-            poseidon: "Poseidon herrscht über das Meer und kann die Erde erbeben lassen. Sein Machtzeichen ist der Dreizack; im Spiel steht dafür der Anker. Er erschuf das Pferd, und Atlantis gilt als versunkenes Reich.",
-            demeter: "Demeter ist Göttin der Fruchtbarkeit und des Getreides. Ihre Tochter heißt Persephone. Ihre berühmten Mysterien wurden in Eleusis gefeiert.",
-            athena: "Athena ist Göttin der Weisheit und der klugen Verteidigung. Sie entsprang dem Kopf des Zeus. Ihr Schutzzeichen ist der Schild; Athen schenkte sie den Olivenbaum.",
-            ares: "Ares ist der Kriegsgott. Seine Begleiterin ist Eris, die Göttin des Streits. Schwert und Speer passen zu ihm; Sparta verehrte ihn besonders.",
-            apollo: "Apollon ist Gott des Lichts, der Musik und der Weissagung. Im Musikwettstreit besiegte er Pan. Sein Zeichen ist die Sonne; sein berühmtes Orakel stand in Delphi.",
-            hephaestus: "Hephaistos ist der Schmiedegott. Er arbeitet mit Hammer und Amboss. In einer Sage fängt er Ares und Aphrodite in einem unsichtbaren Netz; seine Werkstatt liegt unter dem Ätna.",
-            hermes: "Hermes ist der schnelle Götterbote. Flügel und Federn erinnern an seine Bewegung. Er stahl Apollon Rinder, und sein besonderer Stab heißt Caduceus.",
-            artemis: "Artemis ist Göttin der Jagd und des Mondes. Sie verwandelte den Jäger Aktaion in einen Hirsch. Ihre liebste Beschäftigung ist die Jagd.",
-            aphrodite: "Aphrodite ist Göttin der Liebe und Schönheit. Paris überreichte ihr den goldenen Apfel. Ihr Symbol ist das Herz; sie wurde aus Meerschaum geboren.",
-            dionysus: "Dionysos ist Gott des Weines, des Festes und des Theaters. König Midas verwandelte durch ihn alles in Gold. Aus seinen Festen entwickelte sich das Theater.",
-            hestia: "Hestia wacht über Herdfeuer, Heim und Gemeinschaft. Im Tempel durfte ihr Feuer niemals erlöschen. Der Mittelpunkt ihres Bereichs ist das Heim.",
-            hades: "Hades herrscht über die Unterwelt. Der Fluss des Vergessens heißt Lethe. Ein Totenschädel erinnert an Sterblichkeit, und sein dreiköpfiger Hund heißt Kerberos."
+            zeus: {
+                text: "Zeus steht im Zentrum der olympischen Ordnung. Nach dem Mythos wollte Kronos seine Kinder verschlingen; Rhea rettete Zeus und versteckte ihn auf der Insel Kreta. Später stürzte Zeus Kronos und wurde Herrscher über Himmel, Wetter und göttliche Gesetze. Sein wichtigstes Zeichen ist der Blitz, mit dem er Macht und Urteil sichtbar macht.",
+                note: "Merke dir: Mutter Rhea, Zuflucht Kreta, Symbol Blitz."
+            },
+            hera: {
+                text: "Hera ist Königin des Olymp und Göttin von Ehe, Familie und königlicher Würde. Sie erscheint oft mit Krone oder Thron, weil sie nicht nur Begleiterin des Zeus, sondern selbst Herrscherin ist. Der Pfau gilt als ihr heiliges Tier. In vielen Sagen reagiert Hera streng auf Treuebruch; Io gehört zu den Figuren, die sie aus Eifersucht verfolgt.",
+                note: "Merke dir: Hera = Götterkönigin, Krone, Pfau, Sage um Io."
+            },
+            poseidon: {
+                text: "Poseidon beherrscht das Meer, Stürme und Erdbeben. Mit seinem Dreizack kann er Wellen auftürmen und die Erde erschüttern; im Spiel steht der Anker als klares Meeressymbol für ihn. In Mythen wird Poseidon auch mit Pferden verbunden, die er aus der Kraft des Meeres erschaffen haben soll. Atlantis gilt als sagenhaftes, versunkenes Reich.",
+                note: "Merke dir: Meer, Erdbeben, Pferd, Atlantis, Symbol im Spiel: Anker."
+            },
+            demeter: {
+                text: "Demeter ist Göttin des Getreides, der Fruchtbarkeit und der Jahreszeiten. Ihre Tochter Persephone wird von Hades geraubt; Demeters Trauer erklärt im Mythos, warum die Erde zeitweise unfruchtbar wird. Wenn Persephone zurückkehrt, wächst wieder neues Leben. In Eleusis wurden besondere Mysterien zu Demeter und Persephone gefeiert.",
+                note: "Merke dir: Getreide, Persephone, Eleusis, Wachstum."
+            },
+            athena: {
+                text: "Athena verbindet Weisheit mit kluger Verteidigung. Sie entspringt dem Kopf des Zeus, was ihre Nähe zu Verstand, Strategie und Planung erklärt. Ihr Schild steht nicht für blinde Gewalt, sondern für Schutz, Ordnung und überlegte Stärke. Athen verdankt ihr im Mythos den Olivenbaum, ein Zeichen für Frieden, Nahrung und Wohlstand.",
+                note: "Merke dir: Kopf des Zeus, Schild, Weisheit, Olivenbaum."
+            },
+            ares: {
+                text: "Ares verkörpert die wilde, gefährliche Seite des Krieges. Anders als Athena steht er weniger für Strategie, sondern für Kampfeslust und Streit. Seine Begleiterin Eris bringt Zwietracht und Konflikte. Schwert und Speer passen deshalb zu ihm; Sparta, berühmt für militärische Härte, verehrte ihn besonders.",
+                note: "Merke dir: Krieg, Eris, Schwert, Sparta."
+            },
+            apollo: {
+                text: "Apollon ist Gott des Lichts, der Musik, der Heilkunst und der Weissagung. Die Sonne passt zu ihm, weil sie Klarheit und Ordnung bringt. Im Musikwettstreit besiegt er Pan und zeigt damit seine Nähe zur Kunst. Besonders berühmt ist sein Orakel in Delphi, wo Menschen göttlichen Rat suchten.",
+                note: "Merke dir: Licht, Musik, Pan, Delphi, Sonne."
+            },
+            hephaestus: {
+                text: "Hephaistos ist der göttliche Schmied und Meister der Werkstatt. Er fertigt Waffen, Schmuck und kunstvolle Geräte für Götter und Helden. Sein Werkzeug ist der Hammer. In einer bekannten Sage fängt er Ares und Aphrodite mit einem unsichtbaren Netz. Seine Werkstatt wird oft unter einem Vulkan gedacht, besonders unter dem Ätna.",
+                note: "Merke dir: Schmied, Hammer, Netz, Ätna."
+            },
+            hermes: {
+                text: "Hermes ist Götterbote, Grenzgänger und Beschützer der Reisenden. Er ist schnell, listig und beweglich; Flügel oder Federn erinnern an seine Geschwindigkeit. Schon als junger Gott stiehlt er Apollon Rinder und beweist damit seinen Erfindungsgeist. Sein besonderer Stab heißt Caduceus.",
+                note: "Merke dir: Götterbote, Rinder, Flügel/Feder, Caduceus."
+            },
+            artemis: {
+                text: "Artemis ist Göttin der Jagd, der Wildnis und des Mondes. Sie schützt Tiere und junge Menschen, kann aber auch streng sein, wenn ihre Regeln verletzt werden. Der Jäger Aktaion wird in einen Hirsch verwandelt, nachdem er Artemis beleidigt oder heimlich beobachtet hat. Bogen, Mond und Jagd gehören deshalb zu ihr.",
+                note: "Merke dir: Mond, Jagd, Aktaion wird Hirsch."
+            },
+            aphrodite: {
+                text: "Aphrodite ist Göttin der Liebe, Schönheit und Anziehungskraft. Der goldene Apfel spielt im Urteil des Paris eine wichtige Rolle: Paris überreicht ihn Aphrodite. Ihre Geburt aus Meerschaum verbindet sie mit dem Meer und mit einer schimmernden, geheimnisvollen Schönheit. Im Spiel steht das Herz für ihre Macht.",
+                note: "Merke dir: Paris, goldener Apfel, Herz, Meerschaum."
+            },
+            dionysus: {
+                text: "Dionysos ist Gott des Weines, der Feste, der Verwandlung und des Theaters. Er bringt Freude, Rausch und Ausbruch aus dem Alltag, kann aber auch gefährlich werden. König Midas erhält durch ihn die Gabe, alles in Gold zu verwandeln. Aus Feiern zu Ehren des Dionysos entwickelte sich das griechische Theater.",
+                note: "Merke dir: Wein, Midas, Gold, Theater."
+            },
+            hestia: {
+                text: "Hestia wacht über Herdfeuer, Haus und Gemeinschaft. Ihr Bereich ist leiser als der vieler anderer Gottheiten, aber für das Zusammenleben sehr wichtig: Ohne Feuer kein warmes Haus, kein Essen, keine gemeinsame Mitte. Im Tempel durfte ihr Feuer niemals erlöschen. Ihr Kernwort ist Heim.",
+                note: "Merke dir: Herdfeuer, Tempelfeuer, Gemeinschaft, Heim."
+            },
+            hades: {
+                text: "Hades ist Herrscher der Unterwelt, nicht einfach ein böser Gott. Er wacht über das Reich der Toten und über Grenzen, die Lebende normalerweise nicht überschreiten. Der Fluss Lethe steht für Vergessen. Kerberos, der dreiköpfige Hund, bewacht den Eingang zur Unterwelt. Dunkle Schlüssel und Kronen passen zu seiner verschlossenen Macht.",
+                note: "Merke dir: Unterwelt, Lethe, Kerberos, Sterblichkeit."
+            }
         };
 
         const GOD_IDS = GODS_DATA.map(g => g.id);
@@ -601,6 +664,10 @@
         function getIconSVG(name) {
             const path = ICONS[name] || '<circle cx="12" cy="12" r="10"></circle>';
             return `<svg class="icon-svg" viewBox="0 0 24 24">${path}</svg>`;
+        }
+
+        function getGodSymbolPath(god) {
+            return `assets/symbol-${god.id}.png`;
         }
 
         // --- DOM HELPER ---
@@ -625,12 +692,11 @@
                 
                 const circle = el('div', `god-circle ${isFullySolved ? god.cssClass : ''}`);
                 
-                const iconDiv = el('div');
-                iconDiv.style.width = '24px'; iconDiv.style.height = '24px';
-                iconDiv.style.color = isFullySolved ? 'currentColor' : '#64748b';
-                iconDiv.innerHTML = getIconSVG(god.icon); 
-                
-                circle.appendChild(iconDiv);
+                const img = document.createElement('img');
+                img.className = 'god-symbol-img';
+                img.src = getGodSymbolPath(god);
+                img.alt = `${god.name} Symbol`;
+                circle.appendChild(img);
                 wrapper.appendChild(circle);
                 
                 const label = el('div', 'god-label', god.name);
@@ -655,10 +721,11 @@
                 if (isFullySolved) {
                     const iconWrapper = el('div', 'icon-wrapper');
                     iconWrapper.style.cssText = "background:#dcfce7; border-color:#86efac; color:#16a34a;";
-                    const iconDiv = el('div');
-                    iconDiv.style.cssText = "width:2rem; height:2rem;";
-                    iconDiv.innerHTML = getIconSVG('check');
-                    iconWrapper.appendChild(iconDiv);
+                    const img = document.createElement('img');
+                    img.className = 'tile-symbol-img';
+                    img.src = getGodSymbolPath(god);
+                    img.alt = `${god.name} Symbol`;
+                    iconWrapper.appendChild(img);
                     content.appendChild(iconWrapper);
                     
                     const nameDiv = el('div', 'tile-label', god.name);
@@ -670,10 +737,11 @@
                     tile.appendChild(bg);
                     
                     const iconWrapper = el('div', 'icon-wrapper');
-                    const iconDiv = el('div');
-                    iconDiv.style.cssText = "width:2rem; height:2rem;";
-                    iconDiv.innerHTML = getIconSVG('help-circle');
-                    iconWrapper.appendChild(iconDiv);
+                    const img = document.createElement('img');
+                    img.className = 'tile-symbol-img';
+                    img.src = getGodSymbolPath(god);
+                    img.alt = `${god.name} Symbol`;
+                    iconWrapper.appendChild(img);
                     content.appendChild(iconWrapper);
                     
                     const label = el('span', 'tile-label', god.name);
@@ -726,34 +794,34 @@
             document.getElementById('feedback-msg').className = 'msg-box';
             document.getElementById('riddle-progress-display').textContent = `Aufgabe ${3 - available.length + 1} von 3`;
             document.getElementById('riddle-text').textContent = challenge.question;
+            const symbolImg = document.getElementById('modal-god-symbol-img');
+            symbolImg.src = getGodSymbolPath(god);
+            symbolImg.alt = `${god.name} Symbolbild`;
+
             const dossier = document.getElementById('god-dossier');
             dossier.replaceChildren();
+            const dossierData = GOD_DOSSIERS[god.id] || { text: "Lies die Frage genau und nutze die Hinweise in der Aufgabe.", note: "Markiere dir innerlich Name, Symbol und Ort." };
             const dossierTitle = el('strong', null, `${god.name}: Dossier für die Vertretungsstunde`);
-            const dossierText = el('span', null, GOD_DOSSIERS[god.id] || "Lies die Frage genau und nutze die Hinweise in der Aufgabe.");
+            const dossierText = el('span', null, dossierData.text);
             dossier.appendChild(dossierTitle);
             dossier.appendChild(dossierText);
+            document.getElementById('dossier-note').textContent = dossierData.note;
             
             const container = document.getElementById('game-container');
             while (container.firstChild) container.removeChild(container.firstChild);
             
-            const iconContainer = document.getElementById('game-icon-container');
             const titleEl = document.getElementById('modal-title');
             
-            let typeIcon = 'brain-circuit';
             if (challenge.type === 'quiz') {
                 titleEl.textContent = `${god.name}: Wissens-Duell`;
                 renderQuiz(challenge, container);
             } else if (challenge.type === 'symbol') {
                 titleEl.textContent = `${god.name}: Symbol-Jagd`;
-                typeIcon = 'eye';
                 renderSymbolGame(challenge, container);
             } else if (challenge.type === 'word') {
                 titleEl.textContent = `${god.name}: Wort-Orakel`;
-                typeIcon = 'type';
                 renderWordGame(challenge, container);
             }
-            iconContainer.innerHTML = getIconSVG(typeIcon);
-            
             const backdrop = document.getElementById('modal-backdrop');
             backdrop.style.display = 'flex';
             void backdrop.offsetWidth;

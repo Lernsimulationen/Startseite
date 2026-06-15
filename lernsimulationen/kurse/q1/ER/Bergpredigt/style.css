@@ -59,6 +59,15 @@
 .kompass-needles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem;margin:.9rem 0 0;padding:0;list-style:none}
 .kompass-needles li{padding:.6rem .75rem;border:3px solid var(--line);border-radius:14px;background:white;font-weight:800;font-size:.88rem;line-height:1.35}
 @media(max-width:650px){.kompass-needles{grid-template-columns:1fr}}
+.board-page .board-layout{position:relative;grid-template-columns:1fr;grid-template-rows:1fr}
+.board-toolbar{position:absolute;z-index:16;right:.75rem;bottom:.75rem;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:.4rem;max-width:78%}
+.board-toolbar button{background:white}
+.board-toolbar button.active{background:var(--blue);color:white}
+.board-page .side-panel{position:absolute;z-index:15;top:0;right:0;bottom:0;display:flex;flex-direction:column;gap:.5rem;width:min(440px,94vw);padding:.6rem;overflow-y:auto;background:var(--paper);border-left:4px solid var(--line);border-radius:0 22px 22px 0;box-shadow:-6px 0 18px #26323c33;transform:translateX(105%);transition:transform .3s ease}
+.board-page .side-panel.open{transform:translateX(0)}
+.board-page .side-panel>.panel{display:none;flex:none;max-height:none}
+.board-page .side-panel>.panel.active{display:block}
+.side-panel-close{align-self:flex-end}
 .compass-intro{margin:.35rem 0 0;font-size:.85rem;line-height:1.4;font-weight:700}
 .board-page .compass-intro{font-size:.64rem;line-height:1.3}
 .ethik-kompass-recap{margin:.6rem 0 1rem;padding:.75rem;border:3px solid var(--line);border-radius:16px;background:#eadcf2;text-align:left}

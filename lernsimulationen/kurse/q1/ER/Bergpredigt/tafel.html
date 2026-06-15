@@ -22,12 +22,19 @@
       </svg>
       <div class="group-avatar-layer" id="groupAvatarLayer" aria-hidden="true"></div>
       <div class="map-cartouche"><b>Lehrkreis</b><span>Ein Ort der Bergpredigt, vier Deutungszugänge</span></div>
+      <div class="board-toolbar" id="boardToolbar">
+        <button class="comic-button mini-action" type="button" data-panel="progress">📊 Fortschritt</button>
+        <button class="comic-button mini-action" type="button" data-panel="terms">📖 Fachbegriffe</button>
+        <button class="comic-button mini-action" type="button" data-panel="plenum">💬 Plenum</button>
+        <button class="comic-button mini-action" type="button" data-panel="story">📜 Rückblick</button>
+      </div>
     </section>
-    <aside class="side-panel">
-      <section class="panel"><p class="comic-kicker">Live-Fortschritt</p><h2><span id="doneCount">0</span> / 4 Module</h2><p class="session-note"><span id="groupTargetLabel">1 Gruppe</span> im Spiel · <span id="activeGroupsLabel">0 Gruppen aktiv</span></p><div class="progress-track"><div class="progress-bar" id="progressBar"></div></div><div class="sector-list" id="sectorList"></div><div id="leitfragePanel"></div></section>
-      <section class="panel shared-card-panel"><h2>Fachbegriffe</h2><div id="cardWall"></div></section>
-      <section class="panel shared-plenum-panel"><h2>Plenumsarena</h2><div id="plenumArena"></div></section>
-      <section class="panel" id="storyPanel"></section>
+    <aside class="side-panel" id="sidePanel">
+      <button class="comic-button mini-action side-panel-close" id="closeSidePanel" type="button">✕ Schließen</button>
+      <section class="panel" data-panel="progress"><p class="comic-kicker">Live-Fortschritt</p><h2><span id="doneCount">0</span> / 4 Module</h2><p class="session-note"><span id="groupTargetLabel">1 Gruppe</span> im Spiel · <span id="activeGroupsLabel">0 Gruppen aktiv</span></p><div class="progress-track"><div class="progress-bar" id="progressBar"></div></div><div class="sector-list" id="sectorList"></div><div id="leitfragePanel"></div></section>
+      <section class="panel shared-card-panel" data-panel="terms"><h2>Fachbegriffe</h2><div id="cardWall"></div></section>
+      <section class="panel shared-plenum-panel" data-panel="plenum"><h2>Plenumsarena</h2><div id="plenumArena"></div></section>
+      <section class="panel" id="storyPanel" data-panel="story"></section>
     </aside>
   </main>
   <button class="comic-button finale-reopen hidden" id="reopenFinale" type="button">Finale erneut anzeigen</button>

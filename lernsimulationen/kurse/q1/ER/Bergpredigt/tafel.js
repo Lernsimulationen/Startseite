@@ -32,4 +32,7 @@ function exportResults(){const products=productRows(rows),merksaetze=products.fi
 document.getElementById("exportResults").addEventListener("click",exportResults);
 document.getElementById("closeFinale").addEventListener("click",()=>{finaleDismissed=true;document.getElementById("boardFinale").classList.add("hidden");document.getElementById("reopenFinale").classList.remove("hidden")});
 document.getElementById("reopenFinale").addEventListener("click",()=>{finaleDismissed=false;showFinale(true)});
+function closeSidePanel(){const panel=document.getElementById("sidePanel");panel.classList.remove("open");panel.dataset.active="";panel.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));document.querySelectorAll("#boardToolbar button").forEach(b=>b.classList.remove("active"))}
+document.querySelectorAll("#boardToolbar button").forEach(btn=>{btn.addEventListener("click",()=>{const target=btn.dataset.panel,panel=document.getElementById("sidePanel");if(panel.classList.contains("open")&&panel.dataset.active===target){closeSidePanel();return}document.querySelectorAll("#boardToolbar button").forEach(b=>b.classList.remove("active"));btn.classList.add("active");panel.dataset.active=target;panel.classList.add("open");panel.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",p.dataset.panel===target))})});
+document.getElementById("closeSidePanel").addEventListener("click",closeSidePanel);
 start();
