@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Alpha-Agora</title>
-  <link rel="stylesheet" href="style.css?v=20260617-tutorial">
+  <link rel="stylesheet" href="style.css?v=20260617-trace">
 </head>
 <body>
   <div class="app-shell">
@@ -19,6 +19,7 @@
       <nav class="nav-tabs" aria-label="Spielbereiche">
         <button class="nav-tab active" data-view="home">Start</button>
         <button class="nav-tab" data-view="learn">Schriftrolle</button>
+        <button class="nav-tab" data-view="trace">Nachzeichnen</button>
         <button class="nav-tab" data-view="match">Säulen</button>
         <button class="nav-tab" data-view="memory">Theater</button>
         <button class="nav-tab" data-view="sort">Bibliothek</button>
@@ -26,6 +27,7 @@
         <button class="nav-tab" data-view="review">Üben</button>
         <button class="nav-tab" data-view="album">Album</button>
         <button class="nav-tab" data-view="trial">Prüfung</button>
+        <button class="nav-tab" data-view="passed">Bestanden</button>
       </nav>
       <div class="score-chip" aria-live="polite">
         <span id="xpValue">0</span>
@@ -127,39 +129,45 @@
               <strong>Schriftrolle</strong>
               <small>Entdecken</small>
             </button>
+            <button class="map-step" data-jump="trace">
+              <img src="assets/generated/ai-scrolls.png" alt="">
+              <span>2</span>
+              <strong>Nachzeichnen</strong>
+              <small>Formen üben</small>
+            </button>
             <button class="map-step" data-jump="match">
               <img src="assets/generated/ai-hero-agora.png" alt="">
-              <span>2</span>
+              <span>3</span>
               <strong>Säulen-Spiel</strong>
               <small>Paare verbinden</small>
             </button>
             <button class="map-step" data-jump="memory">
               <img src="assets/generated/ai-theater.png" alt="">
-              <span>3</span>
+              <span>4</span>
               <strong>Theater-Memory</strong>
               <small>Namen merken</small>
             </button>
             <button class="map-step" data-jump="sort">
               <img src="assets/generated/ai-library.png" alt="">
-              <span>4</span>
+              <span>5</span>
               <strong>Bibliothek</strong>
               <small>Reihenfolge bauen</small>
             </button>
             <button class="map-step" data-jump="catch">
               <img src="assets/generated/ai-harbor.png" alt="">
-              <span>5</span>
+              <span>6</span>
               <strong>Hafenfang</strong>
               <small>Zeichen fangen</small>
             </button>
             <button class="map-step" data-jump="rush">
               <img src="assets/generated/ai-learn-kids.png" alt="">
-              <span>6</span>
+              <span>7</span>
               <strong>Agora-Blitz</strong>
               <small>Schnell reagieren</small>
             </button>
             <button class="map-step" data-jump="trial">
               <img src="assets/generated/ai-temple.png" alt="">
-              <span>7</span>
+              <span>8</span>
               <strong>Tempelprüfung</strong>
               <small>Alles kombinieren</small>
             </button>
@@ -181,6 +189,36 @@
         <div class="learn-layout">
           <article class="letter-card" id="letterCard"></article>
           <aside class="letter-list" id="letterList" aria-label="Alphabetliste"></aside>
+        </div>
+      </section>
+
+      <section class="view" id="trace">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Nachzeichnen</p>
+            <h2>Zeichne die Buchstaben wie auf einer Wachstafel</h2>
+          </div>
+          <div class="controls">
+            <button class="primary-btn" id="newTraceLetter">Neuer Buchstabe</button>
+            <button class="ghost-btn soft" id="clearTrace">Tafel leeren</button>
+          </div>
+        </div>
+        <div class="trace-layout">
+          <article class="trace-card">
+            <img id="traceArt" src="assets/generated/letter-01-alpha.png" alt="Buchstabenbild zum Nachzeichnen">
+            <div>
+              <p class="eyebrow">Aktueller Auftrag</p>
+              <h3 id="traceName">Alpha</h3>
+              <p id="traceHint">Zeichne den großen Buchstaben nach. Bleib ungefähr auf der hellen Vorlage.</p>
+              <div class="trace-meter" aria-label="Nachzeichnungsfortschritt">
+                <span id="traceProgress"></span>
+              </div>
+              <p id="traceFeedback">Setze den Stift auf die Tafel und zeichne los.</p>
+            </div>
+          </article>
+          <div class="trace-board-wrap">
+            <canvas id="traceCanvas" width="720" height="520" aria-label="Nachzeichentafel"></canvas>
+          </div>
         </div>
       </section>
 
@@ -318,6 +356,32 @@
           </div>
         </div>
       </section>
+
+      <section class="view" id="passed">
+        <div class="passed-screen">
+          <img class="passed-bg" src="assets/generated/ai-reward.png" alt="Leuchtendes Abschlussmosaik">
+          <div class="passed-content">
+            <p class="eyebrow">Tempelprüfung bestanden</p>
+            <h2>Du bist Alpha-Meister der jungen Agora!</h2>
+            <p id="passedSummary">Kallia legt dein Abschlussmosaik in die Bibliothek.</p>
+            <div class="passed-stats">
+              <span><strong id="passedScore">0/10</strong><small>Prüfung</small></span>
+              <span><strong id="passedLetters">0/24</strong><small>Buchstaben</small></span>
+              <span><strong id="passedXp">0</strong><small>XP</small></span>
+            </div>
+            <div class="passed-actions">
+              <button class="primary-btn" data-jump="album">Album ansehen</button>
+              <button class="secondary-btn" data-jump="learn">Weiter üben</button>
+              <button class="ghost-btn soft" id="celebrateAgain">Kallia gratuliert</button>
+            </div>
+          </div>
+          <aside class="passed-kallia">
+            <img src="assets/generated/ai-narrator.png" alt="Kallia gratuliert">
+            <strong>Geschafft!</strong>
+            <p>Du hast die Zeichen erkannt und die Schriftrollen gerettet.</p>
+          </aside>
+        </div>
+      </section>
     </main>
 
     <div class="modal" id="storyModal" hidden>
@@ -382,6 +446,6 @@
     <span class="badge"></span>
   </template>
 
-  <script src="script.js?v=20260617-tutorial"></script>
+  <script src="script.js?v=20260617-trace"></script>
 </body>
 </html>

@@ -36,6 +36,13 @@ const stationStories = {
 
 const state = {
   currentLetter: 0,
+  traceLetter: 0,
+  traceDrawing: false,
+  traceHits: 0,
+  traceMisses: 0,
+  traceCompleted: false,
+  traceCtx: null,
+  traceMaskCtx: null,
   tutorialIndex: 0,
   selectedUpper: null,
   matchRound: [],
@@ -53,6 +60,7 @@ const state = {
   rushScore: 0,
   trialIndex: 0,
   trialScore: 0,
+  lastTrialScore: 0,
   trialQuestions: [],
   reviewQueue: [],
   boss: null,
@@ -67,6 +75,12 @@ const els = {
   badgeRow: document.querySelector("#badgeRow"),
   letterCard: document.querySelector("#letterCard"),
   letterList: document.querySelector("#letterList"),
+  traceCanvas: document.querySelector("#traceCanvas"),
+  traceArt: document.querySelector("#traceArt"),
+  traceName: document.querySelector("#traceName"),
+  traceHint: document.querySelector("#traceHint"),
+  traceProgress: document.querySelector("#traceProgress"),
+  traceFeedback: document.querySelector("#traceFeedback"),
   matchInfo: document.querySelector("#matchInfo"),
   matchScore: document.querySelector("#matchScore"),
   upperColumn: document.querySelector("#upperColumn"),
@@ -91,6 +105,10 @@ const els = {
   trialQuestion: document.querySelector("#trialQuestion"),
   trialOptions: document.querySelector("#trialOptions"),
   trialFeedback: document.querySelector("#trialFeedback"),
+  passedSummary: document.querySelector("#passedSummary"),
+  passedScore: document.querySelector("#passedScore"),
+  passedLetters: document.querySelector("#passedLetters"),
+  passedXp: document.querySelector("#passedXp"),
   storyModal: document.querySelector("#storyModal"),
   storyKicker: document.querySelector("#storyKicker"),
   storyTitle: document.querySelector("#storyTitle"),
@@ -120,7 +138,8 @@ const els = {
 
 const narratorLines = {
   home: ["Kallia wartet auf dich!", "Ich bin Kallia, die junge Schreiberin. Folge dem Lernweg und hilf mir, die Schriftrollen der Agora zu ordnen."],
-  learn: ["Schriftrolle", "Schau dir die Zeichen an, höre sie dir an und markiere nur die Buchstaben, die du wirklich sicher kannst."],
+  learn: ["Schriftrolle", "Schau dir die Zeichen an, höre sie dir an und gehe danach zum Nachzeichnen."],
+  trace: ["Nachzeichnen", "Zeichne die Form auf der Wachstafel nach. Erst wenn die Spur gut passt, zählt der Buchstabe als sicher."],
   match: ["Säulen-Spiel", "Wähle links einen Großbuchstaben und suche rechts seinen kleinen Partner."],
   memory: ["Theater-Memory", "Merke dir die Zeichen wie Rollen auf einer Bühne. Falsche Paare landen in deiner Übungs-Schriftrolle."],
   sort: ["Bibliothek", "Ordne die Rollen in der Reihenfolge des griechischen Alphabets."],
@@ -128,16 +147,19 @@ const narratorLines = {
   rush: ["Agora-Blitz", "Jetzt zählt Tempo. Lieber genau als wild klicken."],
   review: ["Übungs-Schriftrolle", "Hier warten die Zeichen, die eben noch knifflig waren."],
   album: ["Sammelalbum", "Jede sichere Antwort schaltet neue Karten und Mosaikstücke frei."],
-  trial: ["Tempelprüfung", "Wenn du genug Zeichen sicher kennst, kannst du die Abschlussrunde schaffen."]
+  trial: ["Tempelprüfung", "Wenn du genug Zeichen sicher kennst, kannst du die Abschlussrunde schaffen."],
+  passed: ["Bestanden!", "Kallia ist stolz auf dich. Schau dir dein Album an oder übe weiter, um alles frisch zu halten."]
 };
 
 const learningSteps = [
-  { view: "learn", title: "1. Entdecken", text: "Höre die ersten Zeichen und sammle sichere Buchstaben.", required: 0, complete: 3 },
-  { view: "match", title: "2. Paare finden", text: "Verbinde Groß- und Kleinbuchstaben.", required: 0, complete: 6 },
-  { view: "memory", title: "3. Namen merken", text: "Finde Zeichen und Namen im Theater.", required: 3, complete: 9 },
-  { view: "sort", title: "4. Reihenfolge", text: "Ordne die Schriftrollen im Alphabet.", required: 6, complete: 12 },
-  { view: "catch", title: "5. Schnell erkennen", text: "Fange im Hafen das richtige Zeichen.", required: 9, complete: 18 },
-  { view: "trial", title: "6. Tempelprüfung", text: "Zeige, dass du die 24 Zeichen beherrschst.", required: 18, complete: 24 }
+  { view: "learn", title: "1. Entdecken", text: "Höre die ersten Zeichen und schau dir die Form an.", required: 0, complete: 1 },
+  { view: "trace", title: "2. Nachzeichnen", text: "Zeichne die Buchstaben auf der Wachstafel nach.", required: 0, complete: 3 },
+  { view: "match", title: "3. Paare finden", text: "Verbinde Groß- und Kleinbuchstaben.", required: 3, complete: 6 },
+  { view: "memory", title: "4. Namen merken", text: "Finde Zeichen und Namen im Theater.", required: 6, complete: 9 },
+  { view: "sort", title: "5. Reihenfolge", text: "Ordne die Schriftrollen im Alphabet.", required: 9, complete: 12 },
+  { view: "catch", title: "6. Schnell erkennen", text: "Fange im Hafen das richtige Zeichen.", required: 12, complete: 18 },
+  { view: "rush", title: "7. Blitzrunde", text: "Reagiere schnell und sicher auf gemischte Zeichen.", required: 18, complete: 21 },
+  { view: "trial", title: "8. Tempelprüfung", text: "Zeige, dass du die 24 Zeichen beherrschst.", required: 21, complete: 24 }
 ];
 
 const tutorialSteps = [
@@ -152,6 +174,12 @@ const tutorialSteps = [
     kicker: "Schritt 1",
     title: "Erst entdecken",
     text: "Beginne mit der Schriftrolle. Schau dir die Form an, sprich den Namen und höre dir den Buchstaben an."
+  },
+  {
+    image: "assets/generated/letter-01-alpha.png",
+    kicker: "Schritt 3",
+    title: "Dann nachzeichnen",
+    text: "Auf der Wachstafel zeichnest du die Form nach. So merkt sich deine Hand den Buchstaben."
   },
   {
     image: "assets/generated/ai-map-quest.png",
@@ -174,7 +202,8 @@ const tutorialSteps = [
 ];
 
 const stationIntros = {
-  learn: ["Kallias erster Auftrag", "Schau dir die ersten Zeichen in Ruhe an. Nutze Anhören und drücke Kann ich nur, wenn du das Zeichen wiedererkennst."],
+  learn: ["Kallias erster Auftrag", "Schau dir die ersten Zeichen in Ruhe an. Nutze Anhören und gehe dann zum Nachzeichnen."],
+  trace: ["Wachstafel", "Zeichne die helle Vorlage nach. Wenn genug deiner Spur auf dem Buchstaben liegt, zählt Kallia ihn als sicher."],
   match: ["Säulen-Spiel", "Jetzt verbindest du Groß- und Kleinbuchstaben. Wähle links ein großes Zeichen und suche rechts seinen kleinen Partner."],
   memory: ["Theater-Memory", "Finde Zeichen und Namen als Paar. Sage den Namen leise mit, dann bleibt er besser hängen."],
   sort: ["Bibliothek", "Ordne die Schriftrollen in Alphabet-Reihenfolge. Beginne immer bei Alpha."],
@@ -182,7 +211,8 @@ const stationIntros = {
   rush: ["Agora-Blitz", "Jetzt wird es schnell. Genauigkeit ist wichtiger als wildes Klicken."],
   review: ["Übungs-Schriftrolle", "Hier landen Zeichen, die noch wackelig sind. Übe sie kurz und kehre dann zum Lernweg zurück."],
   album: ["Sammelalbum", "Hier siehst du deine freigeschalteten Buchstabenbilder. Verborgene Karten warten noch auf dich."],
-  trial: ["Tempelprüfung", "Wenn du genug Zeichen sicher kennst, kannst du zeigen, was du gelernt hast."]
+  trial: ["Tempelprüfung", "Wenn du genug Zeichen sicher kennst, kannst du zeigen, was du gelernt hast."],
+  passed: ["Bestanden!", "Du hast die Tempelprüfung geschafft. Im Album kannst du deine Buchstabenkarten ansehen."]
 };
 
 function loadProgress() {
@@ -274,10 +304,10 @@ function currentGuide() {
   }
   if (mastered < 3) {
     return {
-      view: "learn",
-      title: "Erst die ersten Zeichen sichern",
-      text: "Starte ruhig: Alpha bis Zeta reichen für den Anfang. Höre dir die Zeichen an und sammle die ersten sicheren Karten.",
-      help: "Merksatz: Schau zuerst auf die Form, sprich den Namen laut und nutze dann Anhören. Danach nur Kann ich drücken, wenn du es allein wiedererkennst."
+      view: "trace",
+      title: "Erst nachzeichnen",
+      text: "Lerne die ersten Zeichen kurz in der Schriftrolle und sichere sie dann auf der Wachstafel.",
+      help: "Kallias Tipp: Höre dir den Buchstaben an, schau auf die Form und zeichne dann langsam über die helle Vorlage."
     };
   }
   if (mastered < 6) {
@@ -312,7 +342,7 @@ function currentGuide() {
       help: "Lies zuerst den Namen im blauen Feld. Suche dann nur dieses Zeichen. Genauigkeit zählt mehr als Tempo."
     };
   }
-  if (mastered < 24) {
+  if (mastered < 21) {
     return {
       view: "rush",
       title: "Agora-Blitz vor der Prüfung",
@@ -323,7 +353,7 @@ function currentGuide() {
   return {
     view: "trial",
     title: "Bereit für die Tempelprüfung",
-    text: "Du hast alle 24 Zeichen gesammelt. Zeig Kallia, dass die Schriftrollen wieder vollständig sind.",
+    text: "Du hast genug Zeichen gesammelt. Zeig Kallia in der Tempelprüfung, dass die Schriftrollen wieder vollständig werden.",
     help: "Atme kurz durch. In der Prüfung kommen Namen und Kleinbuchstaben gemischt vor."
   };
 }
@@ -335,11 +365,11 @@ function renderLearningPath() {
   const buttons = learningSteps.map((step, index) => {
     const button = document.createElement("button");
     const locked = mastered < step.required;
-    const done = mastered >= step.complete;
+    const done = step.complete > 0 && mastered >= step.complete;
     button.className = "path-step";
     button.classList.toggle("locked", locked);
     button.classList.toggle("done", done);
-    button.classList.toggle("current", guide.view === step.view || (guide.view === "rush" && step.view === "catch"));
+    button.classList.toggle("current", guide.view === step.view);
     button.disabled = locked;
     button.innerHTML = `
       <span>${index + 1}</span>
@@ -358,6 +388,18 @@ function renderGuide() {
   if (els.guideText) els.guideText.textContent = guide.text;
   if (els.guideMission) {
     els.guideMission.textContent = `${guide.text} Kallia sammelt schwierige Zeichen automatisch in der Übungs-Schriftrolle.`;
+  }
+}
+
+function renderPassedScreen() {
+  const mastered = state.progress.mastered.length;
+  if (els.passedScore) els.passedScore.textContent = `${state.lastTrialScore || state.trialScore}/10`;
+  if (els.passedLetters) els.passedLetters.textContent = `${mastered}/24`;
+  if (els.passedXp) els.passedXp.textContent = state.progress.xp;
+  if (els.passedSummary) {
+    els.passedSummary.textContent = mastered >= 24
+      ? "Kallia legt dein vollständiges Abschlussmosaik in die Bibliothek der Agora."
+      : "Kallia legt dein Abschlussmosaik in die Bibliothek. Einige Buchstaben kannst du weiter sammeln.";
   }
 }
 
@@ -443,15 +485,17 @@ function renderBadges() {
 
 function renderMapLocks() {
   const mastered = state.progress.mastered.length;
-  const rules = { memory: 3, sort: 6, catch: 9, rush: 12, trial: 18 };
+  const rules = { trace: 0, match: 3, memory: 6, sort: 9, catch: 12, rush: 18, trial: 21, passed: 21 };
   const labels = {
     learn: "Entdecken",
+    trace: "Formen nachzeichnen",
     match: "Paare verbinden",
     memory: "Namen merken",
     sort: "Reihenfolge bauen",
     catch: "Zeichen fangen",
     rush: "Schnell reagieren",
-    trial: "Alles kombinieren"
+    trial: "Alles kombinieren",
+    passed: "Abschluss ansehen"
   };
   document.querySelectorAll(".map-step").forEach((button) => {
     const required = rules[button.dataset.jump] || 0;
@@ -476,6 +520,8 @@ function switchView(view) {
   renderGuide();
   if (view === "album") renderAlbum();
   if (view === "review") renderReview();
+  if (view === "passed") renderPassedScreen();
+  if (view === "trace") renderTraceLetter();
   setTimeout(() => maybeShowStationIntro(view), 120);
 }
 
@@ -494,6 +540,173 @@ function sampleLetters(count, source = activePool()) {
   return shuffle(source).slice(0, Math.min(count, source.length));
 }
 
+function traceItem() {
+  const pool = activePool();
+  return pool[state.traceLetter % pool.length] || alphabet[0];
+}
+
+function setupTraceCanvas() {
+  if (!els.traceCanvas) return;
+  state.traceCtx = els.traceCanvas.getContext("2d");
+  const mask = document.createElement("canvas");
+  mask.width = els.traceCanvas.width;
+  mask.height = els.traceCanvas.height;
+  state.traceMaskCtx = mask.getContext("2d");
+  els.traceCanvas.addEventListener("pointerdown", startTraceDraw);
+  els.traceCanvas.addEventListener("pointermove", continueTraceDraw);
+  els.traceCanvas.addEventListener("pointerup", stopTraceDraw);
+  els.traceCanvas.addEventListener("pointercancel", stopTraceDraw);
+}
+
+function renderTraceLetter() {
+  if (!els.traceCanvas || !state.traceCtx || !state.traceMaskCtx) return;
+  const item = traceItem();
+  state.traceHits = 0;
+  state.traceMisses = 0;
+  state.traceCompleted = state.progress.mastered.includes(item.name);
+  els.traceArt.src = letterArtSrc(item);
+  els.traceArt.alt = `Buchstabenbild ${item.name}`;
+  els.traceName.textContent = `${item.name} ${item.upper}${item.lower}`;
+  els.traceHint.textContent = `Zeichne ${item.upper} langsam nach. Die helle Vorlage zeigt dir die Form.`;
+  drawTraceGuide(item);
+  updateTraceProgress();
+}
+
+function drawTraceGuide(item) {
+  const ctx = state.traceCtx;
+  const mask = state.traceMaskCtx;
+  const w = els.traceCanvas.width;
+  const h = els.traceCanvas.height;
+  ctx.clearRect(0, 0, w, h);
+  mask.clearRect(0, 0, w, h);
+  ctx.fillStyle = "#f6e6bf";
+  ctx.fillRect(0, 0, w, h);
+  ctx.strokeStyle = "rgba(129, 87, 22, .18)";
+  ctx.lineWidth = 2;
+  for (let x = 48; x < w; x += 48) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, h);
+    ctx.stroke();
+  }
+  for (let y = 48; y < h; y += 48) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(w, y);
+    ctx.stroke();
+  }
+  const fontSize = Math.min(340, Math.round(w * 0.46));
+  const font = `900 ${fontSize}px Georgia, "Times New Roman", serif`;
+  ctx.font = font;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.lineWidth = 18;
+  ctx.strokeStyle = "rgba(43, 113, 148, .22)";
+  ctx.fillStyle = "rgba(43, 113, 148, .11)";
+  ctx.strokeText(item.upper, w / 2, h / 2 + 14);
+  ctx.fillText(item.upper, w / 2, h / 2 + 14);
+  mask.font = font;
+  mask.textAlign = "center";
+  mask.textBaseline = "middle";
+  mask.lineWidth = 58;
+  mask.strokeStyle = "#000";
+  mask.fillStyle = "#000";
+  mask.strokeText(item.upper, w / 2, h / 2 + 14);
+  mask.fillText(item.upper, w / 2, h / 2 + 14);
+}
+
+function tracePoint(event) {
+  const rect = els.traceCanvas.getBoundingClientRect();
+  return {
+    x: ((event.clientX - rect.left) / rect.width) * els.traceCanvas.width,
+    y: ((event.clientY - rect.top) / rect.height) * els.traceCanvas.height
+  };
+}
+
+function startTraceDraw(event) {
+  event.preventDefault();
+  state.traceDrawing = true;
+  els.traceCanvas.setPointerCapture(event.pointerId);
+  const point = tracePoint(event);
+  state.traceCtx.beginPath();
+  state.traceCtx.moveTo(point.x, point.y);
+  scoreTracePoint(point);
+}
+
+function continueTraceDraw(event) {
+  if (!state.traceDrawing) return;
+  event.preventDefault();
+  const point = tracePoint(event);
+  state.traceCtx.lineTo(point.x, point.y);
+  state.traceCtx.strokeStyle = "#a94d36";
+  state.traceCtx.lineWidth = 16;
+  state.traceCtx.lineCap = "round";
+  state.traceCtx.lineJoin = "round";
+  state.traceCtx.stroke();
+  scoreTracePoint(point);
+  updateTraceProgress();
+}
+
+function stopTraceDraw(event) {
+  if (!state.traceDrawing) return;
+  state.traceDrawing = false;
+  try {
+    els.traceCanvas.releasePointerCapture(event.pointerId);
+  } catch {}
+  updateTraceProgress();
+}
+
+function scoreTracePoint(point) {
+  const x = Math.max(0, Math.min(els.traceCanvas.width - 1, Math.round(point.x)));
+  const y = Math.max(0, Math.min(els.traceCanvas.height - 1, Math.round(point.y)));
+  const alpha = state.traceMaskCtx.getImageData(x, y, 1, 1).data[3];
+  if (alpha > 0) state.traceHits += 1;
+  else state.traceMisses += 1;
+}
+
+function tracePercent() {
+  const total = state.traceHits + state.traceMisses;
+  const accuracy = total ? state.traceHits / total : 0;
+  const amount = Math.min(1, state.traceHits / 70);
+  return Math.round(Math.min(1, accuracy * 0.55 + amount * 0.45) * 100);
+}
+
+function updateTraceProgress() {
+  const item = traceItem();
+  const percent = tracePercent();
+  els.traceProgress.style.width = `${percent}%`;
+  if (state.progress.mastered.includes(item.name)) {
+    els.traceFeedback.textContent = `${item.name} ist schon sicher. Du kannst weiter üben oder einen neuen Buchstaben wählen.`;
+    return;
+  }
+  if (percent >= 72 && !state.traceCompleted) {
+    state.traceCompleted = true;
+    addXp(8, item.name);
+    els.traceFeedback.textContent = `Sehr gut! ${item.name} zählt jetzt als sicher.`;
+    setTimeout(() => {
+      state.traceLetter = (state.traceLetter + 1) % activePool().length;
+      renderTraceLetter();
+    }, 900);
+    return;
+  }
+  els.traceFeedback.textContent = percent < 35
+    ? "Zeichne langsam auf der hellen Vorlage weiter."
+    : "Gut. Bleib möglichst auf der Vorlage, dann zählt der Buchstabe als sicher.";
+}
+
+function clearTraceBoard() {
+  drawTraceGuide(traceItem());
+  state.traceHits = 0;
+  state.traceMisses = 0;
+  state.traceCompleted = false;
+  updateTraceProgress();
+}
+
+function newTraceLetter() {
+  state.traceLetter = (state.traceLetter + 1) % activePool().length;
+  renderTraceLetter();
+}
+
 function renderLetter() {
   const item = alphabet[state.currentLetter];
   els.letterCard.innerHTML = `
@@ -504,11 +717,15 @@ function renderLetter() {
     <p>${item.hint}</p>
     <p class="card-theme">${item.theme}</p>
     <div class="letter-actions">
-      <button class="primary-btn" id="masterLetter">Kann ich!</button>
+      <button class="primary-btn" id="masterLetter">Nachzeichnen</button>
       <button class="ghost-btn" id="speakLetter">Anhören</button>
     </div>
   `;
-  document.querySelector("#masterLetter").addEventListener("click", () => addXp(5, item.name));
+  document.querySelector("#masterLetter").addEventListener("click", () => {
+    state.traceLetter = state.currentLetter;
+    switchView("trace");
+    renderTraceLetter();
+  });
   document.querySelector("#speakLetter").addEventListener("click", () => playLetterAudio(item));
   renderLetterList();
 }
@@ -727,15 +944,17 @@ function nextCatchTarget() {
     return;
   }
   state.catchTarget = sampleLetters(1, activePool())[0];
-  els.catchTarget.textContent = `Fange: ${state.catchTarget.name}`;
+  els.catchTarget.textContent = `Fange den fallenden Buchstaben: ${state.catchTarget.name}`;
   els.catchScore.textContent = `${state.catchDone}/8`;
   const decoys = sampleLetters(7, alphabet.filter((item) => item.name !== state.catchTarget.name));
   const options = shuffle([state.catchTarget, ...decoys]);
+  const lanes = shuffle([9, 21, 33, 45, 57, 69, 81, 93]);
   els.catchBoard.replaceChildren(...options.map((item, index) => {
     const button = document.createElement("button");
     button.className = "catch-token";
-    button.style.setProperty("--x", `${8 + ((index * 13) % 76)}%`);
-    button.style.setProperty("--y", `${18 + ((index * 29) % 58)}%`);
+    button.style.setProperty("--x", `${lanes[index]}%`);
+    button.style.setProperty("--delay", `-${index * 0.72}s`);
+    button.style.setProperty("--duration", `${7.6 + (index % 3) * 0.55}s`);
     button.innerHTML = `<span>${item.upper}</span>`;
     button.addEventListener("click", () => {
       if (item.name === state.catchTarget.name) {
@@ -948,13 +1167,16 @@ function renderTrialQuestion() {
   const question = state.trialQuestions[state.trialIndex];
   if (!question) {
     const passed = state.trialScore >= 8;
+    state.lastTrialScore = state.trialScore;
     els.trialQuestion.textContent = passed
       ? `Bestanden: ${state.trialScore}/10. Dein Mosaik glänzt!`
       : `Noch eine Runde Übung: ${state.trialScore}/10.`;
     els.trialOptions.replaceChildren();
     if (passed) {
       addXp(40);
-      showStory("Tempelprüfung", "Der Tempel öffnet sich.", "Du hast genug Zeichen erkannt, um das Abschlussmosaik weiterzubauen.");
+      renderPassedScreen();
+      switchView("passed");
+      showStory("Tempelprüfung bestanden", "Der Tempel öffnet sich.", "Du hast genug Zeichen erkannt. Kallia zeigt dir jetzt dein Abschlussmosaik.");
     }
     return;
   }
@@ -1002,9 +1224,16 @@ function bindEvents() {
   document.querySelector("#newMemoryRound").addEventListener("click", newMemoryRound);
   document.querySelector("#newSortRound").addEventListener("click", newSortRound);
   document.querySelector("#newCatchRound").addEventListener("click", newCatchRound);
+  document.querySelector("#newTraceLetter").addEventListener("click", newTraceLetter);
+  document.querySelector("#clearTrace").addEventListener("click", clearTraceBoard);
   document.querySelector("#newReviewRound").addEventListener("click", renderReview);
   document.querySelector("#startRush").addEventListener("click", startRush);
   document.querySelector("#startTrial").addEventListener("click", startTrial);
+  document.querySelector("#celebrateAgain").addEventListener("click", () => {
+    els.narratorTitle.textContent = "Kallia gratuliert!";
+    els.narratorText.textContent = "Du hast die Tempelprüfung bestanden. Deine Buchstabenbilder bleiben im Album, und du kannst jederzeit weiter üben.";
+    els.narratorWidget.classList.remove("collapsed");
+  });
   document.querySelector("#closeStory").addEventListener("click", () => {
     els.storyModal.hidden = true;
     renderAllProgress();
@@ -1034,8 +1263,10 @@ function bindEvents() {
 
 bindEvents();
 normalizeProgress();
+setupTraceCanvas();
 renderLetter();
 renderAllProgress();
+renderTraceLetter();
 updateNarrator("home");
 newMatchRound();
 newMemoryRound();
