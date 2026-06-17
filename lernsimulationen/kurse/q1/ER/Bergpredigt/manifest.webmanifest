@@ -1,9 +1,0 @@
-{
-  "name": "Bergpredigt-Expedition",
-  "short_name": "Bergpredigt",
-  "start_url": "index.html",
-  "display": "standalone",
-  "background_color": "#f8edcf",
-  "theme_color": "#2879a9",
-  "description": "Interaktive Lernlandschaft zur Bergpredigt für Tafel und Gruppen-Tablets."
-}

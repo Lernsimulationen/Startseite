@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Alpha-Agora</title>
+  <link rel="stylesheet" href="style.css?v=20260617-tutorial">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#home" aria-label="Alpha-Agora Start">
+        <span class="brand-mark">Α</span>
+        <span>
+          <strong>Alpha-Agora</strong>
+          <small>Griechisches Alphabet</small>
+        </span>
+      </a>
+      <nav class="nav-tabs" aria-label="Spielbereiche">
+        <button class="nav-tab active" data-view="home">Start</button>
+        <button class="nav-tab" data-view="learn">Schriftrolle</button>
+        <button class="nav-tab" data-view="match">Säulen</button>
+        <button class="nav-tab" data-view="memory">Theater</button>
+        <button class="nav-tab" data-view="sort">Bibliothek</button>
+        <button class="nav-tab" data-view="catch">Hafen</button>
+        <button class="nav-tab" data-view="review">Üben</button>
+        <button class="nav-tab" data-view="album">Album</button>
+        <button class="nav-tab" data-view="trial">Prüfung</button>
+      </nav>
+      <div class="score-chip" aria-live="polite">
+        <span id="xpValue">0</span>
+        <small>XP</small>
+      </div>
+    </header>
+
+    <main>
+      <section class="view active" id="home">
+        <div class="hero">
+          <img class="hero-bg" src="assets/generated/ai-hero-agora.png" alt="Antiker griechischer Lernhof">
+          <div class="hero-content">
+            <p class="eyebrow">Mission der jungen Schreibschule</p>
+            <h1>Meistere die 24 Zeichen des griechischen Alphabets.</h1>
+            <p>Reise über die Karte, sammle Mosaiksteine und finde die verlorenen Schriftrollen der jungen Agora.</p>
+            <div class="hero-actions">
+              <button class="primary-btn" data-jump="learn">Loslernen</button>
+              <button class="secondary-btn" id="openTutorial">Einführung</button>
+              <button class="secondary-btn" id="nextGuideStep">Kallias Tipp</button>
+            </div>
+          </div>
+          <aside class="mentor-card">
+            <img src="assets/generated/ai-narrator.png" alt="Griechische Schuelerin als Spielfuehrerin">
+            <div>
+              <strong>Kallia begleitet dich</strong>
+              <p>Die junge Schreiberin zeigt dir den nächsten Schritt und hilft, wenn du festhängst.</p>
+            </div>
+          </aside>
+        </div>
+
+        <section class="learning-path-panel" aria-label="Geführter Lernweg">
+          <div class="path-intro">
+            <img src="assets/generated/ai-narrator.png" alt="Kallia, die junge Schreiberin">
+            <div>
+              <p class="eyebrow">Dein Lernweg</p>
+              <h2>Hilf Kallia, die Schriftrollen der Agora zu ordnen.</h2>
+              <p id="guideMission">Beginne mit wenigen Zeichen. Kallia schaltet neue Aufgaben frei, sobald du sicherer wirst.</p>
+            </div>
+          </div>
+          <div class="path-steps" id="learningPath"></div>
+        </section>
+
+        <section class="journey-gallery" aria-label="Orte der Lernreise">
+          <article>
+            <img src="assets/generated/ai-map-quest.png" alt="Abenteuerkarte der Lernreise">
+            <strong>Abenteuerkarte</strong>
+            <span>Stationen freischalten</span>
+          </article>
+          <article>
+            <img src="assets/generated/ai-library.png" alt="Antike Bibliothek">
+            <strong>Bibliothek</strong>
+            <span>Alphabet sortieren</span>
+          </article>
+          <article>
+            <img src="assets/generated/ai-harbor.png" alt="Antiker Hafen">
+            <strong>Hafen</strong>
+            <span>Buchstaben fangen</span>
+          </article>
+          <article>
+            <img src="assets/generated/ai-temple.png" alt="Tempelpruefung">
+            <strong>Tempel</strong>
+            <span>Prüfung bestehen</span>
+          </article>
+          <article>
+            <img src="assets/generated/ai-reward.png" alt="Mosaik-Belohnung">
+            <strong>Mosaik</strong>
+            <span>Belohnungen sammeln</span>
+          </article>
+        </section>
+
+        <div class="dashboard">
+          <section class="progress-panel">
+            <div class="panel-title">
+              <h2>Dein Fortschritt</h2>
+              <button class="icon-btn" id="resetProgress" title="Fortschritt zurücksetzen" aria-label="Fortschritt zurücksetzen">↺</button>
+            </div>
+            <div class="meter" aria-label="Gesamtfortschritt">
+              <span id="progressBar"></span>
+            </div>
+            <p id="progressText">0 von 24 Buchstaben sicher.</p>
+            <p id="levelText" class="level-text">Aktuell übst du die ersten 6 Zeichen.</p>
+            <div class="guide-card" id="guideCard">
+              <strong id="guideTitle">Kallias nächster Schritt</strong>
+              <p id="guideText">Starte mit der Schriftrolle und höre dir die ersten Zeichen an.</p>
+              <div class="guide-actions">
+                <button class="primary-btn" id="guideGo">Los</button>
+                <button class="ghost-btn soft" id="guideHelp">Hilfe</button>
+                <button class="ghost-btn soft" id="guideTutorial">Tutorial</button>
+              </div>
+            </div>
+            <div class="badge-row" id="badgeRow"></div>
+          </section>
+
+          <section class="map-panel adventure-map" aria-label="Abenteuerkarte">
+            <img src="assets/generated/ai-map-quest.png" alt="Antike Abenteuerkarte mit Lernstationen">
+            <button class="map-step" data-jump="learn">
+              <img src="assets/generated/ai-scrolls.png" alt="">
+              <span>1</span>
+              <strong>Schriftrolle</strong>
+              <small>Entdecken</small>
+            </button>
+            <button class="map-step" data-jump="match">
+              <img src="assets/generated/ai-hero-agora.png" alt="">
+              <span>2</span>
+              <strong>Säulen-Spiel</strong>
+              <small>Paare verbinden</small>
+            </button>
+            <button class="map-step" data-jump="memory">
+              <img src="assets/generated/ai-theater.png" alt="">
+              <span>3</span>
+              <strong>Theater-Memory</strong>
+              <small>Namen merken</small>
+            </button>
+            <button class="map-step" data-jump="sort">
+              <img src="assets/generated/ai-library.png" alt="">
+              <span>4</span>
+              <strong>Bibliothek</strong>
+              <small>Reihenfolge bauen</small>
+            </button>
+            <button class="map-step" data-jump="catch">
+              <img src="assets/generated/ai-harbor.png" alt="">
+              <span>5</span>
+              <strong>Hafenfang</strong>
+              <small>Zeichen fangen</small>
+            </button>
+            <button class="map-step" data-jump="rush">
+              <img src="assets/generated/ai-learn-kids.png" alt="">
+              <span>6</span>
+              <strong>Agora-Blitz</strong>
+              <small>Schnell reagieren</small>
+            </button>
+            <button class="map-step" data-jump="trial">
+              <img src="assets/generated/ai-temple.png" alt="">
+              <span>7</span>
+              <strong>Tempelprüfung</strong>
+              <small>Alles kombinieren</small>
+            </button>
+          </section>
+        </div>
+      </section>
+
+      <section class="view" id="learn">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Schriftrolle</p>
+            <h2>Lerne die Buchstaben</h2>
+          </div>
+          <div class="controls">
+            <button class="icon-btn" id="prevLetter" title="Vorheriger Buchstabe" aria-label="Vorheriger Buchstabe">‹</button>
+            <button class="icon-btn" id="nextLetter" title="Naechster Buchstabe" aria-label="Naechster Buchstabe">›</button>
+          </div>
+        </div>
+        <div class="learn-layout">
+          <article class="letter-card" id="letterCard"></article>
+          <aside class="letter-list" id="letterList" aria-label="Alphabetliste"></aside>
+        </div>
+      </section>
+
+      <section class="view" id="match">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Säulen-Spiel</p>
+            <h2>Verbinde Großbuchstabe und Kleinbuchstabe</h2>
+          </div>
+          <button class="primary-btn" id="newMatchRound">Neue Runde</button>
+        </div>
+        <img class="station-banner" src="assets/generated/ai-hero-agora.png" alt="Saeulenhof der Alpha-Agora">
+        <div class="game-status">
+          <span id="matchInfo">Wähle links einen Großbuchstaben.</span>
+          <span id="matchScore">0/6</span>
+        </div>
+        <div class="match-board">
+          <div id="upperColumn" class="column-list"></div>
+          <div class="temple-divider" aria-hidden="true"></div>
+          <div id="lowerColumn" class="column-list"></div>
+        </div>
+      </section>
+
+      <section class="view" id="memory">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Vasen-Memory</p>
+            <h2>Finde Buchstabe und Namen</h2>
+          </div>
+          <button class="primary-btn" id="newMemoryRound">Neu mischen</button>
+        </div>
+        <img class="station-banner" src="assets/generated/ai-theater.png" alt="Antikes Theater fuer das Memory-Spiel">
+        <div class="game-status">
+          <span id="memoryInfo">Decke zwei Vasen auf.</span>
+          <span id="memoryScore">0/6</span>
+        </div>
+        <div class="memory-grid" id="memoryGrid"></div>
+      </section>
+
+      <section class="view" id="sort">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Bibliothek</p>
+            <h2>Ordne die Schriftrollen</h2>
+          </div>
+          <button class="primary-btn" id="newSortRound">Neue Rollen</button>
+        </div>
+        <div class="game-status">
+          <span id="sortInfo">Klicke die Buchstaben in Alphabet-Reihenfolge an.</span>
+          <span id="sortScore">0/6</span>
+        </div>
+        <div class="sort-stage">
+          <img src="assets/generated/ai-library.png" alt="Antike Bibliothek">
+          <div id="sortBoard" class="sort-board"></div>
+        </div>
+      </section>
+
+      <section class="view" id="catch">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Hafenfang</p>
+            <h2>Fange das richtige Zeichen</h2>
+          </div>
+          <button class="primary-btn" id="newCatchRound">Neue Jagd</button>
+        </div>
+        <div class="game-status">
+          <span id="catchInfo">Tippe auf den gesuchten Buchstaben.</span>
+          <span id="catchScore">0/8</span>
+        </div>
+        <div class="catch-stage">
+          <img src="assets/generated/ai-harbor.png" alt="Antiker Hafen als Spielfeld">
+          <div class="catch-target" id="catchTarget">Start</div>
+          <div id="catchBoard" class="catch-board"></div>
+        </div>
+      </section>
+
+      <section class="view" id="rush">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Agora-Blitz</p>
+            <h2>60 Sekunden Buchstabenjagd</h2>
+          </div>
+          <button class="primary-btn" id="startRush">Start</button>
+        </div>
+        <img class="station-banner" src="assets/generated/ai-learn-kids.png" alt="Kinder lernen spielerisch Buchstaben">
+        <div class="rush-arena">
+          <div class="rush-question">
+            <small id="rushTimer">60 Sekunden</small>
+            <strong id="rushPrompt">Druecke Start.</strong>
+          </div>
+          <div class="answer-grid" id="rushAnswers"></div>
+          <p id="rushResult"></p>
+        </div>
+      </section>
+
+      <section class="view" id="review">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Übungs-Schriftrolle</p>
+            <h2>Wiederhole knifflige Zeichen</h2>
+          </div>
+          <button class="primary-btn" id="newReviewRound">Jetzt üben</button>
+        </div>
+        <div class="review-layout">
+          <article class="letter-card review-card" id="reviewCard"></article>
+          <aside class="mistake-list" id="mistakeList"></aside>
+        </div>
+      </section>
+
+      <section class="view" id="album">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Sammelalbum</p>
+            <h2>Deine Buchstabenkarten</h2>
+          </div>
+          <button class="primary-btn" data-jump="learn">Weiter sammeln</button>
+        </div>
+        <div class="album-grid" id="albumGrid"></div>
+      </section>
+
+      <section class="view" id="trial">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Tempelprüfung</p>
+            <h2>Bestehe die Abschlussrunde</h2>
+          </div>
+          <button class="primary-btn" id="startTrial">Prüfung starten</button>
+        </div>
+        <div class="trial-layout">
+          <img src="assets/generated/ai-temple.png" alt="Tempelprüfung in der griechischen Antike">
+          <div class="trial-card">
+            <div id="trialQuestion" class="trial-question">Sammle erst etwas Übung oder starte direkt die Prüfung.</div>
+            <div id="trialOptions" class="answer-grid"></div>
+            <p id="trialFeedback"></p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="modal" id="storyModal" hidden>
+      <div class="modal-panel">
+        <img id="storyImage" src="assets/generated/ai-reward.png" alt="Belohnungsmosaik">
+        <div>
+          <p class="eyebrow" id="storyKicker">Neue Szene</p>
+          <h2 id="storyTitle">Ein Mosaikstein leuchtet.</h2>
+          <p id="storyText">Du hast eine Station geschafft.</p>
+          <button class="primary-btn" id="closeStory">Weiter</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="bossModal" hidden>
+      <div class="modal-panel boss-panel">
+        <img src="assets/generated/ai-reward.png" alt="Mosaik-Belohnung">
+        <div>
+          <p class="eyebrow">Mini-Boss</p>
+          <h2 id="bossTitle">Wächterfrage</h2>
+          <p id="bossQuestion">Bereit?</p>
+          <div class="answer-grid" id="bossOptions"></div>
+          <p id="bossFeedback"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal tutorial-modal" id="tutorialModal" hidden>
+      <div class="tutorial-panel">
+        <img id="tutorialImage" src="assets/generated/ai-narrator.png" alt="Kallia erklärt den Lernweg">
+        <div class="tutorial-content">
+          <p class="eyebrow" id="tutorialKicker">Kallias Einführung</p>
+          <h2 id="tutorialTitle">Willkommen in der Alpha-Agora!</h2>
+          <p id="tutorialText">Ich zeige dir, wie du die griechischen Buchstaben Schritt für Schritt lernst.</p>
+          <div class="tutorial-dots" id="tutorialDots" aria-label="Tutorial-Fortschritt"></div>
+          <div class="tutorial-actions">
+            <button class="ghost-btn soft" id="tutorialBack">Zurück</button>
+            <button class="ghost-btn soft" id="tutorialSkip">Später</button>
+            <button class="primary-btn" id="tutorialNext">Weiter</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="narrator-widget" id="narratorWidget" aria-live="polite">
+      <button class="narrator-portrait" id="narratorToggle" aria-label="Erzählerin anzeigen">
+        <img src="assets/generated/ai-narrator.png" alt="Erzählerin">
+      </button>
+      <div class="narrator-bubble" id="narratorBubble">
+        <strong id="narratorTitle">Willkommen in der Alpha-Agora!</strong>
+        <p id="narratorText">Ich begleite dich durch die Stationen. Starte mit der Schriftrolle.</p>
+        <div class="narrator-actions">
+          <button id="narratorNext">Nächster Schritt</button>
+          <button id="narratorHelp">Hilf mir</button>
+          <button id="narratorTutorial">Tutorial</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <template id="badgeTemplate">
+    <span class="badge"></span>
+  </template>
+
+  <script src="script.js?v=20260617-tutorial"></script>
+</body>
+</html>
