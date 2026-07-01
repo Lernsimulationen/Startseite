@@ -40,6 +40,12 @@ const state = {
   traceDrawing: false,
   traceHits: 0,
   traceMisses: 0,
+  traceHitCells: new Set(),
+  traceMissCells: new Set(),
+  traceTargetCells: new Set(),
+  traceCoveredTargets: new Set(),
+  traceLastPoint: null,
+  traceMouseBlockedUntil: 0,
   traceCompleted: false,
   traceCtx: null,
   traceMaskCtx: null,
@@ -80,6 +86,8 @@ const els = {
   traceName: document.querySelector("#traceName"),
   traceHint: document.querySelector("#traceHint"),
   traceProgress: document.querySelector("#traceProgress"),
+  traceProgressText: document.querySelector("#traceProgressText"),
+  traceMeter: document.querySelector("#traceMeter"),
   traceFeedback: document.querySelector("#traceFeedback"),
   matchInfo: document.querySelector("#matchInfo"),
   matchScore: document.querySelector("#matchScore"),
@@ -521,7 +529,7 @@ function switchView(view) {
   if (view === "album") renderAlbum();
   if (view === "review") renderReview();
   if (view === "passed") renderPassedScreen();
-  if (view === "trace") renderTraceLetter();
+  if (view === "trace") renderTraceLetter({ reset: false });
   setTimeout(() => maybeShowStationIntro(view), 120);
 }
 
@@ -556,20 +564,35 @@ function setupTraceCanvas() {
   els.traceCanvas.addEventListener("pointermove", continueTraceDraw);
   els.traceCanvas.addEventListener("pointerup", stopTraceDraw);
   els.traceCanvas.addEventListener("pointercancel", stopTraceDraw);
+  els.traceCanvas.addEventListener("mousedown", startTraceDraw);
+  els.traceCanvas.addEventListener("mousemove", continueTraceDraw);
+  window.addEventListener("mouseup", stopTraceDraw);
 }
 
-function renderTraceLetter() {
+function renderTraceLetter(options = {}) {
   if (!els.traceCanvas || !state.traceCtx || !state.traceMaskCtx) return;
+  const { reset = true } = options;
   const item = traceItem();
-  state.traceHits = 0;
-  state.traceMisses = 0;
-  state.traceCompleted = state.progress.mastered.includes(item.name);
   els.traceArt.src = letterArtSrc(item);
   els.traceArt.alt = `Buchstabenbild ${item.name}`;
   els.traceName.textContent = `${item.name} ${item.upper}${item.lower}`;
   els.traceHint.textContent = `Zeichne ${item.upper} langsam nach. Die helle Vorlage zeigt dir die Form.`;
-  drawTraceGuide(item);
+  if (reset) {
+    resetTraceScore(item);
+    drawTraceGuide(item);
+  }
   updateTraceProgress();
+}
+
+function resetTraceScore(item = traceItem()) {
+  state.traceHits = 0;
+  state.traceMisses = 0;
+  state.traceHitCells = new Set();
+  state.traceMissCells = new Set();
+  state.traceTargetCells = new Set();
+  state.traceCoveredTargets = new Set();
+  state.traceLastPoint = null;
+  state.traceCompleted = false;
 }
 
 function drawTraceGuide(item) {
@@ -608,11 +631,36 @@ function drawTraceGuide(item) {
   mask.font = font;
   mask.textAlign = "center";
   mask.textBaseline = "middle";
-  mask.lineWidth = 58;
+  mask.lineWidth = 82;
   mask.strokeStyle = "#000";
   mask.fillStyle = "#000";
   mask.strokeText(item.upper, w / 2, h / 2 + 14);
   mask.fillText(item.upper, w / 2, h / 2 + 14);
+  buildTraceTargets();
+}
+
+function buildTraceTargets() {
+  const zoneSize = 48;
+  const sampleStep = 6;
+  const w = els.traceCanvas.width;
+  const h = els.traceCanvas.height;
+  const pixels = state.traceMaskCtx.getImageData(0, 0, w, h).data;
+  state.traceTargetCells = new Set();
+  state.traceCoveredTargets = new Set();
+
+  for (let zoneY = 0; zoneY < Math.ceil(h / zoneSize); zoneY += 1) {
+    for (let zoneX = 0; zoneX < Math.ceil(w / zoneSize); zoneX += 1) {
+      let maskSamples = 0;
+      const startX = zoneX * zoneSize;
+      const startY = zoneY * zoneSize;
+      for (let y = startY + sampleStep / 2; y < Math.min(h, startY + zoneSize); y += sampleStep) {
+        for (let x = startX + sampleStep / 2; x < Math.min(w, startX + zoneSize); x += sampleStep) {
+          if (pixels[(Math.floor(y) * w + Math.floor(x)) * 4 + 3] > 0) maskSamples += 1;
+        }
+      }
+      if (maskSamples >= 8) state.traceTargetCells.add(`${zoneX}:${zoneY}`);
+    }
+  }
 }
 
 function tracePoint(event) {
@@ -624,81 +672,130 @@ function tracePoint(event) {
 }
 
 function startTraceDraw(event) {
+  if (event.type === "mousedown" && Date.now() < state.traceMouseBlockedUntil) return;
+  if (event.type === "mousedown" && event.button !== 0) return;
   event.preventDefault();
+  if (event.type === "pointerdown") state.traceMouseBlockedUntil = Date.now() + 700;
   state.traceDrawing = true;
-  els.traceCanvas.setPointerCapture(event.pointerId);
+  if (event.pointerId !== undefined && els.traceCanvas.setPointerCapture) {
+    try {
+      els.traceCanvas.setPointerCapture(event.pointerId);
+    } catch {}
+  }
   const point = tracePoint(event);
+  state.traceLastPoint = point;
   state.traceCtx.beginPath();
   state.traceCtx.moveTo(point.x, point.y);
   scoreTracePoint(point);
+  updateTraceProgress();
 }
 
 function continueTraceDraw(event) {
   if (!state.traceDrawing) return;
+  if (event.type === "mousemove" && Date.now() < state.traceMouseBlockedUntil) return;
   event.preventDefault();
   const point = tracePoint(event);
+  if (!state.traceCompleted) scoreTraceSegment(state.traceLastPoint, point);
+  state.traceLastPoint = point;
   state.traceCtx.lineTo(point.x, point.y);
   state.traceCtx.strokeStyle = "#a94d36";
   state.traceCtx.lineWidth = 16;
   state.traceCtx.lineCap = "round";
   state.traceCtx.lineJoin = "round";
   state.traceCtx.stroke();
-  scoreTracePoint(point);
   updateTraceProgress();
 }
 
 function stopTraceDraw(event) {
   if (!state.traceDrawing) return;
+  if (event.type === "mouseup" && Date.now() < state.traceMouseBlockedUntil) return;
   state.traceDrawing = false;
-  try {
-    els.traceCanvas.releasePointerCapture(event.pointerId);
-  } catch {}
+  state.traceLastPoint = null;
+  if (event.pointerId !== undefined && els.traceCanvas.releasePointerCapture) {
+    try {
+      els.traceCanvas.releasePointerCapture(event.pointerId);
+    } catch {}
+  }
   updateTraceProgress();
+}
+
+function scoreTraceSegment(from, to) {
+  if (!from || !to) {
+    if (to) scoreTracePoint(to);
+    return;
+  }
+  const distance = Math.hypot(to.x - from.x, to.y - from.y);
+  const steps = Math.max(1, Math.ceil(distance / 8));
+  for (let index = 1; index <= steps; index += 1) {
+    const ratio = index / steps;
+    scoreTracePoint({
+      x: from.x + (to.x - from.x) * ratio,
+      y: from.y + (to.y - from.y) * ratio
+    });
+  }
 }
 
 function scoreTracePoint(point) {
   const x = Math.max(0, Math.min(els.traceCanvas.width - 1, Math.round(point.x)));
   const y = Math.max(0, Math.min(els.traceCanvas.height - 1, Math.round(point.y)));
+  const cell = `${Math.floor(x / 12)}:${Math.floor(y / 12)}`;
+  if (state.traceHitCells.has(cell) || state.traceMissCells.has(cell)) return;
   const alpha = state.traceMaskCtx.getImageData(x, y, 1, 1).data[3];
-  if (alpha > 0) state.traceHits += 1;
-  else state.traceMisses += 1;
+  if (alpha > 0) {
+    state.traceHits += 1;
+    state.traceHitCells.add(cell);
+    const target = `${Math.floor(x / 48)}:${Math.floor(y / 48)}`;
+    if (state.traceTargetCells.has(target)) state.traceCoveredTargets.add(target);
+  } else {
+    state.traceMisses += 1;
+    state.traceMissCells.add(cell);
+  }
 }
 
 function tracePercent() {
-  const total = state.traceHits + state.traceMisses;
-  const accuracy = total ? state.traceHits / total : 0;
-  const amount = Math.min(1, state.traceHits / 70);
-  return Math.round(Math.min(1, accuracy * 0.55 + amount * 0.45) * 100);
+  const targets = state.traceTargetCells.size;
+  if (!targets) return 0;
+  return Math.min(100, Math.round((state.traceCoveredTargets.size / targets) * 100));
+}
+
+function traceCompletionReady() {
+  const hits = state.traceHitCells.size;
+  const misses = state.traceMissCells.size;
+  const total = hits + misses;
+  const accuracy = total ? hits / total : 0;
+  return total >= 18 && accuracy >= 0.6 && tracePercent() >= 95;
 }
 
 function updateTraceProgress() {
   const item = traceItem();
-  const percent = tracePercent();
+  const measuredPercent = tracePercent();
+  const percent = state.traceCompleted ? 100 : measuredPercent;
   els.traceProgress.style.width = `${percent}%`;
-  if (state.progress.mastered.includes(item.name)) {
-    els.traceFeedback.textContent = `${item.name} ist schon sicher. Du kannst weiter üben oder einen neuen Buchstaben wählen.`;
-    return;
-  }
-  if (percent >= 72 && !state.traceCompleted) {
+  if (els.traceProgressText) els.traceProgressText.textContent = `${percent}%`;
+  if (els.traceMeter) els.traceMeter.setAttribute("aria-valuenow", String(percent));
+  if (state.traceCompleted) return;
+  if (traceCompletionReady() && !state.traceCompleted) {
+    const wasMastered = state.progress.mastered.includes(item.name);
     state.traceCompleted = true;
-    addXp(8, item.name);
-    els.traceFeedback.textContent = `Sehr gut! ${item.name} zählt jetzt als sicher.`;
-    setTimeout(() => {
-      state.traceLetter = (state.traceLetter + 1) % activePool().length;
-      renderTraceLetter();
-    }, 900);
+    els.traceProgress.style.width = "100%";
+    if (els.traceProgressText) els.traceProgressText.textContent = "100%";
+    if (els.traceMeter) els.traceMeter.setAttribute("aria-valuenow", "100");
+    if (!wasMastered) addXp(8, item.name);
+    els.traceFeedback.textContent = wasMastered
+      ? `Vollständig! Du hast ${item.name} noch einmal sauber nachgezeichnet.`
+      : `Vollständig! ${item.name} zählt jetzt als sicher.`;
     return;
   }
   els.traceFeedback.textContent = percent < 35
     ? "Zeichne langsam auf der hellen Vorlage weiter."
-    : "Gut. Bleib möglichst auf der Vorlage, dann zählt der Buchstabe als sicher.";
+    : percent < 70
+      ? `Gut, ${percent}% der Form sind geschafft. Zeichne alle Teile weiter.`
+      : `Fast geschafft: ${percent}%. Suche noch nach hellen, unberührten Stellen.`;
 }
 
 function clearTraceBoard() {
+  resetTraceScore();
   drawTraceGuide(traceItem());
-  state.traceHits = 0;
-  state.traceMisses = 0;
-  state.traceCompleted = false;
   updateTraceProgress();
 }
 

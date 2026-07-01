@@ -726,6 +726,13 @@ h2 {
   line-height: 1.45;
 }
 
+.trace-progress-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 52px;
+  align-items: center;
+  gap: 12px;
+}
+
 .trace-meter {
   height: 16px;
   overflow: hidden;
@@ -739,6 +746,12 @@ h2 {
   height: 100%;
   background: linear-gradient(90deg, var(--blue), var(--green));
   transition: width .2s ease;
+}
+
+.trace-progress-row strong {
+  color: var(--blue);
+  font-size: 1rem;
+  text-align: right;
 }
 
 .trace-board-wrap {

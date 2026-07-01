@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Leben mit den Göttern" />
+  <meta name="color-scheme" content="light" />
+  <meta name="description" content="Leben mit den Göttern - Rollenspiel-Weltkarte über die griechischen Götter (5. Klasse). Erkunde die Karte, erledige Botengänge, sprich mit den Göttern." />
+  <title>Leben mit den Göttern - Weltkarte der Antike</title>
+  <style>
+    :root{
+      --bg:#f3f6fb; --bg-accent:#e7edfb; --surface:#fff; --surface-soft:#f7f9fe;
+      --text:#10203a; --muted:#5b6b84; --border:rgba(33,55,94,.14);
+      --accent:#2457d6; --accent-soft:rgba(36,87,214,.12);
+      --gold:#d9a521; --gold-soft:#fbf1d6; --success:#12855a; --success-soft:#dff4ea;
+      --shadow:0 20px 45px rgba(18,36,66,.12); --shadow-sm:0 6px 18px rgba(18,36,66,.10);
+      --radius:20px; --max:1080px;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ margin:0; padding:0; min-height:100%; overscroll-behavior:none; }
+    body{
+      font-family:"Segoe UI","Trebuchet MS",Arial,sans-serif; color:var(--text); min-height:100vh;
+      background:
+        radial-gradient(circle at top left, rgba(36,87,214,.14), transparent 42%),
+        radial-gradient(circle at 90% 0%, rgba(217,165,33,.16), transparent 40%),
+        linear-gradient(180deg,var(--bg),var(--bg-accent));
+      -webkit-tap-highlight-color:transparent;
+    }
+    .shell{ max-width:var(--max); margin:0 auto; padding:max(20px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(36px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left)); }
+    .eyebrow{ display:inline-flex; align-items:center; gap:8px; padding:7px 13px; border-radius:999px;
+      border:1px solid var(--border); background:rgba(255,255,255,.75); color:var(--muted);
+      font-size:13px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; }
+    h1{ margin:14px 0 8px; font-size:clamp(1.9rem,4vw,2.9rem); line-height:1.05; letter-spacing:-.02em; }
+    .lead{ margin:0; max-width:70ch; color:var(--muted); line-height:1.6; }
+    .muted{ color:var(--muted); }
+    button{ font-family:inherit; touch-action:manipulation; -webkit-user-select:none; user-select:none; }
+    .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:13px 22px;
+      border-radius:12px; border:1px solid transparent; font-size:1.02rem; font-weight:700; cursor:pointer;
+      text-decoration:none; transition:transform .08s ease, box-shadow .15s ease, background .15s ease; }
+    .btn:active{ transform:translateY(1px); }
+    .btn.primary{ background:var(--accent); color:#fff; box-shadow:var(--shadow-sm); }
+    .btn.primary:hover{ background:#1c47b4; }
+    .btn.ghost{ background:#fff; color:var(--text); border-color:var(--border); }
+    .btn.ghost:hover{ background:var(--surface-soft); }
+    .btn.gold{ background:var(--gold); color:#3a2a00; box-shadow:var(--shadow-sm); }
+    .btn.gold:hover{ background:#c4941a; }
+    .card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); }
+    .screen{ display:none; animation:fade .35s ease; }
+    .screen.active{ display:block; }
+    @keyframes fade{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;} }
+
+    /* ---------- Start ---------- */
+    .hero{ padding:0; overflow:hidden; }
+    .hero-art{ position:relative; min-height:360px; padding:34px 32px; display:flex; align-items:center;
+      background:linear-gradient(90deg,rgba(10,26,51,.94) 0%,rgba(10,26,51,.82) 42%,rgba(10,26,51,.12) 72%),
+      url('assets/hero.png') center/cover no-repeat; color:#fff; }
+    .hero-copy{ max-width:600px; position:relative; z-index:1; }
+    .hero-copy .lead{ color:rgba(255,255,255,.88); }
+    .hero-copy .eyebrow{ color:#fff; background:rgba(255,255,255,.14); border-color:rgba(255,255,255,.28); }
+    .setup{ padding:24px 28px 28px; }
+    .field{ margin-top:20px; }
+    label{ display:block; font-weight:700; margin-bottom:8px; }
+    .chips{ display:flex; flex-wrap:wrap; gap:8px; }
+    .chip{ padding:11px 18px; border-radius:999px; border:1px solid var(--border); background:var(--surface-soft);
+      cursor:pointer; font-weight:700; font-size:1.02rem; transition:border-color .12s, background .12s; }
+    .chip:hover{ background:#fff; }
+    .chip.sel{ border-color:var(--accent); background:var(--accent-soft); color:var(--accent); }
+    .avatars{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+    .avatar{ width:86px; height:100px; padding:4px; overflow:hidden; border-radius:18px; border:2px solid var(--border); background:linear-gradient(#edf3ff,#fdf8e7);
+      cursor:pointer; display:grid; place-items:end center; transition:border-color .15s, transform .1s, box-shadow .15s; }
+    .avatar img{ width:100%; height:100%; object-fit:contain; pointer-events:none; filter:drop-shadow(0 4px 4px rgba(18,36,66,.18)); }
+    .avatar:hover{ transform:translateY(-3px); }
+    .avatar.sel{ border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
+    .footnote{ margin-top:22px; color:var(--muted); font-size:.85rem; text-align:center; }
+
+    /* ---------- Game ---------- */
+    #screen-game .card{ position:relative; padding:14px; }
+    .hud{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; margin-bottom:10px; }
+    .hud .who{ display:flex; align-items:center; gap:10px; }
+    .hud .ava{ width:48px; height:48px; padding:2px; overflow:hidden; border-radius:12px; background:var(--gold-soft); display:grid; place-items:center;
+      border:1px solid var(--border); }
+    .hud .ava img{ width:100%; height:100%; object-fit:contain; }
+    .hud .nm{ font-weight:800; }
+    .stats{ display:flex; gap:8px; flex-wrap:wrap; }
+    .pill{ display:inline-flex; align-items:center; gap:6px; padding:8px 12px; border-radius:999px;
+      background:var(--surface-soft); border:1px solid var(--border); font-weight:700; font-size:.92rem; }
+    .pill .lbl{ color:var(--muted); font-weight:600; }
+    .inventory{ display:flex; gap:5px; flex-wrap:wrap; margin:2px 0 10px; min-height:34px; }
+    .inventory-slot{ width:34px; height:34px; border-radius:10px; border:1px solid var(--border); background:#eef2f8; display:grid; place-items:center; }
+    .inventory-slot img{ width:30px; height:30px; object-fit:contain; filter:drop-shadow(0 2px 2px rgba(0,0,0,.18)); }
+    .inventory-slot.locked{ opacity:.28; filter:grayscale(1); }
+
+    .quest{ position:sticky; top:8px; z-index:24; display:flex; align-items:center; gap:10px; padding:11px 15px; margin-bottom:10px;
+      background:linear-gradient(90deg,var(--gold-soft),#fff); border:1px solid var(--border);
+      border-left:5px solid var(--gold); border-radius:12px; font-weight:700; box-shadow:0 8px 22px rgba(18,36,66,.14); }
+    .quest .qi{ font-size:1.35rem; }
+    .quest .qt{ line-height:1.35; flex:1; min-width:180px; }
+    .quest .qt small{ display:block; color:var(--muted); font-weight:600; }
+    .quest-action{ margin-left:auto; padding:9px 14px; border:0; border-radius:10px; background:var(--gold); color:#342400; font-weight:900; cursor:pointer; display:none; white-space:nowrap; }
+
+    .stage{ position:relative; width:100%; display:flex; justify-content:center; }
+    canvas#world{ display:block; width:100%; max-width:920px; border-radius:16px; border:1px solid var(--border);
+      background:#7cb342; touch-action:none; box-shadow:var(--shadow-sm); }
+    #toasts{ position:absolute; top:12px; left:50%; transform:translateX(-50%); z-index:20;
+      display:flex; flex-direction:column; gap:6px; align-items:center; pointer-events:none; width:100%; }
+    .toast{ background:rgba(16,32,58,.92); color:#fff; padding:9px 16px; border-radius:999px; font-weight:700;
+      font-size:.95rem; box-shadow:var(--shadow-sm); animation:pop .3s ease; max-width:92%; text-align:center; }
+    @keyframes pop{ from{opacity:0; transform:translateY(-6px) scale(.96);} to{opacity:1; transform:none;} }
+
+    .controls{ display:flex; justify-content:space-between; align-items:flex-end; margin-top:12px; gap:12px; }
+    .dpad{ display:grid; grid-template-columns:repeat(3,60px); grid-template-rows:repeat(3,60px); gap:7px; }
+    .dpad button{ border:1px solid var(--border); background:#fff; border-radius:14px; font-size:1.5rem; cursor:pointer;
+      display:grid; place-items:center; box-shadow:var(--shadow-sm); user-select:none; touch-action:none; -webkit-user-select:none; }
+    .dpad button:active{ background:var(--accent-soft); }
+    .dpad .sp{ visibility:hidden; }
+    .abtn{ width:104px; height:104px; border-radius:50%; border:none; background:var(--gold); color:#3a2a00;
+      font-weight:900; font-size:1.1rem; cursor:pointer; box-shadow:var(--shadow-sm); user-select:none; touch-action:none; -webkit-user-select:none; }
+    .abtn:active{ background:#c4941a; }
+    .hint{ text-align:center; color:var(--muted); font-size:.85rem; margin-top:10px; }
+
+    /* dialogue overlay */
+    .overlay{ position:fixed; inset:0; background:rgba(12,20,38,.55); z-index:50; display:none; align-items:center;
+      justify-content:center; padding:16px; }
+    .overlay.show{ display:flex; animation:fade .2s ease; }
+    .dlg{ width:100%; max-width:640px; max-height:calc(100dvh - max(24px,env(safe-area-inset-top)) - max(24px,env(safe-area-inset-bottom))); overflow:auto; overscroll-behavior:contain; background:var(--surface);
+      border-radius:var(--radius); box-shadow:0 26px 80px rgba(5,13,28,.4); border:4px solid #d6a933; outline:1px solid #fff2b5; }
+    .dlg-head{ position:relative; }
+    .dlg-portrait{ width:100%; aspect-ratio:16/9; object-fit:cover; display:block; background:#e9eef8;
+      border-radius:var(--radius) var(--radius) 0 0; }
+    .dlg-note{ position:absolute; left:10px; bottom:10px; background:rgba(16,32,58,.72); color:#fff; font-size:.68rem;
+      padding:2px 7px; border-radius:6px; }
+    .dlg-body{ padding:20px 22px 24px; }
+    .dlg-epithet{ color:var(--gold); font-weight:800; text-transform:uppercase; letter-spacing:.05em; font-size:.8rem; }
+    .dlg-body h2{ margin:2px 0 4px; font-size:1.6rem; }
+    .dlg-domain{ color:var(--muted); margin:0 0 12px; }
+    .dlg-item{ display:none; align-items:center; gap:10px; margin:0 0 12px; padding:9px 12px; border-radius:12px;
+      background:linear-gradient(90deg,#fff4cf,#fff); border:1px solid rgba(217,165,33,.35); font-weight:800; color:#674c08; }
+    .dlg-item.show{ display:flex; }
+    .dlg-item .item-glyph{ font-size:1.45rem; }
+    .speech{ background:var(--surface-soft); border:1px solid var(--border); border-left:4px solid var(--gold);
+      border-radius:12px; padding:15px 17px; line-height:1.6; font-size:1.12rem; min-height:64px; }
+    .choices{ display:grid; gap:10px; margin-top:14px; }
+    .choice{ text-align:left; padding:14px 16px; border-radius:12px; border:1px solid var(--border); background:#fff;
+      font-size:1.05rem; cursor:pointer; transition:background .12s, border-color .12s; }
+    .choice:hover{ background:var(--surface-soft); border-color:var(--accent); }
+    .choice::before{ content:"💬 "; }
+    .dlg-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:18px; }
+    .dlg-actions .btn{ font-size:1.1rem; padding:14px 26px; }
+
+    /* help modal */
+    .help-card{ width:100%; max-width:520px; background:var(--surface); border-radius:var(--radius);
+      box-shadow:var(--shadow); border:1px solid var(--border); padding:26px 26px 22px; }
+    .help-card h2{ margin:0 0 12px; }
+    .help-card ul{ line-height:1.7; padding-left:20px; }
+    .help-card .big{ font-size:1.05rem; }
+    .craft-card{ width:100%; max-width:560px; background:#fffdf7; border:4px solid #d6a933; outline:1px solid #fff1ad;
+      border-radius:24px; box-shadow:0 30px 90px rgba(5,13,28,.48); padding:26px; text-align:center; }
+    .craft-card h2{ margin:0 0 6px; }
+    .craft-progress{ display:flex; justify-content:center; gap:8px; margin:18px 0; }
+    .craft-step{ width:44px; height:44px; display:grid; place-items:center; border-radius:12px; background:#eef2f8; border:2px solid var(--border); font-size:1.35rem; }
+    .craft-step.done{ background:var(--success-soft); border-color:var(--success); }
+    .craft-options{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+    .craft-option{ min-height:76px; border:1px solid var(--border); border-radius:14px; background:#fff; font-size:1.6rem; cursor:pointer; }
+    .craft-option:hover{ border-color:var(--gold); background:var(--gold-soft); }
+    .craft-feedback{ min-height:28px; margin:14px 0 4px; font-weight:800; }
+    .story-card{ width:100%; max-width:620px; overflow:hidden; border-radius:24px; background:#fffdf8;
+      border:4px solid #d6a933; outline:1px solid #fff1ad; box-shadow:0 30px 90px rgba(5,13,28,.48); }
+    .story-scene{ min-height:170px; padding:26px; display:flex; align-items:flex-end;
+      background:linear-gradient(180deg,rgba(22,49,89,.05),rgba(22,49,89,.86)),url('assets/hero.png') center 35%/cover; color:#fff; }
+    .story-speaker{ display:flex; align-items:center; gap:12px; }
+    .story-owl{ width:58px; height:58px; display:grid; place-items:center; flex:0 0 auto; border-radius:50%;
+      background:#fff4c6; border:3px solid #e4b63d; font-size:2rem; box-shadow:0 6px 18px rgba(0,0,0,.2); animation:owlBob 2s ease-in-out infinite; }
+    @keyframes owlBob{ 50%{ transform:translateY(-5px) rotate(2deg); } }
+    .story-scene h2{ margin:0; text-shadow:0 2px 8px rgba(0,0,0,.45); }
+    .story-body{ padding:24px 26px 26px; }
+    .story-text{ font-size:1.1rem; line-height:1.7; margin:0 0 18px; white-space:pre-line; }
+    .companion-note{ display:flex; gap:9px; align-items:center; padding:9px 13px; margin-bottom:10px; border-radius:12px;
+      background:#f2edff; color:#54338c; font-weight:700; font-size:.9rem; }
+    .alphabet-card{ width:100%; max-width:520px; padding:26px; text-align:center; background:#fffdf8; border-radius:24px;
+      border:4px solid #7760a8; outline:1px solid #e4dcff; box-shadow:0 30px 90px rgba(5,13,28,.48); }
+    .greek-letter{ font-family:Georgia,serif; font-size:5rem; line-height:1; color:#54338c; margin:14px 0; }
+    .alphabet-options{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:18px 0; }
+    .alphabet-option{ min-height:58px; border:2px solid var(--border); background:#fff; border-radius:13px; font-weight:900; font-size:1.1rem; cursor:pointer; }
+    .alphabet-option:hover{ border-color:#7760a8; background:#f2edff; }
+    .fullscreen-btn{ padding:9px 12px; border-radius:10px; border:1px solid var(--border); background:#fff; font-weight:800; cursor:pointer; }
+    .game-actions{ text-align:center; margin-top:6px; }
+    :fullscreen body{ background:#dfe7f5; }
+    :fullscreen .shell{ max-width:none; min-height:100dvh; padding:max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left)); }
+    :fullscreen #screen-game .card{ min-height:calc(100dvh - 16px); }
+    body.simulated-fullscreen{ overflow:hidden; }
+    body.simulated-fullscreen .shell{ position:fixed; inset:0; z-index:999; overflow:auto; max-width:none; background:#dfe7f5;
+      padding:max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left)); }
+    body.simulated-fullscreen #screen-game .card{ min-height:calc(100dvh - 16px); }
+
+    /* finale */
+    .finale{ padding:0 0 32px; text-align:center; overflow:hidden; }
+    .finale-art{ width:100%; aspect-ratio:16/7; object-fit:cover; object-position:center; display:block; }
+    .finale-content{ padding:26px 28px 0; }
+    .medals{ display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin:20px 0; }
+    .medal{ display:flex; flex-direction:column; align-items:center; gap:5px; width:92px; }
+    .medal .sym{ width:60px; height:60px; border-radius:16px; display:grid; place-items:center; font-size:1.8rem;
+      background:var(--gold-soft); border:1px solid var(--border); }
+    .medal small{ color:var(--muted); }
+    .journal{ text-align:left; max-width:660px; margin:18px auto 0; }
+    .journal li{ margin-bottom:7px; line-height:1.5; }
+
+    @media (max-width:560px){
+      .hero-art{ min-height:300px; padding:26px 22px; background-position:62% center; }
+      .setup{ padding:20px; }
+      .avatar{ width:72px; height:88px; }
+      .quest{ flex-wrap:wrap; }
+      .quest-action{ width:100%; margin-left:0; }
+      .abtn{ width:88px; height:88px; }
+      .dpad{ grid-template-columns:repeat(3,54px); grid-template-rows:repeat(3,54px); }
+    }
+    @media (pointer:coarse) and (min-width:700px){
+      .btn,.choice,.chip,.fullscreen-btn{ min-height:46px; }
+      .choice{ padding:15px 18px; }
+      .overlay{ padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left)); }
+      .dlg-actions{ position:sticky; bottom:-24px; padding:12px 0 4px; background:linear-gradient(transparent,#fff 28%); }
+    }
+    @media (pointer:coarse) and (min-width:700px) and (orientation:landscape){
+      .shell{ padding:max(6px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(6px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left)); max-width:none; }
+      #screen-game .card{ display:grid; grid-template-columns:minmax(0,1fr) 220px; grid-template-rows:auto auto auto auto 1fr auto;
+        grid-template-areas:"hud hud" "quest quest" "stage companion" "stage inventory" "stage controls" "stage actions"; gap:6px 10px; min-height:calc(100dvh - 12px); padding:8px; }
+      .hud{ grid-area:hud; margin:0; } .inventory{ grid-area:inventory; margin:0; align-content:start; }
+      .companion-note{ grid-area:companion; padding:7px 10px; margin:0; align-self:start; }
+      .quest{ grid-area:quest; position:relative; top:auto; padding:8px 12px; margin:0; }
+      .stage{ grid-area:stage; width:min(100%,calc((100dvh - 145px)*1.586)); justify-self:center; align-self:start; }
+      canvas#world{ width:100%; height:auto; }
+      .controls{ grid-area:controls; margin:0; align-self:end; justify-content:center; flex-wrap:wrap; }
+      .dpad{ grid-template-columns:repeat(3,52px); grid-template-rows:repeat(3,52px); gap:5px; }
+      .abtn{ width:86px; height:86px; }
+      .game-actions{ grid-area:actions; margin:0; align-self:end; display:flex; gap:5px; justify-content:center; flex-wrap:wrap; }
+      .game-actions .btn{ padding:9px 12px; font-size:.92rem; }
+      .hint{ display:none; }
+      .dlg{ max-width:min(940px,96vw); height:min(680px,calc(100dvh - 20px)); display:grid; grid-template-columns:44% 56%; overflow:hidden; }
+      .dlg-head{ min-height:0; } .dlg-portrait{ width:100%; height:100%; object-fit:cover; border-radius:var(--radius) 0 0 var(--radius); }
+      .dlg-body{ min-height:0; overflow:auto; overscroll-behavior:contain; padding:18px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+
+    <!-- ============ START ============ -->
+    <section id="screen-start" class="screen active">
+      <div class="card hero">
+        <div class="hero-art"><div class="hero-copy">
+          <span class="eyebrow">⚡ Antike · Weltkarten-Rollenspiel</span>
+          <h1>Leben mit den Göttern</h1>
+          <p class="lead">Erkunde das alte Griechenland, erledige Botengänge für Zeus, sammle wertvolle Artefakte und lerne alle zwölf Olympier kennen.</p>
+        </div></div>
+        <div class="setup">
+        <div class="field">
+          <label>Wähle deinen Namen:</label>
+          <div class="chips" id="nameChips"></div>
+        </div>
+
+        <div class="field">
+          <label>Wähle deine Figur:</label>
+          <div class="avatars" id="avatars">
+            <button class="avatar sel" data-a="nikos" aria-label="Nikos"><img src="assets/avatar-nikos.png" alt="Nikos"></button>
+            <button class="avatar" data-a="thalia" aria-label="Thalia"><img src="assets/avatar-thalia.png" alt="Thalia"></button>
+            <button class="avatar" data-a="timon" aria-label="Timon"><img src="assets/avatar-timon.png" alt="Timon"></button>
+            <button class="avatar" data-a="kyra" aria-label="Kyra"><img src="assets/avatar-kyra.png" alt="Kyra"></button>
+            <button class="avatar" data-a="alexios" aria-label="Alexios"><img src="assets/avatar-alexios.png" alt="Alexios"></button>
+            <button class="avatar" data-a="hermes" aria-label="Junger Bote"><img src="assets/avatar-hermes.png" alt="Junger Bote"></button>
+          </div>
+        </div>
+
+        <div class="field">
+          <button class="btn gold" id="btnStart">Abenteuer starten →</button>
+          <button class="btn ghost" id="btnReset" style="margin-left:8px; display:none;">Neu beginnen</button>
+        </div>
+        </div>
+      </div>
+      <p class="footnote">Ein Lernabenteuer für die 5. Klasse · Für Tablet &amp; PC</p>
+    </section>
+
+    <!-- ============ GAME ============ -->
+    <section id="screen-game" class="screen">
+      <div class="card">
+        <div class="hud">
+          <div class="who">
+            <div class="ava" id="hudAva"><img src="assets/avatar-nikos.png" alt="Spielfigur"></div>
+            <div>
+              <div class="nm" id="hudName">Reisende:r</div>
+              <div style="color:var(--muted); font-size:.85rem;">Weltkarte der Antike</div>
+            </div>
+          </div>
+          <div class="stats">
+            <span class="pill">⭐ <span class="lbl">Gunst:</span> <span id="hudFavor">0</span></span>
+            <span class="pill">🏛️ <span class="lbl">Götter:</span> <span id="hudVisited">0</span>/12</span>
+            <span class="pill">💎 <span class="lbl">Artefakte:</span> <span id="hudArtifacts">0</span>/8</span>
+            <button class="fullscreen-btn" id="btnFullscreen" aria-label="Vollbildmodus">⛶ Vollbild</button>
+          </div>
+        </div>
+        <div class="inventory" id="inventory" aria-label="Gefundene Artefakte"></div>
+        <div class="companion-note"><span>🦉</span><span id="companionText">Piko begleitet dich und passt auf deine Botentasche auf.</span></div>
+
+        <div class="quest" id="questBanner">
+          <span class="qi" id="questIcon">🧭</span>
+          <span class="qt"><span id="questText">…</span><small id="questSub">Folge dem goldenen Zeichen 📍 auf der Karte.</small></span>
+          <button class="quest-action" id="questAction">Herstellen</button>
+        </div>
+
+        <div class="stage">
+          <div id="toasts"></div>
+          <canvas id="world" width="920" height="580"></canvas>
+        </div>
+
+        <div class="controls">
+          <div class="dpad">
+            <span class="sp"></span>
+            <button data-dir="up" aria-label="hoch">▲</button>
+            <span class="sp"></span>
+            <button data-dir="left" aria-label="links">◀</button>
+            <span class="sp"></span>
+            <button data-dir="right" aria-label="rechts">▶</button>
+            <span class="sp"></span>
+            <button data-dir="down" aria-label="runter">▼</button>
+            <span class="sp"></span>
+          </div>
+          <button class="abtn" id="btnAction">A<br><span style="font-size:.72rem;font-weight:700;">Reden</span></button>
+        </div>
+        <p class="hint">📱 Steuerkreuz + A-Knopf &nbsp;|&nbsp; ⌨️ Pfeiltasten/WASD + Leertaste</p>
+
+        <div class="game-actions">
+          <button class="btn ghost" id="btnHelp">Hilfe</button>
+          <button class="btn gold" id="btnFinale" style="display:none;">Fest der Götter feiern 🎉</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FINALE ============ -->
+    <section id="screen-finale" class="screen">
+      <div class="card finale">
+        <img class="finale-art" src="assets/finale.png" alt="Das Fest der zwölf olympischen Götter">
+        <div class="finale-content">
+        <span class="eyebrow">🎉 Geschafft</span>
+        <h1>Das große Fest der Götter</h1>
+        <p class="lead" style="margin:0 auto;" id="finaleText"></p>
+        <div class="medals" id="finaleMedals"></div>
+        <h2 style="margin-top:8px;">Dein Reisetagebuch</h2>
+        <ul class="journal" id="finaleJournal"></ul>
+        <div style="margin-top:22px;">
+          <button class="btn gold" id="btnRestart">Neues Abenteuer</button>
+          <button class="btn ghost" id="btnFinaleBack" style="margin-left:8px;">Zurück zur Karte</button>
+        </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Dialog-Overlay -->
+  <div class="overlay" id="overlay">
+    <div class="dlg">
+      <div class="dlg-head">
+        <img id="dlgPortrait" class="dlg-portrait" alt="" />
+        <span class="dlg-note" id="dlgNote">KI-Bild-Platzhalter</span>
+      </div>
+      <div class="dlg-body">
+        <div class="dlg-epithet" id="dlgEpithet"></div>
+        <h2 id="dlgName"></h2>
+        <p class="dlg-domain" id="dlgDomain"></p>
+        <div class="dlg-item" id="dlgQuestItem"><span class="item-glyph" id="dlgItemGlyph"></span><span id="dlgItemText"></span></div>
+        <div class="speech" id="dlgSpeech"></div>
+        <div class="choices" id="dlgChoices"></div>
+        <div class="dlg-actions">
+          <button class="btn primary" id="dlgNext">Weiter ▶</button>
+          <button class="btn gold" id="dlgClose" style="display:none;">Weiter erkunden →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hilfe-Overlay -->
+  <div class="overlay" id="helpOverlay">
+    <div class="help-card">
+      <h2>🗺️ So spielst du</h2>
+      <ul class="big">
+        <li><b>Laufen:</b> Steuerkreuz unten (Tablet) oder Pfeiltasten / W A S D.</li>
+        <li><b>Reden / Weiter:</b> der <b>A-Knopf</b> oder die Leertaste.</li>
+        <li>Folge dem <b>goldenen Zeichen 📍</b> – dort wartet dein nächster Auftrag.</li>
+        <li>Sammle die <b>8 Artefakte ✨</b>, die überall versteckt sind.</li>
+        <li>Ziel: Hilf, das <b>Fest der Götter</b> vorzubereiten, und lerne alle 12 Götter kennen!</li>
+      </ul>
+      <div style="text-align:right; margin-top:10px;">
+        <button class="btn gold" id="helpClose">Los geht's!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Handwerks-Minispiel -->
+  <div class="overlay" id="craftOverlay">
+    <div class="craft-card">
+      <span class="eyebrow">⚒️ Werkstatt</span>
+      <h2 id="craftTitle">Gegenstand herstellen</h2>
+      <p class="muted" id="craftInstruction">Wähle die Arbeitsschritte in der richtigen Reihenfolge.</p>
+      <div class="craft-progress" id="craftProgress"></div>
+      <div class="craft-options" id="craftOptions"></div>
+      <div class="craft-feedback" id="craftFeedback"></div>
+      <button class="btn ghost" id="craftClose">Später versuchen</button>
+    </div>
+  </div>
+
+  <!-- Kleine Kapitelgeschichte -->
+  <div class="overlay" id="storyOverlay">
+    <div class="story-card">
+      <div class="story-scene">
+        <div class="story-speaker"><div class="story-owl">🦉</div><div><small>Dein Begleiter Piko erzählt</small><h2 id="storyTitle">Ein ungewöhnlicher Morgen</h2></div></div>
+      </div>
+      <div class="story-body">
+        <p class="story-text" id="storyText"></p>
+        <div style="text-align:right"><button class="btn gold" id="storyContinue">Weiter ins Abenteuer →</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pikos Alphabetübung bei einem falschen Weg -->
+  <div class="overlay" id="alphabetOverlay">
+    <div class="alphabet-card">
+      <div class="story-owl" style="margin:0 auto">🦉</div>
+      <span class="eyebrow">Pikos Reiseübung</span>
+      <h2>Ein Zeichen aus Griechenland</h2>
+      <p class="muted" id="alphabetPrompt">Welchem lateinischen Buchstaben entspricht dieses Zeichen?</p>
+      <div class="greek-letter" id="greekLetter">Α</div>
+      <div class="alphabet-options" id="alphabetOptions"></div>
+      <div class="craft-feedback" id="alphabetFeedback"></div>
+      <button class="btn primary" id="alphabetContinue" style="display:none">Weiterreisen →</button>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    "use strict";
+
+    /* ============================================================
+       DATEN
+    ============================================================ */
+    const NAMES = ["Nikos","Leandros","Alexios","Kastor","Timon","Elena","Daphne","Kyra","Thalia","Melina"];
+
+    /* Die zwölf Olympier: Position (Kachel x,y) + langes Kennenlern-Gespräch
+       (meet: zwei Entscheidungspunkte). Kein Quiz – reine Dialoge. */
+    const GODS = [
+      { key:"zeus", name:"Zeus", epithet:"König der Götter", glyph:"⚡", color:"#3b5bdb", x:14, y:4,
+        domain:"Himmel, Blitz und Donner", item:"Blitzbündel",
+        gift:"Du gefällst mir, Kleiner. Nimm dieses Blitzbündel als Zeichen meiner Gunst!",
+        meet:[
+          "Ah, ein Sterblicher wagt sich auf meinen Berg! Ich bin Zeus, Herr des Himmels und König aller Götter.",
+          "Von hier oben sehe ich alles: die Menschen, die Meere und jeden Blitz, den ich schleudere.",
+          { prompt:"Was möchtest du Zeus zuerst sagen?", choices:[
+            { label:"Dein Adler ist beeindruckend!", reply:"Ha! Mein Adler trägt meine Botschaften über den ganzen Himmel." },
+            { label:"Warum bist du der König?", reply:"Weil ich einst die wilden Titanen bezwang. Seither wache ich über Recht und Gastfreundschaft." } ] },
+          "Wer als Gast zu jemandem kommt, den muss man gut behandeln. Das ist mein heiliges Gesetz.",
+          { prompt:"Und was noch?", choices:[
+            { label:"Ist das Wetter dein Werk?", reply:"Ich sammle die Wolken und schicke den Regen. Zürne ich, kracht der Donner!" },
+            { label:"Wer gehört zu deiner Familie?", reply:"Meine Brüder Poseidon und Hades, meine Frau Hera und viele göttliche Kinder." } ] }
+        ] },
+      { key:"hera", name:"Hera", epithet:"Königin des Olymp", glyph:"👑", color:"#b5179e", x:10, y:6,
+        domain:"Ehe und Familie", item:"Pfauenfeder",
+        gift:"Nimm diese Pfauenfeder als Zeichen meiner Gunst.",
+        meet:[
+          "Sei gegrüßt. Ich bin Hera, die Königin des Olymp und Gemahlin des Zeus.",
+          "Ich wache über die Ehe und die Familien der Menschen.",
+          { prompt:"Was sagst du zu Hera?", choices:[
+            { label:"Deine Krone ist prächtig.", reply:"Sie zeigt, dass ich über alle Göttinnen herrsche." },
+            { label:"Erzähl mir vom Pfau.", reply:"Der Pfau ist mein heiliges Tier. Seine Federn tragen hundert Augen." } ] },
+          "Als Königin achte ich streng darauf, dass Versprechen gehalten werden.",
+          { prompt:"Und weiter?", choices:[
+            { label:"Bist du oft mit Zeus uneins?", reply:"Oh ja! Mein Gemahl ist stur – doch das bin ich auch." },
+            { label:"Was wünschst du dir?", reply:"Dass die Familien in Frieden zusammenhalten. Das ist mein größter Wunsch." } ] }
+        ] },
+      { key:"poseidon", name:"Poseidon", epithet:"Herr der Meere", glyph:"🔱", color:"#1098ad", x:8, y:15,
+        domain:"Meer, Erdbeben und Pferde", item:"Dreizack",
+        gift:"Diesen Dreizack schenke ich dir. Fürchte das Meer – doch achte es.",
+        meet:[
+          "Ich bin Poseidon, Herr der Meere! Spürst du, wie der Boden bebt, wenn ich zornig werde?",
+          "Mit meinem Dreizack peitsche ich die Wellen und schenke den Seefahrern gute Fahrt – oder Sturm.",
+          { prompt:"Was fragst du Poseidon?", choices:[
+            { label:"Beherrschst du auch die Pferde?", reply:"Ja! Ich schuf das erste Pferd aus der Gischt der Wellen." },
+            { label:"Warum bebt die Erde?", reply:"Weil ich mit dem Dreizack den Meeresgrund erschüttere. Man nennt es Erdbeben." } ] },
+          "Das Meer ernährt die Menschen mit Fischen – doch es kann auch gefährlich sein.",
+          { prompt:"Und noch etwas?", choices:[
+            { label:"Wer sind deine Brüder?", reply:"Zeus herrscht über den Himmel, Hades über die Unterwelt, ich über das Meer." },
+            { label:"Darf ich übers Meer segeln?", reply:"Ehre mich mit einem Gebet, dann schicke ich dir günstigen Wind." } ] }
+        ] },
+      { key:"demeter", name:"Demeter", epithet:"Mutter der Ernte", glyph:"🌾", color:"#5c940d", x:24, y:17,
+        domain:"Ackerbau und Jahreszeiten", item:"Ähre",
+        gift:"Nimm diese Ähre – ein Zeichen für Leben und Ernte.",
+        meet:[
+          "Sei willkommen auf meinen Feldern. Ich bin Demeter, die das Korn wachsen lässt.",
+          "Ohne mich gäbe es kein Brot. Alle Bauern beten zu mir für eine reiche Ernte.",
+          { prompt:"Was sagst du zu Demeter?", choices:[
+            { label:"Deine Felder sind wunderschön.", reply:"Danke, Kind. Von meiner Ernte lebt ganz Griechenland." },
+            { label:"Was baust du an?", reply:"Weizen und Gerste vor allem – daraus backen die Menschen ihr Brot." } ] },
+          "Doch nicht immer bin ich fröhlich. Meine Tochter Persephone wurde einst in die Unterwelt entführt.",
+          { prompt:"Und dann?", choices:[
+            { label:"Warum gibt es Winter?", reply:"Wenn Persephone bei Hades ist, trauere ich – dann ruht die Natur im Winter." },
+            { label:"Kommt sie zurück?", reply:"Jedes Frühjahr! Dann jubelt mein Herz und alles blüht wieder auf." } ] }
+        ] },
+      { key:"athena", name:"Athena", epithet:"Göttin der Weisheit", glyph:"🦉", color:"#3b3b8f", x:5, y:9,
+        domain:"Weisheit, Handwerk und Strategie", item:"Weisheits-Eule",
+        gift:"Diese kleine Eule sei dein Begleiter. Denke stets klug!",
+        meet:[
+          "Ich bin Athena, aus dem Haupt des Zeus geboren – schon mit Helm und Speer!",
+          "Ich schenke den Menschen kluge Gedanken und lehre sie nützliche Künste.",
+          { prompt:"Was möchtest du Athena sagen?", choices:[
+            { label:"Wie wurdest du geboren?", reply:"Zeus bekam schreckliche Kopfschmerzen – und heraus sprang ich in voller Rüstung!" },
+            { label:"Warum die Eule?", reply:"Die Eule sieht im Dunkeln, so wie die Weisheit das Verborgene erkennt." } ] },
+          "Die Stadt Athen wählte mich zur Beschützerin, weil ich ihr den Olivenbaum schenkte.",
+          { prompt:"Erzähl mehr!", choices:[
+            { label:"Was lehrst du die Menschen?", reply:"Weben, Töpfern, Schiffe bauen – und vor allem, klug zu planen." },
+            { label:"Kämpfst du auch?", reply:"Nur mit Verstand und Strategie, nicht aus blinder Wut wie Ares." } ] }
+        ] },
+      { key:"apollo", name:"Apollon", epithet:"Gott des Lichts", glyph:"🎵", color:"#e8a600", x:18, y:6,
+        domain:"Sonne, Musik und Weissagung", item:"Goldene Leier",
+        gift:"Nimm diese goldene Leier – möge Musik dich begleiten.",
+        meet:[
+          "Sei gegrüßt! Ich bin Apollon, Gott des Lichts, der Musik und der Heilung.",
+          "Jeden Morgen bringe ich das Sonnenlicht und mit meiner Leier die schönste Musik.",
+          { prompt:"Was fragst du Apollon?", choices:[
+            { label:"Spielst du mir etwas vor?", reply:"Gern! Meine Leier lässt selbst wilde Tiere lauschen." },
+            { label:"Kannst du heilen?", reply:"Ja, ich kenne die Heilkräuter – doch ich kann auch Krankheit senden." } ] },
+          "Wer die Zukunft wissen will, reist zu meinem Orakel von Delphi.",
+          { prompt:"Das Orakel?", choices:[
+            { label:"Wie funktioniert es?", reply:"Eine Priesterin spricht in meinem Namen und gibt rätselhafte Ratschläge." },
+            { label:"Wer ist deine Schwester?", reply:"Artemis, die Jägerin – wir sind Zwillinge, Sonne und Mond." } ] }
+        ] },
+      { key:"artemis", name:"Artemis", epithet:"Herrin der Jagd", glyph:"🏹", color:"#0b7285", x:20, y:8,
+        domain:"Jagd, Wald und Mond", item:"Silberbogen",
+        gift:"Diesen Silberbogen schenke ich dir. Ziele mit Bedacht.",
+        meet:[
+          "Pssst – erschreck das Wild nicht! Ich bin Artemis, die Jägerin der Wälder.",
+          "Mit Pfeil und Bogen streife ich durch die Nacht und wache über die Tiere und den Mond.",
+          { prompt:"Was sagst du zu Artemis?", choices:[
+            { label:"Bist du mit Apollon verwandt?", reply:"Er ist mein Zwillingsbruder – er das Licht des Tages, ich das des Mondes." },
+            { label:"Darf ich mitjagen?", reply:"Sei leise und schnell. Doch verletze niemals ein Tier ohne Not." } ] },
+          "Ich beschütze auch die jungen Mädchen und die Tierkinder im Wald.",
+          { prompt:"Und weiter?", choices:[
+            { label:"Fürchtest du dich nachts?", reply:"Niemals! Die Nacht ist mein Reich, der Mond mein Licht." },
+            { label:"Welche Tiere magst du?", reply:"Besonders die Hirsche und die Bären – sie sind mir heilig." } ] }
+        ] },
+      { key:"ares", name:"Ares", epithet:"Gott des Krieges", glyph:"⚔️", color:"#c92a2a", x:8, y:17,
+        domain:"Krieg und Kampf", item:"Kampfhelm",
+        gift:"Nimm diesen Kampfhelm – trage ihn mit Mut, nicht mit Zorn.",
+        meet:[
+          "HA! Ein Besucher! Ich bin Ares, der Gott des Krieges. Hörst du den Lärm der Schlacht?",
+          "Ich stürme wild in jeden Kampf. Mut ist alles, was zählt!",
+          { prompt:"Was sagst du zu Ares?", choices:[
+            { label:"Du bist ja furchtlos!", reply:"So ist es! Furcht kenne ich nicht – nur den Sturm des Gefechts." },
+            { label:"Wie nennen dich die Römer?", reply:"Mars! Sogar einen roten Stern am Himmel haben sie nach mir benannt." } ] },
+          "Die anderen Götter mögen mich nicht besonders – sie finden mich zu wild.",
+          { prompt:"Warum das?", choices:[
+            { label:"Streitest du mit Athena?", reply:"Ständig! Sie kämpft mit dem Kopf, ich mit der Faust." },
+            { label:"Hast du auch Freunde?", reply:"Aphrodite mag mich… manchmal. Mein wildes Herz schlägt für sie." } ] }
+        ] },
+      { key:"aphrodite", name:"Aphrodite", epithet:"Göttin der Liebe", glyph:"🌹", color:"#e64980", x:12, y:17,
+        domain:"Liebe und Schönheit", item:"Rose",
+        gift:"Diese Rose ist mein Geschenk. Trage Freundlichkeit im Herzen.",
+        meet:[
+          "Wie schön, dich zu sehen. Ich bin Aphrodite, Göttin der Liebe und Schönheit.",
+          "Aus dem Schaum des Meeres wurde ich geboren. Wo ich gehe, blühen Rosen auf.",
+          { prompt:"Was sagst du zu Aphrodite?", choices:[
+            { label:"Woher kommst du?", reply:"Aus dem glitzernden Meeresschaum stieg ich empor – auf einer großen Muschel." },
+            { label:"Wer ist dein Sohn?", reply:"Der kleine Eros mit Pfeil und Bogen. Wen er trifft, der verliebt sich." } ] },
+          "Selbst die Götter streiten manchmal darum, wer der Schönste ist.",
+          { prompt:"Erzähl mehr!", choices:[
+            { label:"Was ist dein Zeichen?", reply:"Die Rose und die Taube – beide stehen für die Liebe." },
+            { label:"Kannst du Streit schlichten?", reply:"Mit einem freundlichen Wort öffne ich selbst das härteste Herz." } ] }
+        ] },
+      { key:"hephaestus", name:"Hephaistos", epithet:"Gott der Schmiede", glyph:"🔨", color:"#e8590c", x:21, y:13,
+        domain:"Feuer und Handwerk", item:"Schmiedehammer",
+        gift:"Nimm diesen Schmiedehammer – mit Fleiß erschafft man Großes.",
+        meet:[
+          "Vorsicht, es ist heiß hier! Ich bin Hephaistos, der Schmied der Götter.",
+          "In meiner Werkstatt tief im Vulkan hämmere ich Waffen und Wunderwerke aus glühendem Metall.",
+          { prompt:"Was fragst du Hephaistos?", choices:[
+            { label:"Was schmiedest du gerade?", reply:"Einen Schild, so glänzend, dass sich der ganze Himmel darin spiegelt." },
+            { label:"Ist das Feuer gefährlich?", reply:"Für mich nicht – ich bin der Herr des Feuers. Doch fass die Esse nicht an!" } ] },
+          "Ich baute die Blitze für Zeus und den Dreizack für Poseidon. Alle Götter brauchen mich.",
+          { prompt:"Und weiter?", choices:[
+            { label:"Wer ist deine Frau?", reply:"Die schöne Aphrodite – auch wenn ich nur ein rußiger Schmied bin." },
+            { label:"Warum arbeitest du so hart?", reply:"Weil ich nur mit meinen Händen und dem Feuer wirklich glänze." } ] }
+        ] },
+      { key:"hermes", name:"Hermes", epithet:"Bote der Götter", glyph:"🪽", color:"#0c8599", x:16, y:11,
+        domain:"Reisende, Handel und Botschaften", item:"Flügelschuhe",
+        gift:"Nimm diese Flügelschuhe – möge dein Weg leicht sein.",
+        meet:[
+          "Schnell, schnell! Ich bin Hermes, der Bote der Götter – kaum hier, schon wieder fort.",
+          "Mit meinen Flügelschuhen bringe ich Nachrichten und beschütze alle Reisenden und Händler.",
+          { prompt:"Was sagst du zu Hermes?", choices:[
+            { label:"Deine Schuhe haben Flügel!", reply:"Damit bin ich schneller als der Wind. Kein Weg ist mir zu weit." },
+            { label:"Was trägst du da?", reply:"Meinen Heroldsstab mit den zwei Schlangen – er zeigt, dass ich ein Bote bin." } ] },
+          "Ich führe sogar die Seelen der Verstorbenen hinab in die Unterwelt.",
+          { prompt:"Erzähl mehr!", choices:[
+            { label:"Bist du auch mal frech?", reply:"Oh ja! Schon als Baby stahl ich Apollons Rinder – ein lustiger Streich!" },
+            { label:"Wem dienst du?", reply:"Vor allem meinem Vater Zeus. Seine Botschaften bringe ich überallhin." } ] }
+        ] },
+      { key:"dionysus", name:"Dionysos", epithet:"Gott der Freude", glyph:"🍇", color:"#9c36b5", x:24, y:12,
+        domain:"Wein, Feste und Theater", item:"Weintraube",
+        gift:"Nimm diese Weintraube – und vergiss das Lachen nie.",
+        meet:[
+          "Willkommen, willkommen! Ich bin Dionysos – wo ich bin, wird gefeiert!",
+          "Ich schenkte den Menschen die Weinreben und das Theater.",
+          { prompt:"Was sagst du zu Dionysos?", choices:[
+            { label:"Erzähl mir vom Theater!", reply:"Zu meinen Festen führten die Griechen die ersten Schauspiele auf – mit Masken und Musik!" },
+            { label:"Warum feierst du so gern?", reply:"Weil Freude das Leben schön macht! Tanz, lach und genieße den Tag." } ] },
+          "Ich reise durch die ganze Welt und bringe den Menschen Fröhlichkeit.",
+          { prompt:"Und weiter?", choices:[
+            { label:"Was ist dein Zeichen?", reply:"Die Weintraube und der Efeukranz, den ich im Haar trage." },
+            { label:"Feierst du jeden Tag?", reply:"Fast! Doch ein echtes Fest der Götter – das wäre das Größte!" } ] }
+        ] }
+    ];
+    const byKey = (k)=>GODS.find(g=>g.key===k);
+    const GOD_EXTRA_CHOICES={
+      zeus:[["Wie schützt du Gäste?","Wer Schutz sucht und friedlich kommt, steht unter meinem besonderen Gesetz."],["Hast du manchmal Angst?","Ein König darf Sorgen haben. Wichtig ist, trotz ihnen gerecht zu entscheiden."]],
+      hera:[["Was bedeutet Familie für dich?","Zusammenzuhalten, ehrlich zu sein und Verantwortung füreinander zu tragen."],["Kann eine Königin Fehler machen?","Natürlich. Würde zeigt sich darin, einen Fehler zu erkennen und zu verbessern."]],
+      poseidon:[["Warum ist das Meer salzig?","Die Menschen erzählen viele Geschichten darüber. Sicher ist: Es verbindet ferne Küsten."],["Was macht einen guten Seefahrer aus?","Geduld, Mut und großer Respekt vor Wind und Wasser."]],
+      demeter:[["Warum wechseln die Jahreszeiten?","Wenn die Erde ruht, sammelt sie Kraft. Im Frühling beginnt das Wachsen erneut."],["Welche Pflanze magst du besonders?","Das schlichte Korn – aus vielen kleinen Körnern wird Brot für eine ganze Gemeinschaft."]],
+      athena:[["Kann man Klugheit lernen?","Jeden Tag: durch Fragen, Beobachten und den Mut, die eigene Meinung zu prüfen."],["Was ist besser: Stärke oder Wissen?","Am stärksten ist, wer weiß, wann Kraft nötig ist und wann ein kluger Gedanke genügt."]],
+      apollo:[["Hilft Musik beim Lernen?","Rhythmus kann Wörter und Geschichten im Gedächtnis verankern."],["Kann Licht auch gefährlich sein?","Ja. Deshalb gehören zu jeder Gabe Maß und Verantwortung."]],
+      artemis:[["Wie bewegst du dich leise?","Ich achte auf den Boden, den Wind und die Tiere. Der Wald spricht, wenn man zuhört."],["Warum schützt du junge Tiere?","Weil Stärke auch bedeutet, Schwächere wachsen zu lassen."]],
+      ares:[["Ist jeder Kampf mutig?","Nein. Manchmal ist es mutiger, einen unnötigen Streit zu beenden."],["Kannst du dich entschuldigen?","Es fällt mir schwer – und gerade deshalb verlangt es echten Mut von mir."]],
+      aphrodite:[["Was macht jemanden schön?","Freundlichkeit, Aufmerksamkeit und der Mut, ganz man selbst zu sein."],["Kann Freundschaft Streit überstehen?","Ja, wenn beide ehrlich zuhören und bereit sind, etwas zu verändern."]],
+      hephaestus:[["Was braucht ein guter Handwerker?","Geduld, Übung und die Bereitschaft, aus misslungenen Versuchen zu lernen."],["Welches Werkzeug ist am wichtigsten?","Nicht der Hammer – der aufmerksame Blick, bevor der erste Schlag fällt."]],
+      hermes:[["Wie merkst du dir alle Wege?","Ich beobachte Berge, Flüsse und Sterne und frage Reisende nach ihren Erfahrungen."],["Was macht eine gute Nachricht aus?","Sie muss wahr, verständlich und beim richtigen Menschen angekommen sein."]],
+      dionysus:[["Kann man auch ohne Wein feiern?","Natürlich! Musik, Theater, gutes Essen und Freunde sind die besten Zutaten."],["Warum tragen Schauspieler Masken?","Damit Gefühle und Rollen selbst auf den hintersten Plätzen erkennbar werden."]]
+    };
+    GODS.forEach(g=>{ let ci=0; g.meet.forEach(node=>{ if(node&&node.choices&&GOD_EXTRA_CHOICES[g.key][ci]){
+      const [label,reply]=GOD_EXTRA_CHOICES[g.key][ci++]; node.choices.push({label,reply}); } }); });
+
+    /* Botengänge (Zelda-Questkette): „Das Fest der Götter vorbereiten".
+       Jede Aufgabe verbindet zwei Götter. give = Auftraggeber, deliver = Empfänger. */
+    const QUESTS = [
+      { from:"zeus", to:"hera", item:"Goldene Einladung",
+        give:["Höre, Kleiner: Ich will das größte Fest aller Zeiten geben!",
+              "Bring diese goldene Einladung zu meiner Gemahlin Hera – sie soll das Fest ausrichten."],
+        deliver:["Eine Einladung von Zeus? Wie aufregend! Ich übernehme die Planung sofort."] },
+      { from:"hera", to:"demeter", item:"Blumenkorb",
+        give:["Für den Festschmuck brauchen wir Blumen und Korn.",
+              "Nimm diesen Korb zu Demeter und bitte sie um ihre schönsten Ähren."],
+        deliver:["Für ein Fest der Götter fülle ich den Korb gern mit Korn und bunten Blüten."] },
+      { from:"demeter", to:"poseidon", item:"Bittbrief",
+        give:["Doch die Schiffe mit meiner Ernte stecken im Sturm fest!",
+              "Bring Poseidon diesen Bittbrief – er möge das Meer beruhigen."],
+        deliver:["Ein Sturm auf meinem Meer? Für das Fest lege ich die Wellen glatt wie einen Spiegel."] },
+      { from:"poseidon", to:"hephaestus", item:"Poseidons Dreizack",
+        give:["Nur eines noch: Mein Dreizack ist stumpf geworden.",
+              "Bring ihn zu Hephaistos in die Schmiede, er soll ihn schärfen."],
+        deliver:["Poseidons Dreizack? Eine Ehre! Am glühenden Amboss wird er schärfer als je zuvor."] },
+      { from:"hephaestus", to:"apollo", item:"Erloschene Laterne",
+        give:["Verflixt – meine Esse ist erloschen und ich habe kein Feuer mehr!",
+              "Geh zu Apollon und bitte ihn, diese Laterne mit Sonnenlicht zu entzünden."],
+        deliver:["Feuer aus reinem Sonnenlicht? Bitte sehr – nun brennt die Laterne hell und warm."] },
+      { from:"apollo", to:"artemis", item:"Sonnenlicht-Laterne",
+        give:["Trag das Feuer zurück – doch sag zuvor meiner Schwester Artemis Bescheid.",
+              "Sie soll zum Fest kommen und Wild für das Festmahl mitbringen."],
+        deliver:["Mein Bruder lädt mich ein? Ich komme – und bringe die beste Jagdbeute mit!"] },
+      { from:"artemis", to:"hermes", item:"Jagd-Botschaft",
+        give:["Diese Nachricht muss schnell zu allen Göttern.",
+              "Zu Fuß dauert das ewig – gib sie dem flinken Hermes, er verteilt sie im Nu."],
+        deliver:["Nachrichten verteilen? Mein Spezialgebiet! In Windeseile weiß es jeder Gott."] },
+      { from:"hermes", to:"athena", item:"Festnachricht",
+        give:["So, alle sind benachrichtigt! Doch ein gutes Fest braucht kluge Planung.",
+              "Frag die weise Athena um Rat – sie plant besser als jeder andere."],
+        deliver:["Ein Fest will gut durchdacht sein: Plätze, Speisen, Musik. Hier, mein fertiger Plan."] },
+      { from:"athena", to:"ares", item:"Festplan",
+        give:["Mein Plan ist fertig – nur eine Sorge bleibt.",
+              "Ares zettelt gern Streit an. Bring ihm die Bitte, das Fest in Frieden zu lassen."],
+        deliver:["Frieden halten? Bei einem Fest? Na gut … für einmal stecke ich mein Schwert weg."] },
+      { from:"ares", to:"aphrodite", item:"Roter Rosenstrauß",
+        give:["Doch nur unter einer Bedingung: Aphrodite soll mir verzeihen.",
+              "Bring ihr diesen roten Rosenstrauß als Zeichen meiner guten Absicht."],
+        deliver:["Rosen von Ares? Wie süß von diesem Grobian. Natürlich verzeihe ich ihm."] },
+      { from:"aphrodite", to:"dionysus", item:"Efeukranz",
+        give:["Nun ist alles bereit – es fehlt nur noch die Freude!",
+              "Bring Dionysos diesen Efeukranz. Er soll das Fest mit Wein und Musik eröffnen."],
+        deliver:["Ein Festkranz für mich? Dann lasst uns feiern – ich eröffne das große Fest der Götter!"] }
+    ];
+    const QUEST_PREP = [
+      {mode:"fetch", glyph:"✉️", pickup:[14,5]},
+      {mode:"craft", glyph:"🧺", recipe:["🧺","🌸","🌾"]},
+      {mode:"fetch", glyph:"📜", pickup:[24,16]},
+      {mode:"craft", glyph:"🔱", recipe:["🔥","🔨","✨"]},
+      {mode:"fetch", glyph:"🏮", pickup:[21,12]},
+      {mode:"craft", glyph:"☀️", recipe:["🪔","☀️","🔥"]},
+      {mode:"fetch", glyph:"📨", pickup:[19,8]},
+      {mode:"craft", glyph:"📣", recipe:["📜","✒️","🪽"]},
+      {mode:"fetch", glyph:"📋", pickup:[6,9]},
+      {mode:"craft", glyph:"🌹", recipe:["🌿","🌹","🎀"]},
+      {mode:"fetch", glyph:"🌿", pickup:[13,17]}
+    ];
+    QUESTS.forEach((q,i)=>Object.assign(q,QUEST_PREP[i]));
+    const QUEST_DIALOGUE_EXTRAS = [
+      {gq:"Zeus hält die goldene Einladung ins Licht. Wie willst du sie sicher zu Hera bringen?",ga:[
+        ["Ich bewahre sie in Pikos Botentasche auf.","Klug. Zwischen den weichen Federn knickt das Goldpapier nicht."],
+        ["Ich trage sie gut sichtbar vor mir.","Würdevoll – doch halte sie fest, wenn der Bergwind auffrischt!"],
+        ["Was steht eigentlich darin?","Dass jeder Gott willkommen ist und niemand beim Fest vergessen werden soll."]],
+       gc:"Auf der Rückseite siehst du Zeus’ Blitzsiegel. Nur Hera darf es brechen.",
+       dq:"Hera prüft Siegel und Goldrand. Was berichtest du ihr?",da:[
+        ["Zeus wünscht sich ein Fest für alle.","Dann muss auch für jeden ein Platz an der Tafel vorbereitet werden."],
+        ["Die Einladung kam direkt vom Wolkenthron.","Das erklärt den kleinen Duft nach Gewitterluft."],
+        ["Piko hat sehr gut darauf aufgepasst.","Dann gebührt unserer kleinen Boteneule der erste Ehrenplatz."]],
+       dc:"Hera glättet die Einladung behutsam und beginnt sofort mit ihrer Gästeliste."},
+      {gq:"Hera zeigt dir einen leeren, geflochtenen Blumenkorb. Womit soll Demeter ihn zuerst füllen?",ga:[
+        ["Mit Kornähren für reichlich Brot.","Sehr umsichtig. Ohne Demeters Korn gäbe es kein Festbrot."],
+        ["Mit Blumen für die lange Tafel.","Ja, der Olymp soll schon von weitem festlich leuchten."],
+        ["Mit beidem – Nahrung und Schönheit.","Genau das ist eine gute Feier: nützlich und wunderschön zugleich."]],
+       gc:"Der Korb ist empfindlich. Piko verspricht, weder darin zu schlafen noch an den Bändern zu knabbern.",
+       dq:"Demeter streicht über das Korbgeflecht. Welche Pflanzen erbittest du?",da:[
+        ["Goldenes Getreide und Mohnblumen.","Eine prächtige Mischung – Feld und Fest gehören zusammen."],
+        ["Olivenzweige als Friedenszeichen.","Sie erinnern alle Gäste daran, freundlich miteinander umzugehen."],
+        ["Kräuter, die gut duften.","Rosmarin und Thymian werden den ganzen Olymp erfüllen."]],
+       dc:"Demeter füllt jede Lücke sorgfältig, bis Piko nur noch mit den Ohrfedern darübersehen kann."},
+      {gq:"Demeter rollt den Bittbrief zusammen. Welche Bitte an Poseidon ist am wichtigsten?",ga:[
+        ["Er soll die Ernteschiffe sicher führen.","Genau. Viele Familien warten auf das Korn in ihren Häfen."],
+        ["Er soll den Sturm sofort beenden.","Dringend, aber wir wollen den stolzen Meeresgott höflich bitten."],
+        ["Er soll zeigen, dass Meer und Land zusammengehören.","Das ist weise: Ohne Wasser wächst nichts, ohne Land gibt es keine Ernte."]],
+       gc:"Du bindest den Papyrus mit einem grünen Halm zu. Das ist Demeters persönliches Zeichen.",
+       dq:"Poseidon liest den Bittbrief und hebt eine Augenbraue. Wie erklärst du Demeters Sorge?",da:[
+        ["Das Korn wird für das gemeinsame Fest gebraucht.","Für alle Götter? Dann will ich den Weg über das Meer öffnen."],
+        ["Die Seeleute fürchten die hohen Wellen.","Wer mein Meer achtet, verdient auch meinen Schutz."],
+        ["Demeter bittet dich als Bruder um Hilfe.","Ha! Bei einer solchen Bitte kann selbst ich nicht stur bleiben."]],
+       dc:"Poseidon drückt sein Dreizacksiegel in den Brief. Draußen werden die Wellen bereits ruhiger."},
+      {gq:"Poseidon legt seinen schweren Dreizack vor dich. Was muss Hephaistos daran verbessern?",ga:[
+        ["Die drei Spitzen müssen wieder scharf werden.","Richtig – jede steht für eine Kraft des Meeres."],
+        ["Der Griff braucht besseren Halt.","Gute Beobachtung. Salzwasser macht selbst göttliches Metall rutschig."],
+        ["Warum gibst du ihn überhaupt aus der Hand?","Nur einem zuverlässigen Boten und dem besten Schmied des Olymp vertraue ich ihn an."]],
+       gc:"Piko kann den Dreizack natürlich nicht tragen. Sie fliegt voraus und warnt vor engen Wegen.",
+       dq:"Hephaistos untersucht jede Kerbe. Welchen Arbeitsschritt empfiehlst du zuerst?",da:[
+        ["Das Metall im Feuer erwärmen.","Genau – erst dann lässt es sich formen, ohne zu brechen."],
+        ["Die Spitzen mit dem Hammer richten.","Bald. Doch kaltes Metall würde unter harten Schlägen reißen."],
+        ["Das Salz sorgfältig entfernen.","Sehr gut gesehen! Eine saubere Oberfläche ist der Anfang jeder guten Arbeit."]],
+       dc:"Der Schmied legt den Dreizack auf den Amboss. Jeder Hammerschlag klingt wie eine kleine Meereswelle."},
+      {gq:"Hephaistos reicht dir eine erloschene Tonlaterne. Was fehlt ihr außer Feuer?",ga:[
+        ["Öl und ein sauberer Docht.","Du denkst wie ein Handwerker. Ohne Brennstoff hilft auch ein Funke wenig."],
+        ["Ein Deckel gegen den Wind.","Sehr praktisch. Auf dem Olymp weht es stärker, als viele glauben."],
+        ["Vielleicht etwas Sonnenlicht?","Genau deshalb soll sie zu Apollon. Seine Flamme rußt nicht."]],
+       gc:"Die Laterne bleibt kühl, bis Apollon sie entzündet. Du kannst sie gefahrlos in beiden Händen tragen.",
+       dq:"Apollon dreht die Laterne prüfend. Welche Art Licht soll darin brennen?",da:[
+        ["Ein warmes Licht für die Festtafel.","Dann schenke ich ihr das goldene Licht des späten Nachmittags."],
+        ["Ein helles Licht für den Heimweg.","Eine gute Idee – kein Gast soll im Dunkeln stolpern."],
+        ["Ein Licht, das Hoffnung macht.","Das schönste Licht entsteht, wenn man es mit anderen teilt."]],
+       dc:"Apollon berührt den Docht. Eine kleine goldene Sonne erwacht hinter dem bemalten Ton."},
+      {gq:"Apollon schützt die nun leuchtende Laterne mit seiner Hand. Was sagst du Artemis dazu?",ga:[
+        ["Das Licht soll ihr den Weg zum Fest zeigen.","Schön gesagt. Selbst im Mondwald ist ein warmes Willkommenslicht kostbar."],
+        ["Sie soll die Flamme vor starkem Wind schützen.","Meine Schwester kennt jeden sicheren Pfad durch den Wald."],
+        ["Warum bringst du die Laterne nicht selbst?","Weil ein guter Bote nicht nur Dinge trägt, sondern Menschen miteinander verbindet."]],
+       gc:"Piko fliegt auf der schattigen Seite der Laterne, damit ihre Federn nicht zu warm werden.",
+       dq:"Artemis betrachtet das Sonnenlicht inmitten ihres kühlen Waldes. Was möchtest du ihr sagen?",da:[
+        ["Apollon möchte, dass du beim Fest dabei bist.","Dann lege ich unseren alten Geschwisterstreit für diesen Abend beiseite."],
+        ["Das Licht sieht neben dem Mond besonders schön aus.","Sonne und Mond müssen keine Gegner sein. Gemeinsam zeigen sie den ganzen Weg."],
+        ["Kannst du die Laterne sicher weitertragen?","Natürlich. Im Wald lernt man, jede Flamme aufmerksam zu hüten."]],
+       dc:"Artemis hängt die Laterne an einen silbernen Haken. Zwischen den Bäumen tanzen goldene Lichtpunkte."},
+      {gq:"Artemis versiegelt die Jagd-Botschaft. Warum ist Hermes der richtige Empfänger?",ga:[
+        ["Er erreicht jeden Ort besonders schnell.","Ja, selbst abgelegene Tempel findet er vor Sonnenuntergang."],
+        ["Er kennt alle Wege und Reisenden.","Darum weiß er auch, wem eine Nachricht noch fehlt."],
+        ["Piko könnte ihm doch helfen.","Eine ausgezeichnete Idee – zwei Boten sehen mehr als einer."]],
+       gc:"Auf dem Siegel ist ein kleiner Hirsch. Hermes erkennt dadurch sofort, von wem die Nachricht stammt.",
+       dq:"Hermes wiegt die Botschaft in der Hand. Wie soll er sie verteilen?",da:[
+        ["Schnell, aber mit Zeit für eine Antwort.","Sehr vernünftig. Eine zugestellte Nachricht ist erst gut, wenn sie verstanden wurde."],
+        ["Zuerst an die entferntesten Götter.","Kluge Route – auf dem Rückweg sammle ich die nahen Antworten ein."],
+        ["Lass Piko einige kurze Wege übernehmen.","Abgemacht! Ich gebe ihr die leichteste Rolle und einen offiziellen Botenstempel."]],
+       dc:"Hermes steckt die Schriftrolle sicher unter seinen Mantel. Piko erhält stolz eine winzige Kopie."},
+      {gq:"Hermes überreicht dir die Festnachricht für Athena. Welche Frage soll sie beantworten?",ga:[
+        ["Wie alle Gäste genug Platz finden.","Athena wird sicher einen Sitzplan zeichnen, bei dem niemand streiten muss."],
+        ["Wie Speisen und Musik zeitlich zusammenpassen.","Gute Planung verhindert, dass die Musiker mit vollem Mund spielen müssen."],
+        ["Wie das Fest für alle in Erinnerung bleibt.","Dafür braucht es mehr als Schmuck – es braucht eine gemeinsame Geschichte."]],
+       gc:"Die Festnachricht enthält viele kleine Antworten. Piko zählt dreimal nach, damit keine verloren geht.",
+       dq:"Athena liest jede Zeile. Welchen Teil des Festplans soll sie zuerst entwerfen?",da:[
+        ["Einen friedlichen Sitzplan.","Sehr wichtig. Poseidon und Athena sollten vielleicht nicht direkt nebeneinandersitzen."],
+        ["Einen genauen Ablauf.","Dann wissen Küche, Musiker und Gäste immer, was als Nächstes geschieht."],
+        ["Einen Plan für unerwartete Probleme.","Voraussicht ist der klügste Schutz gegen Chaos."]],
+       dc:"Athena zeichnet Linien, Plätze und Zeiten auf eine große Rolle. Sogar für Pikos Körbchen ist ein Platz vorgesehen."},
+      {gq:"Athena rollt den fertigen Festplan zusammen. Wie sprichst du Ares auf den Frieden an?",ga:[
+        ["Direkt und respektvoll.","Das ist am besten. Ares erkennt Mut, auch wenn er leise ausgesprochen wird."],
+        ["Ich zeige ihm zuerst seinen Ehrenplatz.","Ein kluger Anfang – wer sich gesehen fühlt, hört eher zu."],
+        ["Piko soll ihn mit großen Augen ansehen.","Ein überraschend wirksamer Plan. Selbst Ares kann einer kleinen Eule schwer widersprechen."]],
+       gc:"Der Plan ist mit blauer Schnur gebunden. Öffne ihn nur gemeinsam mit Ares, damit keine Seite im Wind davonfliegt.",
+       dq:"Ares betrachtet seinen Platz auf dem Plan. Was bedeutet friedliches Feiern für ihn?",da:[
+        ["Stärke zeigen, ohne jemanden zu verletzen.","Das klingt schwieriger als ein Kampf – also ist es eine echte Herausforderung!"],
+        ["Andere ausreden lassen.","Ha! Dafür brauche ich vielleicht mehr Übung als für den Speerwurf."],
+        ["Beim Wettkampf fair bleiben.","Damit kenne ich mich aus. Ein Sieg ohne Ehre ist wertlos."]],
+       dc:"Ares setzt ein kräftiges Zeichen neben seinen Namen: Für diesen Abend verspricht er Frieden."},
+      {gq:"Ares hält den roten Rosenstrauß ungewohnt vorsichtig. Was soll er Aphrodite sagen?",ga:[
+        ["Eine ehrliche Entschuldigung ohne Ausrede.","Du verlangst Mut. Gut – genau den will ich beweisen."],
+        ["Dass jede Rose für einen friedlichen Gedanken steht.","Dann ist es wohl der friedlichste Gegenstand, den ich je getragen habe."],
+        ["Dass der Strauß nicht alles wiedergutmacht.","Richtig. Er ist nur der Anfang – mein Verhalten muss den Rest zeigen."]],
+       gc:"Die Dornen wurden entfernt, aber die Blüten sind empfindlich. Piko hält neugierige Schnäbel auf Abstand.",
+       dq:"Aphrodite riecht an den Rosen. Welche Botschaft überbringst du von Ares?",da:[
+        ["Er möchte sich wirklich entschuldigen.","Dann höre ich nicht nur auf seine Worte, sondern achte auch auf seine nächsten Taten."],
+        ["Er verspricht Frieden beim Fest.","Das ist ein wertvolles Geschenk – viel wertvoller als die Rosen selbst."],
+        ["Das Überreichen fiel ihm nicht leicht.","Gerade deshalb erkenne ich, dass er es ernst meint."]],
+       dc:"Aphrodite stellt den Strauß in eine Amphore. Aus einer Entschuldigung wird der schönste Schmuck des Festes."},
+      {gq:"Aphrodite windet einen Efeukranz. Warum passt immergrüner Efeu zu Dionysos?",ga:[
+        ["Er bleibt lange grün und steht für Lebenskraft.","Genau – echte Freude soll nicht nach einem Abend verwelken."],
+        ["Er schmückt Theater und Feste.","Dionysos wird ihn schon von weitem erkennen."],
+        ["Die Ranken halten fest zusammen.","Wie unsere Reise: Viele einzelne Wege wurden zu einer gemeinsamen Geschichte."]],
+       gc:"Der Kranz ist frisch und kühl. Piko trägt ein winziges Efeublatt hinter ihrem Ohr.",
+       dq:"Dionysos hebt den Efeukranz begeistert hoch. Wie soll er das Fest eröffnen?",da:[
+        ["Mit Musik, bei der alle mitsingen können.","Wunderbar! Ein Fest klingt am schönsten, wenn niemand nur zuhören muss."],
+        ["Mit einer Geschichte über eure Reise.","Dann erfahren alle, wie ein mutiger Bote und eine kleine Eule den Olymp verbunden haben."],
+        ["Mit einem Dank an alle Helfenden.","Genau! Freude wächst, wenn man sie teilt und niemanden vergisst."]],
+       dc:"Dionysos setzt den Kranz auf. Trommeln erklingen – und Piko macht vor Schreck einen kleinen Luftsprung."}
+    ];
+    QUESTS.forEach((q,i)=>{
+      const x=QUEST_DIALOGUE_EXTRAS[i], choices=arr=>arr.map(([label,reply])=>({label,reply}));
+      q.give=q.give.concat([{prompt:x.gq,choices:choices(x.ga)},x.gc]);
+      q.deliver=q.deliver.concat([{prompt:x.dq,choices:choices(x.da)},x.dc]);
+    });
+    const STORY_BEATS = {
+      prologue:{
+        title:"Der Brief, der vom Himmel fiel",
+        text:"An einem ganz gewöhnlichen Morgen landet eine winzige Eule kopfüber in deinem Frühstückskorb. Sie heißt Piko, trägt eine viel zu große Botentasche – und darin steckt ein Brief von Zeus.\n\nAuf dem Olymp soll ein Fest stattfinden. Doch zwischen den Göttern herrscht so viel Durcheinander, dass niemand weiß, wer Blumen bringt, wer die Musik spielt oder ob Poseidon überhaupt gute Laune hat. Piko braucht jemanden mit mutigem Herzen und flinken Füßen. Jemanden wie dich.",
+        button:"Piko helfen →"
+      },
+      q2:{ title:"Ein Fest bekommt Wurzeln", text:"Hera betrachtet den Blumenkorb und lächelt. Piko setzt sich mitten hinein, niest wegen des Blütenstaubs und trägt plötzlich eine kleine Kornblume auf dem Kopf.\n\n„Weißt du“, flüstert die Eule, „ein Fest beginnt nicht mit Trompeten. Es beginnt damit, dass jemand an die anderen denkt.“ Zum ersten Mal fühlt sich eure Botentasche nicht schwer, sondern wichtig an." },
+      q4:{ title:"Mut zwischen Wellen und Feuer", text:"Hinter euch rauscht das Meer, vor euch glüht die Schmiede. Piko versteckt sich kurz unter deiner Kapuze, als Hephaistos den Hammer hebt. Beim ersten Funken steckt sie neugierig den Schnabel wieder hervor.\n\nIhr merkt: Mut bedeutet nicht, niemals Angst zu haben. Mut bedeutet, trotzdem gemeinsam weiterzugehen." },
+      q6:{ title:"Ein Licht für den Weg", text:"Das Sonnenlicht in der Laterne ist so warm, dass Pikos Federn golden schimmern. Sie trägt die Laterne ein kleines Stück selbst – schief, aber sehr stolz.\n\nVon nun an leuchtet sie nicht nur für das Fest. Sie erinnert euch daran, dass selbst eine kleine Flamme einen langen Weg heller machen kann." },
+      q8:{ title:"Die schnellste Nachricht des Olymp", text:"Hermes saust davon, und überall auf der Karte tauchen fröhliche Antworten auf. Piko versucht mit ihm um die Wette zu fliegen. Sie verliert deutlich, behauptet aber, sie habe nur auf dich gewartet.\n\nInzwischen sprechen die Götter nicht mehr nur über ihre eigenen Sorgen. Sie beginnen, sich aufeinander zu freuen." },
+      q10:{ title:"Frieden riecht nach Rosen", text:"Ares hält den Rosenstrauß so vorsichtig, als wäre er kostbarer als jeder Schild. Aphrodite erkennt sofort, wie viel Mut in einer ehrlichen Entschuldigung steckt.\n\nPiko stupst dich glücklich an. Fast alles ist bereit. Es fehlt nur noch einer, der aus all den einzelnen Vorbereitungen ein richtiges Fest macht." }
+    };
+    const GREEK_ALPHABET = [
+      {g:"Α",latin:"A",name:"Alpha"},{g:"Β",latin:"B",name:"Beta"},{g:"Γ",latin:"G",name:"Gamma"},
+      {g:"Δ",latin:"D",name:"Delta"},{g:"Ε",latin:"E",name:"Epsilon"},{g:"Λ",latin:"L",name:"Lambda"},
+      {g:"Μ",latin:"M",name:"My"},{g:"Π",latin:"P",name:"Pi"},{g:"Ρ",latin:"R",name:"Rho"},{g:"Τ",latin:"T",name:"Tau"}
+    ];
+
+    // Versteckte Artefakte (Alltagsleben der Antike)
+    const ARTIFACTS = [
+      { key:"amphore", x:3,  y:10, glyph:"🏺", name:"Amphore",      fact:"In großen Tonkrügen, den Amphoren, bewahrten die Griechen Öl und Wein auf." },
+      { key:"muenze",  x:25, y:4,  glyph:"🪙", name:"Silbermünze",  fact:"Athens Münzen trugen eine Eule – das Zeichen der Göttin Athena." },
+      { key:"maske",   x:13, y:16, glyph:"🎭", name:"Theatermaske", fact:"Im Theater trugen die Schauspieler große Masken, damit man sie von weitem erkannte." },
+      { key:"olive",   x:6,  y:7,  glyph:"🫒", name:"Olivenzweig",  fact:"Die Sieger der Olympischen Spiele erhielten einen Kranz aus Olivenzweigen." },
+      { key:"lampe",   x:18, y:13, glyph:"🏮", name:"Öllampe",      fact:"Abends spendeten kleine Öllampen den Griechen Licht in ihren Häusern." },
+      { key:"rolle",   x:26, y:9,  glyph:"📜", name:"Schriftrolle", fact:"Auf Rollen aus Papyrus schrieben die Griechen ihre Geschichten und Gesetze." },
+      { key:"tempel",  x:2,  y:3,  glyph:"🏛️", name:"Tempelmodell", fact:"Für jeden Gott bauten die Griechen prächtige Tempel aus weißem Marmor." },
+      { key:"waage",   x:11, y:13, glyph:"⚖️", name:"Marktwaage",   fact:"Auf dem Marktplatz, der Agora, wogen die Händler ihre Waren mit einer Waage." }
+    ];
+
+    /* ============================================================
+       KARTE
+    ============================================================ */
+    const COLS=28, ROWS=20, TILE=48;
+    const worldW=COLS*TILE, worldH=ROWS*TILE;
+    const BLOCKERS = new Set(["tree","mountain","water"]);
+    function buildMap(){
+      const m=[]; for(let y=0;y<ROWS;y++) m.push(new Array(COLS).fill("grass"));
+      const set=(x,y,t)=>{ if(x>=0&&x<COLS&&y>=0&&y<ROWS) m[y][x]=t; };
+      const rect=(x0,y0,x1,y1,t)=>{ for(let y=y0;y<=y1;y++) for(let x=x0;x<=x1;x++) set(x,y,t); };
+      for(let x=0;x<COLS;x++){ set(x,0,"tree"); set(x,ROWS-1,"tree"); }
+      for(let y=0;y<ROWS;y++){ set(0,y,"tree"); set(COLS-1,y,"tree"); }
+      rect(11,1,16,3,"mountain"); set(10,2,"mountain"); set(17,2,"mountain");
+      rect(1,13,6,18,"water");
+      rect(20,14,23,16,"mountain");
+      rect(3,4,5,6,"tree"); rect(22,4,24,6,"tree"); rect(21,9,24,11,"tree");
+      rect(22,17,26,18,"flower"); set(23,16,"flower"); set(25,16,"flower");
+      for(let y=5;y<=18;y++) set(14,y,"path");
+      for(let x=6;x<=22;x++) set(x,11,"path");
+      GODS.forEach(g=> set(g.x,g.y,"shrine"));
+      return m;
+    }
+    let map = buildMap();
+    function tileAt(tx,ty){ return (map[ty]&&map[ty][tx])||"tree"; }
+    function blockedPx(px,py){ return BLOCKERS.has(tileAt(Math.floor(px/TILE),Math.floor(py/TILE))); }
+
+    /* ============================================================
+       ZUSTAND
+    ============================================================ */
+    const STORE_KEY="leben-mit-goettern-v3";
+    const AVATAR_KEYS=["nikos","thalia","timon","kyra","alexios","hermes"];
+    function normalizedAvatar(value){ return AVATAR_KEYS.includes(value)?value:"nikos"; }
+    function newState(){ return { name:NAMES[0], avatar:"nikos", favor:0, visited:{}, items:[], artifacts:{},
+      quest:0, carrying:false, questStage:"talk", storySeen:{}, alphabetTurns:0, px:13*TILE+24, py:18*TILE+24, started:false }; }
+    function load(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY)); }catch(e){ return null; } }
+    function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){} }
+    let state = load() || newState();
+    state.avatar=normalizedAvatar(state.avatar);
+    if(!state.questStage) state.questStage=state.carrying?"carry":"talk";
+    if(!state.storySeen) state.storySeen={};
+    if(!Number.isFinite(state.alphabetTurns)) state.alphabetTurns=0;
+
+    const $=(id)=>document.getElementById(id);
+    function esc(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+    function showScreen(id){ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+      $(id).classList.add("active"); window.scrollTo({top:0,behavior:"smooth"}); }
+    function visitedCount(){ return Object.keys(state.visited).length; }
+    function artifactCount(){ return Object.keys(state.artifacts).length; }
+    function allQuestsDone(){ return state.quest>=QUESTS.length; }
+
+    function objective(){
+      if(allQuestsDone()) return { done:true, text:"Alle Aufträge erledigt – feiere das Fest der Götter!", icon:"🎉", target:null };
+      const q=QUESTS[state.quest];
+      if(state.questStage==="carry"||state.carrying){ const g=byKey(q.to); return { text:"Bringe „"+q.item+"“ zu "+g.name, icon:q.glyph, target:q.to, sub:"Der Gegenstand ist sicher in deiner Tasche." }; }
+      if(state.questStage==="prepare"&&q.mode==="fetch") return { text:"Hole „"+q.item+"“ ab", icon:q.glyph, targetPoint:q.pickup, sub:"Gehe zum leuchtenden Gegenstand auf der Karte." };
+      if(state.questStage==="prepare"&&q.mode==="craft") return { text:"Stelle „"+q.item+"“ her", icon:"⚒️", craft:true, sub:"Öffne die Werkstatt und ordne die Arbeitsschritte." };
+      const g=byKey(q.from); return { text:"Sprich mit "+g.name, icon:g.glyph, target:q.from };
+    }
+
+    /* ============================================================
+       BILDER (KI-Platzhalter mit Fallback)
+    ============================================================ */
+    function placeholderSVG(g){
+      const w=640,h=360;
+      const svg=`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${w} ${h}'>`+
+        `<defs><linearGradient id='bg' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='${g.color}'/><stop offset='1' stop-color='#0e1830'/></linearGradient></defs>`+
+        `<rect width='${w}' height='${h}' fill='url(#bg)'/>`+
+        `<circle cx='${w/2}' cy='${h*0.42}' r='${h*0.26}' fill='rgba(255,255,255,0.10)'/>`+
+        `<text x='${w/2}' y='${h*0.5}' font-size='${h*0.3}' text-anchor='middle'>${g.glyph}</text>`+
+        `<text x='${w/2}' y='${h*0.8}' font-size='${h*0.1}' font-family='Segoe UI, Arial' font-weight='800' fill='#fff' text-anchor='middle'>${esc(g.name)}</text>`+
+        `<text x='${w/2}' y='${h*0.9}' font-size='${h*0.05}' font-family='Segoe UI, Arial' fill='rgba(255,255,255,.85)' text-anchor='middle'>${esc(g.epithet)}</text></svg>`;
+      return "data:image/svg+xml;utf8,"+encodeURIComponent(svg);
+    }
+    function setPortrait(imgEl,g,noteEl){
+      imgEl.alt=g.name+" – "+g.epithet;
+      imgEl.onerror=function(){ imgEl.onerror=null; imgEl.src=placeholderSVG(g); if(noteEl) noteEl.style.display="inline-block"; };
+      if(noteEl) noteEl.style.display="none";
+      imgEl.src="assets/portrait-"+g.key+".png";
+    }
+    let mapImg=null, mapImgReady=false;
+    (function(){ const im=new Image(); im.onload=()=>{ mapImg=im; mapImgReady=true; }; im.onerror=()=>{ mapImgReady=false; }; im.src="assets/map.png"; })();
+    const portraitImgs={}, avatarImgs={}, artifactImgs={};
+    GODS.forEach(g=>{ const im=new Image(); im.src="assets/portrait-"+g.key+".png"; portraitImgs[g.key]=im; });
+    AVATAR_KEYS.forEach(key=>{ const im=new Image(); im.src="assets/avatar-"+key+".png"; avatarImgs[key]=im; });
+    ARTIFACTS.forEach(a=>{ const im=new Image(); im.src="assets/artifact-"+a.key+".png"; artifactImgs[a.key]=im; });
+
+    /* ============================================================
+       START
+    ============================================================ */
+    let chosenName=NAMES[0], chosenAvatar="nikos";
+    (function initNames(){
+      const wrap=$("nameChips");
+      NAMES.forEach((n,i)=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"+(i===0?" sel":""); b.textContent=n;
+        b.addEventListener("click",()=>{ document.querySelectorAll(".chip").forEach(c=>c.classList.remove("sel")); b.classList.add("sel"); chosenName=n; });
+        wrap.appendChild(b); });
+    })();
+    $("avatars").addEventListener("click",(e)=>{ const b=e.target.closest(".avatar"); if(!b) return;
+      document.querySelectorAll(".avatar").forEach(a=>a.classList.remove("sel")); b.classList.add("sel"); chosenAvatar=b.dataset.a; });
+    if(state.started){ $("btnReset").style.display="inline-flex";
+      chosenAvatar=normalizedAvatar(state.avatar); chosenName=state.name||NAMES[0];
+      document.querySelectorAll(".avatar").forEach(a=>a.classList.toggle("sel", a.dataset.a===chosenAvatar));
+      document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("sel", c.textContent===chosenName));
+      $("btnStart").textContent="Weiter erkunden →"; }
+    $("btnStart").addEventListener("click",()=>{ state.name=chosenName||NAMES[0]; state.avatar=chosenAvatar; state.started=true; save(); startGame(); });
+    $("btnReset").addEventListener("click",()=>{ if(confirm("Wirklich neu beginnen? Dein Fortschritt geht verloren.")){ state=newState(); save(); location.reload(); } });
+
+    /* ============================================================
+       SPIEL
+    ============================================================ */
+    const canvas=$("world"), ctx=canvas.getContext("2d");
+    let VIEW_W=920, VIEW_H=580, dpr=1;
+    function resize(){
+      const wrapW=canvas.parentElement.clientWidth;
+      const w=Math.min(wrapW,920); const h=Math.round(w*580/920);
+      dpr=window.devicePixelRatio||1;
+      canvas.style.width=w+"px"; canvas.style.height=h+"px";
+      canvas.width=Math.round(w*dpr); canvas.height=Math.round(h*dpr);
+      ctx.setTransform(dpr,0,0,dpr,0,0); VIEW_W=w; VIEW_H=h;
+    }
+    window.addEventListener("resize",resize);
+
+    const player={ x:state.px, y:state.py, r:14, dir:"down" };
+    const keys={ up:false, down:false, left:false, right:false };
+    let running=false, dialogueOpen=false, paused=false, activeNpc=null, activeArtifact=null, activeQuestPickup=false, lastTs=0;
+
+    window.addEventListener("keydown",(e)=>{
+      if(!running) return;
+      const k=e.key.toLowerCase();
+      if(k==="arrowup"||k==="w"){ keys.up=true; e.preventDefault(); }
+      else if(k==="arrowdown"||k==="s"){ keys.down=true; e.preventDefault(); }
+      else if(k==="arrowleft"||k==="a"){ keys.left=true; e.preventDefault(); }
+      else if(k==="arrowright"||k==="d"){ keys.right=true; e.preventDefault(); }
+      else if(k===" "||k==="enter"||k==="e"){ e.preventDefault(); if(dialogueOpen) dlgAdvance(); else if(!paused) tryInteract(); }
+      else if(k==="escape"){ if(dialogueOpen) closeDialogue(); }
+    });
+    window.addEventListener("keyup",(e)=>{
+      const k=e.key.toLowerCase();
+      if(k==="arrowup"||k==="w") keys.up=false; else if(k==="arrowdown"||k==="s") keys.down=false;
+      else if(k==="arrowleft"||k==="a") keys.left=false; else if(k==="arrowright"||k==="d") keys.right=false;
+    });
+    function bindHold(el,dir){
+      const on=(v)=>(e)=>{ e.preventDefault(); keys[dir]=v; };
+      el.addEventListener("pointerdown",on(true)); el.addEventListener("pointerup",on(false));
+      el.addEventListener("pointerleave",on(false)); el.addEventListener("pointercancel",on(false));
+    }
+    document.querySelectorAll(".dpad button[data-dir]").forEach(b=>bindHold(b,b.dataset.dir));
+    $("btnAction").addEventListener("pointerdown",(e)=>{ e.preventDefault(); if(dialogueOpen) dlgAdvance(); else if(!paused) tryInteract(); });
+
+    function canStand(nx,ny){
+      const r=player.r;
+      if(blockedPx(nx-r,ny-r)||blockedPx(nx+r,ny-r)||blockedPx(nx-r,ny+r)||blockedPx(nx+r,ny+r)) return false;
+      for(const g of GODS){ const gx=g.x*TILE+TILE/2, gy=g.y*TILE+TILE/2; if(Math.abs(nx-gx)<26&&Math.abs(ny-gy)<26) return false; }
+      return true;
+    }
+    function update(dt){
+      let vx=0,vy=0;
+      if(keys.up)vy-=1; if(keys.down)vy+=1; if(keys.left)vx-=1; if(keys.right)vx+=1;
+      if(vx||vy){
+        const len=Math.hypot(vx,vy); vx/=len; vy/=len;
+        if(Math.abs(vx)>Math.abs(vy)) player.dir=vx<0?"left":"right"; else player.dir=vy<0?"up":"down";
+        const speed=180*dt, nx=player.x+vx*speed, ny=player.y+vy*speed;
+        if(canStand(nx,player.y)) player.x=nx;
+        if(canStand(player.x,ny)) player.y=ny;
+        state.px=player.x; state.py=player.y;
+      }
+      activeArtifact=null; let artifactBest=1e9;
+      ARTIFACTS.forEach(a=>{ if(state.artifacts[a.key]) return;
+        const ax=a.x*TILE+TILE/2, ay=a.y*TILE+TILE/2, d=Math.hypot(player.x-ax,player.y-ay);
+        if(d<42&&d<artifactBest){ activeArtifact=a; artifactBest=d; } });
+      const q=QUESTS[state.quest];
+      activeQuestPickup=false;
+      if(q&&state.questStage==="prepare"&&q.mode==="fetch"){
+        const qx=q.pickup[0]*TILE+TILE/2, qy=q.pickup[1]*TILE+TILE/2;
+        activeQuestPickup=Math.hypot(player.x-qx,player.y-qy)<42;
+      }
+      activeNpc=null; let best=1e9;
+      for(const g of GODS){ const gx=g.x*TILE+TILE/2, gy=g.y*TILE+TILE/2; const d=Math.hypot(player.x-gx,player.y-gy);
+        if(d<58&&d<best){ best=d; activeNpc=g; } }
+      const actionLabel=(activeQuestPickup||activeArtifact)?"Nehmen":(activeNpc?"Reden":"Aktion");
+      $("btnAction").innerHTML="A<br><span style='font-size:.72rem;font-weight:700'>"+actionLabel+"</span>";
+    }
+
+    /* ---------- Zeichnen ---------- */
+    const TCOL={ grass:"#7cb342", grass2:"#84bb48", path:"#d8c9a0", shrine:"#e9e2c9", water:"#3f9fd0" };
+    const OKGREEN="#12855a";
+    function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r);
+      ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+    let animT=0, camX=0, camY=0;
+    function drawTile(t,sx,sy,tx,ty){
+      if(t==="water"){ ctx.fillStyle=TCOL.water; ctx.fillRect(sx,sy,TILE,TILE);
+        ctx.strokeStyle="rgba(255,255,255,.35)"; ctx.lineWidth=2; ctx.beginPath();
+        const off=Math.sin((tx+ty)*0.9+animT*1.5)*3;
+        ctx.moveTo(sx+6,sy+18+off); ctx.quadraticCurveTo(sx+TILE/2,sy+12+off,sx+TILE-6,sy+18+off); ctx.stroke(); return; }
+      ctx.fillStyle=((tx+ty)%2===0)?TCOL.grass:TCOL.grass2; ctx.fillRect(sx,sy,TILE,TILE);
+      if(t==="path"||t==="shrine"){ ctx.fillStyle=(t==="path")?TCOL.path:TCOL.shrine; ctx.fillRect(sx+2,sy+2,TILE-4,TILE-4); }
+      if(t==="shrine"){ ctx.strokeStyle="rgba(120,90,30,.35)"; ctx.strokeRect(sx+4,sy+4,TILE-8,TILE-8); }
+      ctx.font="34px serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
+      if(t==="tree") ctx.fillText("🌳",sx+TILE/2,sy+TILE/2+2);
+      else if(t==="mountain") ctx.fillText("⛰️",sx+TILE/2,sy+TILE/2+2);
+      else if(t==="flower"){ ctx.font="22px serif"; ctx.fillText("🌼",sx+TILE/2,sy+TILE/2); }
+    }
+    function render(){
+      const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+      camX=clamp(player.x-VIEW_W/2,0,Math.max(0,worldW-VIEW_W));
+      camY=clamp(player.y-VIEW_H/2,0,Math.max(0,worldH-VIEW_H));
+      ctx.clearRect(0,0,VIEW_W,VIEW_H);
+      if(mapImgReady&&mapImg){ ctx.drawImage(mapImg,-camX,-camY,worldW,worldH); }
+      else { const x0=Math.floor(camX/TILE),x1=Math.ceil((camX+VIEW_W)/TILE),y0=Math.floor(camY/TILE),y1=Math.ceil((camY+VIEW_H)/TILE);
+        for(let ty=y0;ty<y1;ty++) for(let tx=x0;tx<x1;tx++) drawTile(tileAt(tx,ty),tx*TILE-camX,ty*TILE-camY,tx,ty); }
+
+      // Subtle living-world overlays on top of the painted map.
+      ctx.save(); ctx.globalAlpha=.22+.08*Math.sin(animT*1.7); ctx.strokeStyle="#dff8ff"; ctx.lineWidth=2;
+      for(let i=0;i<4;i++){ const wy=(14+i)*TILE-camY; ctx.beginPath(); ctx.moveTo(1*TILE-camX,wy); ctx.quadraticCurveTo(3.5*TILE-camX,wy-6,6.5*TILE-camX,wy); ctx.stroke(); }
+      const vg=ctx.createRadialGradient(21.5*TILE-camX,15*TILE-camY,2,21.5*TILE-camX,15*TILE-camY,80);
+      vg.addColorStop(0,"rgba(255,80,15,.38)"); vg.addColorStop(1,"rgba(255,80,15,0)"); ctx.fillStyle=vg; ctx.fillRect(19*TILE-camX,13*TILE-camY,5*TILE,5*TILE); ctx.restore();
+
+      const activeQuest=QUESTS[state.quest];
+      if(activeQuest&&state.questStage==="prepare"&&activeQuest.mode==="fetch"){
+        const sx=activeQuest.pickup[0]*TILE+TILE/2-camX, sy=activeQuest.pickup[1]*TILE+TILE/2-camY;
+        const bob=Math.sin(animT*4)*4, glow=22+Math.sin(animT*4)*3;
+        ctx.save(); ctx.shadowColor="#ffd43b"; ctx.shadowBlur=18; ctx.fillStyle="rgba(255,245,180,.92)";
+        ctx.beginPath(); ctx.arc(sx,sy+bob,glow,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
+        ctx.font="28px serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(activeQuest.glyph,sx,sy+bob); ctx.restore();
+      }
+
+      ARTIFACTS.forEach(a=>{ if(state.artifacts[a.key]) return;
+        const sx=a.x*TILE+TILE/2-camX, sy=a.y*TILE+TILE/2-camY;
+        if(sx<-40||sx>VIEW_W+40||sy<-40||sy>VIEW_H+40) return;
+        const bob=Math.sin(animT*3+a.x)*3;
+        const im=artifactImgs[a.key];
+        ctx.save(); ctx.shadowColor="rgba(255,196,45,.9)"; ctx.shadowBlur=12;
+        if(im&&im.complete&&im.naturalWidth) ctx.drawImage(im,sx-19,sy-22+bob,38,38);
+        ctx.restore();
+        ctx.fillStyle="#fff0a6"; ctx.beginPath(); ctx.arc(sx,sy-21+bob,2.2,0,Math.PI*2); ctx.fill(); });
+
+      GODS.forEach(g=>{
+        const sx=g.x*TILE+TILE/2-camX, sy=g.y*TILE+TILE/2-camY;
+        if(sx<-60||sx>VIEW_W+60||sy<-60||sy>VIEW_H+60) return;
+        ctx.fillStyle="rgba(12,20,38,.22)"; ctx.beginPath(); ctx.ellipse(sx,sy+18,22,9,0,0,Math.PI*2); ctx.fill();
+        const pulse=activeNpc===g?2+Math.sin(animT*4)*1.5:0;
+        ctx.save(); ctx.shadowColor=g.color; ctx.shadowBlur=activeNpc===g?16:6;
+        ctx.fillStyle="#d9a521"; ctx.beginPath(); ctx.arc(sx,sy-3,20+pulse,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle="#fff7dc"; ctx.beginPath(); ctx.arc(sx,sy-3,16+pulse,0,Math.PI*2); ctx.fill();
+        const pim=portraitImgs[g.key];
+        if(pim&&pim.complete&&pim.naturalWidth){ ctx.beginPath(); ctx.arc(sx,sy-3,14+pulse,0,Math.PI*2); ctx.clip();
+          const sw=pim.height*.52, sx0=pim.width*.34-sw/2, sy0=pim.height*.03; ctx.drawImage(pim,sx0,sy0,sw,sw,sx-16-pulse,sy-19-pulse,32+pulse*2,32+pulse*2); }
+        ctx.restore();
+        if(state.visited[g.key]){ ctx.fillStyle=OKGREEN; ctx.beginPath(); ctx.arc(sx+13,sy-14,8,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle="#fff"; ctx.font="bold 11px Segoe UI"; ctx.fillText("✓",sx+13,sy-13); }
+        ctx.font="bold 11px Segoe UI"; const tw=ctx.measureText(g.name).width;
+        ctx.fillStyle="rgba(16,32,58,.82)"; roundRect(sx-tw/2-6,sy+22,tw+12,16,7); ctx.fill();
+        ctx.fillStyle="#fff"; ctx.textBaseline="middle"; ctx.fillText(g.name,sx,sy+31);
+        if(activeNpc===g){ ctx.font="18px serif"; ctx.fillText("💬",sx,sy-30+Math.sin(animT*4)*2); }
+      });
+
+      // Wegweiser zum aktuellen Ziel
+      const obj=objective();
+      if(obj.target||obj.targetPoint){
+        const g=obj.target?byKey(obj.target):null, point=obj.targetPoint||[g.x,g.y];
+        const sx=point[0]*TILE+TILE/2-camX, sy=point[1]*TILE+TILE/2-camY;
+        const m=30, onScreen=(sx>m&&sx<VIEW_W-m&&sy>m&&sy<VIEW_H-m);
+        if(onScreen){
+          const pr=24+Math.sin(animT*4)*3;
+          ctx.strokeStyle="#f5c542"; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(sx,sy-2,pr,0,Math.PI*2); ctx.stroke();
+          ctx.font="22px serif"; ctx.textAlign="center"; ctx.fillText("📍",sx,sy-38+Math.sin(animT*4)*3);
+        } else {
+          const ex=Math.max(m,Math.min(VIEW_W-m,sx)), ey=Math.max(m,Math.min(VIEW_H-m,sy));
+          ctx.fillStyle="#f5c542"; ctx.beginPath(); ctx.arc(ex,ey,18,0,Math.PI*2); ctx.fill();
+          ctx.strokeStyle="#3a2a00"; ctx.lineWidth=2; ctx.stroke();
+          const pim=g?portraitImgs[g.key]:null;
+          if(pim&&pim.complete&&pim.naturalWidth){ ctx.save(); ctx.beginPath(); ctx.arc(ex,ey,14,0,Math.PI*2); ctx.clip();
+            const sw=pim.height*.52, sx0=pim.width*.34-sw/2, sy0=pim.height*.03; ctx.drawImage(pim,sx0,sy0,sw,sw,ex-14,ey-14,28,28); ctx.restore(); }
+          else { ctx.font="18px serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillStyle="#342400"; ctx.fillText(obj.icon,ex,ey); }
+        }
+      }
+
+      const px=player.x-camX, py=player.y-camY;
+      const walking=keys.up||keys.down||keys.left||keys.right;
+      const step=walking?Math.sin(animT*10)*2:Math.sin(animT*2)*.6;
+      ctx.fillStyle="rgba(0,0,0,.2)"; ctx.beginPath(); ctx.ellipse(px,py+16,14-step*.4,6,0,0,Math.PI*2); ctx.fill();
+      const aim=avatarImgs[normalizedAvatar(state.avatar)];
+      if(aim&&aim.complete&&aim.naturalWidth){ ctx.save();
+        if(player.dir==="left"){ ctx.translate(px,0); ctx.scale(-1,1); ctx.translate(-px,0); }
+        ctx.drawImage(aim,px-20,py-34+step,40,50); ctx.restore(); }
+      // Piko fliegt sichtbar neben der Spielfigur her.
+      const ox=px-29, oy=py-22+Math.sin(animT*4)*3;
+      ctx.save(); ctx.fillStyle="rgba(0,0,0,.16)"; ctx.beginPath(); ctx.ellipse(ox,py+13,8,3,0,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle="#8b6238"; ctx.beginPath(); ctx.ellipse(ox,oy,9,11,0,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle="#b9874e"; ctx.beginPath(); ctx.ellipse(ox-8,oy+2,5,8,-.45,0,Math.PI*2); ctx.ellipse(ox+8,oy+2,5,8,.45,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle="#fff4c6"; ctx.beginPath(); ctx.arc(ox-3,oy-3,3.5,0,Math.PI*2); ctx.arc(ox+3,oy-3,3.5,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle="#17243b"; ctx.beginPath(); ctx.arc(ox-3,oy-3,1.5,0,Math.PI*2); ctx.arc(ox+3,oy-3,1.5,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle="#e9a51b"; ctx.beginPath(); ctx.moveTo(ox-2,oy+1); ctx.lineTo(ox+2,oy+1); ctx.lineTo(ox,oy+4); ctx.closePath(); ctx.fill(); ctx.restore();
+    }
+    function loop(ts){
+      if(!running) return;
+      const dt=Math.min(0.05,(ts-lastTs)/1000||0); lastTs=ts; animT+=dt;
+      if(!dialogueOpen&&!paused) update(dt);
+      render(); requestAnimationFrame(loop);
+    }
+
+    /* ============================================================
+       DIALOG + BOTENGÄNGE
+    ============================================================ */
+    function tryInteract(){
+      if(activeQuestPickup){ const q=QUESTS[state.quest]; state.questStage="carry"; state.carrying=true; save(); updateHud();
+        toast(`🎒 ${q.item} aufgenommen! Bringe den Gegenstand jetzt zu ${byKey(q.to).name}.`,3600); return; }
+      if(activeArtifact){ const a=activeArtifact; state.artifacts[a.key]=true; activeArtifact=null; save(); updateHud();
+        toast(`💎 Artefakt gefunden: ${a.name}! ${a.fact}`,4200); return; }
+      if(activeNpc){ openDialogue(activeNpc); }
+    }
+    let curGod=null, steps=[], idx=0, pend={}, pendingStoryBeat=null, pendingAlphabet=false;
+
+    function farewell(g){
+      const o=objective();
+      if(o.done) return "Schön, dich zu sehen! Alles ist bereit – Zeit für das große Fest der Götter!";
+      const q=QUESTS[state.quest];
+      if(state.questStage==="carry") return "Bring am besten „"+q.item+"“ zu "+byKey(q.to).name+".";
+      if(state.questStage==="prepare") return q.mode==="craft"?"Öffne die Werkstatt in deinem angepinnten Auftrag.":"Der Gegenstand wartet am goldenen Zeichen auf der Karte.";
+      return "Sprich mit "+byKey(q.from).name+" – dort wartet eine Aufgabe.";
+    }
+    function openDialogue(g){
+      curGod=g; dialogueOpen=true; keys.up=keys.down=keys.left=keys.right=false;
+      setPortrait($("dlgPortrait"),g,$("dlgNote"));
+      $("dlgEpithet").textContent=g.epithet; $("dlgName").textContent=g.glyph+" "+g.name;
+      $("dlgDomain").textContent="Zuständig für: "+g.domain;
+      const qi=state.quest, q=QUESTS[qi];
+      const itemBox=$("dlgQuestItem"), involved=q&&(g.key===q.from||g.key===q.to);
+      itemBox.classList.toggle("show",!!involved);
+      if(involved){ $("dlgItemGlyph").textContent=q.glyph; $("dlgItemText").textContent=state.questStage==="carry"?
+        `In deiner Botentasche: ${q.item}`:(state.questStage==="prepare"?`Aktueller Gegenstand: ${q.item}`:`Für diesen Auftrag: ${q.item}`); }
+      let seq=[]; pend={meet:false,complete:false,give:false,alphabet:false};
+      if(!state.visited[g.key]){ seq=seq.concat(g.meet); pend.meet=true; }
+      if(q && q.to===g.key && state.questStage==="carry"){
+        seq=seq.concat(q.deliver); pend.complete=true;
+        const nq=QUESTS[qi+1];
+        if(nq && nq.from===g.key){ seq=seq.concat(nq.give); pend.give=true; }
+      } else if(q && q.from===g.key && state.questStage==="talk"){
+        seq=seq.concat(q.give); pend.give=true;
+      }
+      if(q&&g.key!==q.from&&g.key!==q.to){
+        const route=state.questStage==="carry"?byKey(q.to).name:byKey(q.from).name;
+        seq.push(`Bei diesem Auftrag bin ich nicht beteiligt. Piko flattert aufgeregt mit den Flügeln: Dein Weg führt zu ${route}.`);
+        seq.push("Damit ihr euch die Namen auf den alten Wegweisern besser merken könnt, übt Piko mit dir noch ein Zeichen des griechischen Alphabets.");
+        pend.alphabet=true;
+      }
+      if(seq.length===0) seq=[ farewell(g) ];
+      steps=seq; idx=0; $("overlay").classList.add("show"); renderStep();
+    }
+    function speech(html){ $("dlgSpeech").innerHTML=html; }
+    function renderStep(){
+      const node=steps[idx], choicesEl=$("dlgChoices"); choicesEl.innerHTML="";
+      if(node===undefined){ finish(); return; }
+      if(typeof node==="string"){
+        speech("„"+esc(node)+"“");
+        $("dlgNext").style.display="inline-flex"; $("dlgClose").style.display="none";
+      } else if(node.choices){
+        speech("<b>"+esc(node.prompt||"Was möchtest du sagen?")+"</b>");
+        $("dlgNext").style.display="none"; $("dlgClose").style.display="none";
+        node.choices.forEach(c=>{ const b=document.createElement("button"); b.className="choice"; b.textContent=c.label;
+          b.addEventListener("click",()=>{ steps.splice(idx+1,0,c.reply); idx++; renderStep(); }); choicesEl.appendChild(b); });
+      }
+    }
+    function nextStep(){ idx++; renderStep(); }
+    function finish(){
+      $("dlgChoices").innerHTML=""; $("dlgNext").style.display="none";
+      let parts=[];
+      if(pend.meet){ state.visited[curGod.key]=true; state.favor+=10;
+        if(!state.items.includes(curGod.item)) state.items.push(curGod.item);
+        parts.push(`🎁 „${esc(curGod.gift)}“<br><span class="muted">+10 Gunst · Symbol „${esc(curGod.item)}“</span>`); }
+      if(pend.complete){ state.quest+=1; state.carrying=false; state.questStage="talk"; state.favor+=15;
+        parts.push(`✅ <b>Auftrag erfüllt!</b> <span class="muted">+15 Gunst</span>`); }
+      if(pend.give){ state.carrying=false; state.questStage="prepare"; const nq=QUESTS[state.quest];
+        parts.push(nq.mode==="craft"?`⚒️ <b>Neuer Auftrag:</b> Stelle „${esc(nq.item)}“ in der Werkstatt her.`:
+          `📍 <b>Neuer Auftrag:</b> Hole „${esc(nq.item)}“ am goldenen Zeichen ab.`); }
+      save(); updateHud();
+      const beatKey="q"+state.quest;
+      if(pend.complete&&STORY_BEATS[beatKey]&&!state.storySeen[beatKey]) pendingStoryBeat=beatKey;
+      if(allQuestsDone()) parts.push(`🎉 <b>Alle Vorbereitungen sind fertig!</b> Feiere jetzt das Fest der Götter.`);
+      if(parts.length===0) parts.push("„Bis bald, "+esc(state.name)+"!“");
+      if(pend.alphabet){ parts.push("🦉 <b>Piko:</b> Kleiner Umweg! Bevor wir weiterfliegen, lösen wir gemeinsam eine kurze Buchstabenübung."); pendingAlphabet=true; }
+      speech(parts.join("<br>")); $("dlgClose").style.display="inline-flex";
+      if(allQuestsDone()) $("btnFinale").style.display="inline-flex";
+    }
+    function dlgAdvance(){ if($("dlgNext").style.display!=="none") nextStep(); else if($("dlgClose").style.display!=="none") closeDialogue(); }
+    function closeDialogue(){ $("overlay").classList.remove("show"); dialogueOpen=false; lastTs=performance.now(); requestAnimationFrame(loop);
+      if(pendingStoryBeat){ const key=pendingStoryBeat; pendingStoryBeat=null; setTimeout(()=>showStory(key),180); }
+      else if(pendingAlphabet){ pendingAlphabet=false; setTimeout(openAlphabet,180); } }
+    $("dlgNext").addEventListener("click",nextStep);
+    $("dlgClose").addEventListener("click",closeDialogue);
+    $("overlay").addEventListener("click",(e)=>{ if(e.target===$("overlay")) closeDialogue(); });
+
+    /* ---------- Handwerks-Minispiel ---------- */
+    let craftIndex=0;
+    function openCraft(){
+      const q=QUESTS[state.quest];
+      if(!q||q.mode!=="craft"||state.questStage!=="prepare") return;
+      paused=true; keys.up=keys.down=keys.left=keys.right=false; craftIndex=0;
+      $("craftTitle").textContent=q.item+" herstellen";
+      $("craftFeedback").textContent="Beginne mit dem ersten Arbeitsschritt.";
+      $("craftOverlay").classList.add("show"); renderCraft();
+    }
+    function renderCraft(){
+      const q=QUESTS[state.quest], progress=$("craftProgress"), options=$("craftOptions");
+      progress.innerHTML=""; options.innerHTML="";
+      q.recipe.forEach((symbol,i)=>{ const s=document.createElement("div"); s.className="craft-step"+(i<craftIndex?" done":""); s.textContent=i<craftIndex?symbol:"?"; progress.appendChild(s); });
+      const choices=q.recipe.map((symbol,i)=>({symbol,i})).sort((a,b)=>((a.i*7+state.quest*3)%5)-((b.i*7+state.quest*3)%5));
+      choices.forEach(choice=>{ const b=document.createElement("button"); b.className="craft-option"; b.textContent=choice.symbol;
+        b.setAttribute("aria-label","Arbeitsschritt "+(choice.i+1)); b.addEventListener("click",()=>craftChoose(choice.i)); options.appendChild(b); });
+    }
+    function craftChoose(index){
+      const q=QUESTS[state.quest];
+      if(index!==craftIndex){ craftIndex=0; $("craftFeedback").textContent="Noch nicht – die Reihenfolge beginnt von vorn."; renderCraft(); return; }
+      craftIndex++; $("craftFeedback").textContent="Richtig! Weiter so.";
+      if(craftIndex<q.recipe.length){ renderCraft(); return; }
+      state.questStage="carry"; state.carrying=true; state.favor+=5; save(); updateHud();
+      $("craftProgress").querySelectorAll(".craft-step").forEach((s,i)=>{ s.classList.add("done"); s.textContent=q.recipe[i]; });
+      $("craftOptions").innerHTML=""; $("craftFeedback").textContent="Geschafft! "+q.item+" wurde hergestellt. +5 Gunst";
+      $("craftClose").textContent="Zurück zur Karte";
+    }
+    function closeCraft(){ $("craftOverlay").classList.remove("show"); paused=false; $("craftClose").textContent="Später versuchen"; lastTs=performance.now(); }
+    $("questAction").addEventListener("click",openCraft);
+    $("craftClose").addEventListener("click",closeCraft);
+
+    /* ---------- Pikos Kapitelgeschichte ---------- */
+    let currentStoryKey=null;
+    function showStory(key){
+      const beat=STORY_BEATS[key]; if(!beat) return;
+      currentStoryKey=key; paused=true; keys.up=keys.down=keys.left=keys.right=false;
+      $("storyTitle").textContent=beat.title; $("storyText").textContent=beat.text;
+      $("storyContinue").textContent=beat.button||"Weiter ins Abenteuer →";
+      $("storyOverlay").classList.add("show");
+    }
+    function closeStory(){
+      if(currentStoryKey){ state.storySeen[currentStoryKey]=true; save(); }
+      const wasPrologue=currentStoryKey==="prologue"; currentStoryKey=null;
+      $("storyOverlay").classList.remove("show"); paused=false; lastTs=performance.now();
+      if(wasPrologue&&!localStorage.getItem("goetter-help-seen-v3")){ showHelp(); localStorage.setItem("goetter-help-seen-v3","1"); }
+    }
+    $("storyContinue").addEventListener("click",closeStory);
+
+    /* ---------- Griechisches Alphabet mit Piko ---------- */
+    let alphabetEntry=null, alphabetPenalty=false;
+    function openAlphabet(){
+      alphabetEntry=GREEK_ALPHABET[(state.quest+state.alphabetTurns)%GREEK_ALPHABET.length];
+      state.alphabetTurns++; save(); alphabetPenalty=false; paused=true;
+      $("greekLetter").textContent=alphabetEntry.g;
+      $("alphabetPrompt").textContent=`Piko zeigt dir ${alphabetEntry.name}. Welchem lateinischen Buchstaben entspricht es?`;
+      $("alphabetFeedback").textContent="Piko legt den Kopf schief und wartet auf deine Antwort.";
+      $("alphabetContinue").style.display="none";
+      const others=GREEK_ALPHABET.filter(x=>x.latin!==alphabetEntry.latin);
+      const oi=(state.alphabetTurns*3)%others.length;
+      const choices=[alphabetEntry.latin,others[oi].latin,others[(oi+1)%others.length].latin]
+        .sort((a,b)=>((a.charCodeAt(0)+state.alphabetTurns)%7)-((b.charCodeAt(0)+state.alphabetTurns)%7));
+      const wrap=$("alphabetOptions"); wrap.innerHTML="";
+      choices.forEach(letter=>{ const b=document.createElement("button"); b.className="alphabet-option"; b.textContent=letter;
+        b.addEventListener("click",()=>answerAlphabet(letter)); wrap.appendChild(b); });
+      $("alphabetOverlay").classList.add("show");
+    }
+    function answerAlphabet(letter){
+      if(letter===alphabetEntry.latin){
+        $("alphabetFeedback").textContent=`Richtig! ${alphabetEntry.g} heißt ${alphabetEntry.name} und entspricht ${alphabetEntry.latin}. Piko hüpft begeistert.`;
+        $("alphabetOptions").querySelectorAll("button").forEach(b=>b.disabled=true); $("alphabetContinue").style.display="inline-flex";
+      } else {
+        if(!alphabetPenalty){ state.favor=Math.max(0,state.favor-2); alphabetPenalty=true; save(); updateHud(); }
+        $("alphabetFeedback").textContent="Fast! Der kleine Umweg kostet 2 Gunst. Schau genau hin und versuche es noch einmal.";
+      }
+    }
+    function closeAlphabet(){ $("alphabetOverlay").classList.remove("show"); paused=false; alphabetEntry=null; lastTs=performance.now(); }
+    $("alphabetContinue").addEventListener("click",closeAlphabet);
+
+    /* ============================================================
+       HUD / HILFE / FINALE
+    ============================================================ */
+    function updateHud(){
+      $("hudFavor").textContent=state.favor;
+      $("hudVisited").textContent=visitedCount();
+      $("hudArtifacts").textContent=artifactCount();
+      const o=objective();
+      $("questIcon").textContent=o.icon;
+      $("questText").textContent=o.text;
+      $("questSub").textContent=o.done?"Tippe unten auf „Fest der Götter feiern“.":(o.sub||"Folge dem goldenen Zeichen 📍 auf der Karte.");
+      $("questAction").style.display=o.craft?"inline-block":"none";
+      $("btnFinale").style.display=allQuestsDone()?"inline-flex":"none";
+      if(allQuestsDone()) $("companionText").textContent="Piko flattert vor Freude: Das Fest kann beginnen!";
+      else if(state.questStage==="prepare") $("companionText").textContent=QUESTS[state.quest].mode==="craft"?"Piko hält die Werkzeuge bereit. Du bestimmst die richtige Reihenfolge!":"Piko hat den Gegenstand entdeckt und zeigt mit dem Flügel zum goldenen Zeichen.";
+      else if(state.questStage==="carry") $("companionText").textContent="Piko passt gut auf die Botentasche auf. Jetzt zum Zielgott!";
+      else $("companionText").textContent="Piko begleitet dich. Gemeinsam findet ihr heraus, wer eure Hilfe braucht.";
+      const inv=$("inventory"); inv.innerHTML="";
+      ARTIFACTS.forEach(a=>{ const slot=document.createElement("div"); slot.className="inventory-slot"+(state.artifacts[a.key]?"":" locked");
+        const im=document.createElement("img"); im.src="assets/artifact-"+a.key+".png"; im.alt=state.artifacts[a.key]?a.name:"Noch nicht gefunden"; im.title=state.artifacts[a.key]?a.name:"Unentdecktes Artefakt";
+        slot.appendChild(im); inv.appendChild(slot); });
+    }
+    function startGame(){
+      $("hudName").textContent=state.name; $("hudAva").innerHTML='<img src="assets/avatar-'+normalizedAvatar(state.avatar)+'.png" alt="Spielfigur">';
+      player.x=state.px; player.y=state.py; updateHud(); showScreen("screen-game"); resize();
+      running=true; lastTs=performance.now(); requestAnimationFrame(loop);
+      if(!state.storySeen.prologue) showStory("prologue");
+      else if(!localStorage.getItem("goetter-help-seen-v3")){ showHelp(); localStorage.setItem("goetter-help-seen-v3","1"); }
+    }
+    let simulatedFullscreen=false;
+    function setSimulatedFullscreen(on){
+      simulatedFullscreen=on; document.body.classList.toggle("simulated-fullscreen",on);
+      if(on) window.scrollTo(0,0); syncFullscreen();
+      toast(on?"Tablet-Ansicht aktiviert.":"Tablet-Ansicht beendet.",1800);
+    }
+    async function toggleFullscreen(){
+      try{
+        if(document.fullscreenElement||document.webkitFullscreenElement){
+          const exit=document.exitFullscreen||document.webkitExitFullscreen; if(exit) await exit.call(document);
+        } else if(simulatedFullscreen){
+          setSimulatedFullscreen(false);
+        } else {
+          const root=document.documentElement, enter=root.requestFullscreen||root.webkitRequestFullscreen;
+          if(!enter){ setSimulatedFullscreen(true); return; }
+          await enter.call(root);
+        }
+      }catch(e){ setSimulatedFullscreen(true); }
+    }
+    $("btnFullscreen").addEventListener("click",toggleFullscreen);
+    function syncFullscreen(){ const full=!!(document.fullscreenElement||document.webkitFullscreenElement)||simulatedFullscreen; $("btnFullscreen").textContent=full?"× Ansicht beenden":"⛶ Vollbild"; setTimeout(resize,80); }
+    document.addEventListener("fullscreenchange",syncFullscreen); document.addEventListener("webkitfullscreenchange",syncFullscreen);
+    window.addEventListener("orientationchange",()=>setTimeout(resize,180));
+    if(window.visualViewport) window.visualViewport.addEventListener("resize",()=>setTimeout(resize,80));
+    if(window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone) $("btnFullscreen").style.display="none";
+    function toast(msg,ms){ const c=$("toasts"); const el=document.createElement("div"); el.className="toast"; el.textContent=msg;
+      c.appendChild(el); setTimeout(()=>{ el.style.transition="opacity .4s"; el.style.opacity="0"; setTimeout(()=>el.remove(),400); }, ms||2200); }
+    function showHelp(){ paused=true; keys.up=keys.down=keys.left=keys.right=false; $("helpOverlay").classList.add("show"); }
+    $("helpClose").addEventListener("click",()=>{ $("helpOverlay").classList.remove("show"); paused=false; lastTs=performance.now(); });
+    $("btnHelp").addEventListener("click",showHelp);
+
+    $("btnFinale").addEventListener("click",openFinale);
+    function openFinale(){
+      running=false;
+      $("finaleText").innerHTML=`Als die ersten Sterne über dem Olymp erscheinen, hebt Zeus seinen Becher. Doch der lauteste Jubel gilt nicht einem Gott, sondern <b>${esc(state.name)}</b> und der kleinen Eule Piko. `+
+        `Ihr habt aus vielen einzelnen Wünschen ein gemeinsames Fest gemacht, alle zwölf Olympier zusammengebracht, <b>${artifactCount()} von 8 Artefakten</b> gefunden und <b>${state.favor} Gunst</b> gesammelt. `+
+        `Piko kuschelt sich müde auf deine Schulter. Ihre viel zu große Botentasche ist endlich leer – ihr Herz dafür randvoll.`;
+      const med=$("finaleMedals"); med.innerHTML="";
+      GODS.forEach(g=>{ const d=document.createElement("div"); d.className="medal";
+        d.innerHTML=`<div class="sym" style="background:${g.color}22;overflow:hidden;padding:0"><img src="assets/portrait-${g.key}.png" alt="${esc(g.name)}" style="width:100%;height:100%;object-fit:cover"></div><small>${esc(g.name)}</small>`; med.appendChild(d); });
+      const jr=$("finaleJournal"); jr.innerHTML="";
+      GODS.forEach(g=>{ const li=document.createElement("li");
+        li.innerHTML=`<b>${g.glyph} ${esc(g.name)}</b> – ${esc(g.epithet)}: ${esc(g.domain)}.`; jr.appendChild(li); });
+      showScreen("screen-finale");
+    }
+    $("btnFinaleBack").addEventListener("click",()=>{ showScreen("screen-game"); running=true; lastTs=performance.now(); requestAnimationFrame(loop); });
+    $("btnRestart").addEventListener("click",()=>{ if(confirm("Neues Abenteuer starten? Dein Fortschritt wird gelöscht.")){ state=newState(); save(); location.reload(); } });
+  })();
+  </script>
+</body>
+</html>

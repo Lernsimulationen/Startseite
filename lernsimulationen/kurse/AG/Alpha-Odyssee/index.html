@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071b3a">
+  <title>Alpha-Odyssee – Das griechische Alphabet</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand"><span>Α</span> ALPHA-ODYSSEE</div>
+      <div class="hud" aria-label="Spielstatus">
+        <div class="depth-badge"><small>ANSICHT</small><b>2,5D</b></div>
+        <div><small>DIMENSION</small><b id="levelLabel">1 / 3</b></div>
+        <div><small>ZEIT</small><b id="timer">–</b></div>
+        <div><small>ENERGIE</small><b id="hearts">♥ ♥ ♥</b></div>
+        <div><small>PUNKTE</small><b id="score">0000</b></div>
+        <div><small>SERIE</small><b id="streak">× 0</b></div>
+      </div>
+    </header>
+
+    <section class="game-wrap">
+      <canvas id="game" width="1280" height="720" aria-label="2,5D-Jump-and-Run-Spiel"></canvas>
+      <div class="target-card" id="targetCard">
+        <small id="routeStep">ROUTE 1 / 8</small>
+        <strong id="targetGreek">Α</strong>
+        <span id="targetName">Alpha · A</span>
+      </div>
+      <div class="power-status" id="powerStatus" aria-live="polite"></div>
+
+      <section class="screen active" id="startScreen">
+        <div class="panel hero-panel">
+          <p class="eyebrow">DIE 24 ZEICHEN DES OLYMP</p>
+          <h1>ALPHA<br><em>ODYSSEE</em></h1>
+          <p>Springe durch die Ägäis in räumlicher 2,5D-Perspektive, sammle die griechischen Buchstaben in der richtigen Reihenfolge und bezwinge die Wissens-Tore.</p>
+          <button class="primary" id="startBtn">AVATAR WÄHLEN <span>→</span></button>
+          <div class="controls-hint">
+            <span><kbd>A</kbd><kbd>D</kbd> Laufen</span>
+            <span><kbd>W</kbd> / <kbd>Space</kbd> Springen</span>
+          </div>
+          <div class="touch-start-hint">Links laufen · Rechts springen · Halten für einen höheren Sprung</div>
+          <button class="sound-btn" id="soundBtn" aria-pressed="false">♪ Ton einschalten</button>
+        </div>
+      </section>
+
+      <section class="screen" id="avatarScreen">
+        <div class="panel avatar-panel">
+          <p class="eyebrow">DEINE HELDENFIGUR</p>
+          <h2>Wer geht auf Odyssee?</h2>
+          <div class="avatar-grid" id="avatarGrid">
+            <button class="avatar-option selected" data-avatar="0"><i></i><span>Thaleia</span></button>
+            <button class="avatar-option" data-avatar="1"><i></i><span>Alexios</span></button>
+            <button class="avatar-option" data-avatar="2"><i></i><span>Kallista</span></button>
+            <button class="avatar-option" data-avatar="3"><i></i><span>Leandros</span></button>
+          </div>
+          <div class="game-settings">
+            <fieldset>
+              <legend>SCHWIERIGKEIT</legend>
+              <label><input type="radio" name="difficulty" value="easy"> Entdecker</label>
+              <label><input type="radio" name="difficulty" value="normal" checked> Held</label>
+              <label><input type="radio" name="difficulty" value="hard"> Titan</label>
+            </fieldset>
+            <fieldset>
+              <legend>SPIELMODUS</legend>
+              <label><input type="radio" name="gameMode" value="journey" checked> Lernreise</label>
+              <label><input type="radio" name="gameMode" value="speedrun"> Speedrun</label>
+            </fieldset>
+          </div>
+          <button class="primary" id="playBtn">LOS GEHT'S <span>→</span></button>
+          <p class="privacy-note">Keine Anmeldung. Deine Auswahl bleibt nur auf diesem Gerät.</p>
+        </div>
+      </section>
+
+      <section class="screen" id="quizScreen">
+        <div class="panel quiz-panel">
+          <p class="eyebrow">WISSENS-TOR</p>
+          <h2 id="quizQuestion">Welcher Buchstabe heißt Beta?</h2>
+          <div class="answers" id="answers"></div>
+          <p id="quizFeedback" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <section class="screen" id="portalScreen">
+        <div class="portal-transition">
+          <div class="portal-stage">
+            <div class="portal-ring"></div>
+            <div class="portal-ring ring-two"></div>
+            <div class="portal-ring ring-three"></div>
+            <div class="portal-core"></div>
+          </div>
+          <p class="eyebrow">DIMENSION GEÖFFNET</p>
+          <h2 id="portalTitle">Die Schattenwelt</h2>
+          <p id="portalCopy">Hier verändern die Zeichen ihre Gestalt.</p>
+        </div>
+      </section>
+
+      <section class="screen" id="bossScreen">
+        <div class="panel boss-panel">
+          <p class="eyebrow">ENDGEGNER · SPHINX DES ALPHABETS</p>
+          <div class="boss-header">
+            <span class="boss-face" aria-hidden="true"></span>
+            <div><small>WISSENSSCHILD</small><div class="boss-health"><i id="bossHealth"></i></div></div>
+          </div>
+          <h2 id="bossQuestion">Welche Antwort durchbricht den Schild?</h2>
+          <div class="answers" id="bossAnswers"></div>
+          <p id="bossFeedback" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <section class="screen" id="endScreen">
+        <div class="panel end-panel">
+          <p class="eyebrow">DER OLYMP IST ERREICHT</p>
+          <h2>Εὖ γε!</h2>
+          <p class="big-copy">Stark gemacht!</p>
+          <div class="result-grid">
+            <div><b id="finalScore">0</b><span>Punkte</span></div>
+            <div><b id="finalBest">0</b><span>Beste Serie</span></div>
+            <div><b>24 / 24</b><span>Buchstaben</span></div>
+          </div>
+          <p id="finalTime"></p>
+          <button class="primary" id="restartBtn">NOCH EINMAL <span>↻</span></button>
+        </div>
+      </section>
+
+      <div class="toast" id="toast" aria-live="polite"></div>
+      <div class="mobile-controls" aria-label="Touch-Steuerung">
+        <div class="move-pad">
+          <button id="leftBtn" aria-label="Nach links"><b>◀</b><span>LINKS</span></button>
+          <button id="rightBtn" aria-label="Nach rechts"><b>▶</b><span>RECHTS</span></button>
+        </div>
+        <button id="jumpBtn" class="jump" aria-label="Springen"><b>↑</b><span>SPRINGEN</span></button>
+      </div>
+      <div class="rotate-hint">Für das beste Spielerlebnis das Tablet bitte quer halten.</div>
+    </section>
+
+    <footer>
+      <span id="progressText">0 von 24 Zeichen gemeistert</span>
+      <div class="progress"><i id="progressBar"></i></div>
+      <button id="privacyBtn">DATENSCHUTZ</button>
+      <button id="teacherBtn">LEHRKRAFTMODUS</button>
+      <button id="toolsBtn">WERKZEUGE</button>
+      <button id="alphabetBtn">ALPHABET-HILFE</button>
+    </footer>
+  </main>
+
+  <dialog id="alphabetDialog">
+    <button class="close" id="closeAlphabet" aria-label="Schließen">×</button>
+    <p class="eyebrow">SPICKZETTEL</p>
+    <h2>Das griechische Alphabet</h2>
+    <div class="alphabet-grid" id="alphabetGrid"></div>
+  </dialog>
+
+  <dialog id="privacyDialog">
+    <button class="close" id="closePrivacy" aria-label="Schließen">×</button>
+    <p class="eyebrow">DATENSCHUTZ</p>
+    <h2>Privat spielen</h2>
+    <p>Das Spiel benötigt kein Konto und verwendet keine Cookies, Analyse-Dienste oder Werbung. Avatar, Bestwert und anonyme Lernstatistik werden ausschließlich im lokalen Browserspeicher dieses Geräts abgelegt und nicht übertragen.</p>
+    <button class="danger-btn" id="deleteData">LOKALE DATEN LÖSCHEN</button>
+    <p id="deleteFeedback" aria-live="polite"></p>
+  </dialog>
+
+  <dialog id="teacherDialog">
+    <button class="close" id="closeTeacher" aria-label="Schließen">×</button>
+    <p class="eyebrow">LOKALER LERNBERICHT</p>
+    <h2>Lehrkraftmodus</h2>
+    <p class="report-privacy">Anonym und nur auf diesem Gerät. Es werden keine Namen, Konten oder Netzwerkdaten erfasst.</p>
+    <div class="report-cards">
+      <div><b id="reportRuns">0</b><span>Durchläufe</span></div>
+      <div><b id="reportAccuracy">–</b><span>Trefferquote</span></div>
+      <div><b id="reportBest">0</b><span>Bestwert</span></div>
+      <div><b id="reportSpeed">–</b><span>Beste Zeit</span></div>
+    </div>
+    <h3>Häufig zu wiederholen</h3>
+    <div id="weakLetters" class="weak-letters"></div>
+    <h3>Letzte lokale Sitzungen</h3>
+    <div id="sessionList" class="session-list"></div>
+    <button id="exportReport">BERICHT ALS JSON EXPORTIEREN</button>
+  </dialog>
+
+  <dialog id="toolsDialog">
+    <button class="close" id="closeTools" aria-label="Schließen">×</button>
+    <p class="eyebrow">AUSRÜSTUNG</p>
+    <h2>Werkzeuge der Odyssee</h2>
+    <div class="tool-guide">
+      <div><i class="tool-compass"></i><b>Astrolabium</b><span>Zeigt zum nächsten Buchstaben.</span></div>
+      <div><i class="tool-scroll"></i><b>Zeitrolle</b><span>Friert Gegner acht Sekunden ein.</span></div>
+      <div><i class="tool-sandals"></i><b>Flügelsandalen</b><span>Ermöglichen einen Doppelsprung.</span></div>
+      <div><i class="tool-lantern"></i><b>Eulenlaterne</b><span>Lässt Sammelobjekte aufleuchten.</span></div>
+    </div>
+  </dialog>
+
+  <script src="game.js"></script>
+</body>
+</html>

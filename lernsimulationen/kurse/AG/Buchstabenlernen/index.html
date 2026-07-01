@@ -210,8 +210,11 @@
               <p class="eyebrow">Aktueller Auftrag</p>
               <h3 id="traceName">Alpha</h3>
               <p id="traceHint">Zeichne den großen Buchstaben nach. Bleib ungefähr auf der hellen Vorlage.</p>
-              <div class="trace-meter" aria-label="Nachzeichnungsfortschritt">
-                <span id="traceProgress"></span>
+              <div class="trace-progress-row">
+                <div class="trace-meter" id="traceMeter" role="progressbar" aria-label="Nachzeichnungsfortschritt" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                  <span id="traceProgress"></span>
+                </div>
+                <strong id="traceProgressText">0%</strong>
               </div>
               <p id="traceFeedback">Setze den Stift auf die Tafel und zeichne los.</p>
             </div>
