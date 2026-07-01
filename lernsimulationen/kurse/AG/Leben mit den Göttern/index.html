@@ -983,6 +983,8 @@
       if(k==="arrowup"||k==="w") keys.up=false; else if(k==="arrowdown"||k==="s") keys.down=false;
       else if(k==="arrowleft"||k==="a") keys.left=false; else if(k==="arrowright"||k==="d") keys.right=false;
     });
+    function releaseMovement(){ keys.up=keys.down=keys.left=keys.right=false; }
+    window.addEventListener("blur",releaseMovement); document.addEventListener("visibilitychange",()=>{ if(document.hidden) releaseMovement(); });
     function bindHold(el,dir){
       const on=(v)=>(e)=>{ e.preventDefault(); keys[dir]=v; };
       el.addEventListener("pointerdown",on(true)); el.addEventListener("pointerup",on(false));
