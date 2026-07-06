@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Die Götterwerkstatt</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="editor.css">
+  <link rel="stylesheet" href="upgrades.css">
+  <link rel="stylesheet" href="weapon.css">
+</head>
+<body>
+  <main id="app">
+    <header class="topbar">
+      <div class="brand"><span class="laurel">❧</span> DIE GÖTTERWERKSTATT</div>
+      <div class="progress"><span id="stepLabel">PROLOG</span><div class="track"><i id="progressBar"></i></div><span id="stepCount">0 / 10</span></div>
+      <div class="reputation" id="reputation" hidden><span>♥ <b id="worshipStat">0</b></span><span>◆ <b id="wisdomStat">0</b></span><span>✦ <b id="aweStat">0</b></span></div>
+      <button class="sound" id="soundBtn" aria-label="Ton an oder aus">♫</button>
+    </header>
+
+    <section class="screen active" id="startScreen">
+      <div class="hero-copy">
+        <p class="eyebrow">EINE REISE INS ALTE GRIECHENLAND</p>
+        <h1>Erschaffe deine<br><em>Gottheit</em></h1>
+        <p class="lead">Der Olymp ruft! Gestalte dein eigenes anthropomorphes Gottesbild, wähle Kräfte und Eigenschaften und schreibe deine persönliche Sage.</p>
+        <button class="primary" id="startBtn">AUF ZUM OLYMP <span>→</span></button>
+        <button class="resume-btn" id="resumeBtn" hidden>GESPEICHERTE SAGE FORTSETZEN</button>
+        <p class="mini">⏱ ca. 10 Minuten &nbsp; • &nbsp; Für Entdeckerinnen und Entdecker</p>
+      </div>
+      <aside class="oracle"><span>🏺</span><p><b>Schon gewusst?</b><br>Die Griechen glaubten, ihre Götter wohnten auf dem Berg Olymp.</p></aside>
+    </section>
+
+    <section class="screen creator" id="gameScreen">
+      <div class="chapter">
+        <span class="chapter-no" id="chapterNo">I</span>
+        <div><p id="chapterKicker">ERSTE ENTSCHEIDUNG</p><h2 id="question">Welche Macht ist deine?</h2><p id="instruction">Wähle ein göttliches Gebiet.</p></div>
+      </div>
+      <div class="content-grid">
+        <div id="choices" class="choices"></div>
+        <aside class="avatar-card">
+          <div class="avatar-sky" id="avatarSky">
+            <div class="halo"></div><div class="stars">✦ · ✧</div>
+            <div class="god-avatar" id="avatar" aria-label="Dein selbst gestaltetes Gottesbild">
+              <div class="a-hair-back"></div><div class="a-ear left"></div><div class="a-ear right"></div>
+              <div class="a-neck"></div><div class="a-body"><div class="a-sash"></div><div class="a-emblem" id="avatarEmblem">⚡</div></div>
+              <div class="a-arm left"><div class="a-bracer"></div></div><div class="a-arm right"><div class="a-bracer"></div></div>
+              <div class="a-head"><div class="a-hair-front"></div><div class="a-brow left"></div><div class="a-brow right"></div><div class="a-eye left"></div><div class="a-eye right"></div><div class="a-nose"></div><div class="a-mouth"></div><div class="a-beard"></div><div class="a-mark"></div></div>
+              <div class="a-crown" id="avatarCrown">✦</div><div class="a-weapon">⚔️</div>
+            </div>
+          </div>
+          <div class="scroll">
+            <label>DEIN GÖTTERNAME</label>
+            <input id="nameInput" maxlength="18" placeholder="z. B. Asteria">
+            <div class="editor-head"><label>DEIN GÖTTERBILD</label><button id="randomBtn" type="button">⚄ ZUFALL</button></div>
+            <div class="avatar-editor" id="avatarEditor">
+              <label>Gestalt<select id="shapeSelect"><option value="heroic">Heroisch</option><option value="graceful">Anmutig</option><option value="mighty">Mächtig</option></select></label>
+              <label>Haut<select id="skinSelect"><option value="bronze">Bronze</option><option value="olive">Olive</option><option value="deep">Dunkel</option><option value="marble">Marmor</option><option value="azure">Göttlich blau</option></select></label>
+              <label>Haar<select id="hairSelect"><option value="curls">Locken</option><option value="long">Lang</option><option value="braids">Zöpfe</option><option value="windswept">Sturmfrisur</option><option value="bald">Glatze</option></select></label>
+              <label>Farbe<select id="hairColorSelect"><option value="night">Nachtschwarz</option><option value="gold">Gold</option><option value="copper">Kupfer</option><option value="silver">Silber</option><option value="sea">Meeresgrün</option></select></label>
+              <label>Gesicht<select id="faceSelect"><option value="kind">Gütig</option><option value="bold">Entschlossen</option><option value="mystic">Mystisch</option></select></label>
+              <label>Schmuck<select id="crownSelect"><option value="stars">Sternenreif</option><option value="laurel">Lorbeer</option><option value="horns">Hörner</option><option value="waves">Wellenkrone</option><option value="none">Keiner</option></select></label>
+              <label>Augen<select id="eyeSelect"><option value="ocean">Ozeanblau</option><option value="amber">Bernstein</option><option value="violet">Orakelviolett</option><option value="emerald">Smaragd</option></select></label>
+              <label>Gabe<select id="giftSelect"><option value="glow">Leuchten</option><option value="wings">Flügel</option><option value="aura">Elementaraura</option><option value="none">Keine</option></select></label>
+              <label>Attribut<select id="weaponSelect"><option value="sword">Schwert</option><option value="staff">Stab</option><option value="bow">Bogen</option><option value="hammer">Hammer</option><option value="none">Keines</option></select></label>
+              <label>Gewand<input id="clothColorSelect" type="color" value="#164f6d" aria-label="Farbe des Gewands"></label>
+            </div>
+            <div id="traits" class="traits"><span>Noch unbeschrieben</span></div>
+          </div>
+        </aside>
+      </div>
+      <footer class="actions"><button class="back" id="backBtn">← ZURÜCK</button><p id="hint">Triff deine Wahl.</p><button class="primary" id="nextBtn" disabled>WEITER →</button></footer>
+    </section>
+
+    <section class="screen temple" id="templeScreen">
+      <div class="temple-card"><p class="eyebrow">DEIN HEILIGTUM</p><h2>Erbaue deinen Tempel</h2><p>Gestalte den Ort, an dem die Menschen deine Gottheit verehren.</p><div class="temple-layout"><div class="temple-preview" id="templePreview"><div class="temple-sun">☀</div><div class="temple-building"><div class="pediment"><span id="templeMark">⚡</span></div><div class="columns">▥ ▥ ▥ ▥</div></div><div class="offering" id="offeringIcon">🫒</div></div><div class="temple-controls"><label>Säulen<select id="columnSelect"><option value="marble">Weißer Marmor</option><option value="sandstone">Goldener Sandstein</option><option value="obsidian">Schwarzer Obsidian</option></select></label><label>Umgebung<select id="settingSelect"><option value="cliff">Meeresklippe</option><option value="grove">Olivenhain</option><option value="city">Polis</option></select></label><label>Opfergabe<select id="offeringSelect"><option value="olive">Olivenzweig</option><option value="incense">Weihrauch</option><option value="honey">Honigkuchen</option></select></label></div></div><button class="primary" id="templeNextBtn">TEMPEL WEIHEN →</button></div>
+    </section>
+
+    <section class="screen adventure" id="adventureScreen"><div class="adventure-card"><p class="eyebrow" id="trialKicker">DEINE SAGE BEGINNT</p><h2 id="trialTitle"></h2><div class="trial-scene" id="trialScene"></div><p id="trialText"></p><div class="trial-options" id="trialOptions"></div><p class="consequence" id="consequence"></p></div></section>
+
+    <section class="screen quiz" id="quizScreen">
+      <div class="quiz-card">
+        <p class="eyebrow">ATHENES WISSENSPRÜFUNG</p><h2>Eine letzte Frage …</h2>
+        <div class="athena">🦉</div>
+        <p class="quiz-q">Warum bauten die Menschen im alten Griechenland Tempel?</p>
+        <div class="quiz-options">
+          <button data-correct="false">Damit die Götter dort schlafen konnten</button>
+          <button data-correct="true">Um die Götter zu ehren und ihnen Opfer zu bringen</button>
+          <button data-correct="false">Als Sporthallen für die Olympischen Spiele</button>
+        </div>
+        <p id="quizFeedback"></p>
+      </div>
+    </section>
+
+    <section class="screen result" id="resultScreen">
+      <div class="result-card">
+        <p class="eyebrow">IM OLYMP AUFGENOMMEN</p>
+        <h2 id="resultName">Eine neue Gottheit</h2>
+        <p id="resultTitle" class="result-title"></p>
+        <div class="result-avatar-wrap"><div id="resultAvatar"></div></div>
+        <div id="resultSymbol" class="result-symbol">⚡</div>
+        <p id="resultStory" class="result-story"></p>
+        <div id="resultBadges" class="result-badges"></div>
+        <p id="endingText" class="ending-text"></p>
+        <div class="result-actions"><button id="downloadBtn" class="primary">KARTE ALS BILD</button><button id="printBtn" class="back">DRUCKEN</button><button id="restartBtn" class="back">NEU BEGINNEN</button></div>
+      </div>
+    </section>
+    <button class="lexicon-button" id="lexiconBtn">⌘ MYTHEN-LEXIKON</button>
+    <dialog id="lexiconDialog"><button class="dialog-close" id="lexiconClose">×</button><p class="eyebrow">MYTHEN-LEXIKON</p><h2>Spuren der echten Mythologie</h2><div id="lexiconEntries" class="lexicon-entries"></div></dialog>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
