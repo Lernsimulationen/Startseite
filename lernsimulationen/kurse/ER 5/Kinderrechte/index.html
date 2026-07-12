@@ -33,7 +33,8 @@
   }
   .btn:hover{transform:translateY(-2px)}
   .btn:active{transform:translateY(0)}
-  .btn:focus-visible,.wahl:focus-visible,.kkarte:focus-visible,.station:focus-visible{
+  .btn:focus-visible,.wahl:focus-visible,.kkarte:focus-visible,.station:focus-visible,
+  .mission-btn:focus-visible,.suchsel-zelle:focus-visible{
     outline:4px solid rgba(244,197,66,.85); outline-offset:3px;
   }
   .btn:disabled{opacity:.72; cursor:not-allowed; transform:none}
@@ -62,15 +63,26 @@
     background:#eef6fc; box-shadow:0 4px 12px rgba(36,55,70,.09);
   }
   .story-frame{aspect-ratio:16/9}
+  .typewriter-intro.typing::after{
+    content:""; display:inline-block; width:2px; height:1em; margin-left:3px;
+    vertical-align:-.12em; background:var(--blau); animation:cursorBlink .72s steps(1) infinite;
+  }
+  .screen.is-typing button,.screen.is-typing select,.screen.is-typing [role="button"]{
+    pointer-events:none; opacity:.55;
+  }
+  .screen.is-typing .typewriter-skip{pointer-events:auto; opacity:1}
+  .typewriter-skip-row{display:flex; justify-content:flex-end; margin:-6px 0 12px}
+  @keyframes cursorBlink{50%{opacity:0}}
 
   /* Startseite */
   .hero{display:grid; grid-template-columns:minmax(0,1fr) 310px; align-items:center; gap:22px; padding:22px}
-  .hero h2{color:var(--blau-d); margin:.2rem 0; font-size:clamp(1.55rem,2.6vw,2rem)}
+  .hero h2{color:var(--blau-d); margin:.2rem 0; font-size:2rem}
   .hero .kicker{font-weight:800; color:var(--koralle); margin:0 0 4px}
   .hero-action{justify-content:flex-start}
   .hero-img{aspect-ratio:1/1; border-radius:8px}
-  @media(max-width:720px){
+  @media(max-width:820px){
     .hero{grid-template-columns:1fr; text-align:center}
+    .hero h2{font-size:1.7rem}
     .hero-action{justify-content:center}
     .hero-img{max-width:320px; margin:0 auto}
   }
@@ -114,8 +126,6 @@
   }
   .kkarte.aktiv{border-color:var(--gelb); transform:scale(1.03)}
   .kkarte img{aspect-ratio:1/1; height:auto}
-  .kkarte .karten-caption{display:flex; align-items:center; justify-content:center; padding:7px 8px; background:#f8fbfe}
-  .kkarte .k-emoji{font-size:1.45rem}
   .shake{animation:shake .35s}
   @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
   .feedback{min-height:26px; font-weight:600; margin-top:10px}
@@ -144,6 +154,19 @@
   .m2-controls{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:center; margin-top:12px}
   .spring-btn{font-size:1.15rem; padding:16px 34px; touch-action:none; user-select:none}
   select.tempo{padding:8px 12px; border-radius:8px; border:2px solid #ccd6df; font-size:.95rem; background:#fff}
+  .schatz-reveal{font-size:3.4rem; line-height:1; animation:schatzPuls .8s ease-in-out infinite alternate}
+  @keyframes schatzPuls{to{transform:translateY(-5px) scale(1.06)}}
+  .schatzbereich{display:none; margin-top:22px; padding-top:20px; border-top:4px solid var(--gelb)}
+  .schatzbereich.zeigen{display:block; animation:fade .35s ease}
+  .schatz-kopf{text-align:center; max-width:720px; margin:0 auto 18px}
+  .rechte-folgen{border-top:1px solid var(--linie)}
+  .rechte-folge{display:grid; grid-template-columns:220px minmax(0,1fr); gap:18px; align-items:center; padding:18px 0; border-bottom:1px solid var(--linie)}
+  .rechte-folge img{width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:8px}
+  .rechte-folge h4{margin:0 0 6px; color:var(--blau-d); font-size:1.05rem}
+  .rechte-folge p{margin:5px 0}
+  .recht-status{display:inline-block; padding:4px 9px; border-radius:6px; font-size:.82rem; font-weight:800}
+  .recht-status.gesammelt{background:#d8f2df; color:#20763b}
+  .recht-status.verpasst{background:#fde2df; color:#a43128}
 
   /* Modul 3 – Recht oder Wunsch */
   .rw-karte{font-size:1.35rem; font-weight:700; text-align:center; padding:26px 10px; min-height:90px; display:flex; align-items:center; justify-content:center}
@@ -154,18 +177,110 @@
 
   /* Modul 4 */
   .wahl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; margin:12px 0}
-  .wahl{border:2px solid var(--blau); background:#fff; color:var(--blau-d); border-radius:8px; padding:12px; cursor:pointer; font-weight:600; text-align:left}
+  .wahl{border:2px solid var(--blau); background:#fff; color:var(--blau-d); border-radius:8px; padding:12px; min-height:54px; cursor:pointer; font-weight:600; text-align:left}
   .wahl:hover{background:#eaf4fb}
   .wahl.aktiv{background:var(--blau); color:#fff}
+  .m4-schritt{padding-top:12px; margin-top:12px; border-top:1px solid var(--linie)}
+  .dein-ergebnis{margin-top:22px; padding:24px; background:#155a92; color:#fff; border-left:8px solid var(--gelb); text-align:center; animation:ergebnisRein .45s ease}
+  .dein-ergebnis .kicker{margin:0; color:#ffe47a; font-size:.82rem; font-weight:900; letter-spacing:0}
+  .dein-ergebnis h3{font-size:1.9rem; margin:4px 0 2px; color:#fff}
+  .dein-ergebnis .herzensrecht{font-size:1.35rem; font-weight:900; color:#fff; margin:8px 0 14px}
+  .dein-ergebnis .ergebnis-details{max-width:690px; margin:0 auto; text-align:left; border-top:1px solid rgba(255,255,255,.35); padding-top:12px}
+  .dein-ergebnis .ergebnis-details p{margin:6px 0}
+  @keyframes ergebnisRein{from{opacity:0; transform:scale(.96)}to{opacity:1; transform:none}}
+  .mission{padding:22px 0 4px; text-align:center}
+  .mission h3{color:var(--blau-d); margin:.2rem 0}
+  .mission-leiste{height:14px; max-width:620px; margin:14px auto 18px; background:#e4ebf1; border-radius:7px; overflow:hidden}
+  .mission-fuellung{width:0; height:100%; background:var(--gruen); transition:width .3s ease}
+  .mission-stufen{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; max-width:720px; margin:0 auto}
+  .mission-btn{min-height:92px; padding:12px; border:2px solid #b8c8d6; border-radius:8px; background:#fff; color:var(--dunkel); box-shadow:none; cursor:pointer; font-weight:800}
+  .mission-btn .mission-nr{display:block; width:30px; height:30px; line-height:27px; margin:0 auto 7px; border:2px solid var(--blau); border-radius:50%; color:var(--blau-d)}
+  .mission-btn.aktiv{border-color:var(--gruen); background:#e9f7ed; color:#20763b}
+  .mission-btn.aktiv .mission-nr{border-color:var(--gruen); background:var(--gruen); color:#fff}
+  .mission-btn:disabled{opacity:.55; cursor:not-allowed}
+  .mission-btn.aktiv:disabled{opacity:1}
+  .mission-fertig{display:none; margin-top:18px; animation:ergebnisRein .4s ease}
+  .mission-fertig.zeigen{display:block}
 
   /* Urkunde */
   .urkunde{
-    border:6px double var(--gelb); border-radius:8px; padding:26px;
-    background:linear-gradient(160deg,#fffdf5,#fff7e0); text-align:center;
+    border:4px solid var(--blau-d); border-radius:8px; padding:10px;
+    background:#fffdf5; text-align:center; box-shadow:0 10px 28px rgba(21,90,146,.18);
   }
-  .urkunde h2{color:var(--blau-d); margin:.2rem 0}
-  .urkunde .name{font-size:1.6rem; font-weight:800; color:var(--rot); min-height:1.6rem}
-  .urkunde input{font-size:1rem; padding:8px 12px; border-radius:8px; border:2px solid #ccd6df; text-align:center}
+  .urkunde-rahmen{border:2px solid var(--gelb); padding:14px}
+  .urkunde-banner{aspect-ratio:16/6; overflow:hidden; border-radius:6px; background:#eaf6ff}
+  .urkunde-banner img{width:100%; height:100%; object-fit:cover; object-position:center 44%; display:block}
+  .urkunde-inhalt{padding:18px 12px 12px}
+  .urkunde-kicker{font-size:.8rem; font-weight:900; color:var(--koralle); letter-spacing:0}
+  .urkunde h2{color:var(--blau-d); margin:.25rem 0 .5rem; font-size:1.85rem}
+  .urkunde .name{max-width:680px; min-height:2.6rem; margin:8px auto 12px; color:var(--blau-d); font-size:1.35rem; font-weight:900}
+  .urkunde-herzensrecht{display:inline-block; margin:10px 0; padding:8px 14px; border-top:2px solid var(--gelb); border-bottom:2px solid var(--gelb); color:var(--blau-d); font-weight:900}
+  .urkunde-datum{font-size:.85rem; color:#647684; margin-top:10px}
+
+  /* Letzte Abgabe-Mission */
+  .abgabe-mission{margin-top:22px; padding:20px; border-left:7px solid var(--koralle); background:#f7fbff}
+  .abgabe-mission h3{color:var(--blau-d); margin:.15rem 0 .35rem}
+  .abgabe-kicker{font-size:.8rem; font-weight:900; color:var(--koralle)}
+  .abgabe-checkliste{margin-top:14px; border-top:1px solid var(--linie)}
+  .checkschritt{display:grid; grid-template-columns:32px minmax(0,1fr) auto; gap:10px; align-items:center; padding:12px 0; border-bottom:1px solid var(--linie)}
+  .checkschritt input{width:24px; height:24px; accent-color:var(--gruen); cursor:pointer}
+  .checkschritt label{cursor:pointer}
+  .checkschritt strong{display:block; color:var(--dunkel)}
+  .checkschritt small{display:block; color:#5a6b78; margin-top:2px}
+  .abgabe-status{margin-top:14px; padding:10px 12px; background:#fff; border-left:4px solid var(--gelb); font-weight:700}
+  .abgabe-status.fertig{border-color:var(--gruen); color:#20763b; background:#eefaf1}
+
+  /* Freiwilliges Suchsel nach dem Pflichtteil */
+  .bonus-kopf{text-align:center; max-width:760px; margin:0 auto}
+  .bonus-kopf h2{color:var(--blau-d); margin:.2rem 0}
+  .bonus-suchsel{margin-top:24px; padding-top:22px; border-top:4px solid var(--blau)}
+  .bonus-suchsel>h3{color:var(--blau-d); margin:.1rem 0}
+  .suchsel-layout{display:grid; grid-template-columns:minmax(0,1fr) 190px; gap:22px; align-items:start}
+  .suchsel-grid{display:grid; grid-template-columns:repeat(14,minmax(0,1fr)); width:min(100%,616px); aspect-ratio:1/1; border:2px solid var(--blau-d); background:#fff}
+  .suchsel-zelle{min-width:0; min-height:0; padding:0; border:1px solid #d9e5ef; border-radius:0; background:#fff; color:var(--dunkel); font-size:1rem; font-weight:800; box-shadow:none; touch-action:manipulation}
+  .suchsel-zelle:hover{transform:none; background:#eef7ff}
+  .suchsel-zelle.start{background:var(--gelb); color:#243746}
+  .suchsel-zelle.gefunden{background:var(--gruen); color:#fff; border-color:#247c40}
+  .suchsel-woerter{display:flex; flex-direction:column; gap:7px}
+  .suchsel-wort{padding:7px 9px; border-left:4px solid #b9c6d2; background:#f7fafc; font-weight:700}
+  .suchsel-wort.gefunden{border-color:var(--gruen); color:#20763b; text-decoration:line-through}
+  .suchsel-feedback{min-height:26px; margin-top:10px; font-weight:700}
+  .fallwerkstatt{display:none; margin-top:24px; padding-top:22px; border-top:4px solid var(--koralle)}
+  .fallwerkstatt.zeigen{display:block; animation:fade .35s ease}
+  .fallwerkstatt h3{color:var(--blau-d); text-align:center; margin:.2rem 0 14px}
+  .fall-situation{padding:22px; background:#f3f9ff; border-left:6px solid var(--blau); font-size:1.15rem; font-weight:700; text-align:center}
+  .fall-antworten{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:16px 0}
+  .fall-antwort{min-height:66px; border:2px solid var(--blau); border-radius:8px; background:#fff; color:var(--blau-d); padding:10px; font-weight:800; cursor:pointer}
+  .fall-antwort.richtig{border-color:var(--gruen); background:#e9f7ed; color:#20763b}
+  .fall-antwort.falsch{border-color:var(--rot); background:#fde8e5; color:#9d2e25}
+  .fall-feedback{display:none; padding:12px 14px; border-left:5px solid var(--gelb); background:#fffaf0; margin-top:10px}
+  .fall-feedback.zeigen{display:block}
+  .bonus-abschluss{text-align:center; padding:24px 0}
+  .bonus-abschluss .zahl{font-size:2.1rem; font-weight:900; color:var(--blau-d)}
+
+  /* iPad: stabile Touch-Ziele und kompakte, lesbare Flächen in Hoch- und Querformat */
+  @media (min-width:641px) and (max-width:1100px){
+    .wrap{max-width:100%; padding:14px 18px 22px}
+    .card{padding:18px}
+    .btn{min-height:46px}
+    .station{min-height:150px}
+    .kkarte{width:calc(50% - 5px); max-width:150px}
+    .m1-grid{grid-template-columns:minmax(320px,1.05fr) minmax(280px,.95fr); gap:14px}
+    .ziel{min-height:76px}
+    #spielCanvas{aspect-ratio:8/3; object-fit:contain}
+    .overlay{padding:14px 24px}
+  }
+  @media(max-width:820px){
+    .rechte-folge{grid-template-columns:1fr}
+    .rechte-folge img{max-width:360px; margin:0 auto}
+    .suchsel-layout{grid-template-columns:1fr}
+    .suchsel-woerter{display:grid; grid-template-columns:1fr 1fr}
+  }
+  @media(max-width:700px){.suchsel-zelle{font-size:.8rem}}
+  @media(max-width:420px){
+    .suchsel-grid{width:calc(100vw - 36px)}
+    .suchsel-zelle{font-size:.62rem}
+  }
 
   .fussnote{font-size:.82rem; color:#5a6b78; border-left:4px solid var(--gelb); padding:8px 12px; background:#fffdf5; border-radius:6px; margin-top:14px}
 
@@ -193,11 +308,14 @@
   .reiseziel h3{margin:.1rem 0 .3rem; color:var(--blau-d)}
   .reise-fertig{text-align:center; background:#eefaf1; border:1px solid #bfe6cc; border-radius:12px; padding:18px; margin-top:16px}
 
-  /* Teams-Anleitung */
-  .teams-box{border:1px solid var(--linie); border-radius:10px; background:#f7fbff; padding:14px 16px; margin-top:14px; text-align:left}
-  .teams-box h4{margin:.1rem 0 .5rem; color:var(--blau-d)}
-  .teams-box ol{margin:.2rem 0 .2rem 1.1rem; padding:0}
-  .teams-box li{margin:4px 0; font-size:.9rem}
+  @media(max-width:620px){
+    .mission-stufen{grid-template-columns:1fr}
+    .mission-btn{min-height:66px}
+    .checkschritt{grid-template-columns:32px minmax(0,1fr)}
+    .checkschritt .btn{grid-column:2; justify-self:start}
+    .urkunde-inhalt{padding:16px 4px 8px}
+    .fall-antworten{grid-template-columns:1fr}
+  }
 
   @media print{
     body *{visibility:hidden}
@@ -221,7 +339,7 @@
       <div>
         <p class="kicker">Klasse 5</p>
         <h2>Eine Weltreise durch die Kinderrechte</h2>
-        <p>Reise um die Welt und lerne, welche Rechte <b>jedes Kind</b> hat.
+        <p class="typewriter-intro">Reise um die Welt und lerne, welche Rechte <b>jedes Kind</b> hat.
            Du ordnest Bilder zu, sammelst Rechte im Hüpf-Spiel und triffst eigene Entscheidungen.</p>
         <div class="weiter-row hero-action">
           <button class="btn" onclick="zeige('screen-figur'); renderFigur()">Los geht's ▶</button>
@@ -239,7 +357,7 @@
   <section id="screen-figur" class="screen">
     <div class="card">
       <h2 style="color:var(--blau-d)">Wer soll mit dir reisen?</h2>
-      <p>Wähle deine Reisebegleitung. Sie ist deine Figur im Hüpf-Spiel.</p>
+      <p class="typewriter-intro">Wähle deine Reisebegleitung. Sie ist deine Figur im Hüpf-Spiel.</p>
       <div class="stationen" id="figurAuswahl"></div>
     </div>
   </section>
@@ -253,7 +371,7 @@
   <section id="screen-map" class="screen">
     <div class="card">
       <h2 style="color:var(--blau-d)">Deine Reise um die Welt ✈️</h2>
-      <p class="aufgabe">Du startest am Flughafen in <b>Deutschland</b> und fliegst Station für Station
+      <p class="aufgabe typewriter-intro">Du startest am Flughafen in <b>Deutschland</b> und fliegst Station für Station
          zu verschiedenen Kontinenten. Die Reihenfolge steht fest – du kannst keine Station überspringen.</p>
       <div class="reisekarte" id="reisekarte"></div>
       <div id="reiseZiel"></div>
@@ -263,8 +381,8 @@
   <!-- ================= MODUL 1: ZUORDNUNG ================= -->
   <section id="screen-m1" class="screen">
     <div class="card">
-      <h2 style="color:var(--blau-d)">Station 1 – Rechte entdecken 🧩</h2>
-      <p class="aufgabe">Tippe zuerst ein <b>Bild</b> an. Tippe danach auf den passenden Platz beim <b>Recht</b>.
+      <h2 style="color:var(--blau-d)">Station 1 – Rechte entdecken</h2>
+      <p class="aufgabe typewriter-intro">Tippe zuerst ein <b>Bild</b> an. Tippe danach auf den passenden Platz beim <b>Recht</b>.
          In <b>3 Runden</b> ordnest du alle <b>12 Rechte</b> zu.</p>
       <div class="fortschritt" id="m1Fortschritt"></div>
       <div class="m1-grid">
@@ -273,7 +391,7 @@
       </div>
       <div class="feedback" id="m1Feedback"></div>
       <div class="weiter-row" id="m1Weiter" style="display:none">
-        <button class="btn gruen" id="m1WeiterBtn">Weiter ▶</button>
+        <button class="btn gruen" id="m1WeiterBtn">Weiter</button>
       </div>
     </div>
   </section>
@@ -282,7 +400,7 @@
   <section id="screen-m2" class="screen">
     <div class="card">
       <h2 style="color:var(--blau-d)">Station 2 – Rechte-Retter 🏃</h2>
-      <p class="aufgabe"><b>Springen:</b> Leertaste / Pfeil ↑ / SPRINGEN-Button / aufs Spielfeld tippen.
+      <p class="aufgabe typewriter-intro"><b>Springen:</b> Leertaste / Pfeil ↑ / SPRINGEN-Button / aufs Spielfeld tippen.
          <b>Tipp:</b> Taste länger halten = höher springen. Sammle möglichst <b>alle 5 Rechte</b> ein.
          Reise durch Wiese, Stadt und Wüste bis zur Schatztruhe.</p>
       <div class="hud">
@@ -312,6 +430,7 @@
       </div>
       <p class="datenschutz">Hinweis: Die Hindernisse (Steine, Dornen) stehen für Gefahren wie Gewalt oder Kinderarbeit –
          du kannst nicht verlieren, sondern stolperst nur kurz.</p>
+      <section class="schatzbereich" id="m2Schatz" aria-live="polite"></section>
     </div>
   </section>
 
@@ -319,7 +438,7 @@
   <section id="screen-m3" class="screen">
     <div class="card">
       <h2 style="color:var(--blau-d)">Station 3 – Recht oder Wunsch? ⚖️</h2>
-      <p class="aufgabe">Ein <b>Recht</b> gilt für <b>alle</b> Kinder auf der Welt. Ein <b>Wunsch</b> ist etwas Persönliches.
+      <p class="aufgabe typewriter-intro">Ein <b>Recht</b> gilt für <b>alle</b> Kinder auf der Welt. Ein <b>Wunsch</b> ist etwas Persönliches.
          Entscheide bei jeder Karte.</p>
       <div class="fortschritt" id="m3Fortschritt"></div>
       <div class="card rw-karte" id="m3Karte" style="box-shadow:none; background:#f5f9fd"></div>
@@ -337,6 +456,40 @@
   <!-- ================= MODUL 4: ABSCHLUSS ================= -->
   <section id="screen-m4" class="screen">
     <div class="card" id="m4Box"><!-- per JS --></div>
+  </section>
+
+  <!-- ================= BONUS FÜR SCHNELLE ================= -->
+  <section id="screen-bonus" class="screen">
+    <div class="card" id="bonusBox">
+      <div class="bonus-kopf">
+        <div class="fortschritt">Freiwilliger Bonus, ohne Wertung</div>
+        <h2>Die Kinderrechte-Bonuswerkstatt</h2>
+        <p>Hier kannst du dein Wissen noch einmal ganz genau prüfen. Die Ergebnisse werden nicht im Protokoll gespeichert.</p>
+      </div>
+      <section class="bonus-suchsel" id="bonusSuchsel" aria-labelledby="suchselTitel">
+        <h3 id="suchselTitel">Stufe 1: Kinderrechte-Suchsel</h3>
+        <p>Tippe den <b>ersten</b> und danach den <b>letzten Buchstaben</b> eines Wortes an.
+           Die Wörter können waagerecht, senkrecht oder schräg stehen.</p>
+        <div class="suchsel-layout">
+          <div>
+            <div class="suchsel-grid" id="suchselGrid" aria-label="Suchsel mit Kinderrechten"></div>
+            <div class="suchsel-feedback" id="suchselFeedback" aria-live="polite">Wähle den ersten Buchstaben eines Wortes.</div>
+            <div class="weiter-row" id="suchselWeiter" style="display:none">
+              <button class="btn gruen" onclick="starteFallwerkstatt()">Weiter zur Fallwerkstatt</button>
+            </div>
+          </div>
+          <div>
+            <h4 style="margin-top:0">Finde diese Rechte:</h4>
+            <div class="suchsel-woerter" id="suchselWoerter"></div>
+          </div>
+        </div>
+      </section>
+      <section class="fallwerkstatt" id="fallwerkstatt" aria-labelledby="fallTitel">
+        <div class="fortschritt" id="fallFortschritt"></div>
+        <h3 id="fallTitel">Stufe 2: Kinderrechte-Fallwerkstatt</h3>
+        <div id="fallInhalt"></div>
+      </section>
+    </div>
   </section>
 
 </div>
@@ -380,7 +533,7 @@ const EINSTIEG = [
     alt:"Geteiltes Bild mit Kindern in historischer Kleidung links und modernen Kindern verschiedener Herkunft rechts.",
     titel:"Und heute?",
     text:`<b>Heute</b> sind uns Kinder auch wichtig. Aber woran zeigt sich das eigentlich?<br><br>
-          Nicht nur mit schönen Worten – sondern mit <b>Rechten</b>, die für alle Kinder
+          Nicht nur mit schönen Worten, sondern mit <b>Rechten</b>, die für alle Kinder
           auf der Welt gelten sollen.`
   },
   {
@@ -398,31 +551,46 @@ const EINSTIEG = [
 // MODUL 1 – Bild-Zuordnungen (12 Rechte in 3 Runden à 4)
 const M1 = [
   // --- Runde 1: gut darstellbare, konkrete Rechte ---
-  {recht:"Gesundheit", emoji:"🩺", src:"assets/img/recht-gesundheit.webp", alt:"Ärztin hört mit einem Stethoskop ein lächelndes Kind ab."},
-  {recht:"Schule, Spielen und Freizeit", emoji:"📚", src:"assets/img/recht-bildung-meinung.webp", alt:"Mädchen mit Buch spricht selbstbewusst an einem Mikrofon."},
-  {recht:"Essen und Trinken", emoji:"💧", src:"assets/img/recht-essen-trinken.webp", alt:"Kind trinkt fröhlich sauberes Wasser aus einem Becher."},
-  {recht:"Eltern und sicheres Zuhause", emoji:"🏠", src:"assets/img/recht-zuhause.webp", alt:"Familie mit Kind steht vor einem gemütlichen sicheren Haus."},
+  {recht:"Gesundheit", src:"assets/img/recht-gesundheit.webp", alt:"Ärztin hört mit einem Stethoskop ein lächelndes Kind ab."},
+  {recht:"Schule, Spielen und Freizeit", src:"assets/img/recht-bildung-meinung.webp", alt:"Mädchen mit Buch spricht selbstbewusst an einem Mikrofon."},
+  {recht:"Essen und Trinken", src:"assets/img/recht-essen-trinken.webp", alt:"Kind trinkt fröhlich sauberes Wasser aus einem Becher."},
+  {recht:"Eltern und sicheres Zuhause", src:"assets/img/recht-zuhause.webp", alt:"Familie mit Kind steht vor einem gemütlichen sicheren Haus."},
 
   // --- Runde 2: Teilhabe und Gleichheit ---
-  {recht:"Gleichheit", emoji:"🤝", src:"assets/img/recht-gleichheit.webp", alt:"Zwei Kinder verschiedener Herkunft reichen sich lachend die Hand."},
-  {recht:"seine Meinung sagen", emoji:"🗣️", src:"assets/img/recht-meinung.webp", alt:"Kind meldet sich im Stuhlkreis und sagt seine Meinung."},
-  {recht:"besondere Betreuung bei Behinderung", emoji:"♿", src:"assets/img/recht-behinderung.webp", alt:"Ein Kind im Rollstuhl spielt fröhlich mit Freundinnen und Freunden auf dem Schulhof."},
-  {recht:"einen Namen und einen Pass", emoji:"🪪", src:"assets/img/recht-name-pass.webp", alt:"Ein Kind hält stolz einen bunten Kinderausweis und ein kleines Passheft in der Hand."},
+  {recht:"Gleichheit", src:"assets/img/recht-gleichheit.webp", alt:"Zwei Kinder verschiedener Herkunft reichen sich lachend die Hand."},
+  {recht:"seine Meinung sagen", src:"assets/img/recht-meinung.webp", alt:"Kind meldet sich im Stuhlkreis und sagt seine Meinung."},
+  {recht:"besondere Betreuung bei Behinderung", src:"assets/img/recht-behinderung.webp", alt:"Ein Kind im Rollstuhl spielt fröhlich mit Freundinnen und Freunden auf dem Schulhof."},
+  {recht:"einen Namen und einen Pass", src:"assets/img/recht-name-pass.webp", alt:"Ein Kind hält stolz einen bunten Kinderausweis und ein kleines Passheft in der Hand."},
 
   // --- Runde 3: Schutzrechte (neutral, kindgerecht, nicht bedrohlich) ---
-  {recht:"Schutz vor Gewalt", emoji:"🛡️", src:"assets/img/recht-schutz-gewalt.webp", alt:"Große, freundliche Hände halten schützend über ein Kind – ein Bild für Geborgenheit und Sicherheit."},
-  {recht:"Schutz vor Kinderarbeit", emoji:"🧸", src:"assets/img/recht-kinderarbeit.webp", alt:"Ein Kind spielt unbeschwert mit Spielzeug; daneben liegt durchgestrichenes Werkzeug als Zeichen gegen schwere Arbeit für Kinder."},
-  {recht:"Privatsphäre", emoji:"🚪", src:"assets/img/recht-privatsphaere.webp", alt:"Ein Kind steht in seinem Zimmer an der Tür, während ein Erwachsener freundlich anklopft."},
-  {recht:"Schutz vor Drogen", emoji:"🛑", src:"assets/img/recht-drogen.webp", alt:"Ein Kind geht an unsicheren Flaschen vorbei; ein rotes Schutzschild zeigt Stopp."}
+  {recht:"Schutz vor Gewalt", src:"assets/img/recht-schutz-gewalt.webp", alt:"Große, freundliche Hände halten schützend über ein Kind – ein Bild für Geborgenheit und Sicherheit."},
+  {recht:"Schutz vor Kinderarbeit", src:"assets/img/recht-kinderarbeit.webp", alt:"Ein Kind spielt unbeschwert mit Spielzeug; daneben liegt durchgestrichenes Werkzeug als Zeichen gegen schwere Arbeit für Kinder."},
+  {recht:"Privatsphäre", src:"assets/img/recht-privatsphaere.webp", alt:"Ein Kind steht in seinem Zimmer an der Tür, während ein Erwachsener freundlich anklopft."},
+  {recht:"Schutz vor Drogen", src:"assets/img/recht-drogen.webp", alt:"Ein Kind geht an unsicheren Flaschen vorbei; ein rotes Schutzschild zeigt Stopp."}
 ];
 
 // MODUL 2 – Sammel-Rechte im Hüpfspiel
 const M2_RECHTE = [
-  {emoji:"📚", name:"Bildung"},
-  {emoji:"🍎", name:"Gesundheit"},
-  {emoji:"⚽", name:"Spiel & Freizeit"},
-  {emoji:"💧", name:"Essen & Trinken"},
-  {emoji:"❤️", name:"Schutz"}
+  {emoji:"📚", name:"Bildung", src:"assets/img/folge-bildung.webp",
+   alt:"Ein Kind mit Büchern steht vor einer geschlossenen Schultür.",
+   positiv:"Bildung hilft Kindern, die Welt zu verstehen und später selbst zu entscheiden.",
+   folge:"Ohne Zugang zur Schule fehlen Wissen, Chancen und wichtige Wege in die Zukunft."},
+  {emoji:"🍎", name:"Gesundheit", src:"assets/img/folge-gesundheit.webp",
+   alt:"Ein Kind benötigt Hilfe, doch die Gesundheitsstation ist geschlossen.",
+   positiv:"Ärztliche Hilfe und Vorsorge sorgen dafür, dass Kinder gesund aufwachsen können.",
+   folge:"Ohne medizinische Hilfe können Krankheiten oder Verletzungen schlimmer werden."},
+  {emoji:"⚽", name:"Spiel & Freizeit", src:"assets/img/folge-freizeit.webp",
+   alt:"Ein Kind trägt schwere Kisten, während andere Kinder in der Ferne spielen.",
+   positiv:"Beim Spielen erholen sich Kinder, finden Freunde und entwickeln neue Fähigkeiten.",
+   folge:"Ohne Freizeit können Kinder erschöpft, einsam oder durch zu viel Arbeit überfordert werden."},
+  {emoji:"💧", name:"Essen & Trinken", src:"assets/img/folge-essen-trinken.webp",
+   alt:"Ein Kind sitzt vor einem leeren Teller und einem leeren Becher.",
+   positiv:"Genug gesundes Essen und sauberes Wasser geben Kraft zum Leben und Lernen.",
+   folge:"Ohne Essen und sauberes Wasser werden Kinder hungrig, schwach oder krank."},
+  {emoji:"❤️", name:"Schutz", src:"assets/img/folge-schutz.webp",
+   alt:"Ein Kind steht mit einem beschädigten Schirm im Sturm, während eine vertraute Person Hilfe bringt.",
+   positiv:"Schutz bedeutet, dass Erwachsene aufmerksam sind, helfen und Gefahren stoppen.",
+   folge:"Ohne Schutz können Kinder Angst haben, verletzt oder ausgenutzt werden."}
 ];
 
 // MODUL 3 – Recht oder Wunsch (mit VORGEGEBENER Begründung)
@@ -445,6 +613,52 @@ const M4_GRUENDE = [
   "Weil es Kinder vor Gefahren schützt.",
   "Weil Kinder so gut lernen und aufwachsen können."
 ];
+const M4_AKTIONEN = [
+  "Ich höre einem Kind zu und nehme es ernst.",
+  "Ich sage etwas, wenn ich Ungerechtigkeit bemerke.",
+  "Ich hole Hilfe bei einer erwachsenen Vertrauensperson.",
+  "Ich erzähle anderen, welche Rechte Kinder haben."
+];
+
+// Freiwillige Fallwerkstatt nach dem Suchsel, bewusst ohne Protokollierung.
+const BONUS_FAELLE = [
+  {fall:"Noah darf nicht zur Schule gehen, obwohl in seinem Ort Unterricht stattfindet.", recht:"Schule, Spielen und Freizeit",
+   optionen:["Schule, Spielen und Freizeit","Privatsphäre","Schutz vor Drogen"],
+   erklaerung:"Jedes Kind soll lernen, spielen und sich entwickeln können."},
+  {fall:"Mina ist krank, aber niemand bringt sie zu einer Ärztin oder einem Arzt.", recht:"Gesundheit",
+   optionen:["Gesundheit","Gleichheit","Name und Pass"],
+   erklaerung:"Kinder haben ein Recht auf medizinische Hilfe und gesundes Aufwachsen."},
+  {fall:"Eine Person liest Leons Nachrichten, obwohl er das nicht erlaubt hat.", recht:"Privatsphäre",
+   optionen:["Privatsphäre","Essen und Trinken","Schutz vor Kinderarbeit"],
+   erklaerung:"Persönliche Nachrichten und Rückzugsräume müssen respektiert werden."},
+  {fall:"Aylin muss jeden Tag viele Stunden schwer arbeiten und hat keine Zeit zum Lernen.", recht:"Schutz vor Kinderarbeit",
+   optionen:["Schutz vor Kinderarbeit","seine Meinung sagen","Gesundheit"],
+   erklaerung:"Arbeit darf Kinder nicht gefährden und sie nicht von Schule und Freizeit abhalten."},
+  {fall:"Ein Kind wird wegen seiner Hautfarbe schlechter behandelt als andere Kinder.", recht:"Gleichheit",
+   optionen:["Gleichheit","Name und Pass","Privatsphäre"],
+   erklaerung:"Alle Kinder haben dieselben Rechte und dürfen nicht benachteiligt werden."},
+  {fall:"Sofia hat eine Idee für ihre Klasse, aber Erwachsene lassen sie nie ausreden.", recht:"seine Meinung sagen",
+   optionen:["seine Meinung sagen","Schutz vor Drogen","Essen und Trinken"],
+   erklaerung:"Kinder dürfen ihre Meinung äußern und sollen ernst genommen werden."},
+  {fall:"Jemand bietet einem Kind gefährliche Tabletten an und behauptet, sie seien harmlos.", recht:"Schutz vor Drogen",
+   optionen:["Schutz vor Drogen","Schule, Spielen und Freizeit","Name und Pass"],
+   erklaerung:"Kinder müssen vor gefährlichen und abhängig machenden Stoffen geschützt werden."},
+  {fall:"Emil nutzt einen Rollstuhl, aber die Schule hat keinen zugänglichen Eingang und bietet keine Hilfe an.", recht:"besondere Betreuung bei Behinderung",
+   optionen:["besondere Betreuung bei Behinderung","Privatsphäre","Schutz vor Kinderarbeit"],
+   erklaerung:"Kinder mit Behinderung haben ein Recht auf Unterstützung und Teilhabe."},
+  {fall:"Ein Baby wird geboren, aber sein Name wird nirgends eingetragen und es erhält keine Papiere.", recht:"Name und Pass",
+   optionen:["Name und Pass","Gesundheit","seine Meinung sagen"],
+   erklaerung:"Jedes Kind hat ein Recht auf einen Namen und eine anerkannte Identität."},
+  {fall:"In einer Schule gibt es für manche Kinder den ganzen Tag weder Essen noch sauberes Wasser.", recht:"Essen und Trinken",
+   optionen:["Essen und Trinken","Gleichheit","Privatsphäre"],
+   erklaerung:"Genug Nahrung und sauberes Wasser sind lebenswichtig."},
+  {fall:"Ein Kind wird bedroht und bittet um Hilfe, aber die Erwachsenen schauen weg.", recht:"Schutz vor Gewalt",
+   optionen:["Schutz vor Gewalt","Name und Pass","Schule, Spielen und Freizeit"],
+   erklaerung:"Erwachsene müssen Kinder vor Gewalt schützen und Hilfe organisieren."},
+  {fall:"Nach einem Notfall hat ein Kind keinen sicheren Ort und keine vertraute Person, die sich kümmert.", recht:"Eltern und sicheres Zuhause",
+   optionen:["Eltern und sicheres Zuhause","Schutz vor Drogen","seine Meinung sagen"],
+   erklaerung:"Kinder brauchen verlässliche Betreuung, Geborgenheit und einen sicheren Lebensort."}
+];
 
 /* =========================================================
    NAVIGATION
@@ -457,7 +671,7 @@ const ergebnisse = {
   m1:{status:'offen', richtig:0, falsch:0},
   m2:{status:'offen', gesammelt:[], frageRichtig:null},
   m3:{status:'offen', richtig:0, gesamt:M3.length},
-  m4:{status:'offen', recht:null, grund:null}
+  m4:{status:'offen', recht:null, grund:null, aktion:null, mission:false}
 };
 
 // Reisestationen: Start in Deutschland, dann Kontinente. x/y in SVG-Einheiten (viewBox 100x56.25).
@@ -489,6 +703,7 @@ function zeige(id){
   document.getElementById('homeBtn').style.display = (id==='screen-start') ? 'none':'inline-block';
   if(id!=='screen-m2') spielStop();
   window.scrollTo({top:0, behavior:'smooth'});
+  setTimeout(()=>starteTypewriter(id),0);
 }
 function zurKarte(){ zeige('screen-map'); baueKarte(); }
 
@@ -627,11 +842,12 @@ function renderEinstieg(){
   document.getElementById('einstiegBox').innerHTML=`
     <div class="bild-frame story-frame"><img class="asset-img" src="${s.src}" alt="${esc(s.alt)}" loading="lazy" decoding="async"></div>
     <h2 style="color:var(--blau-d); margin-top:16px">${s.titel}</h2>
-    <p>${s.text}</p>
+    <p class="typewriter-intro" data-typewriter-key="einstieg-${einstiegIdx}">${s.text}</p>
     <div class="fortschritt">Einstieg ${einstiegIdx+1} / ${EINSTIEG.length}</div>
     <div class="weiter-row">
       <button class="btn" onclick="${letzte?'zurKarte()':'einstiegWeiter()'}">${letzte?'Reise starten ▶':'Weiter ▶'}</button>
     </div>`;
+  starteTypewriter('screen-einstieg');
 }
 function einstiegWeiter(){ einstiegIdx++; renderEinstieg(); }
 
@@ -660,8 +876,7 @@ function renderM1(){
     k.tabIndex=0;
     k.setAttribute('role','button');
     k.setAttribute('aria-label',p.alt);
-    k.innerHTML=`<img class="asset-img" src="${p.src}" alt="${esc(p.alt)}" loading="lazy" decoding="async">
-                 <div class="karten-caption"><span class="k-emoji">${p.emoji}</span></div>`;
+    k.innerHTML=`<img class="asset-img" src="${p.src}" alt="${esc(p.alt)}" loading="lazy" decoding="async">`;
     k.onclick=()=>m1Waehle(k);
     k.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); m1Waehle(k); } };
     pool.appendChild(k);
@@ -681,14 +896,14 @@ function m1Ablegen(ziel, recht){
     ziel.querySelector('.slot').innerHTML=`<img class="slot-img" src="${img.getAttribute('src')}" alt="">`;
     ziel.classList.add('ok');
     m1Auswahl.remove(); m1Auswahl=null; m1Gesetzt++; ergebnisse.m1.richtig++;
-    fb.className='feedback gut'; fb.textContent='Richtig! 👍';
+    fb.className='feedback gut'; fb.textContent='Richtig!';
     if(m1Gesetzt===m1AktuelleItems().length){
       const letzte = m1Runde===m1Runden()-1;
-      fb.textContent = letzte ? 'Super – alle 12 Rechte richtig zugeordnet! 🎉' : 'Runde geschafft! 🎉';
+      fb.textContent = letzte ? 'Super, alle 12 Rechte sind richtig zugeordnet!' : 'Runde geschafft!';
       document.getElementById('m1Weiter').style.display='flex';
       const btn=document.getElementById('m1WeiterBtn');
-      if(letzte){ btn.textContent='Geschafft! Zur Weltkarte ▶'; btn.onclick=()=>modulFertig('m1'); }
-      else { btn.textContent='Nächste Runde ▶'; btn.onclick=()=>{ m1Runde++; renderM1(); }; }
+      if(letzte){ btn.textContent='Geschafft! Zur Weltkarte'; btn.onclick=()=>modulFertig('m1'); }
+      else { btn.textContent='Nächste Runde'; btn.onclick=()=>{ m1Runde++; renderM1(); }; }
     }
   } else {
     ergebnisse.m1.falsch++;
@@ -737,6 +952,8 @@ function spielStart(){
   document.getElementById('m2StartOverlay').classList.add('hidden');
   document.getElementById('m2Frage').classList.add('hidden');
   document.getElementById('m2Ergebnis').classList.add('hidden');
+  document.getElementById('m2Schatz').classList.remove('zeigen');
+  document.getElementById('m2Schatz').innerHTML='';
   document.getElementById('m2Pause').textContent='⏸ Pause';
   welt=0; gewonnen=false; pausiert=false; warteAufFrage=false;
   unverwundbar=0; coyote=0; halten=false; gesammelt=[]; popups=[]; partikel=[];
@@ -755,6 +972,8 @@ function spielBereit(){
   document.getElementById('m2StartOverlay').classList.remove('hidden');
   document.getElementById('m2Frage').classList.add('hidden');
   document.getElementById('m2Ergebnis').classList.add('hidden');
+  document.getElementById('m2Schatz').classList.remove('zeigen');
+  document.getElementById('m2Schatz').innerHTML='';
   document.getElementById('m2Pause').textContent='⏸ Pause';
   welt=0; gewonnen=false; pausiert=true; warteAufFrage=false;
   unverwundbar=0; coyote=0; halten=false; gesammelt=[]; popups=[]; partikel=[];
@@ -1016,25 +1235,51 @@ function frageAntwort(i,q,btn,box){
   box.appendChild(w);
 }
 
-// Ergebnis-Bildschirm: gesammelt vs. verpasst
+// Die Truhe öffnet den Rechte-Kompass: Spielhandlung und Lebenswelt werden verbunden.
 function gewinne(){
   gewonnen=true; warteAufFrage=false; spielStop();
   ergebnisse.m2.gesammelt = gesammelt.map(idx=>M2_RECHTE[idx].name);
   zeichne();
-  let liste='';
-  M2_RECHTE.forEach((r,idx)=>{
-    const ok=gesammelt.includes(idx);
-    liste+=`<div class="zeile"><span>${r.emoji} ${r.name}</span><span>${ok?'✅ gesammelt':'❌ verpasst'}</span></div>`;
-  });
   const el=document.getElementById('m2Ergebnis');
-  el.innerHTML=`<h3>🎉 Ziel erreicht!</h3>
+  el.innerHTML=`<div class="schatz-reveal" aria-hidden="true">✨🧭✨</div>
+    <h3>Die Truhe ist offen: der Rechte-Kompass!</h3>
     <p>Du hast <b>${gesammelt.length} von 5</b> Rechten eingesammelt.</p>
-    <div class="erg-liste">${liste}</div>
-    <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:4px">
-      <button class="btn sekundaer" onclick="spielStart()">↻ Nochmal (alle sammeln)</button>
-      <button class="btn gruen" onclick="modulFertig('m2')">Weiter ▶</button>
-    </div>`;
+    <p style="max-width:520px">Im Spiel trainierst du, Kinderrechte zu erkennen und nicht zu übersehen.
+       Im echten Leben braucht jedes Recht Menschen, die hinschauen und es schützen.</p>
+    <button class="btn gruen" onclick="zeigeM2Schatz()">Rechte-Kompass ansehen ▶</button>`;
   el.classList.remove('hidden');
+}
+
+function zeigeM2Schatz(){
+  document.getElementById('m2Ergebnis').classList.add('hidden');
+  const verpasst=M2_RECHTE.length-gesammelt.length;
+  const folgen=M2_RECHTE.map((r,idx)=>{
+    const ok=gesammelt.includes(idx);
+    return `<article class="rechte-folge">
+      <img src="${r.src}" alt="${esc(r.alt)}" loading="lazy" decoding="async">
+      <div>
+        <span class="recht-status ${ok?'gesammelt':'verpasst'}">${ok?'Im Spiel gesammelt':'Im Spiel verpasst'}</span>
+        <h4>Recht auf ${r.name}</h4>
+        <p><b>Wenn es geschützt wird:</b> ${r.positiv}</p>
+        <p><b>Wenn es nicht geschützt wird:</b> ${r.folge}</p>
+      </div>
+    </article>`;
+  }).join('');
+  const el=document.getElementById('m2Schatz');
+  el.innerHTML=`<div class="schatz-kopf">
+      <div style="font-size:2.5rem" aria-hidden="true">🧭</div>
+      <h3 style="color:var(--blau-d); margin:.2rem 0">Dein Rechte-Kompass</h3>
+      <p><b>Wichtig:</b> Auch ein im Spiel verpasstes Recht gilt weiterhin für jedes Kind.
+         Wird ein Recht im echten Leben aber nicht beachtet und geschützt, hat das Folgen.</p>
+      ${verpasst?`<p>Du hast ${verpasst} ${verpasst===1?'Recht':'Rechte'} verpasst. Schau dir besonders diese Folgen an.</p>`:'<p>Du hast alle Rechte gesammelt. Prüfe trotzdem, was ohne ihren Schutz passieren könnte.</p>'}
+    </div>
+    <div class="rechte-folgen">${folgen}</div>
+    <div class="weiter-row">
+      <button class="btn sekundaer" onclick="spielStart()">↻ Noch einmal spielen</button>
+      <button class="btn gruen" onclick="modulFertig('m2')">Weiter zur Weltkarte ▶</button>
+    </div>`;
+  el.classList.add('zeigen');
+  setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),50);
 }
 
 /* =========================================================
@@ -1073,21 +1318,37 @@ function m3Weiter(){
 /* =========================================================
    MODUL 4 – ABSCHLUSS (Variante B) + Reflexion + Urkunde
    ========================================================= */
-let m4Recht=null, m4Grund=null;
-function startM4(){ zeige('screen-m4'); m4Recht=null; m4Grund=null; renderM4(); }
+let m4Recht=null, m4Grund=null, m4Aktion=null, missionSchritt=0;
+function startM4(){
+  zeige('screen-m4');
+  if(fortschritt.m4 && ergebnisse.m4.mission){
+    m4Recht=ergebnisse.m4.recht;
+    m4Grund=ergebnisse.m4.grund;
+    m4Aktion=ergebnisse.m4.aktion;
+    zeigeUrkunde();
+    return;
+  }
+  m4Recht=null; m4Grund=null; m4Aktion=null; missionSchritt=0;
+  ergebnisse.m4.mission=false;
+  renderM4();
+}
 function renderM4(){
   document.getElementById('m4Box').innerHTML=`
     <div class="bild-frame story-frame"><img class="asset-img" src="assets/img/abschluss-kinder-zaehlen.webp" alt="Viele Kinder halten gemeinsam eine leuchtende Weltkugel." loading="lazy" decoding="async"></div>
     <h2 style="color:var(--blau-d); margin-top:16px">Kinder zählen</h2>
-    <p><b>Jesus</b> waren Kinder wichtig. <b>Heute</b> schützt die <b>UN-Kinderrechtskonvention</b> die Kinder.
+    <p class="typewriter-intro" data-typewriter-key="abschluss-einfuehrung"><b>Jesus</b> waren Kinder wichtig. <b>Heute</b> schützt die <b>UN-Kinderrechtskonvention</b> die Kinder.
        Beides sagt auf seine Weise: <b>Kinder zählen.</b></p>
 
-    <h3 style="color:var(--blau-d)">Denk selbst nach</h3>
-    <p><b>1. Welches Recht ist dir am wichtigsten?</b></p>
+    <h3 style="color:var(--blau-d)">Dein persönlicher Rechte-Kompass</h3>
+    <p><b>1. Welches Recht ist DIR am wichtigsten?</b></p>
     <div class="wahl-grid" id="m4Rechte"></div>
-    <div id="m4Schritt2" style="display:none">
+    <div class="m4-schritt" id="m4Schritt2" style="display:none">
       <p><b>2. Warum ist dir dieses Recht wichtig?</b></p>
       <div class="wahl-grid" id="m4Gruende"></div>
+    </div>
+    <div class="m4-schritt" id="m4Schritt3" style="display:none">
+      <p><b>3. Was willst DU tun, damit Kinderrechte stark werden?</b></p>
+      <div class="wahl-grid" id="m4Aktionen"></div>
     </div>
     <div id="m4Ergebnis"></div>`;
 
@@ -1100,8 +1361,18 @@ function renderM4(){
   const gg=document.getElementById('m4Gruende');
   M4_GRUENDE.forEach(g=>{
     const b=document.createElement('button'); b.className='wahl'; b.textContent=g;
-    b.onclick=()=>{ m4Grund=g; markiere('m4Gruende',b); pruefeM4(); };
+    b.onclick=()=>{
+      m4Grund=g; markiere('m4Gruende',b);
+      document.getElementById('m4Schritt3').style.display='block';
+      pruefeM4();
+    };
     gg.appendChild(b);
+  });
+  const ag=document.getElementById('m4Aktionen');
+  M4_AKTIONEN.forEach(a=>{
+    const b=document.createElement('button'); b.className='wahl'; b.textContent=a;
+    b.onclick=()=>{ m4Aktion=a; markiere('m4Aktionen',b); pruefeM4(); };
+    ag.appendChild(b);
   });
 }
 function markiere(containerId, btn){
@@ -1109,47 +1380,253 @@ function markiere(containerId, btn){
   btn.classList.add('aktiv');
 }
 function pruefeM4(){
-  if(m4Recht && m4Grund){
-    ergebnisse.m4.recht=m4Recht; ergebnisse.m4.grund=m4Grund;
-    document.getElementById('m4Ergebnis').innerHTML=`
-      <div class="fussnote">Dein Ergebnis: Dir ist das <b>Recht auf ${m4Recht}</b> am wichtigsten –
-         <i>${m4Grund}</i></div>
-      <div class="weiter-row"><button class="btn gruen" onclick="zeigeUrkunde()">🏆 Urkunde erhalten</button></div>`;
+  if(!m4Recht || !m4Grund || !m4Aktion) return;
+  ergebnisse.m4.recht=m4Recht;
+  ergebnisse.m4.grund=m4Grund;
+  ergebnisse.m4.aktion=m4Aktion;
+  ergebnisse.m4.mission=false;
+  missionSchritt=0;
+  document.getElementById('m4Ergebnis').innerHTML=`
+    <section class="dein-ergebnis" aria-labelledby="deinErgebnisTitel">
+      <p class="kicker">DEIN ERGEBNIS</p>
+      <h3 id="deinErgebnisTitel">DAS IST DIR WICHTIG!</h3>
+      <div class="herzensrecht">Recht auf ${m4Recht}</div>
+      <div class="ergebnis-details">
+        <p><b>Dein Warum:</b> ${m4Grund}</p>
+        <p><b>Deine eigene Mission:</b> ${m4Aktion}</p>
+      </div>
+    </section>
+    <section class="mission" aria-labelledby="missionTitel">
+      <div class="fortschritt" id="missionStatus">Urkunde noch gesperrt</div>
+      <h3 id="missionTitel">Aktiviere deinen Rechte-Kompass</h3>
+      <p>Ein wichtiges Recht braucht Menschen, die handeln. Tippe die drei Schritte der Reihe nach an.</p>
+      <div class="mission-leiste" aria-hidden="true"><div class="mission-fuellung" id="missionFuellung"></div></div>
+      <div class="mission-stufen">
+        <button class="mission-btn" onclick="missionAktivieren(0,this)"><span class="mission-nr">1</span>HINSEHEN</button>
+        <button class="mission-btn" onclick="missionAktivieren(1,this)" disabled><span class="mission-nr">2</span>ZUHÖREN UND REDEN</button>
+        <button class="mission-btn" onclick="missionAktivieren(2,this)" disabled><span class="mission-nr">3</span>HILFE HOLEN</button>
+      </div>
+      <div class="mission-fertig" id="missionFertig" aria-live="polite">
+        <p><b>Dein Rechte-Kompass ist vollständig aktiviert.</b><br>Du weißt jetzt: Kinderrechte werden stark, wenn Menschen hinschauen und handeln.</p>
+        <button class="btn gruen" onclick="zeigeUrkunde()">Urkunde freischalten</button>
+      </div>
+    </section>`;
+  setTimeout(()=>document.getElementById('m4Ergebnis').scrollIntoView({behavior:'smooth',block:'start'}),50);
+}
+function missionAktivieren(index,btn){
+  if(index!==missionSchritt) return;
+  btn.classList.add('aktiv'); btn.disabled=true;
+  missionSchritt++;
+  document.getElementById('missionFuellung').style.width=(missionSchritt/3*100)+'%';
+  const buttons=[...document.querySelectorAll('.mission-btn')];
+  if(missionSchritt<buttons.length){
+    buttons[missionSchritt].disabled=false;
+    buttons[missionSchritt].focus();
+  } else {
+    ergebnisse.m4.mission=true;
+    document.getElementById('missionStatus').textContent='Urkunde bereit';
+    document.getElementById('missionFertig').classList.add('zeigen');
   }
 }
 function zeigeUrkunde(){
+  if(!ergebnisse.m4.mission) return;
   fortschritt.m4=true; ergebnisse.m4.status='erledigt';
   const heute=new Date().toLocaleDateString('de-DE');
   document.getElementById('m4Box').innerHTML=`
     <div class="urkunde">
-      <div style="font-size:2.4rem">🏆</div>
-      <h2>Urkunde</h2>
-      <p>Diese Urkunde bestätigt die erfolgreiche</p>
-      <div class="name">Reise durch die Kinderrechte</div>
-      <p>Alle <b>12 UN-Kinderrechte</b> wurden auf ${genitiv(figur.name)} Weltreise<br>rund um die Welt kennengelernt.</p>
-      <p style="margin-top:14px">🌍 <i>Kinder zählen.</i></p>
-      <p style="font-size:.85rem; color:#7a8894">${heute}</p>
+      <div class="urkunde-rahmen">
+        <div class="urkunde-banner"><img src="assets/img/urkunde-kinderrechte.webp" alt="Kinder feiern gemeinsam mit einer Weltkugel und einem goldenen Kompass." decoding="async"></div>
+        <div class="urkunde-inhalt">
+          <div class="urkunde-kicker">WELTREISE GESCHAFFT</div>
+          <h2>Urkunde der Kinderrechte</h2>
+          <p>Diese Urkunde bestätigt die erfolgreiche</p>
+          <div class="name">Reise durch die Kinderrechte</div>
+          <p>Du hast alle Stationen der Weltreise geschafft, <b>12 Kinderrechte</b> kennengelernt<br>und deinen persönlichen Rechte-Kompass aktiviert.</p>
+          <div class="urkunde-herzensrecht">Das ist dir wichtig: Recht auf ${m4Recht}</div>
+          <p><b>Deine Mission:</b> ${m4Aktion}</p>
+          <p><i>Kinder zählen. Deine Stimme auch.</i></p>
+          <p class="urkunde-datum">${heute}</p>
+        </div>
+      </div>
     </div>
-    <div class="noprint">
-      <div class="weiter-row" style="margin-top:18px">
-        <button class="btn" onclick="protokollDownload()">📄 Ergebnisse als Datei speichern</button>
-        <button class="btn sekundaer" onclick="zurKarte()">Zur Reisekarte ▶</button>
+    <section class="abgabe-mission noprint" aria-labelledby="abgabeTitel">
+      <div class="abgabe-kicker">DEINE LETZTE MISSION</div>
+      <h3 id="abgabeTitel">Eine Sache musst du noch machen: Gib dein Ergebnis ab.</h3>
+      <p>Gehe die vier Schritte der Reihe nach durch und hake jeden erledigten Schritt an.</p>
+      <div class="abgabe-checkliste">
+        <div class="checkschritt">
+          <input type="checkbox" id="abgabe1" onchange="aktualisiereAbgabeCheckliste()">
+          <label for="abgabe1"><strong>Ergebnis-Datei speichern</strong><small>Die Datei heißt Kinderrechte_Ergebnis_…&#8203;.txt.</small></label>
+          <button class="btn klein" onclick="protokollDownload()">Datei speichern</button>
+        </div>
+        <div class="checkschritt">
+          <input type="checkbox" id="abgabe2" onchange="aktualisiereAbgabeCheckliste()">
+          <label for="abgabe2"><strong>Teams öffnen</strong><small>Öffne deinen Kurs, dann Aufgaben und die Aufgabe deiner Lehrkraft.</small></label>
+        </div>
+        <div class="checkschritt">
+          <input type="checkbox" id="abgabe3" onchange="aktualisiereAbgabeCheckliste()">
+          <label for="abgabe3"><strong>Datei hinzufügen</strong><small>Tippe auf Arbeit hinzufügen, dann Von diesem Gerät und wähle deine TXT-Datei.</small></label>
+        </div>
+        <div class="checkschritt">
+          <input type="checkbox" id="abgabe4" onchange="aktualisiereAbgabeCheckliste()">
+          <label for="abgabe4"><strong>Abgeben</strong><small>Tippe in Teams ganz zum Schluss auf Abgeben.</small></label>
+        </div>
       </div>
-      <div class="teams-box">
-        <h4>📤 So gibst du deine Ergebnis-Datei in Teams ab</h4>
-        <ol>
-          <li>Tippe oben auf <b>„Ergebnisse als Datei speichern"</b>. Es wird eine Datei
-              <b>Kinderrechte_Ergebnis_…&#8203;.txt</b> heruntergeladen (meist in den Ordner <i>Downloads</i>).</li>
-          <li>Öffne in <b>Microsoft Teams</b> deinen Kurs und dort links <b>Aufgaben</b>.</li>
-          <li>Öffne die passende <b>Aufgabe</b> deiner Lehrkraft.</li>
-          <li>Klicke auf <b>„Arbeit hinzufügen"</b> bzw. <b>„+ Anlage hinzufügen"</b> und dann <b>„Von diesem Gerät"</b>.</li>
-          <li>Wähle die heruntergeladene <b>.txt-Datei</b> aus.</li>
-          <li>Klicke zum Schluss auf <b>„Abgeben"</b> (bzw. „Zur Bewertung abgeben"). Fertig! ✅</li>
-        </ol>
-      </div>
-      <p class="datenschutz" style="text-align:center">🔒 Die Datei entsteht nur auf deinem Gerät. Es werden keine Daten automatisch gespeichert oder gesendet.</p>
+      <div class="abgabe-status" id="abgabeStatus" aria-live="polite">Noch 4 Schritte, dann ist deine Reise wirklich abgeschlossen.</div>
+      <p class="datenschutz">Die Datei entsteht nur auf deinem Gerät. Es werden keine Daten automatisch gespeichert oder gesendet.</p>
+    </section>
+    <div class="weiter-row noprint">
+      <button class="btn" onclick="zeigeBonus()">Bonuswerkstatt für Schnelle</button>
+      <button class="btn sekundaer" onclick="zurKarte()">Zur Reisekarte</button>
     </div>`;
 }
+
+function aktualisiereAbgabeCheckliste(){
+  const checks=[1,2,3,4].map(i=>document.getElementById('abgabe'+i)).filter(Boolean);
+  const erledigt=checks.filter(c=>c.checked).length;
+  const offen=checks.length-erledigt;
+  const status=document.getElementById('abgabeStatus');
+  if(!status) return;
+  status.classList.toggle('fertig',offen===0);
+  status.textContent=offen===0
+    ? 'Alles erledigt. Deine Ergebnis-Datei ist abgegeben!'
+    : `Noch ${offen} ${offen===1?'Schritt':'Schritte'}, dann ist deine Reise wirklich abgeschlossen.`;
+}
+
+function zeigeBonus(){
+  zeige('screen-bonus');
+  document.getElementById('bonusSuchsel').style.display='block';
+  document.getElementById('fallwerkstatt').classList.remove('zeigen');
+  renderSuchsel();
+}
+
+/* Freiwilliges Suchsel. Es schreibt bewusst nichts in das Ergebnis-Protokoll. */
+const SUCHSEL_WOERTER=[
+  {wort:'GLEICHHEIT',label:'Gleichheit',r:0,c:0,dr:0,dc:1},
+  {wort:'PRIVATSPHAERE',label:'Privatsphäre',r:1,c:0,dr:0,dc:1},
+  {wort:'ZUHAUSE',label:'Zuhause',r:2,c:0,dr:0,dc:1},
+  {wort:'GESUNDHEIT',label:'Gesundheit',r:2,c:13,dr:1,dc:0},
+  {wort:'BILDUNG',label:'Bildung',r:3,c:0,dr:1,dc:1},
+  {wort:'MEINUNG',label:'Meinung',r:4,c:8,dr:1,dc:0},
+  {wort:'FREIZEIT',label:'Freizeit',r:12,c:12,dr:0,dc:-1},
+  {wort:'SCHUTZ',label:'Schutz',r:13,c:0,dr:0,dc:1}
+];
+let suchselStart=null, suchselGefunden=new Set(), suchselFelder=[];
+function renderSuchsel(){
+  const N=14, alphabet='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const g=Array.from({length:N},()=>Array(N).fill(''));
+  SUCHSEL_WOERTER.forEach(e=>{
+    [...e.wort].forEach((ch,i)=>{ g[e.r+e.dr*i][e.c+e.dc*i]=ch; });
+  });
+  g.forEach(row=>row.forEach((ch,i)=>{ if(!ch) row[i]=alphabet[Math.floor(Math.random()*alphabet.length)]; }));
+  suchselStart=null; suchselGefunden=new Set(); suchselFelder=[];
+  const weiter=document.getElementById('suchselWeiter');
+  if(weiter) weiter.style.display='none';
+  const grid=document.getElementById('suchselGrid'); grid.innerHTML='';
+  g.forEach((row,r)=>row.forEach((ch,c)=>{
+    const b=document.createElement('button');
+    b.type='button'; b.className='suchsel-zelle'; b.textContent=ch;
+    b.setAttribute('aria-label',`Zeile ${r+1}, Spalte ${c+1}, Buchstabe ${ch}`);
+    b.onclick=()=>suchselWaehle(r,c);
+    grid.appendChild(b); suchselFelder.push(b);
+  }));
+  aktualisiereSuchselWoerter();
+}
+function suchselWaehle(r,c){
+  const feedback=document.getElementById('suchselFeedback');
+  if(!suchselStart){
+    suchselStart={r,c};
+    suchselFelder[r*14+c].classList.add('start');
+    feedback.textContent='Jetzt den letzten Buchstaben des Wortes wählen.';
+    return;
+  }
+  const a=suchselStart, passt=SUCHSEL_WOERTER.find(e=>{
+    const ende={r:e.r+e.dr*(e.wort.length-1),c:e.c+e.dc*(e.wort.length-1)};
+    return (a.r===e.r&&a.c===e.c&&r===ende.r&&c===ende.c) ||
+           (r===e.r&&c===e.c&&a.r===ende.r&&a.c===ende.c);
+  });
+  suchselFelder[a.r*14+a.c].classList.remove('start');
+  if(passt){
+    suchselGefunden.add(passt.wort);
+    [...passt.wort].forEach((_,i)=>suchselFelder[(passt.r+passt.dr*i)*14+passt.c+passt.dc*i].classList.add('gefunden'));
+    feedback.textContent=suchselGefunden.size===SUCHSEL_WOERTER.length
+      ? 'Alle Kinderrechte gefunden. Stark beobachtet!'
+      : `${passt.label} gefunden! Wähle den Anfang des nächsten Wortes.`;
+    if(suchselGefunden.size===SUCHSEL_WOERTER.length){
+      const weiter=document.getElementById('suchselWeiter');
+      if(weiter) weiter.style.display='flex';
+    }
+    aktualisiereSuchselWoerter();
+  } else {
+    feedback.textContent='Das war noch keines der gesuchten Wörter. Versuche es erneut.';
+  }
+  suchselStart=null;
+}
+function aktualisiereSuchselWoerter(){
+  const el=document.getElementById('suchselWoerter'); el.innerHTML='';
+  SUCHSEL_WOERTER.forEach(e=>{
+    const d=document.createElement('div');
+    d.className='suchsel-wort'+(suchselGefunden.has(e.wort)?' gefunden':'');
+    d.textContent=(suchselGefunden.has(e.wort)?'✓ ':'')+e.label;
+    el.appendChild(d);
+  });
+}
+
+/* Zweite freiwillige Stufe: zwölf Fälle, ebenfalls ohne Eintrag ins Protokoll. */
+let bonusFallIdx=0, bonusRichtig=0, bonusReihe=[];
+function starteFallwerkstatt(){
+  document.getElementById('bonusSuchsel').style.display='none';
+  document.getElementById('fallwerkstatt').classList.add('zeigen');
+  bonusFallIdx=0; bonusRichtig=0; bonusReihe=mische([...BONUS_FAELLE]);
+  renderBonusFall();
+  setTimeout(()=>document.getElementById('fallwerkstatt').scrollIntoView({behavior:'smooth',block:'start'}),50);
+}
+function renderBonusFall(){
+  const fort=document.getElementById('fallFortschritt');
+  const inhalt=document.getElementById('fallInhalt');
+  if(bonusFallIdx>=bonusReihe.length){
+    fort.textContent='Fallwerkstatt abgeschlossen';
+    inhalt.innerHTML=`<div class="bonus-abschluss">
+      <div class="zahl">${bonusRichtig} von ${bonusReihe.length} richtig</div>
+      <p>Du hast die Kinderrechte in vielen Alltagssituationen geprüft und begründet.</p>
+      <div class="weiter-row">
+        <button class="btn" onclick="starteFallwerkstatt()">Fallwerkstatt wiederholen</button>
+        <button class="btn sekundaer" onclick="startM4()">Zurück zur Urkunde</button>
+      </div>
+    </div>`;
+    return;
+  }
+  const item=bonusReihe[bonusFallIdx];
+  fort.textContent=`Fall ${bonusFallIdx+1} von ${bonusReihe.length} · ${bonusRichtig} richtig`;
+  inhalt.innerHTML=`<div class="fall-situation">${item.fall}</div>
+    <div class="fall-antworten" id="fallAntworten"></div>
+    <div class="fall-feedback" id="fallFeedback" aria-live="polite"></div>
+    <div class="weiter-row"><button class="btn gruen" id="fallWeiter" style="display:none" onclick="bonusFallWeiter()">Nächster Fall</button></div>`;
+  const antworten=document.getElementById('fallAntworten');
+  mische([...item.optionen]).forEach(option=>{
+    const b=document.createElement('button');
+    b.className='fall-antwort'; b.textContent=option; b.dataset.recht=option;
+    b.onclick=()=>bonusFallAntwort(option,b);
+    antworten.appendChild(b);
+  });
+}
+function bonusFallAntwort(wahl,btn){
+  const item=bonusReihe[bonusFallIdx];
+  const richtig=wahl===item.recht;
+  if(richtig) bonusRichtig++;
+  document.querySelectorAll('.fall-antwort').forEach(b=>{
+    b.disabled=true;
+    if(b.dataset.recht===item.recht) b.classList.add('richtig');
+  });
+  if(!richtig) btn.classList.add('falsch');
+  const feedback=document.getElementById('fallFeedback');
+  feedback.classList.add('zeigen');
+  feedback.innerHTML=`<b>${richtig?'Richtig!':'Noch nicht ganz.'}</b> Gesucht war <b>${item.recht}</b>.<br>${item.erklaerung}`;
+  const weiter=document.getElementById('fallWeiter');
+  weiter.style.display='inline-block';
+  if(bonusFallIdx===bonusReihe.length-1) weiter.textContent='Auswertung ansehen';
+}
+function bonusFallWeiter(){ bonusFallIdx++; renderBonusFall(); }
 
 /* Ergebnis-Protokoll als .txt */
 function statusText(s){ return s==='erledigt' ? 'erledigt ✓' : 'nicht abgeschlossen'; }
@@ -1181,6 +1658,7 @@ function protokollText(){
   L.push('  Status: '+statusText(e.m4.status));
   L.push('  Wichtigstes Recht: '+(e.m4.recht||'-'));
   L.push('  Begründung:        '+(e.m4.grund||'-'));
+  L.push('  Eigene Mission:    '+(e.m4.aktion||'-'));
   L.push('');
   L.push('----------------------------------------------------');
   L.push('Erstellt mit dem Lernspiel "Kinderrechte – Weltreise".');
@@ -1194,18 +1672,113 @@ function protokollDownload(){
   const a=document.createElement('a');
   a.href=url; a.download='Kinderrechte_Ergebnis_'+stamp+'.txt';
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  const downloadCheck=document.getElementById('abgabe1');
+  if(downloadCheck){ downloadCheck.checked=true; aktualisiereAbgabeCheckliste(); }
   setTimeout(()=>URL.revokeObjectURL(url),1500);
 }
 
 /* =========================================================
    HILFSFUNKTION
    ========================================================= */
+const typewriterGesehen=new Set();
+const warten=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+
+async function schreibeNode(ziel, quelle, steuerung){
+  if(steuerung.skip) return false;
+  if(quelle.nodeType===Node.TEXT_NODE){
+    const out=document.createTextNode(''); ziel.appendChild(out);
+    for(const ch of quelle.textContent){
+      if(steuerung.skip) return false;
+      out.textContent+=ch;
+      if(/\s/.test(ch)) continue;
+      const pause=/[.!?]/.test(ch)?200:/[,;:]/.test(ch)?100:48;
+      await warten(pause);
+    }
+    return true;
+  }
+  if(quelle.nodeType!==Node.ELEMENT_NODE) return true;
+  const out=quelle.cloneNode(false); ziel.appendChild(out);
+  for(const kind of quelle.childNodes){
+    if(!await schreibeNode(out,kind,steuerung)) return false;
+  }
+  return true;
+}
+
+async function starteTypewriter(screenId){
+  const screen=document.getElementById(screenId);
+  if(!screen || screen.dataset.typingRunning==='1') return;
+  const texte=[...screen.querySelectorAll('.typewriter-intro')].filter((el,index)=>{
+    const key=el.dataset.typewriterKey||`${screenId}-${index}`;
+    el.dataset.typewriterKey=key;
+    if(!el.dataset.typewriterHtml) el.dataset.typewriterHtml=el.innerHTML;
+    if(typewriterGesehen.has(key)){
+      el.innerHTML=el.dataset.typewriterHtml;
+      return false;
+    }
+    return true;
+  });
+  if(!texte.length) return;
+
+  screen.dataset.typingRunning='1';
+  screen.classList.add('is-typing');
+  screen.setAttribute('aria-busy','true');
+  const steuerung={skip:false};
+  const skipRow=document.createElement('div');
+  skipRow.className='typewriter-skip-row';
+  const skipBtn=document.createElement('button');
+  skipBtn.type='button'; skipBtn.className='btn sekundaer klein typewriter-skip';
+  skipBtn.textContent='Ich bin schon fertig mit Lesen';
+  skipBtn.onclick=()=>{ steuerung.skip=true; };
+  skipRow.appendChild(skipBtn);
+  texte[texte.length-1].insertAdjacentElement('afterend',skipRow);
+
+  const controls=[...screen.querySelectorAll('button,select,[role="button"]')].filter(x=>x!==skipBtn);
+  controls.forEach(control=>{
+    if('disabled' in control){
+      control.dataset.vorherDisabled=control.disabled?'1':'0';
+      control.disabled=true;
+    } else {
+      control.dataset.vorherTabindex=String(control.tabIndex);
+      control.tabIndex=-1;
+    }
+  });
+
+  for(const el of texte){
+    const key=el.dataset.typewriterKey;
+    typewriterGesehen.add(key);
+    const template=document.createElement('template');
+    template.innerHTML=el.dataset.typewriterHtml;
+    el.innerHTML=''; el.classList.add('typing');
+    for(const node of template.content.childNodes){
+      if(!await schreibeNode(el,node,steuerung)) break;
+    }
+    if(steuerung.skip) el.innerHTML=el.dataset.typewriterHtml;
+    el.classList.remove('typing');
+  }
+
+  skipRow.remove();
+  controls.forEach(control=>{
+    if('disabled' in control){
+      control.disabled=control.dataset.vorherDisabled==='1';
+      delete control.dataset.vorherDisabled;
+    } else {
+      control.tabIndex=Number(control.dataset.vorherTabindex||0);
+      delete control.dataset.vorherTabindex;
+    }
+  });
+  screen.classList.remove('is-typing');
+  screen.removeAttribute('aria-busy');
+  delete screen.dataset.typingRunning;
+}
+
 function esc(text){
   return String(text).replace(/[&<>"']/g, ch=>({
     '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
   }[ch]));
 }
 function mische(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+window.addEventListener('DOMContentLoaded',()=>starteTypewriter('screen-start'));
 </script>
 </body>
 </html>
