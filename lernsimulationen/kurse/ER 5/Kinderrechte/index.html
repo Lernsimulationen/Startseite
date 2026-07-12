@@ -63,6 +63,21 @@
     background:#eef6fc; box-shadow:0 4px 12px rgba(36,55,70,.09);
   }
   .story-frame{aspect-ratio:16/9}
+  .avatar-dialog{
+    display:grid; grid-template-columns:68px minmax(0,1fr); gap:12px; align-items:center;
+    margin:14px 0; padding:12px 14px; background:#fffaf0; border-left:6px solid var(--gelb);
+  }
+  .avatar-dialog img{width:68px; height:68px; object-fit:cover; object-position:center 18%; border-radius:50%; border:3px solid #fff; box-shadow:0 2px 8px rgba(36,55,70,.16)}
+  .avatar-dialog strong{display:block; color:var(--blau-d); margin-bottom:2px}
+  .avatar-dialog p{margin:0}
+  .avatar-dialog.gut{background:#eefaf1; border-color:var(--gruen)}
+  .avatar-dialog.achtung{background:#fff3ef; border-color:var(--koralle)}
+  .avatar-dialog.verzoegert{display:none}
+  .avatar-dialog.verzoegert.sichtbar{display:grid; animation:fade .25s ease}
+  @media(max-width:460px){
+    .avatar-dialog{grid-template-columns:52px minmax(0,1fr); padding:10px}
+    .avatar-dialog img{width:52px; height:52px}
+  }
   .typewriter-intro.typing::after{
     content:""; display:inline-block; width:2px; height:1em; margin-left:3px;
     vertical-align:-.12em; background:var(--blau); animation:cursorBlink .72s steps(1) infinite;
@@ -372,6 +387,7 @@
       <h2 style="color:var(--blau-d)">Deine Reise um die Welt ✈️</h2>
       <p class="aufgabe typewriter-intro">Du startest am Flughafen in <b>Deutschland</b> und fliegst Station für Station
          zu verschiedenen Kontinenten. Die Reihenfolge steht fest – du kannst keine Station überspringen.</p>
+      <div id="avatarMap"></div>
       <div class="reisekarte" id="reisekarte"></div>
       <div id="reiseZiel"></div>
     </div>
@@ -383,6 +399,7 @@
       <h2 style="color:var(--blau-d)">Station 1 – Rechte entdecken</h2>
       <p class="aufgabe typewriter-intro">Tippe zuerst ein <b>Bild</b> an. Tippe danach auf den passenden Platz beim <b>Recht</b>.
          In <b>3 Runden</b> ordnest du alle <b>12 Rechte</b> zu.</p>
+      <div id="m1Coach" aria-live="polite"></div>
       <div class="fortschritt" id="m1Fortschritt"></div>
       <div class="m1-grid">
         <div class="ziel-liste" id="m1Ziele"></div>
@@ -402,6 +419,7 @@
       <p class="aufgabe typewriter-intro"><b>Springen:</b> Leertaste / Pfeil ↑ / SPRINGEN-Button / aufs Spielfeld tippen.
          <b>Tipp:</b> Taste länger halten = höher springen. Sammle möglichst <b>alle 5 Rechte</b> ein.
          Reise durch Wiese, Stadt und Wüste bis zur Schatztruhe.</p>
+      <div id="m2Coach" aria-live="polite"></div>
       <div class="hud">
         <div>Gesammelte Rechte: <b><span id="m2Count">0</span> / 5</b></div>
         <div class="sammel" id="m2Sammel"></div>
@@ -439,6 +457,7 @@
       <h2 style="color:var(--blau-d)">Station 3 – Recht oder Wunsch? ⚖️</h2>
       <p class="aufgabe typewriter-intro">Ein <b>Recht</b> gilt für <b>alle</b> Kinder auf der Welt. Ein <b>Wunsch</b> ist etwas Persönliches.
          Entscheide bei jeder Karte.</p>
+      <div id="m3Coach" aria-live="polite"></div>
       <div class="fortschritt" id="m3Fortschritt"></div>
       <div class="card rw-karte" id="m3Karte" style="box-shadow:none; background:#f5f9fd"></div>
       <div class="rw-buttons">
@@ -465,6 +484,7 @@
         <h2>Die Kinderrechte-Bonuswerkstatt</h2>
         <p>Hier kannst du dein Wissen noch einmal ganz genau prüfen. Die Ergebnisse werden nicht im Protokoll gespeichert.</p>
       </div>
+      <div id="bonusCoach" aria-live="polite"></div>
       <section class="bonus-suchsel" id="bonusSuchsel" aria-labelledby="suchselTitel">
         <h3 id="suchselTitel">Stufe 1: Kinderrechte-Suchsel</h3>
         <p>Tippe den <b>ersten</b> und danach den <b>letzten Buchstaben</b> eines Wortes an.
@@ -519,6 +539,26 @@ const FIGUREN = [
 let figur = FIGUREN[0]; // Standard, bis gewählt wird
 let figurBild = new Image();
 figurBild.src=figur.src;
+
+const EINSTIEG_GUIDE = [
+  "Ich finde wichtig, dass Jesus die Kinder nicht weggeschickt, sondern ernst genommen hat.",
+  "Heute reichen freundliche Worte nicht aus. Rechte müssen für alle Kinder wirklich gelten.",
+  "Auf unserer Reise achte ich mit dir darauf, was jedes einzelne Recht im Alltag bedeutet."
+];
+
+function avatarDialogHtml(text,key='',ton=''){
+  const klasse='avatar-dialog'+(ton?' '+ton:'')+(key?' verzoegert':'');
+  const textKlasse=key?' class="typewriter-intro"':'';
+  const keyAttr=key?` data-typewriter-key="${esc(key)}"`:'';
+  return `<div class="${klasse}">
+    <img src="${figur.src}" alt="" loading="lazy" decoding="async">
+    <div><strong>${esc(figur.name)} begleitet dich:</strong><p${textKlasse}${keyAttr}>${esc(text)}</p></div>
+  </div>`;
+}
+function setAvatarDialog(id,text,ton=''){
+  const el=document.getElementById(id);
+  if(el) el.innerHTML=avatarDialogHtml(text,'',ton);
+}
 
 // EINSTIEG – 3 Szenen (Variante B: Jesus -> heute, ohne Vermischung)
 const EINSTIEG = [
@@ -714,6 +754,14 @@ function zurKarte(){ zeige('screen-map'); baueKarte(); }
 
 function baueKarte(){
   const done=reiseFortschritt();
+  const kartenTexte=[
+    "Unser erstes Ziel ist Afrika. Dort schauen wir uns Bilder genau an und entdecken Kinderrechte.",
+    "Die erste Station ist geschafft. In Asien werde ich im Hüpfspiel zu deiner sichtbaren Spielfigur.",
+    "Wir haben Rechte gesammelt. In Südamerika prüfen wir gemeinsam: Recht oder persönlicher Wunsch?",
+    "Nur noch eine Station. In Nordamerika zählt deine eigene Meinung zu den Kinderrechten.",
+    "Wir haben die ganze Reise geschafft. Dein persönlicher Rechte-Kompass zeigt, was dir wichtig ist."
+  ];
+  document.getElementById('avatarMap').innerHTML=avatarDialogHtml(kartenTexte[done],`karte-guide-${done}`,'gut');
   document.getElementById('reisekarte').innerHTML=reiseSvg(done);
   const zielEl=document.getElementById('reiseZiel');
   if(done>=MODUL_REIHE.length){
@@ -849,6 +897,7 @@ function renderEinstieg(){
     <div class="bild-frame story-frame"><img class="asset-img" src="${s.src}" alt="${esc(s.alt)}" loading="lazy" decoding="async"></div>
     <h2 style="color:var(--blau-d); margin-top:16px">${s.titel}</h2>
     <p class="typewriter-intro" data-typewriter-key="einstieg-${einstiegIdx}">${s.text}</p>
+    ${avatarDialogHtml(EINSTIEG_GUIDE[einstiegIdx],`einstieg-guide-${einstiegIdx}`)}
     <div class="fortschritt">Einstieg ${einstiegIdx+1} / ${EINSTIEG.length}</div>
     <div class="weiter-row">
       <button class="btn" onclick="${letzte?'zurKarte()':'einstiegWeiter()'}">${letzte?'Reise starten ▶':'Weiter ▶'}</button>
@@ -860,13 +909,13 @@ function einstiegWeiter(){ einstiegIdx++; renderEinstieg(); }
 /* =========================================================
    MODUL 1 – ZUORDNUNG (Tippen statt Ziehen: tablet-tauglich)
    ========================================================= */
-let m1Auswahl=null, m1Gesetzt=0, m1Runde=0;
+let m1Auswahl=null, m1Gesetzt=0, m1Runde=0, m1FehlerRunde=0;
 const M1_PRO_RUNDE=4;
 function m1Runden(){ return Math.ceil(M1.length/M1_PRO_RUNDE); }
 function m1AktuelleItems(){ return M1.slice(m1Runde*M1_PRO_RUNDE, m1Runde*M1_PRO_RUNDE+M1_PRO_RUNDE); }
 function startM1(){ zeige('screen-m1'); m1Runde=0; ergebnisse.m1.richtig=0; ergebnisse.m1.falsch=0; renderM1(); }
 function renderM1(){
-  m1Auswahl=null; m1Gesetzt=0;
+  m1Auswahl=null; m1Gesetzt=0; m1FehlerRunde=0;
   const items=m1AktuelleItems();
   document.getElementById('m1Fortschritt').textContent='Runde '+(m1Runde+1)+' von '+m1Runden();
   const ziele=document.getElementById('m1Ziele'); ziele.innerHTML='';
@@ -888,6 +937,7 @@ function renderM1(){
     pool.appendChild(k);
   });
   const fb=document.getElementById('m1Feedback'); fb.textContent=''; fb.className='feedback';
+  setAvatarDialog('m1Coach',`In Runde ${m1Runde+1} schaue ich zuerst: Wer handelt im Bild und was wird dabei geschützt?`);
   document.getElementById('m1Weiter').style.display='none';
 }
 function m1Waehle(k){
@@ -896,24 +946,34 @@ function m1Waehle(k){
 }
 function m1Ablegen(ziel, recht){
   const fb=document.getElementById('m1Feedback');
-  if(!m1Auswahl){ fb.className='feedback'; fb.textContent='Tippe zuerst ein Bild an.'; return; }
+  if(!m1Auswahl){
+    fb.className='feedback'; fb.textContent='Tippe zuerst ein Bild an.';
+    setAvatarDialog('m1Coach','Wähle zuerst ein Bild. Danach suchen wir gemeinsam den passenden Platz.','achtung');
+    return;
+  }
   if(m1Auswahl.dataset.recht===recht){
     const img=m1Auswahl.querySelector('img');
     ziel.querySelector('.slot').innerHTML=`<img class="slot-img" src="${img.getAttribute('src')}" alt="">`;
     ziel.classList.add('ok');
     m1Auswahl.remove(); m1Auswahl=null; m1Gesetzt++; ergebnisse.m1.richtig++;
     fb.className='feedback gut'; fb.textContent='Richtig!';
+    setAvatarDialog('m1Coach','Gut beobachtet. Du hast die Handlung im Bild mit dem passenden Recht verbunden.','gut');
     if(m1Gesetzt===m1AktuelleItems().length){
       const letzte = m1Runde===m1Runden()-1;
       fb.textContent = letzte ? 'Super, alle 12 Rechte sind richtig zugeordnet!' : 'Runde geschafft!';
+      setAvatarDialog('m1Coach',letzte?'Wir haben alle Bilder geprüft. Du erkennst jetzt viele Kinderrechte im Alltag.':`Runde ${m1Runde+1} ist geschafft. Ich begleite dich auch in die nächste Runde.`,'gut');
       document.getElementById('m1Weiter').style.display='flex';
       const btn=document.getElementById('m1WeiterBtn');
       if(letzte){ btn.textContent='Geschafft! Zur Weltkarte'; btn.onclick=()=>modulFertig('m1'); }
       else { btn.textContent='Nächste Runde'; btn.onclick=()=>{ m1Runde++; renderM1(); }; }
     }
   } else {
-    ergebnisse.m1.falsch++;
+    ergebnisse.m1.falsch++; m1FehlerRunde++;
     fb.className='feedback schlecht'; fb.textContent='Das passt noch nicht – versuch es noch einmal.';
+    const hinweis=m1FehlerRunde<2
+      ? 'Noch nicht. Beschreibe zuerst in einem Satz, was im Bild passiert, und lies dann die Rechte erneut.'
+      : 'Vergleiche besonders die Handlung und den geschützten Lebensbereich. Der Bildausschnitt allein kann täuschen.';
+    setAvatarDialog('m1Coach',hinweis,'achtung');
     m1Auswahl.classList.add('shake');
     setTimeout(()=>m1Auswahl&&m1Auswahl.classList.remove('shake'),400);
   }
@@ -966,6 +1026,7 @@ function spielStart(){
   spieler={x:100, y:GROUND-46, vy:0, boden:true};
   entitaeten=baueLevel();
   aktualisiereM2Hud();
+  setAvatarDialog('m2Coach','Jetzt bin ich deine Spielfigur. Hilf mir, aufmerksam zu springen und möglichst alle fünf Rechte mitzunehmen.');
   spielStop();
   spielLauf=requestAnimationFrame(spielLoop);
 }
@@ -986,6 +1047,7 @@ function spielBereit(){
   spieler={x:100, y:GROUND-46, vy:0, boden:true};
   entitaeten=baueLevel();
   aktualisiereM2Hud();
+  setAvatarDialog('m2Coach','Ich starte erst, wenn du bereit bist. Im Spiel erinnert jedes Sammelzeichen an ein Recht, das geschützt werden muss.');
   zeichne();
 }
 
@@ -1254,6 +1316,9 @@ function frageAntwort(i,q,btn,box){
 function gewinne(){
   gewonnen=true; warteAufFrage=false; spielStop();
   ergebnisse.m2.gesammelt = gesammelt.map(idx=>M2_RECHTE[idx].name);
+  setAvatarDialog('m2Coach',gesammelt.length===M2_RECHTE.length
+    ? 'Wir haben alle fünf Rechte erreicht. Jetzt prüfen wir, warum jedes davon im echten Leben wichtig ist.'
+    : `Wir haben ${gesammelt.length} von fünf Rechten erreicht. Die verpassten Rechte gelten trotzdem und brauchen genauso viel Schutz.`,'gut');
   zeichne();
   const el=document.getElementById('m2Ergebnis');
   el.innerHTML=`<div class="schatz-reveal" aria-hidden="true">✨🧭✨</div>
@@ -1270,6 +1335,7 @@ function gewinne(){
 
 function zeigeM2Schatz(){
   document.getElementById('m2Ergebnis').classList.add('hidden');
+  setAvatarDialog('m2Coach','Lies bei jedem Recht beide Seiten: Was wird möglich, wenn es geschützt wird, und was kann ohne Schutz passieren?');
   const verpasst=M2_RECHTE.length-gesammelt.length;
   const folgen=M2_RECHTE.map((r,idx)=>{
     const ok=gesammelt.includes(idx);
@@ -1312,6 +1378,7 @@ function renderM3(){
   const b=document.getElementById('m3Begruendung'); b.className='begruendung'; b.innerHTML='';
   document.getElementById('m3Next').style.display='none';
   document.querySelectorAll('.rw-buttons .btn').forEach(x=>x.disabled=false);
+  setAvatarDialog('m3Coach','Ich frage mich: Braucht jedes Kind auf der Welt das, oder ist es ein persönlicher Wunsch?');
 }
 function m3Antwort(wahl){
   const item=m3Reihe[m3Idx];
@@ -1323,6 +1390,9 @@ function m3Antwort(wahl){
   const kopf = richtig ? '<b style="color:var(--gruen)">Richtig! ✓</b>' : '<b style="color:var(--rot)">Nicht ganz.</b>';
   const loesung = item.typ==='recht' ? 'Das ist ein <b>Kinderrecht</b>.' : 'Das ist ein <b>persönlicher Wunsch</b>.';
   b.innerHTML=`${kopf} ${loesung}<br><br><b>Begründung:</b> ${item.b}`;
+  setAvatarDialog('m3Coach',richtig
+    ? 'Deine Entscheidung passt. Entscheidend ist, ob es für alle Kinder gelten und ihre Entwicklung schützen muss.'
+    : 'Gut, dass wir nachprüfen. Lies die Begründung und achte bei der nächsten Karte auf das Wort alle.',richtig?'gut':'achtung');
   const letzte = m3Idx===m3Reihe.length-1;
   const nx=document.getElementById('m3Next');
   nx.style.display='inline-block';
@@ -1356,6 +1426,7 @@ function renderM4(){
     <h2 style="color:var(--blau-d); margin-top:16px">Kinder zählen</h2>
     <p class="typewriter-intro" data-typewriter-key="abschluss-einfuehrung"><b>Jesus</b> waren Kinder wichtig. <b>Heute</b> schützt die <b>UN-Kinderrechtskonvention</b> die Kinder.
        Beides sagt auf seine Weise: <b>Kinder zählen.</b></p>
+    ${avatarDialogHtml('Jetzt entscheide nicht für mich, sondern für dich: Welches Recht berührt dich besonders und was willst du dafür tun?','abschluss-guide')}
 
     <h3 style="color:var(--blau-d)">Dein persönlicher Rechte-Kompass</h3>
     <p><b>1. Welches Recht ist DIR am wichtigsten?</b></p>
@@ -1405,6 +1476,7 @@ function pruefeM4(){
   ergebnisse.m4.mission=false;
   missionSchritt=0;
   document.getElementById('m4Ergebnis').innerHTML=`
+    ${avatarDialogHtml(`Ich habe dich begleitet. Deine Entscheidung zeigt jetzt, was dir selbst wichtig ist: ${m4Recht}.`,'','gut')}
     <section class="dein-ergebnis" aria-labelledby="deinErgebnisTitel">
       <p class="kicker">DEIN ERGEBNIS</p>
       <h3 id="deinErgebnisTitel">DAS IST DIR WICHTIG!</h3>
@@ -1513,6 +1585,7 @@ function aktualisiereAbgabeCheckliste(){
 
 function zeigeBonus(){
   zeige('screen-bonus');
+  setAvatarDialog('bonusCoach','Ich bleibe bei dir: Erst suchen wir wichtige Begriffe, danach lösen wir gemeinsam zwölf Fälle.');
   document.getElementById('bonusSuchsel').style.display='block';
   document.getElementById('fallwerkstatt').classList.remove('zeigen');
   renderSuchsel();
@@ -1573,10 +1646,14 @@ function suchselWaehle(r,c){
     if(suchselGefunden.size===SUCHSEL_WOERTER.length){
       const weiter=document.getElementById('suchselWeiter');
       if(weiter) weiter.style.display='flex';
+      setAvatarDialog('bonusCoach','Alle Begriffe sind gefunden. Jetzt können wir in der Fallwerkstatt prüfen, ob du die Rechte auch in Situationen erkennst.','gut');
+    } else {
+      setAvatarDialog('bonusCoach',`${passt.label} ist gefunden. Es fehlen noch ${SUCHSEL_WOERTER.length-suchselGefunden.size} Begriffe.`,'gut');
     }
     aktualisiereSuchselWoerter();
   } else {
     feedback.textContent='Das war noch keines der gesuchten Wörter. Versuche es erneut.';
+    setAvatarDialog('bonusCoach','Versuche eine gerade Linie und prüfe beide Leserichtungen. Manche Wörter stehen auch schräg.','achtung');
   }
   suchselStart=null;
 }
@@ -1596,6 +1673,7 @@ function starteFallwerkstatt(){
   document.getElementById('bonusSuchsel').style.display='none';
   document.getElementById('fallwerkstatt').classList.add('zeigen');
   bonusFallIdx=0; bonusRichtig=0; bonusReihe=mische([...BONUS_FAELLE]);
+  setAvatarDialog('bonusCoach','Lies jeden Fall genau. Entscheide nicht nach einem einzelnen Wort, sondern nach dem Recht, das die Situation schützen würde.');
   renderBonusFall();
   setTimeout(()=>document.getElementById('fallwerkstatt').scrollIntoView({behavior:'smooth',block:'start'}),50);
 }
@@ -1640,6 +1718,9 @@ function bonusFallAntwort(wahl,btn){
   const feedback=document.getElementById('fallFeedback');
   feedback.classList.add('zeigen');
   feedback.innerHTML=`<b>${richtig?'Richtig!':'Noch nicht ganz.'}</b> Gesucht war <b>${item.recht}</b>.<br>${item.erklaerung}`;
+  setAvatarDialog('bonusCoach',richtig
+    ? 'Du hast das betroffene Recht erkannt und auf die ganze Situation geachtet.'
+    : 'Vergleiche deine Wahl mit der Erklärung. Beim nächsten Fall suchen wir wieder: Was fehlt dem Kind?',richtig?'gut':'achtung');
   const weiter=document.getElementById('fallWeiter');
   weiter.style.display='inline-block';
   if(bonusFallIdx===bonusReihe.length-1) weiter.textContent='Auswertung ansehen';
@@ -1726,6 +1807,8 @@ async function starteTypewriter(screenId){
     if(!el.dataset.typewriterHtml) el.dataset.typewriterHtml=el.innerHTML;
     if(typewriterGesehen.has(key)){
       el.innerHTML=el.dataset.typewriterHtml;
+      const dialog=el.closest('.avatar-dialog.verzoegert');
+      if(dialog) dialog.classList.add('sichtbar');
       return false;
     }
     return true;
@@ -1749,6 +1832,8 @@ async function starteTypewriter(screenId){
   for(const el of texte){
     const key=el.dataset.typewriterKey;
     typewriterGesehen.add(key);
+    const dialog=el.closest('.avatar-dialog.verzoegert');
+    if(dialog) dialog.classList.add('sichtbar');
     const template=document.createElement('template');
     template.innerHTML=el.dataset.typewriterHtml;
     el.innerHTML=''; el.classList.add('typing');
