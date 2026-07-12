@@ -70,8 +70,6 @@
   .screen.is-typing button,.screen.is-typing select,.screen.is-typing [role="button"]{
     pointer-events:none; opacity:.55;
   }
-  .screen.is-typing .typewriter-skip{pointer-events:auto; opacity:1}
-  .typewriter-skip-row{display:flex; justify-content:flex-end; margin:-6px 0 12px}
   @keyframes cursorBlink{50%{opacity:0}}
 
   /* Startseite */
@@ -357,7 +355,8 @@
   <section id="screen-figur" class="screen">
     <div class="card">
       <h2 style="color:var(--blau-d)">Wer soll mit dir reisen?</h2>
-      <p class="typewriter-intro">Wähle deine Reisebegleitung. Sie ist deine Figur im Hüpf-Spiel.</p>
+      <p class="typewriter-intro">Wähle deine Reisebegleitung. Sie ist deine Figur im Hüpf-Spiel.
+         <b>Alle Figuren sind gleich stark</b> und können dieselben Aufgaben lösen.</p>
       <div class="stationen" id="figurAuswahl"></div>
     </div>
   </section>
@@ -511,9 +510,15 @@ const RECHTE = [
 const FIGUREN = [
   {id:"malia", name:"Malia", emoji:"👧🏽", src:"assets/img/figur-malia.webp", alt:"Fröhliches Mädchen mit dunklen Haaren und Rucksack."},
   {id:"jonas", name:"Jonas", emoji:"👦🏼", src:"assets/img/figur-jonas.webp", alt:"Fröhlicher Junge mit blonden Haaren und Rucksack."},
-  {id:"kim", name:"Kim", emoji:"🧒🏾", src:"assets/img/figur-kim.webp", alt:"Fröhliches Kind mit kurzen Locken und Rucksack."}
+  {id:"kim", name:"Kim", emoji:"🧒🏾", src:"assets/img/figur-kim.webp", alt:"Fröhliches Kind mit kurzen Locken und Rucksack."},
+  {id:"leyla", name:"Leyla", emoji:"👧🏽", src:"assets/img/figur-leyla.webp", alt:"Fröhliches Mädchen mit brauner Haut, türkisfarbenem Kopftuch und Rucksack."},
+  {id:"minh", name:"Minh", emoji:"👦🏻", src:"assets/img/figur-minh.webp", alt:"Fröhlicher ostasiatischer Junge mit schwarzem Haar, runder Brille und Rucksack."},
+  {id:"alex", name:"Alex", emoji:"🧒🏽", src:"assets/img/figur-alex.webp", alt:"Fröhliches Kind mit kurzem, welligem Haar, geschlechtsneutraler Kleidung und Rucksack."},
+  {id:"sofia", name:"Sofia", emoji:"👧🏽", src:"assets/img/figur-sofia.webp", alt:"Fröhliches lateinamerikanisches Mädchen mit dunklem Pferdeschwanz, Hörgeräten und Rucksack."}
 ];
 let figur = FIGUREN[0]; // Standard, bis gewählt wird
+let figurBild = new Image();
+figurBild.src=figur.src;
 
 // EINSTIEG – 3 Szenen (Variante B: Jesus -> heute, ohne Vermischung)
 const EINSTIEG = [
@@ -816,7 +821,7 @@ function renderFigur(){
     d.setAttribute('aria-label',f.name+' auswählen');
     d.innerHTML=`<div class="figur-bild"><img class="asset-img" src="${f.src}" alt="${esc(f.alt)}" loading="lazy" decoding="async"></div>
                  <h3>${f.name}</h3>
-                 <div class="status">Reisefigur auswählen ${f.emoji}</div>`;
+                 <div class="status">Reisefigur auswählen</div>`;
     d.onclick=()=>waehleFigur(f);
     d.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); waehleFigur(f); } };
     el.appendChild(d);
@@ -825,6 +830,7 @@ function renderFigur(){
 function genitiv(name){ return /[sxzß]$/i.test(name) ? name+"'" : name+"s"; }
 function waehleFigur(f){
   figur=f;
+  figurBild=new Image(); figurBild.src=f.src;
   ergebnisse.figur=f.name;
   if(!ergebnisse.start) ergebnisse.start=Date.now(); // Reisezeit ab Figurenwahl
   document.getElementById('kopfTitel').textContent='🌍 Kinderrechte – '+genitiv(f.name)+' Weltreise';
@@ -1163,8 +1169,17 @@ function spielerZeichnen(){
   let ex=1,ey=1;
   if(!spieler.boden){ if(spieler.vy<0){ ey=1.12; ex=.9; } else { ey=.92; ex=1.08; } }
   ctx.translate(bx,by); ctx.scale(ex,ey);
-  ctx.font='42px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.fillText(figur.emoji,0,0);
+  if(figurBild.complete && figurBild.naturalWidth){
+    const s=Math.min(figurBild.naturalWidth,figurBild.naturalHeight), crop=s*.74;
+    const sx=(figurBild.naturalWidth-crop)/2, sy=Math.min(s*.03,figurBild.naturalHeight-crop);
+    ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(0,0,22,0,Math.PI*2); ctx.fill();
+    ctx.save(); ctx.beginPath(); ctx.arc(0,0,20,0,Math.PI*2); ctx.clip();
+    ctx.drawImage(figurBild,sx,sy,crop,crop,-21,-21,42,42); ctx.restore();
+    ctx.strokeStyle='#f4c542'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(0,0,21,0,Math.PI*2); ctx.stroke();
+  } else {
+    ctx.font='42px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(figur.emoji,0,0);
+  }
   ctx.restore();
 }
 function popupZeichnen(p){
@@ -1246,7 +1261,10 @@ function gewinne(){
     <p>Du hast <b>${gesammelt.length} von 5</b> Rechten eingesammelt.</p>
     <p style="max-width:520px">Im Spiel trainierst du, Kinderrechte zu erkennen und nicht zu übersehen.
        Im echten Leben braucht jedes Recht Menschen, die hinschauen und es schützen.</p>
-    <button class="btn gruen" onclick="zeigeM2Schatz()">Rechte-Kompass ansehen ▶</button>`;
+    <div class="weiter-row">
+      <button class="btn sekundaer" onclick="spielStart()">Modul 2 noch einmal spielen</button>
+      <button class="btn gruen" onclick="zeigeM2Schatz()">Rechte-Kompass ansehen ▶</button>
+    </div>`;
   el.classList.remove('hidden');
 }
 
@@ -1683,25 +1701,20 @@ function protokollDownload(){
 const typewriterGesehen=new Set();
 const warten=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 
-async function schreibeNode(ziel, quelle, steuerung){
-  if(steuerung.skip) return false;
+async function schreibeNode(ziel, quelle){
   if(quelle.nodeType===Node.TEXT_NODE){
     const out=document.createTextNode(''); ziel.appendChild(out);
     for(const ch of quelle.textContent){
-      if(steuerung.skip) return false;
       out.textContent+=ch;
       if(/\s/.test(ch)) continue;
       const pause=/[.!?]/.test(ch)?200:/[,;:]/.test(ch)?100:48;
       await warten(pause);
     }
-    return true;
+    return;
   }
-  if(quelle.nodeType!==Node.ELEMENT_NODE) return true;
+  if(quelle.nodeType!==Node.ELEMENT_NODE) return;
   const out=quelle.cloneNode(false); ziel.appendChild(out);
-  for(const kind of quelle.childNodes){
-    if(!await schreibeNode(out,kind,steuerung)) return false;
-  }
-  return true;
+  for(const kind of quelle.childNodes) await schreibeNode(out,kind);
 }
 
 async function starteTypewriter(screenId){
@@ -1722,17 +1735,7 @@ async function starteTypewriter(screenId){
   screen.dataset.typingRunning='1';
   screen.classList.add('is-typing');
   screen.setAttribute('aria-busy','true');
-  const steuerung={skip:false};
-  const skipRow=document.createElement('div');
-  skipRow.className='typewriter-skip-row';
-  const skipBtn=document.createElement('button');
-  skipBtn.type='button'; skipBtn.className='btn sekundaer klein typewriter-skip';
-  skipBtn.textContent='Ich bin schon fertig mit Lesen';
-  skipBtn.onclick=()=>{ steuerung.skip=true; };
-  skipRow.appendChild(skipBtn);
-  texte[texte.length-1].insertAdjacentElement('afterend',skipRow);
-
-  const controls=[...screen.querySelectorAll('button,select,[role="button"]')].filter(x=>x!==skipBtn);
+  const controls=[...screen.querySelectorAll('button,select,[role="button"]')];
   controls.forEach(control=>{
     if('disabled' in control){
       control.dataset.vorherDisabled=control.disabled?'1':'0';
@@ -1749,14 +1752,10 @@ async function starteTypewriter(screenId){
     const template=document.createElement('template');
     template.innerHTML=el.dataset.typewriterHtml;
     el.innerHTML=''; el.classList.add('typing');
-    for(const node of template.content.childNodes){
-      if(!await schreibeNode(el,node,steuerung)) break;
-    }
-    if(steuerung.skip) el.innerHTML=el.dataset.typewriterHtml;
+    for(const node of template.content.childNodes) await schreibeNode(el,node);
     el.classList.remove('typing');
   }
 
-  skipRow.remove();
   controls.forEach(control=>{
     if('disabled' in control){
       control.disabled=control.dataset.vorherDisabled==='1';
