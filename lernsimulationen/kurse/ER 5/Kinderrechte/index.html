@@ -23,9 +23,14 @@
   .wrap{max-width:960px; margin:0 auto; padding:18px;}
   header.bar{
     display:flex; align-items:center; justify-content:space-between;
-    gap:12px; margin-bottom:14px;
+    gap:12px; margin-bottom:14px; padding:8px 10px;
+    position:sticky; top:0; z-index:30;
+    background:rgba(255,255,255,.96); border:1px solid var(--linie);
+    border-radius:8px; box-shadow:0 4px 14px rgba(32,57,78,.1);
   }
   header.bar h1{font-size:1.15rem; margin:0; color:var(--blau-d);}
+  .kopf-aktionen{display:flex; align-items:center; justify-content:flex-end; gap:8px; flex-wrap:wrap}
+  .download-btn{min-width:188px}
   .btn{
     border:none; border-radius:999px; padding:12px 22px; font-size:1rem;
     font-weight:700; cursor:pointer; background:var(--blau); color:#fff;
@@ -283,6 +288,11 @@
     #spielCanvas{aspect-ratio:8/3; object-fit:contain}
     .overlay{padding:14px 24px}
   }
+  @media(max-width:640px){
+    header.bar{align-items:flex-start; flex-direction:column}
+    .kopf-aktionen{width:100%; justify-content:flex-start}
+    .download-btn{min-width:0}
+  }
   @media(max-width:820px){
     .rechte-folge{grid-template-columns:1fr}
     .rechte-folge img{max-width:360px; margin:0 auto}
@@ -343,7 +353,10 @@
 
   <header class="bar noprint">
     <h1 id="kopfTitel">🌍 Kinderrechte – Weltreise</h1>
-    <button class="btn sekundaer klein" id="homeBtn" onclick="zurKarte()" style="display:none">Zur Reisekarte</button>
+    <div class="kopf-aktionen">
+      <button class="btn sekundaer klein download-btn" id="protokollBtn" onclick="protokollDownload(this)" title="Den bisherigen Stand als TXT-Datei speichern">↓ Zwischenstand speichern</button>
+      <button class="btn sekundaer klein" id="homeBtn" onclick="zurKarte()" style="display:none">Zur Reisekarte</button>
+    </div>
   </header>
 
   <!-- ================= START ================= -->
@@ -568,9 +581,10 @@ const EINSTIEG = [
     titel:"Jesus und die Kinder",
     text:`Schon vor rund 2000 Jahren wurden Kinder zu <b>Jesus</b> gebracht.
           Seine Jünger wollten sie wegschicken – Kinder galten damals als unwichtig.
-          Doch Jesus sagte:<br><br>
+          Jesus widersprach ihnen und sagte:<br><br>
           <i>„Lasst die Kinder zu mir kommen und haltet sie nicht davon ab!"</i><br>
-          <small>(Matthäus 19,14)</small><br><br>
+          <small>(Mk 10,13–16)</small><br><br>
+          Danach nahm Jesus die Kinder in die Arme und segnete sie.
           Für Jesus waren Kinder also <b>wichtig</b> – das war zu seiner Zeit ungewöhnlich.`
   },
   {
@@ -715,7 +729,7 @@ const ergebnisse = {
   figur:null, start:null,
   m1:{status:'offen', richtig:0, falsch:0},
   m2:{status:'offen', gesammelt:[], frageRichtig:null},
-  m3:{status:'offen', richtig:0, gesamt:M3.length},
+  m3:{status:'offen', richtig:0, bearbeitet:0, gesamt:M3.length},
   m4:{status:'offen', recht:null, grund:null, aktion:null, mission:false}
 };
 
@@ -913,7 +927,12 @@ let m1Auswahl=null, m1Gesetzt=0, m1Runde=0, m1FehlerRunde=0;
 const M1_PRO_RUNDE=4;
 function m1Runden(){ return Math.ceil(M1.length/M1_PRO_RUNDE); }
 function m1AktuelleItems(){ return M1.slice(m1Runde*M1_PRO_RUNDE, m1Runde*M1_PRO_RUNDE+M1_PRO_RUNDE); }
-function startM1(){ zeige('screen-m1'); m1Runde=0; ergebnisse.m1.richtig=0; ergebnisse.m1.falsch=0; renderM1(); }
+function startM1(){
+  zeige('screen-m1');
+  m1Runde=0;
+  ergebnisse.m1={status:'in_bearbeitung', richtig:0, falsch:0};
+  renderM1();
+}
 function renderM1(){
   m1Auswahl=null; m1Gesetzt=0; m1FehlerRunde=0;
   const items=m1AktuelleItems();
@@ -1015,6 +1034,9 @@ function setTempo(){ tempo=parseFloat(document.getElementById('tempoSel').value)
 
 function spielStart(){
   setTempo();
+  ergebnisse.m2.status='in_bearbeitung';
+  ergebnisse.m2.gesammelt=[];
+  ergebnisse.m2.frageRichtig=null;
   document.getElementById('m2StartOverlay').classList.add('hidden');
   document.getElementById('m2Frage').classList.add('hidden');
   document.getElementById('m2Ergebnis').classList.add('hidden');
@@ -1030,7 +1052,11 @@ function spielStart(){
   spielStop();
   spielLauf=requestAnimationFrame(spielLoop);
 }
-function startM2(){ zeige('screen-m2'); spielBereit(); }
+function startM2(){
+  zeige('screen-m2');
+  ergebnisse.m2={status:'in_bearbeitung', gesammelt:[], frageRichtig:null};
+  spielBereit();
+}
 function spielStop(){ if(spielLauf){ cancelAnimationFrame(spielLauf); spielLauf=null; } }
 
 function spielBereit(){
@@ -1099,6 +1125,7 @@ function spielLoop(){
     if(o.t==='sammel'){
       if(Math.abs(sx-(px+pw/2))<34 && Math.abs(o.y-(spieler.y+ph/2))<44){
         o.weg=true; gesammelt.push(o.idx); aktualisiereM2Hud();
+        ergebnisse.m2.gesammelt=gesammelt.map(idx=>M2_RECHTE[idx].name);
         popups.push({text:'Recht auf '+M2_RECHTE[o.idx].name+'!', x:px+20, y:spieler.y, leben:75, farbe:'#2e7d32'});
         for(let n=0;n<12;n++) partikel.push({x:sx, y:o.y, vx:(Math.random()-.5)*4.5, vy:(Math.random()-1.4)*3.2, r:1.5+Math.random()*2.5, leben:30, farbe:['#ffd54a','#ffffff','#8ed06a','#f4a63b'][n%4]});
       }
@@ -1370,7 +1397,13 @@ function zeigeM2Schatz(){
    MODUL 3 – RECHT ODER WUNSCH
    ========================================================= */
 let m3Idx=0, m3Reihe=[];
-function startM3(){ zeige('screen-m3'); m3Idx=0; ergebnisse.m3.richtig=0; m3Reihe=mische([...M3]); renderM3(); }
+function startM3(){
+  zeige('screen-m3');
+  m3Idx=0;
+  ergebnisse.m3={status:'in_bearbeitung', richtig:0, bearbeitet:0, gesamt:M3.length};
+  m3Reihe=mische([...M3]);
+  renderM3();
+}
 function renderM3(){
   const item=m3Reihe[m3Idx];
   document.getElementById('m3Fortschritt').textContent=`Karte ${m3Idx+1} von ${m3Reihe.length}`;
@@ -1383,6 +1416,7 @@ function renderM3(){
 function m3Antwort(wahl){
   const item=m3Reihe[m3Idx];
   const richtig = wahl===item.typ;
+  ergebnisse.m3.bearbeitet++;
   if(richtig) ergebnisse.m3.richtig++;
   document.querySelectorAll('.rw-buttons .btn').forEach(x=>x.disabled=true);
   const b=document.getElementById('m3Begruendung');
@@ -1417,6 +1451,10 @@ function startM4(){
     return;
   }
   m4Recht=null; m4Grund=null; m4Aktion=null; missionSchritt=0;
+  ergebnisse.m4.status='in_bearbeitung';
+  ergebnisse.m4.recht=null;
+  ergebnisse.m4.grund=null;
+  ergebnisse.m4.aktion=null;
   ergebnisse.m4.mission=false;
   renderM4();
 }
@@ -1444,14 +1482,17 @@ function renderM4(){
   const rg=document.getElementById('m4Rechte');
   M4_RECHTE.forEach(r=>{
     const b=document.createElement('button'); b.className='wahl'; b.textContent=r;
-    b.onclick=()=>{ m4Recht=r; markiere('m4Rechte',b); document.getElementById('m4Schritt2').style.display='block'; pruefeM4(); };
+    b.onclick=()=>{
+      m4Recht=r; ergebnisse.m4.recht=r;
+      markiere('m4Rechte',b); document.getElementById('m4Schritt2').style.display='block'; pruefeM4();
+    };
     rg.appendChild(b);
   });
   const gg=document.getElementById('m4Gruende');
   M4_GRUENDE.forEach(g=>{
     const b=document.createElement('button'); b.className='wahl'; b.textContent=g;
     b.onclick=()=>{
-      m4Grund=g; markiere('m4Gruende',b);
+      m4Grund=g; ergebnisse.m4.grund=g; markiere('m4Gruende',b);
       document.getElementById('m4Schritt3').style.display='block';
       pruefeM4();
     };
@@ -1460,7 +1501,7 @@ function renderM4(){
   const ag=document.getElementById('m4Aktionen');
   M4_AKTIONEN.forEach(a=>{
     const b=document.createElement('button'); b.className='wahl'; b.textContent=a;
-    b.onclick=()=>{ m4Aktion=a; markiere('m4Aktionen',b); pruefeM4(); };
+    b.onclick=()=>{ m4Aktion=a; ergebnisse.m4.aktion=a; markiere('m4Aktionen',b); pruefeM4(); };
     ag.appendChild(b);
   });
 }
@@ -1547,7 +1588,7 @@ function zeigeUrkunde(){
         <div class="checkschritt">
           <input type="checkbox" id="abgabe1" onchange="aktualisiereAbgabeCheckliste()">
           <label for="abgabe1"><strong>Ergebnis-Datei speichern</strong><small>Die Datei heißt Kinderrechte_Ergebnis_…&#8203;.txt.</small></label>
-          <button class="btn klein" onclick="protokollDownload()">Datei speichern</button>
+          <button class="btn klein" onclick="protokollDownload(this)">Datei speichern</button>
         </div>
         <div class="checkschritt">
           <input type="checkbox" id="abgabe2" onchange="aktualisiereAbgabeCheckliste()">
@@ -1728,17 +1769,24 @@ function bonusFallAntwort(wahl,btn){
 function bonusFallWeiter(){ bonusFallIdx++; renderBonusFall(); }
 
 /* Ergebnis-Protokoll als .txt */
-function statusText(s){ return s==='erledigt' ? 'erledigt ✓' : 'nicht abgeschlossen'; }
+function statusText(s){
+  if(s==='erledigt') return 'erledigt';
+  if(s==='in_bearbeitung') return 'in Bearbeitung';
+  return 'noch nicht begonnen';
+}
 function protokollText(){
   const e=ergebnisse;
   const dauerS = e.start ? Math.round((Date.now()-e.start)/1000) : 0;
   const min=Math.floor(dauerS/60), sek=dauerS%60;
   const L=[];
-  L.push('KINDERRECHTE – MEINE WELTREISE (Ergebnis-Protokoll)');
+  L.push('KINDERRECHTE – MEINE WELTREISE (Zwischenstand)');
   L.push('====================================================');
   L.push('Datum/Uhrzeit:   '+new Date().toLocaleString('de-DE'));
   L.push('Reisefigur:      '+(e.figur||'-'));
   L.push('Benötigte Zeit:  '+min+' min '+sek+' s');
+  L.push('');
+  L.push('Die Datei zeigt alles, was du bis jetzt erarbeitet hast.');
+  L.push('Noch nicht bearbeitete Stationen bleiben als solche markiert.');
   L.push('');
   L.push('Station 1 – Rechte entdecken (Zuordnung, 12 Rechte)');
   L.push('  Status: '+statusText(e.m1.status));
@@ -1751,7 +1799,8 @@ function protokollText(){
   L.push('');
   L.push('Station 3 – Recht oder Wunsch?');
   L.push('  Status: '+statusText(e.m3.status));
-  L.push('  Richtige Antworten: '+e.m3.richtig+' von '+e.m3.gesamt);
+  L.push('  Bearbeitete Karten: '+e.m3.bearbeitet+' von '+e.m3.gesamt);
+  L.push('  Richtige Antworten: '+e.m3.richtig+' von '+e.m3.bearbeitet);
   L.push('');
   L.push('Station 4 – Abschluss (eigene Meinung)');
   L.push('  Status: '+statusText(e.m4.status));
@@ -1763,7 +1812,7 @@ function protokollText(){
   L.push('Erstellt mit dem Lernspiel "Kinderrechte – Weltreise".');
   return L.join('\r\n');
 }
-function protokollDownload(){
+function protokollDownload(ausloeser){
   const blob=new Blob([protokollText()], {type:'text/plain;charset=utf-8'});
   const url=URL.createObjectURL(blob);
   const d=new Date();
@@ -1773,6 +1822,12 @@ function protokollDownload(){
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   const downloadCheck=document.getElementById('abgabe1');
   if(downloadCheck){ downloadCheck.checked=true; aktualisiereAbgabeCheckliste(); }
+  if(ausloeser){
+    const vorher=ausloeser.textContent;
+    ausloeser.textContent='Gespeichert';
+    ausloeser.disabled=true;
+    setTimeout(()=>{ ausloeser.textContent=vorher; ausloeser.disabled=false; },1400);
+  }
   setTimeout(()=>URL.revokeObjectURL(url),1500);
 }
 

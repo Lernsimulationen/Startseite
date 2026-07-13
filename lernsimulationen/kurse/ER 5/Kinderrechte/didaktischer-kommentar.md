@@ -1,143 +1,155 @@
-# Didaktischer Kommentar zum Lernspiel „Kinderrechte – eine Weltreise"
+# Methodisch-didaktischer Kommentar zum Lernspiel „Kinderrechte - eine Weltreise"
 
-*Evangelische Religionslehre · Jahrgangsstufe 5 · Themenfeld Kinderrechte / Menschenwürde*
+*Evangelische Religionslehre | Jahrgangsstufe 5 | Kinderrechte, Menschenwürde und Verantwortung*
 
----
+Stand: passend zur aktuellen Programmfassung mit Flugreise, Avatar-Begleitung, Rechte-Kompass, jederzeit verfügbarer Ergebnissicherung und freiwilliger Bonuswerkstatt.
 
 ## 1. Einordnung und Lerngruppe
 
-Das Lernspiel richtet sich an eine **5. Klasse im Fach Evangelische Religionslehre**. Es greift das
-im Schulbuch angelegte Thema der UN-Kinderrechte auf und verbindet es mit der religionspädagogischen
-Leitfrage: *„Warum sind Kinder wichtig – und woran zeigt sich das?"*
+Das Lernspiel richtet sich an eine 5. Klasse im Fach Evangelische Religionslehre. Es verbindet die Auseinandersetzung mit der UN-Kinderrechtskonvention mit der religionspädagogischen Leitfrage: **Warum sind Kinder wichtig und woran zeigt sich das?**
 
-Die Anwendung ist als **digitale Ergänzung** konzipiert, nicht als Ersatz für das Unterrichtsgespräch.
-Ihr Ertrag entsteht erst im Zusammenspiel mit einer mündlichen Auswertung im Plenum (siehe Abschnitt 7).
-
----
+Die Anwendung ist als digitale Ergänzung des Unterrichts konzipiert. Sie strukturiert Informationsaufnahme, Anwendung, Urteilsbildung und persönliche Reflexion. Das Lernspiel ersetzt jedoch weder die gemeinsame Erschließung der Bibelstelle noch die Anschlusskommunikation im Unterricht.
 
 ## 2. Sachanalytischer Kern
 
-Zwei Bezugssysteme werden im Spiel **bewusst getrennt** gehalten:
+Das Lernspiel hält zwei Bezugssysteme bewusst auseinander:
 
-1. **Religiös-historisch:** Die Zuwendung Jesu zu Kindern (Mt 19,13–15). In einer Zeit, in der Kinder
-   rechtlich und sozial wenig galten, stellt Jesus sie in die Mitte. Das ist ein biblisch belegbarer,
-   nicht ausgedeuteter Befund.
-2. **Rechtlich-politisch:** Die **UN-Kinderrechtskonvention (1989)** als weltweit gültiges Regelwerk;
-   UNICEF (seit 1946) als umsetzendes Kinderhilfswerk.
+1. **Religiös-biblische Perspektive:** In Mk 10,13–16 wollen die Jünger Kinder von Jesus fernhalten. Jesus widerspricht ihnen, lässt die Kinder zu sich kommen, nimmt sie in die Arme und segnet sie. Die Perikope zeigt die besondere Zuwendung Jesu zu Kindern.
+2. **Rechtlich-politische Perspektive:** Die UN-Kinderrechtskonvention von 1989 formuliert verbindliche Rechte für alle Kinder. UNICEF unterstützt ihre weltweite Verwirklichung, hat die Rechte aber nicht selbst beschlossen.
 
-Das Spiel behauptet **nicht**, die Kinderrechte seien aus der Bibel abgeleitet. Es stellt beide
-Perspektiven nebeneinander (Abschluss: *„Jesus waren Kinder wichtig. Heute schützt die UN-KRK die
-Kinder. Beides sagt: Kinder zählen."*). Diese Zurückhaltung ist didaktisch gewollt: Sie verhindert
-eine sachlich falsche religiöse Vereinnahmung eines säkularen Menschenrechtsdokuments.
+Das Spiel behauptet nicht, die Kinderrechte seien aus der Bibel abgeleitet. Beide Perspektiven werden nebeneinandergestellt und über die Frage nach **Würde, Wert und Schutz jedes Kindes** miteinander ins Gespräch gebracht. Diese Trennung verhindert eine religiöse Vereinnahmung eines säkularen Menschenrechtsdokuments.
 
-Verbindendes Motiv – und damit der eigentliche **religionsdidaktische Anker** – ist die Frage nach der
-**Würde und dem Wert jedes Kindes**.
+## 3. Lehrplanbezug und Kompetenzorientierung
 
----
+Grundlage ist der **Kernlehrplan für die Gesamtschule in Nordrhein-Westfalen, Evangelische Religionslehre** (Ministerium für Schule und Weiterbildung NRW, 2013). Die dort genannten Kompetenzerwartungen beziehen sich auf das Ende der Erprobungsstufe. Das Lernspiel trägt zu ihrem kumulativen Aufbau bei; ein einzelner Durchgang kann ihre vollständige Erreichung nicht nachweisen (vgl. KLP, S. 16).
 
-## 3. Kompetenzorientierung
+### Curriculare Schwerpunkte
 
-Orientiert an den üblichen prozessbezogenen Kompetenzbereichen des evangelischen Religionsunterrichts
-(die konkrete Zuordnung ist an den Lehrplan des jeweiligen Bundeslandes anzupassen):
+- **Inhaltsfeld 2: Christlicher Glaube als Lebensorientierung**  
+  Inhaltlicher Schwerpunkt: „Leben, Handeln und Botschaft Jesu Christi“ (KLP, S. 19). Der Einstieg mit Mk 10,13–16 erschließt Jesu Umgang mit Kindern als Orientierung für heutiges Handeln.
+- **Inhaltsfeld 3: Einsatz für Gerechtigkeit und Menschenwürde**  
+  Inhaltlicher Schwerpunkt: „Gemeinschaft und Verantwortung in Schule und Gesellschaft“ (KLP, S. 21). Kinderrechte, Gleichheit, Schutz und eigene Verantwortung bilden den Schwerpunkt der Lernreise.
 
-| Kompetenzbereich | Umsetzung im Spiel |
-|---|---|
-| **Wahrnehmen & beschreiben** | Kinderrechte erkennen und benennen (Modul 1, 2) |
-| **Deuten** | Bibelstelle Mt 19 in ihrer historischen Bedeutung verstehen (Einstieg) |
-| **Urteilen** | Recht vs. persönlichen Wunsch unterscheiden und begründen (Modul 3) |
-| **Kommunizieren & teilhaben** | eigene Position zu einem Recht einnehmen (Modul 4) |
-| **Methodisch handeln** | selbstständige, mediengestützte Auseinandersetzung |
+### Ausgewählte übergeordnete Kompetenzerwartungen 5/6
 
-**Übergeordnetes Stundenziel:** Die Schülerinnen und Schüler können zentrale Kinderrechte benennen,
-sie von persönlichen Wünschen unterscheiden und begründet zu ihrer Bedeutung Stellung nehmen.
+- **Sachkompetenz / Deutungskompetenz:** Die Schülerinnen und Schüler können „die Bedeutung elementarer biblischer Aussagen und Einsichten für das heutige Leben kriteriengeleitet untersuchen und darstellen“ (KLP, S. 16).  
+  *Umsetzung:* Einstieg und Abschlussreflexion beziehen Mk 10,13–16 auf die Frage nach Wert und Würde von Kindern, ohne daraus die UN-Kinderrechte abzuleiten.
 
----
+- **Urteilskompetenz:** Die Schülerinnen und Schüler können „ansatzweise eigene Standpunkte zu menschlichen Verhaltensweisen sowie zu religiösen und ethischen Fragen und religiösen Ausdrucksformen begründen“ (KLP, S. 17).  
+  *Umsetzung:* Die Lernenden unterscheiden Recht und persönlichen Wunsch und begründen, welches Kinderrecht ihnen besonders wichtig ist.
 
-## 4. Feinziele der einzelnen Module
+- **Handlungskompetenz / Dialogkompetenz:** Die Schülerinnen und Schüler können „als Voraussetzung für einen Dialog in Ansätzen adressatenorientiert eigene Standpunkte zu einfachen religiösen Fragen und Problemen formulieren“ (KLP, S. 17).  
+  *Umsetzung:* Der persönliche Rechte-Kompass bereitet eine begründete Position für Partner- oder Plenumsgespräche vor.
 
-- **Einstieg:** die historische Besonderheit der Zuwendung Jesu zu Kindern erfassen; Entstehung und
-  Zweck der UN-Kinderrechtskonvention in Grundzügen kennen.
-- **Modul 1 – Zuordnung (12 Rechte in 3 Runden):** Rechte einem anschaulichen Bild zuordnen und so
-  ihr inhaltliches Spektrum überblicken.
-- **Modul 2 – Jump-and-Run:** Rechte spielerisch als etwas „Schützenswertes" erfahren; Hindernisse
-  symbolisieren Gefährdungen, ohne bedrohlich zu wirken.
-- **Modul 3 – Recht oder Wunsch:** das entscheidende Kriterium erarbeiten – ein Recht gilt für **alle**
-  Kinder, ein Wunsch ist individuell. Die vorgegebenen Begründungen sichern die Argumentationsfigur.
-- **Modul 4 – Abschluss & Reflexion:** eine persönliche, aber begründete Wertung vornehmen.
+- **Handlungskompetenz / Gestaltungskompetenz:** Die Schülerinnen und Schüler können „anhand ausgewählter biblischer Geschichten Beispiele für verantwortungsbewusstes Handeln in der eigenen Lebenswelt entwickeln“ (KLP, S. 17).  
+  *Umsetzung:* In Station 4 formulieren sie eine konkrete Mission und aktivieren die Schritte Hinsehen, Zuhören und Reden sowie Hilfe holen.
 
----
+- **Methodenkompetenz:** Die Schülerinnen und Schüler können „aus Medien (u. a. künstlerische Darstellungen) Informationen und Aussagen angeleitet entnehmen und wiedergeben“ (KLP, S. 17) sowie „zu religiös relevanten Sachverhalten unter Anleitung Informationen sammeln“ (KLP, S. 18).  
+  *Umsetzung:* Bildimpulse, Zuordnungen, Weltkarte und Rechte-Kompass werden zielgerichtet ausgewertet; Ergebnisse werden in einer TXT-Datei gesichert.
+
+### Ausgewählte konkretisierte Kompetenzerwartungen
+
+- **Inhaltsfeld 2:** Die Schülerinnen und Schüler können „Beispiele für das Orientierung gebende Auftreten und Handeln Jesu benennen“ (KLP, S. 19) und „Ansprüche aus Jesu Auftreten für das christliche Handeln der Menschen heute ableiten und darstellen“ (KLP, S. 20).
+- **Inhaltsfeld 3:** Die Schülerinnen und Schüler können „die Grundlagen des Zusammenlebens in ihrer Lebenswirklichkeit, insbesondere unter den Aspekten Freiheit und Verantwortung [...] beschreiben“ (KLP, S. 21) sowie „konkretes Handeln in ihrer näheren Umgebung als gemeinschaftsstiftend oder gemeinschaftsschädlich unterscheiden und bewerten“ (KLP, S. 21).
+
+### Übergeordnetes Lernziel
+
+Die Schülerinnen und Schüler können zentrale Kinderrechte benennen, sie von persönlichen Wünschen unterscheiden, Jesu Zuwendung zu Kindern in Mk 10,13–16 als biblischen Orientierungsimpuls beschreiben, begründet zur Bedeutung eines Kinderrechts Stellung nehmen und eine konkrete Handlungsabsicht für ihre Lebenswelt formulieren.
+
+## 4. Aufbau der Lernreise und Feinziele
+
+### Einstieg
+
+Drei bebilderte Szenen führen von Mk 10,13–16 über die Gegenwartsfrage „Und heute?“ zur UN-Kinderrechtskonvention. Die Einführungstexte erscheinen beim ersten Aufruf als Schreibmaschinentext. Die gewählte Reisefigur kommentiert die Inhalte erst nach dem jeweiligen Haupttext. Bei erneuter Anzeige erscheinen bekannte Texte sofort.
+
+### Reisefigur und Weltkarte
+
+Die Lernenden wählen eine von sieben gleichwertigen, vielfältig gestalteten Reisefiguren. Sie begleitet als Coach durch alle Stationen und wird in Station 2 zur sichtbaren Spielfigur. Eine KI-generierte Weltkarte und ein langsam fliegendes Flugzeug machen Reihenfolge und Fortschritt sichtbar; Stationen können nicht übersprungen werden.
+
+### Station 1: Rechte entdecken
+
+Zwölf Kinderrechte werden in drei Runden anhand von Bildern zugeordnet. Auf zusätzliche Emoji-Hinweise wird verzichtet, damit die Lernenden die Bildhandlungen tatsächlich deuten. Bei Fehlern gibt die Begleitfigur gestufte strategische Hinweise, ohne die Lösung vorwegzunehmen.
+
+### Station 2: Rechte-Retter
+
+Das Hüpfspiel beginnt erst nach einer bewussten Startentscheidung. Die Lernenden sammeln fünf Rechte, überwinden symbolische Gefährdungen und öffnen nach einer Wissensfrage die Truhe. Der anschließende Rechte-Kompass zeigt mit KI-generierten Bildern sowohl die positive Bedeutung jedes Rechts als auch mögliche Folgen fehlenden Schutzes. Ein verpasstes Recht bleibt trotzdem gültig und schutzbedürftig. Das Modul kann erneut gespielt werden.
+
+### Station 3: Recht oder Wunsch?
+
+Acht Situationen werden als Kinderrecht oder persönlicher Wunsch eingeordnet. Das tragende Kriterium lautet: Ein Kinderrecht gilt für alle Kinder, ein Wunsch ist individuell. Vorgegebene Begründungen sichern die fachliche Argumentation und entlasten sprachlich.
+
+### Station 4: Persönlicher Rechte-Kompass
+
+Die Lernenden wählen ein besonders wichtiges Recht, eine Begründung und eine konkrete Handlungsmöglichkeit. Eine dreistufige Aktivierung - Hinsehen, Zuhören und Reden, Hilfe holen - übersetzt Wissen in Handlungsbereitschaft. Erst danach wird die namenlose Urkunde freigeschaltet.
+
+### Freiwillige Bonuswerkstatt
+
+Ein Kinderrechte-Suchsel auf einer eigenen Seite und eine Fallwerkstatt mit zwölf Alltagssituationen bieten zusätzliche Lernzeit für schnelle Lernende. Die Bonusaufgaben sind freiwillig, ohne Wertung und nicht Teil des Ergebnisprotokolls.
 
 ## 5. Methodisch-mediale Gestaltung
 
-**Gamification als Motivationsträger:** Reise-Rahmung, Sammel- und Fortschrittslogik sowie eine
-Abschluss-Urkunde erhöhen die Aufgabenbindung altersgemäß. Die Spielformen sind bewusst variiert:
+Die Lernreise verbindet unterschiedliche Aufgabenformate und Anforderungsniveaus:
 
-- **Zuordnung** fördert deklaratives Wissen (Was gehört zusammen?).
-- **Jump-and-Run** schafft eine handlungs- und körpernahe, emotional positive Besetzung des Themas.
-- **Sortieraufgabe (Recht/Wunsch)** zielt auf begriffliche Klärung und Urteilsbildung.
+- **Zuordnung:** Aufbau und Sicherung deklarativen Wissens.
+- **Hüpfspiel:** motivierende Handlungserfahrung mit anschließender inhaltlicher Vertiefung.
+- **Kategorisierung:** begriffliche Klärung und Urteilsbildung.
+- **Persönliche Reflexion:** begründete Positionierung und Handlungsorientierung.
+- **Fallwerkstatt:** Transfer auf neue Alltagssituationen.
 
-**Niedrige Frustschwelle:** Im Hüpfspiel gibt es kein „Game Over" – Hindernisse führen nur zu kurzem
-Stolpern. Das hält den Fokus auf dem Lerninhalt statt auf Spielleistung. Falsche Antworten werden nicht
-sanktioniert, sondern mit der richtigen Lösung erläutert.
+Die Gamification dient nicht nur als Belohnung. Reiseweg, Avatar, Sammellogik, Truhe, Rechte-Kompass, Mission und Urkunde visualisieren einen Lernfortschritt vom **Erkennen** über das **Beurteilen** bis zum **Handeln**.
 
-**Ergebnissicherung:** Die Mini-Frage an der Schatztruhe und der Ergebnis-Bildschirm (gesammelt /
-verpasst) machen den Lernstand für die Lernenden selbst sichtbar.
+Im Hüpfspiel gibt es kein „Game Over“. Hindernisse führen lediglich zu kurzem Stolpern. Fehler werden mit Rückmeldung und erneuter Bearbeitungsmöglichkeit verbunden. Dadurch bleibt der Fokus auf dem Lerngegenstand und nicht auf spielerischer Leistung.
 
----
+## 6. Differenzierung, Inklusion und Barrierearmut
 
-## 6. Differenzierung, Inklusion, Barrierearmut
+- Sieben vielfältige Reisefiguren unterstützen Identifikation; alle Figuren werden ausdrücklich als gleich stark dargestellt.
+- Große Touch-Ziele, Antippen statt Ziehen und ein iPad-optimiertes Layout erleichtern die Bedienung.
+- Tastatur- und Touchsteuerung ermöglichen unterschiedliche Zugänge.
+- Eine Tempoauswahl im Hüpfspiel und portionierte Runden reduzieren Überforderung.
+- Bilder, kurze Texte und gesprochensprachlich formulierte Coach-Hinweise sprechen mehrere Zugänge an; Bilder besitzen Alternativtexte.
+- Vorgegebene Begründungen und Auswahlmöglichkeiten entlasten Lernende mit geringer Schreib- oder Lesesicherheit, ohne die Entscheidung abzunehmen.
+- Sichtbare Fokusrahmen, `aria-live`-Rückmeldungen und die Berücksichtigung reduzierter Bewegung verbessern die technische Zugänglichkeit.
+- Bonuswerkstatt und Fallarbeit ermöglichen Binnendifferenzierung nach oben.
 
-- **Tempo-Wahl** (langsam/normal) und das **Rundensystem** in Modul 1 portionieren die Anforderung.
-- **Bedienung** per Tastatur **und** Touch; großer „SPRINGEN"-Button für Tablet und Beamer.
-- **Zuordnung durch Antippen** (statt fein-motorischem Ziehen) ist tablet-tauglich.
-- **Bild + Symbol + Text** sprechen unterschiedliche Wahrnehmungskanäle an; Bilder tragen
-  Alternativtexte (`alt`).
-- **Vorgegebene Begründungen** entlasten schreibschwache Lernende, ohne die Denkleistung zu ersetzen.
+## 7. Ergebnissicherung und Abgabe
 
----
+Der aktuelle Lernstand kann **zu jedem Zeitpunkt und in jeder Station** als TXT-Datei gespeichert werden. Erfasst werden Reisefigur, Bearbeitungszeit, Status und Kennwerte der Stationen sowie bereits getroffene Entscheidungen aus Station 4. Noch nicht begonnene oder in Bearbeitung befindliche Stationen werden entsprechend gekennzeichnet. Die Bonuswerkstatt bleibt bewusst außerhalb des Protokolls.
 
-## 7. Einsatz im Unterricht
+Nach der Urkunde unterstützt eine kindgerechte Checkliste die Abgabe über Microsoft Teams. Das Protokoll ist ein niedrigschwelliger Bearbeitungsnachweis und eine Gesprächsgrundlage, keine eigenständige Leistungsbewertung und kein vollständiger Kompetenznachweis.
 
-**Sozialform:** Einzel- oder Partnerarbeit am Gerät; alternativ als Lehrer-Demonstration am Beamer im
-Klassengespräch.
+## 8. Einsatz im Unterricht
 
-**Zeitbedarf:** ca. 20–30 Minuten für den vollständigen Durchgang; einzelne Module sind auch getrennt
-einsetzbar.
+**Sozialform:** Einzel- oder Partnerarbeit am iPad; einzelne Phasen können gemeinsam am Beamer erschlossen werden.
 
-**Unverzichtbar – die Anschlusskommunikation:** Das Spiel ersetzt das religiöse Gespräch nicht. Es
-empfiehlt sich eine **Auswertungsphase**, die das Digitale ins Gespräch zurückholt, z. B.:
+**Zeitbedarf:** etwa 30 bis 40 Minuten für den Pflichtdurchgang. Für Suchsel und Fallwerkstatt sollten bei Nutzung weitere 15 bis 25 Minuten eingeplant werden.
 
-- *„Welches Recht war dir neu – und warum ist es wichtig?"*
-- *„Was hat Jesu Umgang mit Kindern mit unserer heutigen Frage zu tun – und was nicht?"*
-- *„Wo erleben Kinder, dass ihre Rechte nicht gelten?"* (Transfer, altersangemessen dosiert)
+Die Lehrkraft sollte insbesondere die Bibelstelle und die Abschlussreflexion kommunikativ rahmen. Geeignete Auswertungsimpulse sind:
 
-Erst diese Phase hebt das Thema von der Ebene des Faktenwissens auf die der **Werthaltung**.
+- Welches Kinderrecht war dir neu und warum ist es wichtig?
+- Was zeigt Mk 10,13–16 über Jesu Umgang mit Kindern?
+- Was verbindet die biblische Erzählung und die Kinderrechte, und worin unterscheiden sie sich?
+- Welche Mission hast du gewählt und wie könnte sie in Schule oder Alltag konkret werden?
+- Wo erleben Kinder, dass ihre Rechte nicht ausreichend geschützt werden?
 
----
+Erst die Anschlusskommunikation führt Faktenwissen, biblische Deutung, Urteil und Handlungsorientierung zusammen.
 
-## 8. Grenzen und kritische Reflexion
+## 9. Grenzen und kritische Reflexion
 
-- **Komplexitätsreduktion:** Die Unterscheidung „Recht vs. Wunsch" ist bewusst vereinfacht. Grenzfälle
-  (z. B. Spiel/Freizeit als Recht) sollten im Gespräch aufgegriffen werden.
-- **Symbolik:** Emojis und generierte Illustrationen prägen die Wirkung stark; auf klischeefreie,
-  vielfältige Darstellungen ist zu achten.
-- **Sensible Rechte:** Schutz vor Gewalt, Kinderarbeit und Drogen werden nur **neutral-symbolisch**
-  dargestellt. Ob und wie tief diese Themen vertieft werden, entscheidet die Lehrkraft je nach
-  Lerngruppe.
-- **Emotionale Nähe:** Ein Spiel kann Betroffenheit anstoßen, aber nicht auffangen. Die Lehrkraft
-  bleibt für die Einordnung verantwortlich.
+- Die Unterscheidung zwischen Recht und Wunsch ist didaktisch reduziert. Grenzfälle sollten im Gespräch aufgegriffen werden.
+- KI-generierte Bilder benötigen eine kritische Prüfung auf Klischees und sachliche Eindeutigkeit.
+- Gewalt, Kinderarbeit, Krankheit und fehlende Versorgung werden altersangemessen, aber nicht verharmlosend dargestellt. Bei persönlicher Betroffenheit ist pädagogische Begleitung notwendig.
+- Die Weltreise dient der Strukturierung und behauptet keine kontinenttypischen Eigenschaften. Kulturelle Stereotype sind ausdrücklich zu vermeiden.
+- Die persönliche Mission ist ein Handlungsimpuls, keine überprüfbare Garantie zukünftigen Handelns.
+- Das Ergebnisprotokoll dokumentiert Bearbeitung, nicht die vollständige Erreichung der zitierten Kompetenzen.
 
----
+## 10. Datenschutz
 
-## 9. Datenschutz
+Die Anwendung läuft vollständig lokal im Browser. Es gibt keine Server-Kommunikation, kein Tracking und keine automatische Übertragung personenbezogener Daten. In die Urkunde wird bewusst kein Vorname eingetragen. Die TXT-Datei entsteht nur auf dem Gerät und wird ausschließlich durch eine aktive Handlung der Lernenden gespeichert und gegebenenfalls weitergegeben.
 
-Die Anwendung läuft **vollständig lokal im Browser**: keine Server-Kommunikation, keine externen
-Ressourcen (Schriften/Skripte/Bilder sind eingebunden bzw. liegen lokal), **keine Speicherung**
-personenbezogener Daten. Der für die Urkunde eingegebene Name wird nur angezeigt und **nicht**
-gespeichert oder übertragen. Damit ist der Einsatz auch mit Blick auf schulische Datenschutzvorgaben
-unkritisch.
+## 11. Quelle und Zitierweise
 
----
+Ministerium für Schule und Weiterbildung des Landes Nordrhein-Westfalen (Hrsg.) (2013): *Kernlehrplan für die Gesamtschule in Nordrhein-Westfalen. Evangelische Religionslehre.* Heft 3109. Düsseldorf.
 
-*Hinweis: Konkrete Lehrplan- und Kompetenzformulierungen sind an das Kerncurriculum bzw. den Lehrplan
-des jeweiligen Bundeslandes anzupassen.*
+Kurzzitat im Kommentar: **KLP, Seite**. Die Seitenangaben beziehen sich auf die gedruckte Seitenzählung und stimmen im bereitgestellten PDF mit den PDF-Seiten überein.
+
+Bibelbezug der Lernsimulation: **Mk 10,13–16**.
