@@ -438,6 +438,11 @@ function answerColorIndex(i, sub){
   const order = Array.isArray(sub?.answerColors) && sub.answerColors.length ? sub.answerColors : [1,2,3,0];
   return order[i] ?? (i%4);
 }
+function orderedQuestion(q, order){
+  if(!q || !Array.isArray(order)) return q;
+  const a=order.map(i=>q.a[i]);
+  return {...q, a, correct:order.indexOf(q.correct)};
+}
 
 let role = null;          // 'host' | 'team'
 let NET = null;           // Supabase-Kanal
@@ -655,7 +660,7 @@ function handleHelpPurchase(tid, pi){
   const P = PHASES[G.phaseIdx], allowed = ["quiz","reveal","tribunal","finale"].includes(P.type);
   if(!allowed || G.sub.stage!=="ask" && !(P.type==="finale" && ["play","retry"].includes(G.sub.stage))) return;
   const cost=helpCostFor(tid), team = G.teams[tid]; if(!team || team.pts < cost) return;
-  const q = P.type==="quiz" ? currentQ() : P.type==="finale" ? P.questions[G.sub.assigned[tid]] : {a:P.options};
+  const q = P.type==="quiz" ? currentQ() : P.type==="finale" ? P.questions[G.sub.assigned[tid]] : orderedQuestion({a:P.options,correct:P.correct},G.sub.optionOrder);
   const correct = q.correct;
   const wrong = q.a.map((_,i)=>i).filter(i=>i!==correct && !(G.sub.eliminated?.[tid]||[]).includes(i));
   if(!wrong.length) return;
@@ -734,7 +739,7 @@ function enterPhase(idx){
   if(P.type==="quiz"){ G.sub = {qi:0, stage:"ask", counts:[], answers:{}}; startQuestion(); return; }
   if(P.type==="reveal"||P.type==="tribunal"){
     G.sub = {step:0, stage:"ask", locked:[], answered:{}, winner:null, fCounts:[], fAnswers:{}};
-    G.sub.answerColors = randomAnswerColors(P.options.length); resetHelpState(); setDeadline(P.time); hostRender(); broadcastState(); return;
+    G.sub.optionOrder = shuffle(P.options.map((_,i)=>i)); G.sub.answerColors = randomAnswerColors(P.options.length); resetHelpState(); setDeadline(P.time); hostRender(); broadcastState(); return;
   }
   if(P.type==="sort"){
     G.sub = {stage:"work", prog:{}, finished:[]};
@@ -771,10 +776,10 @@ function setDeadline(sec){ G.total = sec; G.deadline = Date.now() + sec*1000; }
 function extendTime(sec){ if(G.deadline){ G.deadline += sec*1000; hostRender(); broadcastState(); } }
 
 /* ---------- Quiz ---------- */
-function currentQ(){ const P=PHASES[G.phaseIdx]; return P.questions[G.sub.qi]; }
+function currentQ(){ const P=PHASES[G.phaseIdx]; return orderedQuestion(P.questions[G.sub.qi],G.sub.optionOrder); }
 function startQuestion(){
   const P = PHASES[G.phaseIdx];
-  G.sub.stage = "ask"; G.sub.answers = {}; G.sub.counts = []; G.sub.answerColors = randomAnswerColors(P.questions[G.sub.qi].a.length); resetHelpState();
+  G.sub.stage = "ask"; G.sub.answers = {}; G.sub.counts = []; G.sub.optionOrder = shuffle(P.questions[G.sub.qi].a.map((_,i)=>i)); G.sub.answerColors = randomAnswerColors(P.questions[G.sub.qi].a.length); resetHelpState();
   teamsArr().forEach(t=>t.lastDelta=0);
   setDeadline(P.time);
   sfx.whoosh();
@@ -827,10 +832,11 @@ const CLUE_PTS = [300,200,100];
 function handleClueAnswer(tid, pi, choice){
   if(pi!==G.phaseIdx) return;
   const P = PHASES[G.phaseIdx];
+  const correctChoice = G.sub.optionOrder ? G.sub.optionOrder.indexOf(P.correct) : P.correct;
   if(G.sub.stage==="ask"){
     if(G.sub.locked.includes(tid) || G.sub.answered[tid]!==undefined) return;
     G.sub.answered[tid] = choice;
-    if(choice === P.correct){
+    if(choice === correctChoice){
       G.sub.winner = tid;
       const avatarBonus = P.title==="Der erste Angeklagte" && G.teams[tid].avatarId==="feuerbach" ? claimAvatarBonus(tid,"feuerbach-tribunal") : P.title==="Der zweite Angeklagte" && G.teams[tid].avatarId==="nietzsche" ? claimAvatarBonus(tid,"nietzsche-tribunal") : 0;
       addPts(tid, CLUE_PTS[Math.min(G.sub.step, 2)] + avatarBonus);
@@ -854,20 +860,20 @@ function handleClueAnswer(tid, pi, choice){
 function nextClue(){
   const P = PHASES[G.phaseIdx];
   if(G.sub.step < 2){
-    G.sub.step++; G.sub.answerColors = randomAnswerColors(P.options.length); resetHelpState(); setDeadline(P.time); sfx.whoosh();
+    G.sub.step++; G.sub.optionOrder = shuffle(P.options.map((_,i)=>i)); G.sub.answerColors = randomAnswerColors(P.options.length); resetHelpState(); setDeadline(P.time); sfx.whoosh();
   } else { G.sub.stage = "res"; G.deadline = 0; stopTimerUI(); }
   hostRender(); broadcastState();
 }
 function startFollow(){
   const P = PHASES[G.phaseIdx];
   if(!P.follow){ hostAdvancePhase(); return; }
-  G.sub.stage = "follow"; G.sub.fAnswers = {}; G.sub.answerColors = randomAnswerColors(P.follow.a.length); resetHelpState();
+    G.sub.stage = "follow"; G.sub.fAnswers = {}; G.sub.optionOrder = shuffle(P.follow.a.map((_,i)=>i)); G.sub.answerColors = randomAnswerColors(P.follow.a.length); resetHelpState();
   setDeadline(P.follow.time || 25);
   hostRender(); broadcastState();
 }
 function resolveFollow(){
   stopTimerUI();
-  const P = PHASES[G.phaseIdx], q = P.follow;
+  const P = PHASES[G.phaseIdx], q = orderedQuestion(P.follow,G.sub.optionOrder);
   const counts = new Array(q.a.length).fill(0);
   Object.entries(G.sub.fAnswers).forEach(([tid,a])=>{
     counts[a.choice]++;
@@ -1091,7 +1097,7 @@ function hostRender(){
     }
     let bottom = "";
     if(G.sub.stage==="ask"){
-      bottom = `<div class="board-answers">${P.options.map((o,i)=>`<div class="board-ans a${answerColorIndex(i,G.sub)}" style="background:${ANSWER_COLORS[answerColorIndex(i,G.sub)]}">${["🟥","🟦","🟧","🟩"][answerColorIndex(i,G.sub)]} ${esc(o)}</div>`).join("")}</div>
+      bottom = `<div class="board-answers">${(G.sub.optionOrder||P.options.map((_,i)=>i)).map((sourceIndex,i)=>{const o=P.options[sourceIndex]; return `<div class="board-ans a${answerColorIndex(i,G.sub)}" style="background:${ANSWER_COLORS[answerColorIndex(i,G.sub)]}">${["🟥","🟦","🟧","🟩"][answerColorIndex(i,G.sub)]} ${esc(o)}</div>`;}).join("")}</div>
         ${answeredChipsHtml(G.sub.answered)}
         <p class="center" style="color:var(--muted); margin-top:10px;">Früh antworten bringt ${CLUE_PTS[Math.min(G.sub.step,2)]} Punkte – falsch kostet 50 und sperrt!</p>`;
       barExtra = `<button class="btn small secondary" onclick="nextClue()">${isRev?"Mehr aufdecken":"Nächstes Indiz"} 🔎</button>`;
@@ -1101,10 +1107,10 @@ function hostRender(){
       bottom = `<h2 style="margin-top:14px;">${w?`${w.emblem} ${esc(w.name)} hat es erkannt! +${CLUE_PTS[Math.min(G.sub.step,2)]}`:"Niemand hat es erkannt …"}</h2>`;
     }
     if(G.sub.stage==="follow"){
-      bottom = `${timerHtml()}<h2 style="margin:14px 0;">${esc(P.follow.q)}</h2>${boardAnswersHtml(P.follow, null, false)}${answeredChipsHtml(G.sub.fAnswers)}`;
+      bottom = `${timerHtml()}<h2 style="margin:14px 0;">${esc(P.follow.q)}</h2>${boardAnswersHtml(orderedQuestion(P.follow,G.sub.optionOrder), null, false)}${answeredChipsHtml(G.sub.fAnswers)}`;
     }
     if(G.sub.stage==="fres"){
-      bottom = `<h2 style="margin:14px 0;">${esc(P.follow.q)}</h2>${boardAnswersHtml(P.follow, {counts:G.sub.fCounts}, true)}${scoreboardHtml(teamsArr(), true)}`;
+      bottom = `<h2 style="margin:14px 0;">${esc(P.follow.q)}</h2>${boardAnswersHtml(orderedQuestion(P.follow,G.sub.optionOrder), {counts:G.sub.fCounts}, true)}${scoreboardHtml(teamsArr(), true)}`;
     }
     html = `${worldBanner(P.world)}
       <div class="center" style="color:var(--muted); letter-spacing:.15em;">${esc(P.title || "Die Enthüllung")}</div>
@@ -1387,7 +1393,7 @@ function teamRender(){
   }
 
   if(P.type==="quiz"){
-    const q = P.questions[sub.qi];
+    const q = orderedQuestion(P.questions[sub.qi],sub.optionOrder);
     const key = pi+":"+sub.qi;
     if(sub.stage==="ask"){
       const answered = myAnswers[key]!==undefined;
@@ -1419,7 +1425,7 @@ function teamRender(){
     if(sub.stage==="ask"){
       const locked = (sub.locked||[]).includes(T.tid);
       const answered = sub.answered && sub.answered[T.tid]!==undefined;
-      const q = {a:P.options};
+      const q = {a:orderedQuestion({a:P.options,correct:P.correct},sub.optionOrder).a};
       const clues = P.clues ? `<div class="clue-list"><div class="world-tag">Indizien für euer Team</div>${P.clues.slice(0,sub.step+1).map((clue,i)=>`<div class="clue-item ${i===sub.step?"current":""}">🔎 ${esc(clue)}</div>`).join("")}</div>` : "";
       app.innerHTML = `${teamHeader()}
         ${withTimer?timerHtml():""}
@@ -1447,7 +1453,7 @@ function teamRender(){
       app.innerHTML = `${teamHeader()}
         ${withTimer?timerHtml():""}
         <div class="panel"><p style="font-size:1.15rem;">${esc(P.follow.q)}</p></div>
-        ${answerButtons(P.follow, fkey, answered, sub.eliminated?.[T.tid]||[])}
+        ${answerButtons(orderedQuestion(P.follow,sub.optionOrder), fkey, answered, sub.eliminated?.[T.tid]||[])}
         ${answered?`<p class="center" style="margin-top:14px; color:var(--muted);">Gesendet …</p>`:""}`;
       if(withTimer) runTimerUI(lastState.deadline, lastState.total, null);
       if(!answered) bindAnswers(i=>{
