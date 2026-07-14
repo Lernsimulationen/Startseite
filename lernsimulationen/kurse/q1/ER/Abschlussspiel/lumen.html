@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>LUMEN – Das große Q1-Finale</title>
+<style>
+:root{
+  --bg:#151a35; --bg2:#202852; --panel:#29315a; --panel2:#333d70;
+  --gold:#f4c95d; --gold2:#ffe29a; --glass-red:#e05263; --glass-blue:#5b8def;
+  --glass-green:#5fbf77; --glass-purple:#9b6fd4; --lead:#0a0c18;
+  --text:#f2efe6; --muted:#9aa0c3;
+  --w1:#e08d3c; --w2:#5b8def; --w3:#9b6fd4; --w4:#5fbf77;
+}
+*{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+html,body{height:100%;}
+body{
+  font-family:Georgia,'Times New Roman',serif; background:var(--bg); color:var(--text);
+  background-image:radial-gradient(ellipse at 50% -20%, #465596 0%, #202852 42%, var(--bg) 78%);
+  min-height:100vh; overflow-x:hidden;
+}
+button{font-family:inherit;}
+.hidden{display:none !important;}
+#app{max-width:1200px; margin:0 auto; padding:16px; min-height:100vh; display:flex; flex-direction:column;}
+
+/* ===== Typo ===== */
+h1{font-size:clamp(2rem,6vw,4rem); letter-spacing:.35em; text-align:center; color:var(--gold);
+   text-shadow:0 0 30px rgba(244,201,93,.35); font-weight:normal;}
+h2{font-size:clamp(1.3rem,3.5vw,2.4rem); text-align:center; font-weight:normal;}
+.subtitle{text-align:center; color:var(--muted); letter-spacing:.15em; margin-top:6px;}
+
+/* ===== Buttons ===== */
+.btn{
+  display:inline-block; border:none; cursor:pointer; border-radius:14px;
+  padding:14px 26px; font-size:1.1rem; color:var(--lead); background:var(--gold);
+  box-shadow:0 4px 0 #b8923c, 0 8px 24px rgba(0,0,0,.4); transition:transform .08s, filter .15s;
+}
+.btn:active{transform:translateY(3px); box-shadow:0 1px 0 #b8923c;}
+.btn:disabled{filter:grayscale(.8) brightness(.6); cursor:default;}
+.btn.secondary{background:var(--panel2); color:var(--text); box-shadow:0 4px 0 #12152b, 0 8px 24px rgba(0,0,0,.4);}
+.btn.big{font-size:1.5rem; padding:20px 40px;}
+.btn.small{font-size:.95rem; padding:8px 16px; border-radius:10px;}
+.btn.danger{background:var(--glass-red); color:#fff; box-shadow:0 4px 0 #8c2f3b;}
+
+/* ===== Panels ===== */
+.panel{background:var(--panel); border:1px solid #5665a0; border-radius:18px; padding:22px; box-shadow:0 10px 40px rgba(0,0,0,.38);}
+.center{text-align:center;}
+.row{display:flex; gap:14px; flex-wrap:wrap; justify-content:center; align-items:center;}
+.spacer{flex:1;}
+
+/* ===== Kirchenfenster (CSS-Zeichnung) ===== */
+.window-frame{
+  width:min(46vh,340px); aspect-ratio:.62; margin:0 auto; position:relative;
+  border-radius:50% 50% 8px 8px / 38% 38% 8px 8px;
+  background:var(--lead); padding:12px; box-shadow:0 0 85px rgba(244,201,93,.28), 0 0 30px rgba(120,160,255,.2), inset 0 0 20px #000;
+}
+.window-inner{
+  width:100%; height:100%; border-radius:50% 50% 4px 4px / 38% 38% 4px 4px; overflow:hidden;
+  display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1.25fr 1fr; gap:10px; background:var(--lead);
+}
+.pane{position:relative; transition:all 1.2s ease; display:flex; align-items:center; justify-content:center; font-size:clamp(1.6rem,5vh,3rem); filter:grayscale(1) brightness(.38);}
+.pane .pane-label{position:absolute; bottom:6px; left:0; right:0; text-align:center; font-size:.55rem; letter-spacing:.1em; color:rgba(255,255,255,.75); text-transform:uppercase;}
+.pane.w1{background:radial-gradient(circle at 50% 60%, #f4a259 0%, #b3502c 55%, #6e2a18 100%);}
+.pane.w2{background:radial-gradient(circle at 50% 40%, #7fa8f0 0%, #2d4f9e 55%, #14264f 100%);}
+.pane.w3{background:radial-gradient(circle at 50% 50%, #b58ae0 0%, #5f3b91 55%, #2c1b47 100%);}
+.pane.w4{background:radial-gradient(circle at 50% 45%, #8fd6a0 0%, #35774a 55%, #143521 100%);}
+.pane.lit{filter:grayscale(0) brightness(1.35) saturate(1.1); box-shadow:inset 0 0 40px rgba(255,255,255,.55), 0 0 20px rgba(255,255,255,.18);}
+.pane.glow{animation:paneGlow 2.2s ease-in-out infinite alternate;}
+@keyframes paneGlow{from{box-shadow:inset 0 0 20px rgba(255,255,255,.25);} to{box-shadow:inset 0 0 55px rgba(255,255,255,.7);}}
+
+/* ===== KI-Bild-Platzhalter ===== */
+.ai-img{position:relative; border-radius:14px; overflow:hidden; border:3px solid var(--lead); background:#000; box-shadow:0 10px 40px rgba(0,0,0,.5);}
+.finale-image{padding:10px; border-radius:22px; background:linear-gradient(135deg, #ffe29a, #5b8def 45%, #9b6fd4 72%, #5fbf77); box-shadow:0 0 55px rgba(244,201,93,.65), 0 18px 50px rgba(0,0,0,.45);}
+.finale-image .ai-img{border-color:#fff1bd; box-shadow:0 0 30px rgba(255,255,255,.35);}
+.ai-img img{width:100%; height:100%; object-fit:cover; display:block;}
+.ai-placeholder{
+  width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:12px; padding:18px; text-align:center;
+}
+.ai-placeholder .emoji{font-size:clamp(3rem,10vw,6rem); filter:drop-shadow(0 0 18px rgba(255,255,255,.4));}
+.ai-placeholder .desc{font-size:.85rem; color:rgba(255,255,255,.85); font-style:italic; max-width:420px;}
+.ai-placeholder .tag{font-size:.65rem; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,.5); border:1px solid rgba(255,255,255,.3); padding:3px 10px; border-radius:99px;}
+
+/* ===== Enthüllung ===== */
+.reveal-box{position:relative;}
+.reveal-cover{position:absolute; inset:0; display:grid; grid-template-columns:repeat(6,1fr); grid-template-rows:repeat(4,1fr);}
+.reveal-cover .tile{background:var(--lead); border:1px solid #1c2140; transition:opacity .5s;}
+.reveal-cover .tile.off{opacity:0;}
+
+/* ===== Antwort-Buttons (Team) ===== */
+.answers{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px;}
+.answers.one-col{grid-template-columns:1fr;}
+.ans-btn{
+  border:none; border-radius:14px; padding:18px 14px; font-size:1.05rem; cursor:pointer; color:#fff;
+  min-height:74px; box-shadow:0 4px 0 rgba(0,0,0,.4); transition:transform .08s, filter .2s; text-align:center;
+}
+.ans-btn:active{transform:translateY(3px);}
+.ans-btn.a0{background:var(--glass-red);} .ans-btn.a1{background:var(--glass-blue);}
+.ans-btn.a2{background:var(--w1);} .ans-btn.a3{background:var(--glass-green);}
+.ans-btn.chosen{outline:4px solid #fff;}
+.ans-btn.dim{filter:brightness(.35);}
+.ans-btn.correct{outline:4px solid var(--gold); filter:brightness(1.15);}
+
+/* ===== Tafel: Antwort-Anzeige ===== */
+.board-answers{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:18px;}
+.board-ans{border-radius:14px; padding:18px 20px; font-size:clamp(1rem,2.2vw,1.5rem); color:#fff; position:relative; overflow:hidden; min-height:64px; display:flex; align-items:center; box-shadow:0 6px 20px rgba(0,0,0,.35);}
+.board-ans .cnt{margin-left:auto; background:rgba(0,0,0,.35); border-radius:99px; padding:4px 14px; font-size:1rem;}
+.board-ans.dim{filter:brightness(.3);}
+.board-ans.correct{outline:4px solid var(--gold);}
+
+/* ===== Teams / Punkte ===== */
+.team-chip{display:flex; align-items:center; gap:8px; background:var(--panel2); border-radius:99px; padding:8px 16px; font-size:1rem; border:1px solid #3a4180;}
+.team-chip .emblem{font-size:1.3rem;}
+.scoreboard{display:flex; flex-direction:column; gap:10px; margin-top:14px;}
+.score-row{display:flex; align-items:center; gap:12px; background:var(--panel2); border-radius:12px; padding:10px 16px; transition:transform .6s;}
+.score-row .emblem{font-size:1.5rem;}
+.score-row .name{font-size:1.1rem;}
+.score-row .pts{margin-left:auto; color:var(--gold); font-size:1.2rem; font-variant-numeric:tabular-nums;}
+.score-row .delta{color:var(--glass-green); font-size:.95rem; margin-left:10px;}
+
+/* ===== Fortschritts-Rennen ===== */
+.race{display:flex; flex-direction:column; gap:14px; margin-top:18px;}
+.race-row{display:flex; align-items:center; gap:10px;}
+.race-row .emblem{font-size:1.4rem; width:36px; text-align:center;}
+.race-track{flex:1; height:26px; background:var(--panel2); border-radius:99px; position:relative; overflow:hidden;}
+.race-fill{height:100%; border-radius:99px; background:linear-gradient(90deg,var(--gold),var(--gold2)); width:0%; transition:width .4s ease; box-shadow:0 0 14px rgba(244,201,93,.5);}
+.race-row.done .race-fill{background:linear-gradient(90deg,var(--glass-green),#a5e8b5);}
+
+/* ===== Sortieren (Team) ===== */
+.sort-list{display:flex; flex-direction:column; gap:8px; margin-top:14px;}
+.sort-item{background:var(--panel2); border:1px solid #3a4180; border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px; font-size:1rem; user-select:none;}
+.sort-item .num{background:var(--lead); border-radius:8px; min-width:30px; text-align:center; padding:4px 0; color:var(--gold); font-variant-numeric:tabular-nums;}
+.sort-item .updown{margin-left:auto; display:flex; gap:6px;}
+.sort-item button{background:var(--panel); color:var(--text); border:1px solid #3a4180; border-radius:8px; width:40px; height:40px; font-size:1.2rem; cursor:pointer;}
+.sort-item.locked{opacity:.7;}
+
+/* ===== Timer ===== */
+.timerbar{height:10px; background:var(--panel2); border-radius:99px; overflow:hidden; margin:14px 0;}
+.timerbar .fill{height:100%; background:linear-gradient(90deg,var(--glass-red),var(--gold)); width:100%; transition:width .25s linear;}
+.timer-num{font-size:clamp(1.6rem,4vw,2.6rem); color:var(--gold); text-align:center; font-variant-numeric:tabular-nums;}
+
+/* ===== Kreativ/Voting ===== */
+.free-input{width:100%; background:var(--panel2); border:1px solid #3a4180; color:var(--text); border-radius:12px; padding:14px; font-size:1.05rem; font-family:inherit; resize:none; min-height:90px;}
+.vote-card{background:var(--panel2); border:1px solid #3a4180; border-radius:14px; padding:16px 18px; font-size:clamp(1rem,2vw,1.3rem); font-style:italic; position:relative;}
+.vote-card .votes{position:absolute; top:-10px; right:-6px; background:var(--gold); color:var(--lead); border-radius:99px; padding:3px 12px; font-size:.95rem; font-style:normal;}
+.vote-card.mine{outline:2px dashed var(--muted);}
+
+/* ===== Lobby ===== */
+.roomcode{font-size:clamp(2.6rem,8vw,5rem); letter-spacing:.4em; color:var(--gold); text-align:center; text-shadow:0 0 24px rgba(244,201,93,.4); font-variant-numeric:tabular-nums;}
+.emblem-pick{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin:12px 0;}
+.emblem-pick button{font-size:1.8rem; background:var(--panel2); border:2px solid #3a4180; border-radius:14px; width:60px; height:60px; cursor:pointer;}
+.emblem-pick button.sel{border-color:var(--gold); background:#2e3567;}
+.emblem-pick button.taken{opacity:.25; pointer-events:none;}
+input.text{background:var(--panel2); border:1px solid #3a4180; color:var(--text); border-radius:12px; padding:14px; font-size:1.2rem; font-family:inherit; width:100%; text-align:center;}
+input.code{letter-spacing:.4em; text-transform:uppercase; font-size:1.6rem;}
+
+/* ===== Host-Steuerleiste ===== */
+#hostbar{position:fixed; bottom:0; left:0; right:0; background:rgba(10,12,24,.92); backdrop-filter:blur(6px); border-top:1px solid #333a6e; padding:10px 14px; display:flex; gap:10px; align-items:center; z-index:50;}
+#hostbar .info{color:var(--muted); font-size:.9rem;}
+body.is-host #app{padding-bottom:90px;}
+
+/* ===== Welt-Header ===== */
+.world-banner{display:flex; align-items:center; gap:16px; justify-content:center; margin-bottom:14px;}
+.world-banner .icon{font-size:2.2rem;}
+.world-banner .wname{font-size:clamp(1.2rem,3vw,2rem); letter-spacing:.12em;}
+.world-tag{font-size:.75rem; letter-spacing:.25em; text-transform:uppercase; color:var(--muted); text-align:center; margin-bottom:4px;}
+
+/* ===== Feedback-Overlays (Team) ===== */
+.flash{position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; z-index:40; font-size:1.6rem; text-align:center; padding:20px;}
+.flash.ok{background:rgba(35,110,60,.96);}
+.flash.bad{background:rgba(140,47,59,.96);}
+.flash.wait{background:rgba(20,24,48,.96);}
+.flash .big-ico{font-size:4rem;}
+
+/* ===== Konfetti ===== */
+#confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+
+/* ===== Podium ===== */
+.podium{display:flex; align-items:flex-end; justify-content:center; gap:14px; margin-top:26px; min-height:260px;}
+.podium .col{display:flex; flex-direction:column; align-items:center; gap:10px; width:130px;}
+.podium .block{width:100%; border-radius:12px 12px 0 0; background:linear-gradient(180deg,var(--panel2),var(--panel)); border:1px solid #3a4180; display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:1.6rem;}
+.podium .col.p1 .block{height:170px; background:linear-gradient(180deg,#6d5b1e,var(--panel));}
+.podium .col.p2 .block{height:120px;}
+.podium .col.p3 .block{height:85px;}
+.podium .who{font-size:1.05rem; text-align:center;}
+.podium .who .emblem{font-size:2rem; display:block;}
+
+@media (max-width:640px){
+  .answers{grid-template-columns:1fr;}
+  .board-answers{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<canvas id="confetti"></canvas>
+<div id="hostbar" class="hidden"></div>
+<script>
+/* ============================================================
+   LUMEN – Das große Q1-Finale (Ev. Religionslehre)
+   ============================================================
+   EINSTELLUNGEN – bitte hier eintragen:
+   1) Supabase-Projekt anlegen (kostenlos): https://supabase.com
+   2) Settings → API: "Project URL" und "anon public"-Key kopieren
+   3) Unten einfügen. Bleiben die Felder leer, startet das Spiel
+      im NOTFALLMODUS (Tafel allein, Antworten per Handzeichen).
+   ============================================================ */
+const SUPABASE_URL = "https://xeqzioibjztjvscpdbrm.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_ubP_iCK_eNkBgGGzFmrIDw_CmDOP09D";
+
+/* ============================================================
+   KURS-INSIDER (optional): Hier eigene Spaßfragen ergänzen.
+   Format wie unten – sie werden automatisch als Bonusfragen
+   in das Blitzquiz der passenden Welt gemischt (world:1-4).
+   ============================================================ */
+const INSIDER = [
+  // {world:4, q:"Welcher Satz fiel in unserem Kurs am häufigsten?", a:["...", "...", "...", "..."], correct:0},
+];
+
+/* ============ KI-BILDER ============
+   Die Dateien werden aus dem Unterordner img/ geladen (img/<id>.png).
+   Fehlt eine Datei, zeigt das Spiel automatisch einen stimmigen
+   Platzhalter mit der Bildbeschreibung an – voll spielbar.
+   Prompt-Stil für alle Bilder:
+   "Moderne Glasmalerei / Stained-Glass-Illustration, leuchtende
+    Farben auf dunklem Grund, klare schwarze Bleilinien, feierlich,
+    KEINE Darstellung Gottes als Person."                       */
+const AI_IMAGES = {
+  "titel-fenster":     {emoji:"⛪", desc:"Großes gotisches Kirchenfenster mit vier dunklen Feldern, ein einzelner goldener Lichtstrahl fällt schräg ein"},
+  "goldenes-kalb":     {emoji:"🐂", desc:"Goldenes Kalb auf einem Altar, tanzende Silhouetten darum, Glasmalerei-Stil"},
+  "brennender-dornbusch":{emoji:"🔥", desc:"Brennender Dornbusch, der nicht verbrennt – Flammen aus buntem Glas, davor abgestreifte Sandalen"},
+  "welt2-sturm":       {emoji:"🌪️", desc:"Eine kleine einsame Gestalt (Hiob) unter einem gewaltigen Sturmwirbel aus blauem Glas"},
+  "welt3-tribunal":    {emoji:"⚖️", desc:"Vier Scherenschnitt-Porträts auf einer Richterbank: Denker mit Schnurrbart, mit Brille und Zigarre, mit Vollbart, mit Backenbart"},
+  "welt4-weg":         {emoji:"🌴", desc:"Staubige Straße mit Palmzweigen Richtung Stadtsilhouette Jerusalems im Abendlicht"},
+  "senfkorn-baum":     {emoji:"🌳", desc:"Winziges Senfkorn neben riesigem Baum voller Vögel, Kontrast klein/groß in Glasmalerei"},
+  "finale-fenster":    {emoji:"✨", desc:"Dasselbe Kirchenfenster wie am Anfang, jetzt in voller Farbe leuchtend, Lichtstrahlen fluten den Raum"},
+};
+
+/* ============ SPIEL-DATEN ============ */
+const WORLDS = [
+  {id:1, name:"Der Dornbusch",        tag:"Biblisches Sprechen von Gott", icon:"🔥", color:"var(--w1)", paneClass:"w1"},
+  {id:2, name:"Der Sturm",            tag:"Die Theodizee-Frage",          icon:"🌪️", color:"var(--w2)", paneClass:"w2"},
+  {id:3, name:"Das Tribunal",         tag:"Religionskritik",              icon:"⚖️", color:"var(--w3)", paneClass:"w3"},
+  {id:4, name:"Der Weg nach Jerusalem", tag:"Jesus Christus",             icon:"🌴", color:"var(--w4)", paneClass:"w4"},
+];
+
+const EMBLEMS = ["🕊️","🐟","🦁","🐑","🌱","🕯️"];
+
+/* Phasentypen: lobby, world-intro, quiz, reveal, sort, creative, vote,
+   world-done, finale-intro, finale, ceremony */
+const PHASES = [
+  {type:"lobby"},
+
+  /* ---------- WELT 1: Der Dornbusch ---------- */
+  {type:"world-intro", world:1},
+  {type:"quiz", world:1, title:"Blitzquiz", time:25, questions:[
+    {q:"Mose fragt am Dornbusch nach Gottes Namen. Die Antwort lautet:",
+     a:["„Ich werde sein, der ich sein werde.“","„Ich bin der Allmächtige.“","„Mein Name ist heilig – frage nicht.“","„Ich bin, der euch richtet.“"], correct:0},
+    {q:"Beim Vorlesen der Bibel sprechen Juden den Gottesnamen JHWH nicht aus. Stattdessen sagen sie:",
+     a:["Adonai","Elohim","Messias","Halleluja"], correct:0},
+    {q:"Aus welchen vier hebräischen Buchstaben besteht der Gottesname?",
+     a:["Jod – He – Waw – He","Alef – Bet – Gimel – Dalet","Jod – Schin – Waw – He","He – Waw – Schin – Jod"], correct:0},
+    {q:"Was ist das Besondere am brennenden Dornbusch?",
+     a:["Er brennt, verbrennt aber nicht","Er spricht mit Donnerstimme","Er wächst mitten im Wasser","Er trägt goldene Früchte"], correct:0},
+    {q:"Gott verheißt ein Land, in dem … fließt:",
+     a:["Milch und Honig","Wein und Öl","Wasser und Gold","Brot und Fisch"], correct:0},
+  ]},
+  {type:"reveal", world:1, img:"goldenes-kalb", time:45, solution:"Das Goldene Kalb (Ex 32)",
+   options:["Das Goldene Kalb","Die Arche Noah","Der Auszug aus Ägypten","Jakobs Traumleiter"], correct:0,
+   follow:{q:"Warum verstößt das Goldene Kalb gegen das Bilderverbot (Ex 20,4)?",
+     a:["Ein menschengemachtes Bild ersetzt den unsichtbaren Gott","Weil Gold zu teuer für den Gottesdienst ist","Weil nur Mose Bilder machen durfte","Weil Tiere unrein sind"], correct:0, time:25}},
+  {type:"reveal", world:1, img:"brennender-dornbusch", time:45, solution:"Der brennende Dornbusch (Ex 3)",
+   options:["Das Pfingstwunder","Der brennende Dornbusch","Die Feuersäule in der Wüste","Elia und die Feuerprobe"], correct:1,
+   follow:{q:"„Das Bild ersetzt die Beziehung.“ – Von wem stammt dieser Satz zum Bilderverbot?",
+     a:["Martin Buber","Dorothee Sölle","Martin Luther","Erich Fromm"], correct:0, time:25}},
+  {type:"world-done", world:1},
+
+  /* ---------- WELT 2: Der Sturm ---------- */
+  {type:"world-intro", world:2},
+  {type:"quiz", world:2, title:"Wer sagt das? – Stimmen aus dem Buch Hiob", time:25, palette:"hiob", questions:[
+    {q:"„Wo ist je ein Unschuldiger zugrunde gegangen? Wer Unheil pflügt, der erntet es.“",
+     a:["Hiobs Freunde","Hiob","Gott"], correct:0},
+    {q:"„Wo warst du, als ich die Erde gründete? Hat der Regen einen Vater?“",
+     a:["Hiobs Freunde","Hiob","Gott"], correct:2},
+    {q:"„Warum schenkt er dem Elenden Licht? Ich habe keinen Frieden, keine Rast, keine Ruhe.“",
+     a:["Hiobs Freunde","Hiob","Gott"], correct:1},
+    {q:"„Erkenne: Gott vergisst dir noch einen Teil deiner Schuld – du leidest weniger, als du verdienst.“",
+     a:["Hiobs Freunde","Hiob","Gott"], correct:0},
+    {q:"„Ich weiß, dass mein Erlöser lebt.“",
+     a:["Hiobs Freunde","Hiob","Gott"], correct:1},
+  ]},
+  {type:"creative", world:2, time:150, title:"Die Epikur-Werkstatt",
+   intro:"Vervollständigt euren Satzanfang so klug oder so kreativ wie möglich – danach stimmt der Kurs ab!",
+   prompts:[
+    "Entweder will Gott die Übel beseitigen und kann es nicht, dann …",
+    "Oder Gott kann die Übel beseitigen und will es nicht, dann …",
+    "Oder Gott will es nicht und kann es nicht, dann …",
+    "Oder Gott will es und kann es – warum aber gibt es dann …",
+    "Wenn ich Gott eine einzige Frage zum Leid stellen dürfte, dann …",
+   ]},
+  {type:"vote", world:2, time:45},
+  {type:"world-done", world:2},
+
+  /* ---------- WELT 3: Das Tribunal ---------- */
+  {type:"world-intro", world:3},
+  {type:"tribunal", world:3, title:"Der erste Angeklagte", time:30,
+   options:["Ludwig Feuerbach","Karl Marx","Sigmund Freud","Friedrich Nietzsche"], correct:0,
+   clues:[
+    "Indiz 1: Ich war ein Philosoph des 19. Jahrhunderts und lernte bei Hegel. (300 Punkte)",
+    "Indiz 2: Ich sage: Nicht Gott schuf den Menschen – der Mensch schuf sich Gott. (200 Punkte)",
+    "Indiz 3: Meine berühmte These: Religion ist eine Projektion menschlicher Wünsche. (100 Punkte)"]},
+  {type:"tribunal", world:3, title:"Der zweite Angeklagte", time:30,
+   options:["Ludwig Feuerbach","Karl Marx","Sigmund Freud","Friedrich Nietzsche"], correct:3,
+   clues:[
+    "Indiz 1: Ich war Professor in Basel und liebte die Musik Richard Wagners – bis zum großen Bruch. (300 Punkte)",
+    "Indiz 2: Ich schrieb „Also sprach Zarathustra“ und forderte die Umwertung aller Werte. (200 Punkte)",
+    "Indiz 3: Mein „toller Mensch“ läuft mit der Laterne über den Markt und ruft meine berühmteste These. (100 Punkte)"]},
+  {type:"quiz", world:3, title:"Blitzquiz: Kritiker & Gottesbeweise", time:25, questions:[
+    {q:"Karl Marx nennt die Religion das … des Volkes:",
+     a:["Opium","Brot","Licht","Gewissen"], correct:0},
+    {q:"Für Sigmund Freud ist Religion vor allem:",
+     a:["Eine Illusion aus kindlichem Wunschdenken","Ein Machtinstrument der Reichen","Eine Projektion des Wesens des Menschen","Der Tod aller Werte"], correct:0},
+    {q:"„Gott ist das, worüber hinaus nichts Größeres gedacht werden kann“ – so beginnt der …",
+     a:["ontologische Gottesbeweis (Anselm)","kosmologische Gottesbeweis","teleologische Gottesbeweis","moralische Gottesbeweis"], correct:0},
+    {q:"Welcher Gottesbeweis schließt aus der Ordnung und Zweckmäßigkeit der Welt auf Gott?",
+     a:["der teleologische","der ontologische","der kosmologische","der moralische"], correct:0},
+    {q:"„Säkularisierung“ bedeutet:",
+     a:["Religion verliert an Einfluss, die Welt wird „weltlicher“","Die Kirche wird reicher","Ein neues Kirchenjahr beginnt","Die Trennung von Mt und Lk"], correct:0},
+  ]},
+  {type:"world-done", world:3},
+
+  /* ---------- WELT 4: Der Weg nach Jerusalem ---------- */
+  {type:"world-intro", world:4},
+  {type:"sort", world:4, title:"Das Passions-Puzzle", time:120,
+   intro:"Bringt die Ereignisse der Passion in die richtige Reihenfolge – das Rennen läuft an der Tafel!",
+   items:["Einzug in Jerusalem (Palmsonntag)","Tempelreinigung","Letztes Abendmahl","Gebet in Getsemani","Verhaftung Jesu","Verhör vor Pilatus","Kreuzigung und Tod","Auferstehung"]},
+  {type:"quiz", world:4, title:"Emoji-Evangelium", time:30, emoji:true, questions:[
+    {q:"🌱 ➡️ 🌳 🐦🐦🐦", a:["Gleichnis vom Senfkorn","Gleichnis vom Sämann","Der Feigenbaum","Die Arche Noah"], correct:0},
+    {q:"🚶 ⬇️🥊 😵 | 🚶‍♂️🚫 🚶‍♂️🚫 | 🧴🍷🤝🏨", a:["Der barmherzige Samariter","Der verlorene Sohn","Die Emmausjünger","Die Speisung der 5000"], correct:0},
+    {q:"🏠🪨🌧️💪  vs.  🏠🏖️🌧️💥", a:["Haus auf Fels und Sand","Der Turmbau zu Babel","Die Sturmstillung","Arche und Sintflut"], correct:0},
+    {q:"👩 🍞✨ (ein bisschen davon durchsäuert alles)", a:["Gleichnis vom Sauerteig","Das letzte Abendmahl","Die Hochzeit zu Kana","Manna in der Wüste"], correct:0},
+    {q:"Bei welchem Evangelisten besuchen HIRTEN das Kind – und bei welchem die WEISEN mit dem Stern?",
+     a:["Hirten: Lukas / Weise: Matthäus","Hirten: Matthäus / Weise: Lukas","Beide bei Markus","Beide bei Johannes"], correct:0},
+    {q:"Der hermeneutische Schlüssel, um die Antithesen der Bergpredigt zu verstehen, ist:",
+     a:["das Liebesgebot","das Bilderverbot","der Tun-Ergehen-Zusammenhang","die Zwei-Quellen-Theorie"], correct:0},
+  ]},
+  {type:"world-done", world:4},
+
+  /* ---------- FINALE ---------- */
+  {type:"finale-intro"},
+  {type:"finale", time:90, questions:[
+    {q:"Vervollständigt den Gottesnamen: „Ich werde sein, …“",
+     a:["… der ich sein werde.","… solange ihr glaubt.","… wenn ihr mich ruft.","… von Ewigkeit her."], correct:0},
+    {q:"Wer ließ den „tollen Menschen“ ausrufen: „Gott ist tot“?",
+     a:["Friedrich Nietzsche","Karl Marx","Ludwig Feuerbach","Sigmund Freud"], correct:0},
+    {q:"Der Tun-Ergehen-Zusammenhang behauptet:",
+     a:["Wer Gutes tut, dem ergeht es gut – wer leidet, ist selbst schuld","Gott würfelt nicht","Alle Menschen leiden gleich viel","Das Leid ist eine Illusion"], correct:0},
+    {q:"Wie endet das Vaterunser (vor dem Amen)? „Denn dein ist das Reich und die Kraft und die Herrlichkeit …“",
+     a:["… in Ewigkeit.","… bis ans Ende der Welt.","… im Himmel wie auf Erden.","… von nun an bis morgen."], correct:0},
+    {q:"Die Pointe des Senfkorn-Gleichnisses lautet:",
+     a:["Aus dem kleinsten Anfang wächst das Größte","Wer sät, muss auch ernten","Vögel sind ein schlechtes Omen","Nur große Bäume tragen Früchte"], correct:0},
+  ]},
+  {type:"ceremony"},
+];
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+/* ================= Grund-Infrastruktur ================= */
+const $ = sel => document.querySelector(sel);
+const app = $("#app");
+const hostbar = $("#hostbar");
+const esc = s => String(s??"").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shuffle = arr => { const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; };
+
+let role = null;          // 'host' | 'team'
+let NET = null;           // Supabase-Kanal
+let ONLINE = !!(SUPABASE_URL && SUPABASE_ANON_KEY);
+let sb = null;
+let soundOn = true;
+
+/* ---------- Sound (WebAudio, ohne Dateien) ---------- */
+let AC = null;
+function ac(){ if(!AC) AC = new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==="suspended") AC.resume(); return AC; }
+function tone(freq, dur, type="sine", vol=0.18, when=0){
+  if(!soundOn) return;
+  try{
+    const ctx = ac(), o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, ctx.currentTime + when);
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + when + dur);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(ctx.currentTime + when); o.stop(ctx.currentTime + when + dur + .05);
+  }catch(e){}
+}
+const sfx = {
+  tick(){ tone(880, .06, "square", .05); },
+  join(){ tone(523,.1); tone(659,.12,"sine",.18,.09); },
+  correct(){ tone(523,.12); tone(659,.12,"sine",.2,.1); tone(784,.25,"sine",.2,.2); },
+  wrong(){ tone(196,.3,"sawtooth",.12); tone(147,.4,"sawtooth",.1,.15); },
+  reveal(){ tone(440,.15,"triangle",.15); tone(554,.2,"triangle",.15,.12); },
+  fanfare(){ [523,659,784,1047].forEach((f,i)=>tone(f,.4,"triangle",.22,i*.18)); tone(1319,.9,"triangle",.25,.75); },
+  whoosh(){ tone(220,.25,"sawtooth",.06); tone(330,.25,"sawtooth",.06,.08); },
+};
+
+/* ---------- Konfetti ---------- */
+const confettiCv = $("#confetti"), cfx = confettiCv.getContext("2d");
+let confParts = [], confRunning = false;
+function resizeConf(){ confettiCv.width = innerWidth; confettiCv.height = innerHeight; }
+addEventListener("resize", resizeConf); resizeConf();
+function confettiBurst(n=180){
+  const colors = ["#f4c95d","#e05263","#5b8def","#5fbf77","#9b6fd4","#ffe29a"];
+  for(let i=0;i<n;i++) confParts.push({
+    x:Math.random()*confettiCv.width, y:-20-Math.random()*confettiCv.height*.4,
+    w:6+Math.random()*7, h:8+Math.random()*10, c:colors[i%colors.length],
+    vy:2+Math.random()*3.2, vx:-1.5+Math.random()*3, rot:Math.random()*Math.PI, vr:-.12+Math.random()*.24
+  });
+  if(!confRunning){ confRunning=true; requestAnimationFrame(confStep); }
+}
+function confStep(){
+  cfx.clearRect(0,0,confettiCv.width,confettiCv.height);
+  confParts.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
+    cfx.save(); cfx.translate(p.x,p.y); cfx.rotate(p.rot); cfx.fillStyle=p.c; cfx.fillRect(-p.w/2,-p.h/2,p.w,p.h); cfx.restore(); });
+  confParts = confParts.filter(p=>p.y < confettiCv.height+30);
+  if(confParts.length){ requestAnimationFrame(confStep); } else { confRunning=false; }
+}
+
+/* ---------- KI-Bild / Platzhalter ---------- */
+function aiImg(id, aspect="16/9", maxW="640px"){
+  const meta = AI_IMAGES[id] || {emoji:"🖼️", desc:id};
+  return `<div class="ai-img" style="aspect-ratio:${aspect}; max-width:${maxW}; margin:0 auto;">
+    <img src="img/${id}.png" alt="${esc(meta.desc)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+    <div class="ai-placeholder" style="display:none; position:absolute; inset:0; background:radial-gradient(circle at 50% 40%, #2e3567 0%, #12152b 75%);">
+      <div class="emoji">${meta.emoji}</div>
+      <div class="desc">${esc(meta.desc)}</div>
+      <div class="tag">KI-Bild folgt · img/${id}.png</div>
+    </div>
+  </div>`;
+}
+
+/* ---------- Netzwerk ---------- */
+function makeCode(){ const A="ABCDEFGHKLMNPRSTUWXYZ"; let c=""; for(let i=0;i<4;i++) c+=A[Math.floor(Math.random()*A.length)]; return c; }
+function connect(code, onMsg, onReady){
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  NET = sb.channel("lumen-"+code, {config:{broadcast:{self:false}}});
+  NET.on("broadcast", {event:"msg"}, ({payload}) => onMsg(payload));
+  NET.subscribe(status => { if(status === "SUBSCRIBED" && onReady) onReady(); });
+}
+function send(payload){ if(NET) NET.send({type:"broadcast", event:"msg", payload}); }
+
+/* ---------- Timer-Anzeige ---------- */
+let timerInterval = null;
+function stopTimerUI(){ if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } }
+function runTimerUI(deadline, total, onZero){
+  stopTimerUI();
+  const fill = $("#tfill"), num = $("#tnum");
+  function step(){
+    const left = Math.max(0, deadline - Date.now());
+    if(fill) fill.style.width = (100*left/(total*1000)) + "%";
+    if(num){ const s = Math.ceil(left/1000); if(num.textContent != s){ num.textContent = s; if(s<=5 && s>0) sfx.tick(); } }
+    if(left<=0){ stopTimerUI(); if(onZero) onZero(); }
+  }
+  step(); timerInterval = setInterval(step, 200);
+}
+function timerHtml(){ return `<div class="timerbar"><div class="fill" id="tfill"></div></div><div class="timer-num" id="tnum"></div>`; }
+
+/* ---------- Gemeinsame Bausteine ---------- */
+function worldBanner(w){
+  const W = WORLDS.find(x=>x.id===w);
+  return `<div class="world-tag">Welt ${W.id} · ${esc(W.tag)}</div>
+  <div class="world-banner"><span class="icon">${W.icon}</span><span class="wname" style="color:${W.color}">${esc(W.name)}</span><span class="icon">${W.icon}</span></div>`;
+}
+function windowHtml(litWorlds, glowAll=false){
+  return `<div class="window-frame"><div class="window-inner">
+    ${WORLDS.map(W=>`<div class="pane ${W.paneClass} ${litWorlds.includes(W.id)?"lit":""} ${glowAll?"glow lit":""}">
+      ${W.icon}<span class="pane-label">${esc(W.name)}</span></div>`).join("")}
+  </div></div>`;
+}
+function scoreboardHtml(teams, showDelta=false){
+  const sorted = [...teams].sort((a,b)=>b.pts-a.pts);
+  return `<div class="scoreboard">${sorted.map(t=>`
+    <div class="score-row"><span class="emblem">${t.emblem}</span><span class="name">${esc(t.name)}</span>
+    ${showDelta && t.lastDelta ? `<span class="delta">${t.lastDelta>0?"+":""}${t.lastDelta}</span>`:""}
+    <span class="pts">${t.pts}</span></div>`).join("")}</div>`;
+}
+
+/* ================= Startbildschirm ================= */
+function renderStart(){
+  document.body.classList.remove("is-host");
+  hostbar.classList.add("hidden");
+  app.innerHTML = `
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:26px; padding:20px 0;">
+      ${windowHtml([])}
+      <div><h1>LUMEN</h1><div class="subtitle">DAS GROSSE Q1-FINALE · EVANGELISCHE RELIGIONSLEHRE</div></div>
+      ${ONLINE ? "" : `<div class="panel center" style="border-color:var(--glass-red); max-width:560px; margin:0 auto;">
+        ⚠️ <b>Notfallmodus:</b> Es sind noch keine Supabase-Zugangsdaten eingetragen.<br>
+        Die Tafel läuft trotzdem – Teams antworten dann per Handzeichen, und du wertest an der Tafel.</div>`}
+      <div class="row">
+        <button class="btn big" id="btnHost">🖥️ Tafel starten</button>
+        <button class="btn big secondary" id="btnJoin" ${ONLINE?"":"disabled"}>📱 Mitspielen</button>
+      </div>
+    </div>`;
+  $("#btnHost").onclick = ()=>{ ac(); startHost(); };
+  const j = $("#btnJoin"); if(j && ONLINE) j.onclick = ()=>{ ac(); renderJoin(); };
+}
+</script>
+<script>
+/* ================= Insider-Fragen einmischen ================= */
+INSIDER.forEach(ins=>{
+  const ph = PHASES.find(p=>p.type==="quiz" && p.world===ins.world);
+  if(ph) ph.questions.push({q:ins.q, a:ins.a, correct:ins.correct, insider:true});
+});
+
+/* =========================================================
+   HOST (Tafel)
+   ========================================================= */
+let G = null;
+let heartbeat = null;
+
+function startHost(){
+  role = "host";
+  document.body.classList.add("is-host");
+  G = { code: makeCode(), phaseIdx: 0, teams: {}, sub: {}, deadline: 0, total: 0,
+        creative: null, awards: {fastest:null, poet:null, bonus:[]} };
+  if(ONLINE){
+    connect(G.code, onHostMsg, ()=>{ enterPhase(0); });
+    heartbeat = setInterval(()=>broadcastState(), 2000);
+  }
+  enterPhase(0);
+}
+
+function teamsArr(){ return Object.values(G.teams); }
+function teamCount(){ return Object.keys(G.teams).length; }
+
+function broadcastState(){
+  if(!ONLINE) return;
+  send({ t:"state", pi:G.phaseIdx, sub:G.sub, deadline:G.deadline, total:G.total,
+         teams: teamsArr().map(t=>({tid:t.tid,name:t.name,emblem:t.emblem,pts:t.pts,lastDelta:t.lastDelta||0})) });
+}
+
+function addPts(tid, delta){
+  const t = G.teams[tid]; if(!t) return;
+  t.pts = Math.max(0, t.pts + delta); t.lastDelta = delta;
+}
+
+function onHostMsg(m){
+  if(!m || !m.t) return;
+  const P = PHASES[G.phaseIdx];
+  if(m.t==="hello"){
+    if(!G.teams[m.tid]){
+      G.teams[m.tid] = {tid:m.tid, name:String(m.name||"Team").slice(0,18), emblem:EMBLEMS.includes(m.emblem)?m.emblem:"🕊️", pts:0, lastDelta:0};
+      sfx.join();
+      if(PHASES[G.phaseIdx].type==="lobby") hostRender();
+    }
+    broadcastState(); return;
+  }
+  if(!G.teams[m.tid]) return;
+
+  if(m.t==="ans" && (P.type==="quiz"||P.type==="finale") ){
+    handleAnswer(m.tid, m.pi, m.qi, m.choice);
+  } else if(m.t==="ans" && (P.type==="reveal"||P.type==="tribunal")){
+    handleClueAnswer(m.tid, m.pi, m.choice);
+  } else if(m.t==="prog" && P.type==="sort"){
+    handleProgress(m.tid, m.pi, m.correct, m.done);
+  } else if(m.t==="txt" && P.type==="creative"){
+    handleText(m.tid, m.pi, m.text);
+  } else if(m.t==="vote" && P.type==="vote"){
+    handleVote(m.tid, m.pi, m.key);
+  }
+}
+
+/* ---------- Phasen-Eintritt ---------- */
+function enterPhase(idx){
+  stopTimerUI();
+  G.phaseIdx = idx;
+  const P = PHASES[idx];
+  G.deadline = 0; G.total = 0;
+  teamsArr().forEach(t=>t.lastDelta=0);
+
+  if(P.type==="quiz"){ G.sub = {qi:0, stage:"ask", counts:[], answers:{}}; startQuestion(); return; }
+  if(P.type==="reveal"||P.type==="tribunal"){
+    G.sub = {step:0, stage:"ask", locked:[], answered:{}, winner:null, fCounts:[], fAnswers:{}};
+    setDeadline(P.time); hostRender(); broadcastState(); return;
+  }
+  if(P.type==="sort"){
+    G.sub = {stage:"work", prog:{}, finished:[]};
+    setDeadline(P.time); hostRender(); broadcastState(); return;
+  }
+  if(P.type==="creative"){
+    const assigned = {};
+    teamsArr().forEach((t,i)=>assigned[t.tid] = i % P.prompts.length);
+    G.sub = {stage:"write", assigned, texts:{}};
+    setDeadline(P.time); hostRender(); broadcastState(); return;
+  }
+  if(P.type==="vote"){
+    const texts = (G.creative && G.creative.texts) || {};
+    const entries = shuffle(Object.keys(texts).map(tid=>({key:tid, text:texts[tid]})));
+    G.sub = {stage:"vote", entries, votes:{}};
+    if(entries.length===0){ G.sub.stage="res"; G.sub.results={}; }
+    else setDeadline(P.time);
+    hostRender(); broadcastState(); return;
+  }
+  if(P.type==="finale"){
+    const assigned = {};
+    teamsArr().forEach((t,i)=>assigned[t.tid] = i % P.questions.length);
+    G.sub = {stage:"play", assigned, results:{}, round:1};
+    setDeadline(P.time); hostRender(); broadcastState(); return;
+  }
+  G.sub = {};
+  hostRender(); broadcastState();
+  if(P.type==="world-done"){ sfx.reveal; sfx.reveal(); }
+  if(P.type==="ceremony"){ computeAwards(); sfx.fanfare(); confettiBurst(220); hostRender(); broadcastState(); }
+}
+
+function setDeadline(sec){ G.total = sec; G.deadline = Date.now() + sec*1000; }
+function extendTime(sec){ if(G.deadline){ G.deadline += sec*1000; hostRender(); broadcastState(); } }
+
+/* ---------- Quiz ---------- */
+function currentQ(){ const P=PHASES[G.phaseIdx]; return P.questions[G.sub.qi]; }
+function startQuestion(){
+  const P = PHASES[G.phaseIdx];
+  G.sub.stage = "ask"; G.sub.answers = {}; G.sub.counts = [];
+  teamsArr().forEach(t=>t.lastDelta=0);
+  setDeadline(P.time);
+  sfx.whoosh();
+  hostRender(); broadcastState();
+}
+function handleAnswer(tid, pi, qi, choice){
+  if(pi!==G.phaseIdx) return;
+  const P = PHASES[G.phaseIdx];
+  if(P.type==="quiz"){
+    if(G.sub.stage!=="ask" || qi!==G.sub.qi || G.sub.answers[tid]!==undefined) return;
+    const remaining = Math.max(0, G.deadline - Date.now());
+    G.sub.answers[tid] = {choice, remaining};
+    if(Object.keys(G.sub.answers).length >= teamCount()) resolveQuestion();
+    else { hostRender(); broadcastState(); }
+  }
+  if(P.type==="finale"){
+    if((G.sub.stage!=="play" && G.sub.stage!=="retry") || G.sub.results[tid]===true) return;
+    const q = P.questions[G.sub.assigned[tid]];
+    G.sub.results[tid] = (choice === q.correct);
+    const vals = teamsArr().map(t=>G.sub.results[t.tid]);
+    if(vals.every(v=>v===true)) finaleWon();
+    else if(vals.every(v=>v!==undefined && v!==null)) { hostRender(); broadcastState(); }
+    else { hostRender(); broadcastState(); }
+  }
+}
+function resolveQuestion(){
+  stopTimerUI();
+  const P = PHASES[G.phaseIdx], q = currentQ();
+  const counts = new Array(q.a.length).fill(0);
+  let fastBest = null;
+  Object.entries(G.sub.answers).forEach(([tid,a])=>{
+    counts[a.choice]++;
+    if(a.choice===q.correct){
+      const bonus = Math.round(100 * a.remaining / (G.total*1000));
+      addPts(tid, 100 + bonus);
+      if(!fastBest || a.remaining > fastBest.remaining) fastBest = {tid, remaining:a.remaining};
+      if(!G.awards.fastest || a.remaining > G.awards.fastest.remaining) G.awards.fastest = {tid, remaining:a.remaining};
+    }
+  });
+  G.sub.counts = counts; G.sub.stage = "res";
+  G.deadline = 0;
+  sfx.reveal();
+  hostRender(); broadcastState();
+}
+
+/* ---------- Reveal / Tribunal ---------- */
+const CLUE_PTS = [300,200,100];
+function handleClueAnswer(tid, pi, choice){
+  if(pi!==G.phaseIdx) return;
+  const P = PHASES[G.phaseIdx];
+  if(G.sub.stage==="ask"){
+    if(G.sub.locked.includes(tid) || G.sub.answered[tid]!==undefined) return;
+    G.sub.answered[tid] = choice;
+    if(choice === P.correct){
+      G.sub.winner = tid;
+      addPts(tid, CLUE_PTS[Math.min(G.sub.step, 2)]);
+      G.sub.stage = "res"; G.deadline = 0; stopTimerUI();
+      sfx.correct();
+    } else {
+      addPts(tid, -50);
+      G.sub.locked.push(tid);
+      sfx.wrong();
+      if(G.sub.locked.length >= teamCount()){ G.sub.stage="res"; G.deadline=0; stopTimerUI(); }
+    }
+    hostRender(); broadcastState();
+  } else if(G.sub.stage==="follow"){
+    if(G.sub.fAnswers[tid]!==undefined) return;
+    const remaining = Math.max(0, G.deadline - Date.now());
+    G.sub.fAnswers[tid] = {choice, remaining};
+    if(Object.keys(G.sub.fAnswers).length >= teamCount()) resolveFollow();
+    else { hostRender(); broadcastState(); }
+  }
+}
+function nextClue(){
+  const P = PHASES[G.phaseIdx];
+  if(G.sub.step < 2){
+    G.sub.step++; setDeadline(P.time); sfx.whoosh();
+  } else { G.sub.stage = "res"; G.deadline = 0; stopTimerUI(); }
+  hostRender(); broadcastState();
+}
+function startFollow(){
+  const P = PHASES[G.phaseIdx];
+  if(!P.follow){ hostAdvancePhase(); return; }
+  G.sub.stage = "follow"; G.sub.fAnswers = {};
+  setDeadline(P.follow.time || 25);
+  hostRender(); broadcastState();
+}
+function resolveFollow(){
+  stopTimerUI();
+  const P = PHASES[G.phaseIdx], q = P.follow;
+  const counts = new Array(q.a.length).fill(0);
+  Object.entries(G.sub.fAnswers).forEach(([tid,a])=>{
+    counts[a.choice]++;
+    if(a.choice===q.correct){
+      addPts(tid, 100 + Math.round(100*a.remaining/(G.total*1000)));
+      if(!G.awards.fastest || a.remaining > G.awards.fastest.remaining) G.awards.fastest = {tid, remaining:a.remaining};
+    }
+  });
+  G.sub.fCounts = counts; G.sub.stage = "fres"; G.deadline = 0;
+  sfx.reveal();
+  hostRender(); broadcastState();
+}
+
+/* ---------- Sortierung ---------- */
+function handleProgress(tid, pi, correct, done){
+  if(pi!==G.phaseIdx || G.sub.stage!=="work") return;
+  const P = PHASES[G.phaseIdx];
+  G.sub.prog[tid] = {correct, done: !!done};
+  if(done && !G.sub.finished.includes(tid)){
+    G.sub.finished.push(tid);
+    sfx.correct();
+  }
+  if(G.sub.finished.length >= teamCount()) resolveSort();
+  else { hostRender(); broadcastState(); }
+}
+function resolveSort(){
+  stopTimerUI();
+  const P = PHASES[G.phaseIdx];
+  const rankPts = [300,200,150,120,100,100];
+  G.sub.finished.forEach((tid,i)=>addPts(tid, rankPts[Math.min(i,rankPts.length-1)]));
+  teamsArr().forEach(t=>{
+    if(!G.sub.finished.includes(t.tid)){
+      const pr = G.sub.prog[t.tid];
+      addPts(t.tid, pr ? Math.round(100 * pr.correct / P.items.length) : 0);
+    }
+  });
+  G.sub.stage = "res"; G.deadline = 0;
+  sfx.reveal();
+  hostRender(); broadcastState();
+}
+
+/* ---------- Kreativ & Voting ---------- */
+function handleText(tid, pi, text){
+  if(pi!==G.phaseIdx || G.sub.stage!=="write") return;
+  G.sub.texts[tid] = String(text||"").slice(0,220);
+  sfx.join();
+  if(Object.keys(G.sub.texts).length >= teamCount()){
+    G.sub.stage = "done"; G.deadline = 0; stopTimerUI();
+    G.creative = {texts: G.sub.texts, assigned: G.sub.assigned};
+  }
+  hostRender(); broadcastState();
+}
+function handleVote(tid, pi, key){
+  if(pi!==G.phaseIdx || G.sub.stage!=="vote") return;
+  if(key===tid || G.sub.votes[tid]!==undefined) return;
+  G.sub.votes[tid] = key;
+  sfx.join();
+  if(Object.keys(G.sub.votes).length >= teamCount()) resolveVote();
+  else { hostRender(); broadcastState(); }
+}
+function resolveVote(){
+  stopTimerUI();
+  const results = {};
+  Object.values(G.sub.votes).forEach(key=>{ results[key] = (results[key]||0)+1; });
+  Object.entries(results).forEach(([key,n])=>addPts(key, n*100));
+  let best=null; Object.entries(results).forEach(([key,n])=>{ if(!best || n>best.n) best={key,n}; });
+  if(best) G.awards.poet = best.key;
+  G.sub.results = results; G.sub.stage = "res"; G.deadline = 0;
+  sfx.fanfare();
+  hostRender(); broadcastState();
+}
+
+/* ---------- Finale ---------- */
+function finaleWon(){
+  stopTimerUI();
+  G.sub.stage = "won"; G.deadline = 0;
+  sfx.fanfare(); confettiBurst(260);
+  hostRender(); broadcastState();
+}
+function finaleRetry(){
+  const P = PHASES[G.phaseIdx];
+  teamsArr().forEach(t=>{ if(G.sub.results[t.tid]!==true) delete G.sub.results[t.tid]; });
+  G.sub.stage = "retry"; G.sub.round++;
+  setDeadline(60);
+  hostRender(); broadcastState();
+}
+
+/* ---------- Awards ---------- */
+function computeAwards(){ /* fastest & poet werden unterwegs gesammelt */ }
+
+/* ---------- Host: Weiter-Logik ---------- */
+function hostAdvancePhase(){ if(G.phaseIdx < PHASES.length-1) enterPhase(G.phaseIdx+1); }
+function hostNext(){
+  const P = PHASES[G.phaseIdx];
+  if(P.type==="quiz"){
+    if(G.sub.stage==="ask"){ resolveQuestion(); return; }
+    if(G.sub.qi < P.questions.length-1){ G.sub.qi++; startQuestion(); return; }
+    hostAdvancePhase(); return;
+  }
+  if(P.type==="reveal"||P.type==="tribunal"){
+    if(G.sub.stage==="ask"){ nextClue(); return; }
+    if(G.sub.stage==="res"){ startFollow(); return; }
+    if(G.sub.stage==="follow"){ resolveFollow(); return; }
+    hostAdvancePhase(); return;
+  }
+  if(P.type==="sort"){
+    if(G.sub.stage==="work"){ resolveSort(); return; }
+    hostAdvancePhase(); return;
+  }
+  if(P.type==="creative"){
+    if(G.sub.stage==="write"){
+      G.sub.stage="done"; G.creative={texts:G.sub.texts, assigned:G.sub.assigned};
+      G.deadline=0; stopTimerUI(); hostRender(); broadcastState(); return;
+    }
+    hostAdvancePhase(); return;
+  }
+  if(P.type==="vote"){
+    if(G.sub.stage==="vote"){ resolveVote(); return; }
+    hostAdvancePhase(); return;
+  }
+  if(P.type==="finale"){
+    if(G.sub.stage==="play"||G.sub.stage==="retry"){ finaleRetry(); return; }
+    hostAdvancePhase(); return;
+  }
+  hostAdvancePhase();
+}
+
+/* ---------- Host-Rendering ---------- */
+function litWorldsUpTo(){
+  const lit = [];
+  for(let i=0;i<G.phaseIdx;i++){ const p=PHASES[i]; if(p.type==="world-done") lit.push(p.world); }
+  return lit;
+}
+function hostbarRender(extra=""){
+  hostbar.classList.remove("hidden");
+  const P = PHASES[G.phaseIdx];
+  hostbar.innerHTML = `
+    <span class="info">Raum <b style="color:var(--gold)">${G.code}</b> · Phase ${G.phaseIdx+1}/${PHASES.length} · ${teamCount()} Teams ${ONLINE?"":"· NOTFALLMODUS"}</span>
+    <span class="spacer"></span> ${extra}
+    ${G.deadline ? `<button class="btn small secondary" onclick="extendTime(30)">+30 s</button>` : ""}
+    <button class="btn small secondary" onclick="soundOn=!soundOn; hostRender();">${soundOn?"🔊":"🔇"}</button>
+    ${G.phaseIdx < PHASES.length-1 ? `<button class="btn small secondary" onclick="if(confirm('Diese Phase wirklich überspringen?')) hostAdvancePhase();">⏭</button>` : ""}
+    <button class="btn small" onclick="hostNext()">Weiter ▶</button>`;
+}
+function boardAnswersHtml(q, sub, showResult){
+  const cnt = sub && sub.counts && sub.counts.length ? sub.counts : null;
+  return `<div class="board-answers">` + q.a.map((a,i)=>`
+    <div class="board-ans a${i} ${showResult ? (i===q.correct?"correct":"dim") : ""}" style="background:${["var(--glass-red)","var(--glass-blue)","var(--w1)","var(--glass-green)"][i%4]}">
+      ${esc(a)} ${showResult && cnt ? `<span class="cnt">${cnt[i]||0}×</span>`:""}
+    </div>`).join("") + `</div>`;
+}
+function answeredChipsHtml(map){
+  return `<div class="row" style="margin-top:14px;">${teamsArr().map(t=>
+    `<span class="team-chip" style="${map[t.tid]!==undefined?"border-color:var(--gold)":"opacity:.45"}">
+     <span class="emblem">${t.emblem}</span>${esc(t.name)} ${map[t.tid]!==undefined?"✓":"…"}</span>`).join("")}</div>`;
+}
+
+function hostRender(){
+  const P = PHASES[G.phaseIdx];
+  let html = "";
+  let barExtra = "";
+
+  if(P.type==="lobby"){
+    html = `<div class="center" style="margin-top:10px;">${aiImg("titel-fenster","3/4","300px")}</div>
+      <h1 style="margin-top:14px;">LUMEN</h1>
+      <div class="subtitle">DAS GROSSE Q1-FINALE</div>
+      <div class="panel center" style="max-width:640px; margin:22px auto;">
+        ${ONLINE ? `<div style="color:var(--muted); letter-spacing:.15em;">RAUMCODE – auf dem iPad eingeben:</div>
+        <div class="roomcode">${G.code}</div>` : `<div>⚠️ Notfallmodus ohne Live-Verbindung – Teams spielen per Handzeichen mit.</div>`}
+      </div>
+      <div class="row">${teamsArr().length ? teamsArr().map(t=>`<span class="team-chip"><span class="emblem">${t.emblem}</span>${esc(t.name)}</span>`).join("") : `<span style="color:var(--muted)">Warte auf Teams …</span>`}</div>`;
+  }
+
+  else if(P.type==="world-intro"){
+    const W = WORLDS.find(w=>w.id===P.world);
+    const imgId = {1:"brennender-dornbusch",2:"welt2-sturm",3:"welt3-tribunal",4:"welt4-weg"}[P.world];
+    html = `${worldBanner(P.world)}
+      <div class="center">${aiImg(imgId,"16/9","720px")}</div>
+      <p class="center" style="margin-top:16px; color:var(--muted); font-size:1.1rem;">Macht euch bereit …</p>`;
+    sfx.whoosh();
+  }
+
+  else if(P.type==="quiz"){
+    const q = currentQ();
+    const showRes = G.sub.stage==="res";
+    html = `${worldBanner(P.world)}
+      <div class="center" style="color:var(--muted); letter-spacing:.15em;">${esc(P.title)} · Frage ${G.sub.qi+1}/${P.questions.length} ${q.insider?"· 🎉 INSIDER":""}</div>
+      ${G.deadline?timerHtml():""}
+      <h2 style="margin:18px 0; ${P.emoji && q.q.length<40 ? "font-size:3rem;":""}">${esc(q.q)}</h2>
+      ${boardAnswersHtml(q, G.sub, showRes)}
+      ${showRes ? scoreboardHtml(teamsArr(), true) : answeredChipsHtml(G.sub.answers)}`;
+  }
+
+  else if(P.type==="reveal" || P.type==="tribunal"){
+    const isRev = P.type==="reveal";
+    const done = ["res","follow","fres"].includes(G.sub.stage);
+    let center = "";
+    if(isRev){
+      const offCount = done ? 24 : [8,16,22][G.sub.step];
+      const offs = revealPattern(G.phaseIdx).slice(0, offCount);
+      center = `<div class="reveal-box" style="max-width:640px; margin:0 auto;">
+        ${aiImg(P.img,"16/9","640px")}
+        <div class="reveal-cover">${Array.from({length:24},(_,i)=>`<div class="tile ${offs.includes(i)?"off":""}"></div>`).join("")}</div>
+      </div>
+      ${done?`<h2 style="margin-top:14px;">${esc(P.solution)}</h2>`:""}`;
+    } else {
+      center = `<div class="panel" style="max-width:720px; margin:0 auto;">
+        ${P.clues.slice(0, done?3:G.sub.step+1).map(c=>`<p style="font-size:1.25rem; margin:10px 0;">🔎 ${esc(c)}</p>`).join("")}
+        ${done?`<h2 style="margin-top:10px; color:var(--gold);">→ ${esc(P.options[P.correct])}</h2>`:""}
+      </div>`;
+    }
+    let bottom = "";
+    if(G.sub.stage==="ask"){
+      bottom = `<div class="board-answers">${P.options.map((o,i)=>`<div class="board-ans" style="background:var(--panel2)">${["🟥","🟦","🟧","🟩"][i]} ${esc(o)}</div>`).join("")}</div>
+        ${answeredChipsHtml(G.sub.answered)}
+        <p class="center" style="color:var(--muted); margin-top:10px;">Früh antworten bringt ${CLUE_PTS[Math.min(G.sub.step,2)]} Punkte – falsch kostet 50 und sperrt!</p>`;
+      barExtra = `<button class="btn small secondary" onclick="nextClue()">${isRev?"Mehr aufdecken":"Nächstes Indiz"} 🔎</button>`;
+    }
+    if(G.sub.stage==="res"){
+      const w = G.sub.winner ? G.teams[G.sub.winner] : null;
+      bottom = `<h2 style="margin-top:14px;">${w?`${w.emblem} ${esc(w.name)} hat es erkannt! +${CLUE_PTS[Math.min(G.sub.step,2)]}`:"Niemand hat es erkannt …"}</h2>`;
+    }
+    if(G.sub.stage==="follow"){
+      bottom = `${timerHtml()}<h2 style="margin:14px 0;">${esc(P.follow.q)}</h2>${boardAnswersHtml(P.follow, null, false)}${answeredChipsHtml(G.sub.fAnswers)}`;
+    }
+    if(G.sub.stage==="fres"){
+      bottom = `<h2 style="margin:14px 0;">${esc(P.follow.q)}</h2>${boardAnswersHtml(P.follow, {counts:G.sub.fCounts}, true)}${scoreboardHtml(teamsArr(), true)}`;
+    }
+    html = `${worldBanner(P.world)}
+      <div class="center" style="color:var(--muted); letter-spacing:.15em;">${esc(P.title || "Die Enthüllung")}</div>
+      ${G.sub.stage==="ask" && G.deadline?timerHtml():""}${center}${bottom}`;
+  }
+
+  else if(P.type==="sort"){
+    html = `${worldBanner(P.world)}
+      <div class="center" style="color:var(--muted); letter-spacing:.15em;">${esc(P.title)}</div>
+      ${G.sub.stage==="work" ? timerHtml() : ""}
+      <p class="center" style="font-size:1.15rem; margin:10px 0;">${esc(P.intro)}</p>
+      <div class="race">${teamsArr().map(t=>{
+        const pr = G.sub.prog[t.tid]; const pct = pr ? Math.round(100*pr.correct/P.items.length) : 0;
+        const rank = G.sub.finished.indexOf(t.tid);
+        return `<div class="race-row ${rank>=0?"done":""}"><span class="emblem">${t.emblem}</span>
+          <div class="race-track"><div class="race-fill" style="width:${rank>=0?100:pct}%"></div></div>
+          <span style="min-width:70px; text-align:right;">${rank>=0?["🥇","🥈","🥉"][rank]||"✅":pct+"%"}</span></div>`;
+      }).join("")}</div>
+      ${G.sub.stage==="res" ? `<div class="panel" style="margin-top:18px; max-width:640px; margin-left:auto; margin-right:auto;">
+        <b>Die richtige Reihenfolge:</b><ol style="margin:10px 0 0 22px; line-height:1.9;">${P.items.map(i=>`<li>${esc(i)}</li>`).join("")}</ol></div>
+        ${scoreboardHtml(teamsArr(), true)}` : ""}`;
+  }
+
+  else if(P.type==="creative"){
+    html = `${worldBanner(P.world)}
+      <div class="center" style="color:var(--muted); letter-spacing:.15em;">${esc(P.title)}</div>
+      ${G.sub.stage==="write" && G.deadline ? timerHtml() : ""}
+      <p class="center" style="font-size:1.15rem; margin:12px auto; max-width:720px;">${esc(P.intro)}</p>
+      <div class="panel" style="max-width:720px; margin:0 auto;">
+        ${teamsArr().map(t=>`<p style="margin:8px 0;">${t.emblem} <i style="color:var(--muted)">${esc(P.prompts[G.sub.assigned[t.tid]]||"")}</i>
+        ${G.sub.texts[t.tid]!==undefined?" ✅":" ✍️ …"}</p>`).join("")}
+      </div>
+      ${G.sub.stage==="done"?`<h2 style="margin-top:16px;">Alle Antworten sind da – weiter zum Voting!</h2>`:""}`;
+  }
+
+  else if(P.type==="vote"){
+    const cre = G.creative || {texts:{},assigned:{}};
+    const crePhase = PHASES.find(p=>p.type==="creative");
+    if(G.sub.stage==="vote"){
+      html = `${worldBanner(P.world)}
+        <h2 style="margin-bottom:6px;">Kurs-Voting</h2>
+        <p class="center" style="color:var(--muted);">Stimmt auf dem iPad für die beste fremde Antwort!</p>
+        ${G.deadline?timerHtml():""}
+        <div style="display:flex; flex-direction:column; gap:14px; max-width:800px; margin:14px auto;">
+          ${G.sub.entries.map((e,i)=>`<div class="vote-card"><span style="color:var(--gold)">${i+1}.</span>
+            <i style="color:var(--muted)">${esc(crePhase.prompts[cre.assigned[e.key]]||"")}</i><br>„${esc(e.text)}“</div>`).join("")}
+        </div>${answeredChipsHtml(G.sub.votes)}`;
+    } else {
+      html = `${worldBanner(P.world)}<h2>Die Ergebnisse!</h2>
+        <div style="display:flex; flex-direction:column; gap:14px; max-width:800px; margin:14px auto;">
+          ${G.sub.entries.map(e=>{ const t=G.teams[e.key]; const n=(G.sub.results&&G.sub.results[e.key])||0;
+            return `<div class="vote-card">„${esc(e.text)}“<br><span style="color:var(--gold); font-style:normal;">${t?t.emblem+" "+esc(t.name):""}</span>
+            <span class="votes">${n} ❤ = +${n*100}</span></div>`;}).join("")}
+        </div>${scoreboardHtml(teamsArr(), true)}`;
+    }
+  }
+
+  else if(P.type==="world-done"){
+    const lit = [...litWorldsUpTo(), P.world];
+    html = `${worldBanner(P.world)}
+      <h2 style="color:var(--gold); margin-bottom:14px;">✨ Ein Fenster beginnt zu leuchten! ✨</h2>
+      ${windowHtml(lit)}
+      ${scoreboardHtml(teamsArr())}`;
+    sfx.fanfare();
+  }
+
+  else if(P.type==="finale-intro"){
+    html = `<h2 style="letter-spacing:.2em; color:var(--gold);">DAS FINALE: ES WERDE LICHT</h2>
+      ${windowHtml([1,2,3,4])}
+      <div class="panel center" style="max-width:680px; margin:18px auto; font-size:1.15rem; line-height:1.7;">
+        Alle vier Fenster leuchten – aber das Licht ist noch nicht ganz da.<br>
+        <b>Jedes Team bekommt jetzt EINE letzte Frage.</b><br>
+        Nur wenn <b style="color:var(--gold)">alle Teams richtig</b> antworten, flutet das Licht den Raum.<br>
+        <i style="color:var(--muted)">Keine Punkte. Nur gemeinsam. Ihr habt 90 Sekunden.</i>
+      </div>`;
+  }
+
+  else if(P.type==="finale"){
+    const res = G.sub.results;
+    if(G.sub.stage==="won"){
+      html = `<div class="center finale-image">${aiImg("finale-fenster","3/4","380px")}</div>
+        <h1 style="letter-spacing:.2em; margin-top:14px;">ES WERDE LICHT!</h1>
+        <h2 style="color:var(--gold);">Ihr habt es gemeinsam geschafft! 🕯️</h2>
+        ${windowHtml([1,2,3,4], true)}`;
+    } else {
+      html = `<h2 style="letter-spacing:.15em;">FINALE · Versuch ${G.sub.round}</h2>
+        ${G.deadline?timerHtml():""}
+        <div class="row" style="margin-top:20px;">${teamsArr().map(t=>{
+          const r = res[t.tid];
+          const state = r===true?"✅":(r===false?"❌":"⏳");
+          return `<div class="panel center" style="min-width:150px;"><div style="font-size:2rem;">${t.emblem}</div>
+            <div>${esc(t.name)}</div><div style="font-size:2rem; margin-top:6px;">${state}</div></div>`;}).join("")}
+        </div>
+        ${Object.values(res).includes(false)?`<p class="center" style="margin-top:16px; font-size:1.15rem;">💡 <b>Hilferuf:</b> Teams mit ✅ dürfen laut helfen! Dann „Weiter“ für den nächsten Versuch.</p>`:""}`;
+      barExtra = `<button class="btn small secondary" onclick="finaleWon()">Als geschafft werten ✨</button>`;
+    }
+  }
+
+  else if(P.type==="ceremony"){
+    const sorted = [...teamsArr()].sort((a,b)=>b.pts-a.pts);
+    const p1=sorted[0], p2=sorted[1], p3=sorted[2];
+    const fast = G.awards.fastest ? G.teams[G.awards.fastest.tid] : null;
+    const poet = G.awards.poet ? G.teams[G.awards.poet] : null;
+    html = `<h1 style="letter-spacing:.2em;">SIEGEREHRUNG</h1>
+      <div class="podium">
+        ${p2?`<div class="col p2"><div class="who"><span class="emblem">${p2.emblem}</span>${esc(p2.name)}<br><b style="color:var(--gold)">${p2.pts}</b></div><div class="block">🥈</div></div>`:""}
+        ${p1?`<div class="col p1"><div class="who"><span class="emblem">${p1.emblem}</span>${esc(p1.name)}<br><b style="color:var(--gold)">${p1.pts}</b></div><div class="block">🥇</div></div>`:""}
+        ${p3?`<div class="col p3"><div class="who"><span class="emblem">${p3.emblem}</span>${esc(p3.name)}<br><b style="color:var(--gold)">${p3.pts}</b></div><div class="block">🥉</div></div>`:""}
+      </div>
+      ${sorted.length>3 ? scoreboardHtml(sorted.slice(3)) : ""}
+      <div class="panel" style="max-width:640px; margin:22px auto;">
+        <h2 style="margin-bottom:10px;">🏆 Sonder-Awards</h2>
+        ${fast?`<p style="margin:8px 0;">⚡ <b>Blitzmerker:</b> ${fast.emblem} ${esc(fast.name)} – schnellste richtige Antwort</p>`:""}
+        ${poet?`<p style="margin:8px 0;">🖋️ <b>Poeten-Award:</b> ${poet.emblem} ${esc(poet.name)} – beliebteste Epikur-Antwort</p>`:""}
+        <p style="margin:8px 0;">👁️ <b>Bilderverbot-Bonus:</b> Welchem Team ist aufgefallen, dass Gott im ganzen Spiel <i>nie</i> abgebildet wurde? (+150)</p>
+        ${G.awards.bonus.map(tid=>{const t=G.teams[tid]; return t?`<p style="margin:4px 0; color:var(--gold);">→ ${t.emblem} ${esc(t.name)} +150</p>`:"";}).join("")}
+      </div>`;
+    barExtra = `<button class="btn small secondary" onclick="giveBonus()">👁️ Bonus vergeben</button>
+      <button class="btn small secondary" onclick="confettiBurst(200); sfx.fanfare();">🎉 Konfetti</button>`;
+  }
+
+  app.innerHTML = html;
+  hostbarRender(barExtra);
+
+  if(G.deadline){
+    runTimerUI(G.deadline, G.total, ()=>{
+      const Pn = PHASES[G.phaseIdx];
+      if(Pn.type==="quiz" && G.sub.stage==="ask") resolveQuestion();
+      else if((Pn.type==="reveal"||Pn.type==="tribunal") && G.sub.stage==="ask") nextClue();
+      else if((Pn.type==="reveal"||Pn.type==="tribunal") && G.sub.stage==="follow") resolveFollow();
+      else if(Pn.type==="sort" && G.sub.stage==="work") resolveSort();
+      else if(Pn.type==="creative" && G.sub.stage==="write") hostNext();
+      else if(Pn.type==="vote" && G.sub.stage==="vote") resolveVote();
+      else if(Pn.type==="finale" && (G.sub.stage==="play"||G.sub.stage==="retry")){ hostRender(); broadcastState(); }
+    });
+  }
+}
+function giveBonus(){
+  const name = prompt("Teamname für den Bilderverbot-Bonus (+150):");
+  if(!name) return;
+  const t = teamsArr().find(x=>x.name.toLowerCase().includes(name.toLowerCase()));
+  if(t){ addPts(t.tid,150); G.awards.bonus.push(t.tid); hostRender(); broadcastState(); }
+  else alert("Team nicht gefunden.");
+}
+/* deterministisches Aufdeck-Muster je Phase */
+const _revealCache = {};
+function revealPattern(pi){
+  if(!_revealCache[pi]){ _revealCache[pi] = shuffle(Array.from({length:24},(_,i)=>i)); }
+  return _revealCache[pi];
+}
+</script>
+<script>
+/* =========================================================
+   TEAM (iPad-Client)
+   ========================================================= */
+let T = null;         // {tid, name, emblem, code}
+let lastState = null; // letzter Host-State
+let myAnswers = {};   // "pi:qi" -> choice (lokal)
+let sortLocal = null; // lokale Sortierreihenfolge
+let helloTimer = null;
+
+function renderJoin(){
+  role = null;
+  hostbar.classList.add("hidden");
+  const saved = JSON.parse(localStorage.getItem("lumen-team")||"null");
+  app.innerHTML = `
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:18px; max-width:460px; margin:0 auto; width:100%;">
+      <h2 style="color:var(--gold); letter-spacing:.2em;">MITSPIELEN</h2>
+      <input class="text code" id="jCode" maxlength="4" placeholder="CODE" autocomplete="off" value="${saved?esc(saved.code||""):""}">
+      <input class="text" id="jName" maxlength="18" placeholder="Teamname" autocomplete="off" value="${saved?esc(saved.name||""):""}">
+      <div class="emblem-pick" id="jEmb">${EMBLEMS.map(e=>`<button data-e="${e}">${e}</button>`).join("")}</div>
+      <button class="btn big" id="jGo">Beitreten ➜</button>
+      <button class="btn small secondary" onclick="renderStart()">← zurück</button>
+    </div>`;
+  let emblem = saved ? saved.emblem : null;
+  document.querySelectorAll("#jEmb button").forEach(b=>{
+    if(b.dataset.e===emblem) b.classList.add("sel");
+    b.onclick = ()=>{ document.querySelectorAll("#jEmb button").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); emblem=b.dataset.e; };
+  });
+  $("#jGo").onclick = ()=>{
+    const code = $("#jCode").value.trim().toUpperCase();
+    const name = $("#jName").value.trim();
+    if(code.length!==4){ alert("Bitte den 4-stelligen Raumcode von der Tafel eingeben."); return; }
+    if(!name){ alert("Bitte einen Teamnamen eingeben."); return; }
+    if(!emblem) emblem = EMBLEMS[Math.floor(Math.random()*EMBLEMS.length)];
+    startTeam(code, name, emblem);
+  };
+}
+
+function startTeam(code, name, emblem){
+  role = "team";
+  const saved = JSON.parse(localStorage.getItem("lumen-team")||"null");
+  const tid = (saved && saved.code===code) ? saved.tid : ("t"+Math.random().toString(36).slice(2,9));
+  T = {tid, name, emblem, code};
+  localStorage.setItem("lumen-team", JSON.stringify(T));
+  teamFlash("wait", "⏳", "Verbinde mit Raum " + code + " …");
+  connect(code, onTeamMsg, ()=>{
+    sayHello();
+    helloTimer = setInterval(()=>{ if(!lastState) sayHello(); else { clearInterval(helloTimer); helloTimer=null; } }, 1500);
+  });
+}
+function sayHello(){ send({t:"hello", tid:T.tid, name:T.name, emblem:T.emblem}); }
+
+let _lastSig = null;
+function onTeamMsg(m){
+  if(!m || m.t!=="state") return;
+  const isNewPhase = !lastState || lastState.pi !== m.pi;
+  const sig = JSON.stringify([m.pi, m.sub, m.teams]);
+  lastState = m;
+  if(isNewPhase){ sortLocal = null; }
+  if(!isNewPhase && sig === _lastSig) return;   // Heartbeat ohne Änderung: nicht neu zeichnen
+  _lastSig = sig;
+  teamRender();
+}
+/* Sound/Konfetti nur einmal pro Ereignis abspielen */
+const _onceKeys = new Set();
+function once(key, fn){ if(_onceKeys.has(key)) return; _onceKeys.add(key); fn(); }
+
+function teamFlash(kind, ico, text){
+  app.innerHTML = `<div class="flash ${kind}"><div class="big-ico">${ico}</div><div>${esc(text)}</div></div>`;
+}
+function myTeamState(){ return lastState.teams.find(t=>t.tid===T.tid); }
+
+function teamHeader(){
+  const me = myTeamState();
+  return `<div class="row" style="justify-content:space-between; margin-bottom:14px;">
+    <span class="team-chip"><span class="emblem">${T.emblem}</span>${esc(T.name)}</span>
+    <span class="team-chip">⭐ ${me?me.pts:0}</span></div>`;
+}
+function answerButtons(q, keyPrefix, disabled){
+  const chosen = myAnswers[keyPrefix];
+  return `<div class="answers ${q.a.length<=2?"one-col":""}">` + q.a.map((a,i)=>`
+    <button class="ans-btn a${i} ${chosen===i?"chosen":""} ${disabled&&chosen!==i?"dim":""}" data-i="${i}" ${disabled?"disabled":""}>${esc(a)}</button>`).join("") + `</div>`;
+}
+function bindAnswers(handler){
+  document.querySelectorAll(".ans-btn").forEach(b=> b.onclick = ()=>handler(parseInt(b.dataset.i,10)) );
+}
+
+function teamRender(){
+  if(!lastState){ return; }
+  const pi = lastState.pi, sub = lastState.sub || {};
+  const P = PHASES[pi];
+  const me = myTeamState();
+  if(!me){ sayHello(); teamFlash("wait","👋","Anmeldung läuft …"); return; }
+
+  /* Timer für Team-Ansichten */
+  const withTimer = lastState.deadline && lastState.deadline > Date.now();
+
+  if(P.type==="lobby"){
+    app.innerHTML = `${teamHeader()}
+      <div class="panel center" style="margin-top:30px;">
+        <h2 style="color:var(--gold);">Ihr seid dabei! 🎉</h2>
+        <p style="margin-top:10px; color:var(--muted);">Schaut zur Tafel – gleich geht es los.</p>
+        <div class="row" style="margin-top:16px;">${lastState.teams.map(t=>`<span class="team-chip"><span class="emblem">${t.emblem}</span>${esc(t.name)}</span>`).join("")}</div>
+      </div>`;
+    return;
+  }
+
+  if(P.type==="world-intro"){
+    app.innerHTML = `${teamHeader()}${worldBanner(P.world)}<div class="panel center"><p style="font-size:1.2rem;">Blick zur Tafel! ${WORLDS.find(w=>w.id===P.world).icon}</p></div>`;
+    return;
+  }
+
+  if(P.type==="quiz"){
+    const q = P.questions[sub.qi];
+    const key = pi+":"+sub.qi;
+    if(sub.stage==="ask"){
+      const answered = myAnswers[key]!==undefined;
+      app.innerHTML = `${teamHeader()}
+        ${withTimer?timerHtml():""}
+        <div class="panel"><p style="font-size:1.15rem; ${P.emoji&&q.q.length<40?"font-size:2.2rem; text-align:center;":""}">${esc(q.q)}</p></div>
+        ${answerButtons(q, key, answered)}
+        ${answered?`<p class="center" style="margin-top:14px; color:var(--muted);">Antwort gesendet – warten auf die anderen …</p>`:""}`;
+      if(withTimer) runTimerUI(lastState.deadline, lastState.total, null);
+      if(!answered) bindAnswers(i=>{
+        myAnswers[key]=i; send({t:"ans", tid:T.tid, pi, qi:sub.qi, choice:i}); sfx.whoosh(); teamRender();
+      });
+    } else {
+      const mine = myAnswers[key];
+      const ok = mine===q.correct;
+      app.innerHTML = `${teamHeader()}
+        <div class="flash ${mine===undefined?"wait":(ok?"ok":"bad")}" style="position:static; border-radius:18px; min-height:50vh;">
+          <div class="big-ico">${mine===undefined?"⏳":(ok?"✅":"❌")}</div>
+          <div>${mine===undefined?"Keine Antwort abgegeben":(ok?"Richtig!":"Leider falsch")}</div>
+          <div style="font-size:1.05rem; color:rgba(255,255,255,.85);">Richtig war: „${esc(q.a[q.correct])}“</div>
+        </div>`;
+      if(mine!==undefined){ once("qres:"+key, ()=>{ ok?sfx.correct():sfx.wrong(); }); }
+    }
+    return;
+  }
+
+  if(P.type==="reveal" || P.type==="tribunal"){
+    const key = pi+":clue";
+    if(sub.stage==="ask"){
+      const locked = (sub.locked||[]).includes(T.tid);
+      const answered = sub.answered && sub.answered[T.tid]!==undefined;
+      const q = {a:P.options};
+      app.innerHTML = `${teamHeader()}
+        ${withTimer?timerHtml():""}
+        <div class="panel center"><p style="font-size:1.1rem;">${P.type==="reveal"?"Was zeigt das Bild an der Tafel?":"Wer ist die gesuchte Person?"}</p>
+        <p style="color:var(--gold); margin-top:6px;">Stufe ${sub.step+1}: ${CLUE_PTS[Math.min(sub.step,2)]} Punkte · Falsch = −50 & gesperrt</p></div>
+        ${locked?`<div class="flash bad" style="position:static; border-radius:18px; margin-top:14px;"><div class="big-ico">🔒</div><div>Gesperrt für diese Runde</div></div>`
+          : answerButtons(q, key, answered) }
+        ${answered&&!locked?`<p class="center" style="margin-top:14px; color:var(--muted);">Gesendet …</p>`:""}`;
+      if(withTimer) runTimerUI(lastState.deadline, lastState.total, null);
+      if(!locked && !answered) bindAnswers(i=>{
+        myAnswers[key]=i; send({t:"ans", tid:T.tid, pi, choice:i}); sfx.whoosh(); teamRender();
+      });
+    } else if(sub.stage==="res"){
+      const win = sub.winner===T.tid;
+      app.innerHTML = `${teamHeader()}
+        <div class="flash ${win?"ok":"wait"}" style="position:static; border-radius:18px; min-height:50vh;">
+          <div class="big-ico">${win?"🏆":"👀"}</div>
+          <div>${win?"Ihr wart es!":"Auflösung an der Tafel"}</div>
+          <div style="font-size:1.05rem;">${esc(P.type==="reveal"?P.solution:P.options[P.correct])}</div>
+        </div>`;
+    } else if(sub.stage==="follow"){
+      const fkey = pi+":follow";
+      const answered = myAnswers[fkey]!==undefined;
+      app.innerHTML = `${teamHeader()}
+        ${withTimer?timerHtml():""}
+        <div class="panel"><p style="font-size:1.15rem;">${esc(P.follow.q)}</p></div>
+        ${answerButtons(P.follow, fkey, answered)}
+        ${answered?`<p class="center" style="margin-top:14px; color:var(--muted);">Gesendet …</p>`:""}`;
+      if(withTimer) runTimerUI(lastState.deadline, lastState.total, null);
+      if(!answered) bindAnswers(i=>{
+        myAnswers[fkey]=i; send({t:"ans", tid:T.tid, pi, choice:i}); sfx.whoosh(); teamRender();
+      });
+    } else {
+      const mine = myAnswers[pi+":follow"];
+      const ok = mine===P.follow.correct;
+      app.innerHTML = `${teamHeader()}
+        <div class="flash ${mine===undefined?"wait":(ok?"ok":"bad")}" style="position:static; border-radius:18px; min-height:50vh;">
+          <div class="big-ico">${mine===undefined?"⏳":(ok?"✅":"❌")}</div>
+          <div>Richtig war: „${esc(P.follow.a[P.follow.correct])}“</div></div>`;
+    }
+    return;
+  }
+
+  if(P.type==="sort"){
+    if(sub.stage==="work"){
+      if(!sortLocal){ sortLocal = shuffle(P.items.map((_,i)=>i)); sendSortProgress(P, pi, false); }
+      const done = (sub.prog && sub.prog[T.tid] && sub.prog[T.tid].done) || false;
+      app.innerHTML = `${teamHeader()}
+        ${withTimer?timerHtml():""}
+        <div class="panel center"><p>${esc(P.title)}: Bringt alles in die richtige Reihenfolge (oben = zuerst)!</p></div>
+        <div class="sort-list">${sortLocal.map((itemIdx,pos)=>`
+          <div class="sort-item ${done?"locked":""}"><span class="num">${pos+1}</span> ${esc(P.items[itemIdx])}
+            <span class="updown">
+              <button ${done||pos===0?"disabled":""} data-up="${pos}">▲</button>
+              <button ${done||pos===sortLocal.length-1?"disabled":""} data-down="${pos}">▼</button>
+            </span></div>`).join("")}
+        </div>
+        <div class="center" style="margin-top:16px;">
+          ${done?`<h2 style="color:var(--gold);">Eingeloggt! ✅</h2>`:`<button class="btn" id="sortDone">Reihenfolge einloggen ✓</button>`}
+        </div>`;
+      if(withTimer) runTimerUI(lastState.deadline, lastState.total, null);
+      document.querySelectorAll("[data-up]").forEach(b=>b.onclick=()=>{
+        const p=parseInt(b.dataset.up,10); [sortLocal[p-1],sortLocal[p]]=[sortLocal[p],sortLocal[p-1]]; sfx.tick(); sendSortProgress(P,pi,false); teamRender();
+      });
+      document.querySelectorAll("[data-down]").forEach(b=>b.onclick=()=>{
+        const p=parseInt(b.dataset.down,10); [sortLocal[p+1],sortLocal[p]]=[sortLocal[p],sortLocal[p+1]]; sfx.tick(); sendSortProgress(P,pi,false); teamRender();
+      });
+      const sd = $("#sortDone");
+      if(sd) sd.onclick = ()=>{
+        const correct = countCorrect(P);
+        if(correct === P.items.length){ sendSortProgress(P, pi, true); sfx.correct(); }
+        else { sendSortProgress(P, pi, false); sfx.wrong();
+          const el = document.createElement("div");
+          el.className="flash bad"; el.innerHTML=`<div class="big-ico">🤔</div><div>${correct} von ${P.items.length} sitzen schon richtig – weiter tüfteln!</div>`;
+          document.body.appendChild(el); setTimeout(()=>el.remove(), 1600);
+        }
+      };
+    } else {
+      app.innerHTML = `${teamHeader()}
+        <div class="panel"><b>Die richtige Reihenfolge:</b>
+        <ol style="margin:10px 0 0 22px; line-height:1.9;">${P.items.map(i=>`<li>${esc(i)}</li>`).join("")}</ol></div>`;
+    }
+    return;
+  }
+
+  if(P.type==="creative"){
+    const myPrompt = P.prompts[(sub.assigned||{})[T.tid] ?? 0];
+    const sent = sub.texts && sub.texts[T.tid]!==undefined;
+    if(sub.stage==="write" && !sent){
+      const keep = $("#creTxt") ? $("#creTxt").value : "";
+      app.innerHTML = `${teamHeader()}
+        ${withTimer?timerHtml():""}
+        <div class="panel"><p style="color:var(--muted); margin-bottom:8px;">Euer Satzanfang:</p>
+          <p style="font-size:1.25rem; font-style:italic;">„${esc(myPrompt)}“</p></div>
+        <textarea class="free-input" id="creTxt" maxlength="220" placeholder="Eure Vervollständigung …" style="margin-top:14px;"></textarea>
+        <div class="center" style="margin-top:14px;"><button class="btn" id="creSend">Absenden ✍️</button></div>`;
+      $("#creTxt").value = keep;
+      if(withTimer) runTimerUI(lastState.deadline, lastState.total, null);
+      $("#creSend").onclick = ()=>{
+        const txt = $("#creTxt").value.trim();
+        if(txt.length<5){ alert("Schreibt noch einen ganzen Gedanken dazu!"); return; }
+        send({t:"txt", tid:T.tid, pi, text:txt}); sfx.correct(); teamRender();
+      };
+    } else {
+      app.innerHTML = `${teamHeader()}<div class="flash wait" style="position:static; border-radius:18px; min-height:50vh;">
+        <div class="big-ico">${sent?"✅":"✍️"}</div><div>${sent?"Abgeschickt! Warten auf die anderen …":"Gleich seid ihr dran …"}</div></div>`;
+    }
+    return;
+  }
+
+  if(P.type==="vote"){
+    if(sub.stage==="vote"){
+      const voted = sub.votes && sub.votes[T.tid]!==undefined;
+      app.innerHTML = `${teamHeader()}
+        ${withTimer?timerHtml():""}
+        <div class="panel center"><p>Stimmt für die beste Antwort – <b>nicht die eigene!</b></p></div>
+        <div style="display:flex; flex-direction:column; gap:12px; margin-top:14px;">
+          ${(sub.entries||[]).map((e,i)=>{
+            const own = e.key===T.tid;
+            return `<button class="vote-card ${own?"mine":""}" data-k="${e.key}" ${own||voted?"disabled":""} style="text-align:left; cursor:pointer; ${voted&&sub.votes[T.tid]===e.key?"outline:3px solid var(--gold);":""}">
+              <span style="color:var(--gold)">${i+1}.</span> „${esc(e.text)}“ ${own?"<br><i style='font-size:.85rem;'>(eure eigene)</i>":""}</button>`;}).join("")}
+        </div>
+        ${voted?`<p class="center" style="margin-top:14px; color:var(--muted);">Stimme abgegeben ✓</p>`:""}`;
+      if(withTimer) runTimerUI(lastState.deadline, lastState.total, null);
+      if(!voted) document.querySelectorAll(".vote-card[data-k]").forEach(b=>{
+        if(!b.disabled) b.onclick = ()=>{ send({t:"vote", tid:T.tid, pi, key:b.dataset.k}); sfx.join(); teamRender(); };
+      });
+    } else {
+      app.innerHTML = `${teamHeader()}<div class="flash wait" style="position:static; border-radius:18px; min-height:40vh;">
+        <div class="big-ico">🏆</div><div>Ergebnisse an der Tafel!</div></div>`;
+    }
+    return;
+  }
+
+  if(P.type==="world-done"){
+    const meIdx = [...lastState.teams].sort((a,b)=>b.pts-a.pts).findIndex(t=>t.tid===T.tid);
+    app.innerHTML = `${teamHeader()}${worldBanner(P.world)}
+      <div class="panel center"><h2 style="color:var(--gold);">✨ Fenster ${P.world} leuchtet! ✨</h2>
+      <p style="margin-top:10px;">Ihr seid gerade auf <b>Platz ${meIdx+1}</b>.</p></div>
+      ${scoreboardHtml(lastState.teams, true)}`;
+    return;
+  }
+
+  if(P.type==="finale-intro"){
+    app.innerHTML = `${teamHeader()}<div class="panel center" style="margin-top:20px;">
+      <h2 style="color:var(--gold); letter-spacing:.15em;">DAS FINALE</h2>
+      <p style="margin-top:12px; font-size:1.1rem; line-height:1.7;">Gleich bekommt ihr <b>eine</b> Frage.<br>Nur wenn <b>alle Teams</b> richtig liegen, leuchtet das Fenster.<br>Jetzt zählt der ganze Kurs. 🕯️</p></div>`;
+    return;
+  }
+
+  if(P.type==="finale"){
+    const myQi = (sub.assigned||{})[T.tid] ?? 0;
+    const q = P.questions[myQi];
+    const myRes = (sub.results||{})[T.tid];
+    if(sub.stage==="won"){
+      once("finale-won", ()=>{ confettiBurst(160); sfx.fanfare(); });
+      app.innerHTML = `${teamHeader()}<div class="center finale-image" style="margin-top:14px;">${aiImg("finale-fenster","3/4","380px")}</div>
+        <div class="flash ok" style="position:static; border-radius:18px; min-height:34vh; margin-top:14px;">
+        <div class="big-ico">🕯️</div><div style="font-size:2rem; letter-spacing:.15em;">ES WERDE LICHT!</div><div>Ihr habt es gemeinsam geschafft!</div></div>`;
+      return;
+    }
+    if(myRes===true){
+      app.innerHTML = `${teamHeader()}<div class="flash ok" style="position:static; border-radius:18px; min-height:50vh;">
+        <div class="big-ico">✅</div><div>Eure Antwort sitzt!</div><div style="font-size:1rem;">Helft jetzt den anderen Teams – laut und deutlich! 📣</div></div>`;
+      return;
+    }
+    if(myRes===false && sub.stage==="play"){
+      app.innerHTML = `${teamHeader()}<div class="flash bad" style="position:static; border-radius:18px; min-height:50vh;">
+        <div class="big-ico">❌</div><div>Noch nicht … gleich kommt eine zweite Chance!</div></div>`;
+      return;
+    }
+    const key = pi+":f:"+sub.round;
+    const answered = myAnswers[key]!==undefined && myRes!==undefined && myRes!==null;
+    app.innerHTML = `${teamHeader()}
+      ${withTimer?timerHtml():""}
+      <div class="panel center" style="border-color:var(--gold);"><p style="color:var(--gold); letter-spacing:.15em;">EURE FINALFRAGE</p>
+        <p style="font-size:1.2rem; margin-top:10px;">${esc(q.q)}</p></div>
+      ${answerButtons(q, key, false)}`;
+    if(withTimer) runTimerUI(lastState.deadline, lastState.total, null);
+    bindAnswers(i=>{
+      myAnswers[key]=i; send({t:"ans", tid:T.tid, pi, qi:myQi, choice:i}); sfx.whoosh();
+    });
+    return;
+  }
+
+  if(P.type==="ceremony"){
+    const sorted = [...lastState.teams].sort((a,b)=>b.pts-a.pts);
+    const meIdx = sorted.findIndex(t=>t.tid===T.tid);
+    if(meIdx===0){ once("ceremony-conf", ()=>confettiBurst(160)); }
+    app.innerHTML = `${teamHeader()}
+      <div class="panel center" style="margin-top:20px;">
+        <div style="font-size:3.5rem;">${["🥇","🥈","🥉"][meIdx]||"🏅"}</div>
+        <h2 style="margin-top:8px;">Platz ${meIdx+1}</h2>
+        <p style="color:var(--muted); margin-top:8px;">Danke für dieses Jahr – schöne Ferien! ☀️</p>
+      </div>${scoreboardHtml(lastState.teams)}`;
+    return;
+  }
+}
+
+function countCorrect(P){
+  let c=0; sortLocal.forEach((itemIdx,pos)=>{ if(itemIdx===pos) c++; });
+  return c;
+}
+function sendSortProgress(P, pi, done){
+  send({t:"prog", tid:T.tid, pi, correct:countCorrect(P), done});
+}
+
+/* ================= Start ================= */
+renderStart();
+</script>
+
+<!-- ============================================================
+  BILD-PROMPTS für die KI-Generierung (alle Dateien → Ordner img/)
+  Einheitlicher Stil-Zusatz für JEDEN Prompt:
+  "Moderne Glasmalerei, Stained-Glass-Illustration, leuchtende
+   Farben auf dunklem Grund, klare schwarze Bleilinien, feierliche
+   Stimmung, hochwertig, KEINE bildliche Darstellung Gottes."
+
+  img/titel-fenster.png  (Hochformat 3:4)
+    Großes gotisches Kirchenfenster mit vier dunklen, erloschenen
+    Feldern; ein einzelner goldener Lichtstrahl fällt schräg von
+    oben links ein und trifft die Fensterkante.
+
+  img/brennender-dornbusch.png  (16:9)
+    Ein Dornbusch in leuchtenden orange-roten Glasflammen, die den
+    Busch nicht verzehren; davor ein Paar abgestreifte Sandalen auf
+    steinigem Boden; Wüstenberg Horeb im Hintergrund.
+
+  img/goldenes-kalb.png  (16:9)
+    Ein goldenes Kalb auf einem steinernen Altar, umringt von
+    tanzenden dunklen Silhouetten; im Hintergrund ein zorniger
+    Berg mit Gewitterwolken und zwei herabfallenden Steintafeln.
+
+  img/welt2-sturm.png  (16:9)
+    Eine kleine, gebeugte menschliche Gestalt (Hiob) allein auf
+    kahlem Boden unter einem gewaltigen blau-violetten Sturmwirbel,
+    der fast das ganze Bild füllt; ein winziger goldener Lichtpunkt
+    im Zentrum des Sturms.
+
+  img/welt3-tribunal.png  (16:9)
+    Ein dunkler Gerichtssaal: vier Scherenschnitt-Porträts als
+    Angeklagte auf einer Richterbank – ein Denker mit gewaltigem
+    Schnurrbart, einer mit runder Brille und Zigarre, einer mit
+    mächtigem Vollbart, einer mit Backenbart; darüber eine Waage
+    aus buntem Glas.
+
+  img/welt4-weg.png  (16:9)
+    Eine staubige Straße führt durch Olivenhaine auf die Silhouette
+    Jerusalems im goldenen Abendlicht zu; am Wegrand liegen
+    Palmzweige; keine Personen im Vordergrund.
+
+  img/senfkorn-baum.png  (16:9, optional)
+    Ein winziges leuchtendes Senfkorn im Vordergrund, dahinter ein
+    riesiger Baum voller bunter Vögel – extremer Größenkontrast.
+
+  img/finale-fenster.png  (Hochformat 3:4)
+    Dasselbe gotische Kirchenfenster wie auf dem Titelbild, jetzt
+    in voller Farbe strahlend: vier leuchtende Felder (Feuer/orange,
+    Sturm/blau, Waage/violett, Weg/grün), Lichtstrahlen fluten
+    einen dunklen Kirchenraum, Staubpartikel im Licht.
+============================================================ -->
+</body>
+</html>
