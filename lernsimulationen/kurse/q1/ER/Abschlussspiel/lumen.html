@@ -47,6 +47,10 @@ h2{font-size:clamp(1.3rem,3.5vw,2.4rem); text-align:center; font-weight:normal;}
 .center{text-align:center;}
 .row{display:flex; gap:14px; flex-wrap:wrap; justify-content:center; align-items:center;}
 .spacer{flex:1;}
+.join-qr{display:flex; align-items:center; justify-content:center; gap:18px; max-width:620px; margin:0 auto; padding:14px 18px; background:rgba(255,255,255,.96); border:2px solid var(--gold); border-radius:18px; color:var(--lead); box-shadow:0 10px 30px rgba(0,0,0,.35);}
+.join-qr img{width:clamp(120px,22vw,180px); height:auto; image-rendering:pixelated;}
+.join-qr p{font-size:1.05rem; line-height:1.45; text-align:left;}
+@media(max-width:520px){.join-qr{flex-direction:column; text-align:center;}.join-qr p{text-align:center;}}
 
 /* ===== Kirchenfenster (CSS-Zeichnung) ===== */
 .window-frame{
@@ -491,6 +495,10 @@ function renderStart(){
     <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:26px; padding:20px 0;">
       ${windowHtml([])}
       <div><h1>LUMEN</h1><div class="subtitle">DAS GROSSE Q1-FINALE · EVANGELISCHE RELIGIONSLEHRE</div></div>
+      <div class="join-qr">
+        <img src="img/lumen-teilnahme-qr.png" alt="QR-Code zur Teilnahme mit dem iPad">
+        <p><b>Mit dem iPad teilnehmen</b><br>QR-Code scannen und anschließend den Raumcode von der Tafel eingeben.</p>
+      </div>
       ${ONLINE ? "" : `<div class="panel center" style="border-color:var(--glass-red); max-width:560px; margin:0 auto;">
         ⚠️ <b>Notfallmodus:</b> Es sind noch keine Supabase-Zugangsdaten eingetragen.<br>
         Die Tafel läuft trotzdem – Teams antworten dann per Handzeichen, und du wertest an der Tafel.</div>`}
