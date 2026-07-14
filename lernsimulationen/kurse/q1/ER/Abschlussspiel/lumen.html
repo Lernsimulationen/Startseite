@@ -164,6 +164,17 @@ input.code{letter-spacing:.4em; text-transform:uppercase; font-size:1.6rem;}
 #hostbar{position:fixed; bottom:0; left:0; right:0; background:rgba(10,12,24,.92); backdrop-filter:blur(6px); border-top:1px solid #333a6e; padding:10px 14px; display:flex; gap:10px; align-items:center; z-index:50;}
 #hostbar .info{color:var(--muted); font-size:.9rem;}
 body.is-host #app{padding-bottom:90px;}
+body.is-team{overflow:hidden;}
+body.is-team #app{height:100vh; min-height:100vh; padding:10px; overflow-y:auto; scrollbar-width:none;}
+body.is-team #app::-webkit-scrollbar{display:none;}
+body.is-team .phase-image{margin:0 auto 8px;}
+body.is-team .phase-image .ai-img{max-height:110px;}
+body.is-team .panel{padding:13px; border-radius:13px;}
+body.is-team .team-chip{padding:6px 10px; font-size:.9rem;}
+body.is-team .answers{gap:8px; margin-top:10px;}
+body.is-team .ans-btn{min-height:52px; padding:11px 9px; font-size:.98rem;}
+body.is-team .clue-list{gap:7px; margin:8px auto;}
+body.is-team .clue-item{padding:9px 11px; font-size:.94rem;}
 #version-badge{position:fixed; right:12px; bottom:10px; z-index:55; padding:4px 9px; border:1px solid rgba(244,201,93,.45); border-radius:999px; background:rgba(10,12,24,.78); color:var(--muted); font:12px/1.2 Georgia,'Times New Roman',serif; letter-spacing:.04em; pointer-events:none;}
 body.is-host #version-badge{bottom:76px;}
 
@@ -175,6 +186,21 @@ body.is-host #version-badge{bottom:76px;}
 .clue-list{display:flex; flex-direction:column; gap:10px; margin:14px auto; max-width:720px;}
 .clue-item{background:var(--panel2); border:1px solid #5665a0; border-radius:12px; padding:13px 16px; line-height:1.45;}
 .clue-item.current{border-color:var(--gold); box-shadow:0 0 16px rgba(244,201,93,.18);}
+.team-guide{display:flex; align-items:center; gap:9px; min-width:0;}
+.team-guide img{width:42px; height:42px; object-fit:cover; border-radius:50%; border:2px solid var(--gold); box-shadow:0 0 12px rgba(244,201,93,.28);}
+.team-guide .team-guide-copy{display:flex; flex-direction:column; gap:2px; min-width:0;}
+.team-guide .guide-label{font-size:.68rem; color:var(--muted); letter-spacing:.08em; text-transform:uppercase;}
+.avatar-badge{width:38px; height:38px; object-fit:cover; border-radius:50%; border:2px solid var(--gold); vertical-align:middle;}
+.avatar-pick{display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin:12px 0;}
+.avatar-option{background:var(--panel2); color:var(--text); border:2px solid #3a4180; border-radius:13px; padding:7px 4px; cursor:pointer; font-family:inherit; font-size:.78rem;}
+.avatar-option img{display:block; width:58px; height:58px; object-fit:cover; border-radius:50%; margin:0 auto 5px;}
+.avatar-option.sel{border-color:var(--gold); box-shadow:0 0 14px rgba(244,201,93,.3);}
+.avatar-option.taken{opacity:.25; pointer-events:none;}
+.avatar-ability{display:block; color:var(--muted); font-size:.68rem; line-height:1.25; margin-top:3px;}
+.points-change{font-size:.82rem; font-weight:bold; animation:pointsPop .55s ease-out;}
+.points-change.plus{color:var(--glass-green);}
+.points-change.minus{color:var(--glass-red);}
+@keyframes pointsPop{0%{opacity:0; transform:translateY(6px) scale(.9);}60%{opacity:1; transform:translateY(-2px) scale(1.05);}100%{opacity:1; transform:translateY(0) scale(1);}}
 
 /* ===== Feedback-Overlays (Team) ===== */
 .flash{position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; z-index:40; font-size:1.6rem; text-align:center; padding:20px;}
@@ -207,6 +233,7 @@ body.is-host #version-badge{bottom:76px;}
 <canvas id="confetti"></canvas>
 <div id="hostbar" class="hidden"></div>
 <div id="version-badge">Version 1.0</div>
+<audio id="ambientMusic" src="audio/lumen-ambient.mp3" loop preload="auto"></audio>
 <script>
 /* ============================================================
    LUMEN – Das große Q1-Finale (Ev. Religionslehre)
@@ -238,6 +265,7 @@ const INSIDER = [
     Farben auf dunklem Grund, klare schwarze Bleilinien, feierlich,
     KEINE Darstellung Gottes als Person."                       */
 const AI_IMAGES = {
+  "titel-fenster-start": {emoji:"", desc:"Dunkles gotisches Kirchenfenster mit vier farbigen Glasmalerei-Szenen: Feuer, Sturm, Gerechtigkeit und Weg"},
   "titel-fenster":     {emoji:"⛪", desc:"Großes gotisches Kirchenfenster mit vier dunklen Feldern, ein einzelner goldener Lichtstrahl fällt schräg ein"},
   "goldenes-kalb":     {emoji:"🐂", desc:"Goldenes Kalb auf einem Altar, tanzende Silhouetten darum, Glasmalerei-Stil"},
   "brennender-dornbusch":{emoji:"🔥", desc:"Brennender Dornbusch, der nicht verbrennt – Flammen aus buntem Glas, davor abgestreifte Sandalen"},
@@ -263,6 +291,20 @@ const WORLDS = [
 ];
 
 const EMBLEMS = ["🕊️","🐟","🦁","🐑","🌱","🕯️"];
+const AVATARS = [
+  {id:"mose",name:"Mose",ability:"+50 einmalig bei einer richtigen Dornbusch-Frage"},
+  {id:"hiob",name:"Hiob",ability:"+50 einmalig bei einer richtigen Theodizee-Frage"},
+  {id:"epikur",name:"Epikur",ability:"+50 für eine erhaltene Stimme im Epikur-Voting"},
+  {id:"feuerbach",name:"Feuerbach",ability:"+50 für die erste richtige Tribunal-Antwort"},
+  {id:"marx",name:"Marx",ability:"+50 einmalig bei einer richtigen Religionskritik-Frage"},
+  {id:"freud",name:"Freud",ability:"Hilfen kosten nur 50 statt 100 Punkte"},
+  {id:"nietzsche",name:"Nietzsche",ability:"+50 für die zweite richtige Tribunal-Antwort"},
+  {id:"jesus",name:"Jesus",ability:"+100 für eine richtige Finale-Antwort"},
+  {id:"petrus",name:"Petrus",ability:"+50 für den ersten Platz im Passions-Puzzle"},
+  {id:"maria-magdalena",name:"Maria Magdalena",ability:"+50 beim Gewinn einer Tablet-Bonusfrage"}
+];
+function avatarMeta(id){ return AVATARS.find(a=>a.id===id) || AVATARS[0]; }
+function avatarBadge(id, alt="Figur"){ const a=avatarMeta(id); return `<img class="avatar-badge" src="img/avatar-${a.id}.png" alt="${esc(alt||a.name)}">`; }
 const HELP_COST = 100;
 const ANSWER_COLORS = ["var(--glass-red)","var(--glass-blue)","var(--w1)","var(--glass-green)"];
 function randomAnswerColors(count=4){ return shuffle([0,1,2,3]).slice(0,count); }
@@ -392,12 +434,17 @@ const app = $("#app");
 const hostbar = $("#hostbar");
 const esc = s => String(s??"").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const shuffle = arr => { const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; };
+function answerColorIndex(i, sub){
+  const order = Array.isArray(sub?.answerColors) && sub.answerColors.length ? sub.answerColors : [1,2,3,0];
+  return order[i] ?? (i%4);
+}
 
 let role = null;          // 'host' | 'team'
 let NET = null;           // Supabase-Kanal
 let ONLINE = !!(SUPABASE_URL && SUPABASE_ANON_KEY);
 let sb = null;
 let soundOn = true;
+const ambientMusic = $("#ambientMusic");
 
 /* ---------- Sound (WebAudio, ohne Dateien) ---------- */
 let AC = null;
@@ -434,12 +481,11 @@ function playMusicNote(freq, duration=2.4){
   }catch(e){}
 }
 function startMusic(){
-  if(musicTimer || !soundOn) return;
-  const ctx=ac(); musicGain=ctx.createGain(); musicGain.gain.value=0.55; musicGain.connect(ctx.destination);
-  const notes=[196,246.94,293.66,246.94,220,261.63,329.63,261.63]; let i=0;
-  playMusicNote(notes[i++]); musicTimer=setInterval(()=>playMusicNote(notes[i++%notes.length]),2300);
+  if(!soundOn || !ambientMusic) return;
+  ambientMusic.volume=.22;
+  ambientMusic.play().catch(()=>{});
 }
-function stopMusic(){ if(musicTimer){ clearInterval(musicTimer); musicTimer=null; } if(musicGain){ musicGain.gain.setTargetAtTime(0.0001,ac().currentTime,0.12); setTimeout(()=>{try{musicGain.disconnect();}catch(e){} musicGain=null;},500); } }
+function stopMusic(){ if(ambientMusic){ ambientMusic.pause(); ambientMusic.currentTime=0; } }
 function toggleSound(){ soundOn=!soundOn; if(soundOn){ if(role==="host") startMusic(); } else stopMusic(); hostRender(); }
 
 /* ---------- Konfetti ---------- */
@@ -529,7 +575,7 @@ function windowHtml(litWorlds, glowAll=false){
 function scoreboardHtml(teams, showDelta=false){
   const sorted = [...teams].sort((a,b)=>b.pts-a.pts);
   return `<div class="scoreboard">${sorted.map(t=>`
-    <div class="score-row"><span class="emblem">${t.emblem}</span><span class="name">${esc(t.name)}</span>
+    <div class="score-row">${avatarBadge(t.avatarId,t.name)}<span class="name">${esc(t.name)}</span>
     ${showDelta && t.lastDelta ? `<span class="delta">${t.lastDelta>0?"+":""}${t.lastDelta}</span>`:""}
     <span class="pts">${t.pts}</span></div>`).join("")}</div>`;
 }
@@ -537,10 +583,11 @@ function scoreboardHtml(teams, showDelta=false){
 /* ================= Startbildschirm ================= */
 function renderStart(){
   document.body.classList.remove("is-host");
+  document.body.classList.remove("is-team");
   hostbar.classList.add("hidden");
   app.innerHTML = `
     <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:26px; padding:20px 0;">
-      ${windowHtml([])}
+      <div class="center">${aiImg("titel-fenster-start","3/4","340px")}</div>
       <div><h1>LUMEN</h1><div class="subtitle">DAS GROSSE Q1-FINALE · EVANGELISCHE RELIGIONSLEHRE</div></div>
       <div class="join-qr">
         <img src="img/lumen-teilnahme-qr.png" alt="QR-Code zur Teilnahme mit dem iPad">
@@ -573,9 +620,10 @@ let heartbeat = null;
 
 function startHost(){
   role = "host";
+  document.body.classList.remove("is-team");
   document.body.classList.add("is-host");
   G = { code: makeCode(), phaseIdx: 0, teams: {}, sub: {}, deadline: 0, total: 0,
-        creative: null, awards: {fastest:null, poet:null, bonus:[]} };
+        creative: null, avatarAwards:{}, awards: {fastest:null, poet:null, bonus:[]} };
   if(ONLINE){
     connect(G.code, onHostMsg, ()=>{ enterPhase(0); });
     heartbeat = setInterval(()=>broadcastState(), 2000);
@@ -589,24 +637,29 @@ function teamCount(){ return Object.keys(G.teams).length; }
 function broadcastState(){
   if(!ONLINE) return;
   send({ t:"state", pi:G.phaseIdx, sub:G.sub, deadline:G.deadline, total:G.total,
-         teams: teamsArr().map(t=>({tid:t.tid,name:t.name,emblem:t.emblem,pts:t.pts,lastDelta:t.lastDelta||0})) });
+         teams: teamsArr().map(t=>({tid:t.tid,name:t.name,avatarId:t.avatarId,emblem:t.emblem,pts:t.pts,lastDelta:t.lastDelta||0})) });
 }
 
 function addPts(tid, delta){
   const t = G.teams[tid]; if(!t) return;
   t.pts = Math.max(0, t.pts + delta); t.lastDelta = delta;
 }
+function helpCostFor(tid){ return G.teams[tid]?.avatarId==="freud" ? 50 : HELP_COST; }
+function claimAvatarBonus(tid, key, amount=50){
+  const awardKey=tid+":"+key; if(G.avatarAwards[awardKey]) return 0;
+  G.avatarAwards[awardKey]=true; return amount;
+}
 function resetHelpState(){ G.sub.helpUsed = {}; G.sub.eliminated = {}; }
 function handleHelpPurchase(tid, pi){
   if(pi!==G.phaseIdx || !G.sub || G.sub.helpUsed?.[tid]) return;
   const P = PHASES[G.phaseIdx], allowed = ["quiz","reveal","tribunal","finale"].includes(P.type);
   if(!allowed || G.sub.stage!=="ask" && !(P.type==="finale" && ["play","retry"].includes(G.sub.stage))) return;
-  const team = G.teams[tid]; if(!team || team.pts < HELP_COST) return;
+  const cost=helpCostFor(tid), team = G.teams[tid]; if(!team || team.pts < cost) return;
   const q = P.type==="quiz" ? currentQ() : P.type==="finale" ? P.questions[G.sub.assigned[tid]] : {a:P.options};
   const correct = q.correct;
   const wrong = q.a.map((_,i)=>i).filter(i=>i!==correct && !(G.sub.eliminated?.[tid]||[]).includes(i));
   if(!wrong.length) return;
-  addPts(tid, -HELP_COST);
+  addPts(tid, -cost);
   const remove = shuffle(wrong)[0];
   G.sub.helpUsed[tid] = true;
   G.sub.eliminated[tid] = [...(G.sub.eliminated[tid]||[]), remove];
@@ -628,7 +681,7 @@ function handleBonusAnswer(tid, pi, choice){
   if(pi!==G.phaseIdx || G.sub.bonus?.stage!=="ask" || G.sub.bonus.answers[tid]!==undefined) return;
   const b=G.sub.bonus; b.answers[tid]=choice;
   if(choice===b.q.correct && !b.winner){
-    b.winner=tid; addPts(tid,150); G.awards.bonus.push(tid); b.stage="res"; sfx.fanfare();
+    b.winner=tid; const avatarBonus=G.teams[tid].avatarId==="maria-magdalena" ? claimAvatarBonus(tid,"maria-bonus") : 0; addPts(tid,150+avatarBonus); G.awards.bonus.push(tid); b.stage="res"; sfx.fanfare();
   } else if(Object.keys(b.answers).length>=teamCount()){
     b.stage="res"; sfx.reveal();
   }
@@ -640,7 +693,12 @@ function onHostMsg(m){
   const P = PHASES[G.phaseIdx];
   if(m.t==="hello"){
     if(!G.teams[m.tid]){
-      G.teams[m.tid] = {tid:m.tid, name:String(m.name||"Team").slice(0,18), emblem:EMBLEMS.includes(m.emblem)?m.emblem:"🕊️", pts:0, lastDelta:0};
+      const used = teamsArr().map(t=>t.avatarId).filter(Boolean);
+      const requested = AVATARS.some(a=>a.id===m.avatarId) ? m.avatarId : null;
+      const avatarId = requested && !used.includes(requested) ? requested : AVATARS.find(a=>!used.includes(a.id))?.id;
+      if(!avatarId) return;
+      G.teams[m.tid] = {tid:m.tid, name:String(m.name||"Team").slice(0,18), avatarId, emblem:EMBLEMS[AVATARS.findIndex(a=>a.id===avatarId)%EMBLEMS.length], pts:0, lastDelta:0};
+      send({t:"assign", tid:m.tid, avatarId, emblem:G.teams[m.tid].emblem});
       sfx.join();
       if(PHASES[G.phaseIdx].type==="lobby") hostRender();
     }
@@ -736,6 +794,7 @@ function handleAnswer(tid, pi, qi, choice){
     if((G.sub.stage!=="play" && G.sub.stage!=="retry") || G.sub.results[tid]===true) return;
     const q = P.questions[G.sub.assigned[tid]];
     G.sub.results[tid] = (choice === q.correct);
+    if(G.sub.results[tid] && G.teams[tid].avatarId==="jesus") addPts(tid,claimAvatarBonus(tid,"jesus-finale",100));
     const vals = teamsArr().map(t=>G.sub.results[t.tid]);
     if(vals.every(v=>v===true)) finaleWon();
     else if(vals.every(v=>v!==undefined && v!==null)) { hostRender(); broadcastState(); }
@@ -751,7 +810,8 @@ function resolveQuestion(){
     counts[a.choice]++;
     if(a.choice===q.correct){
       const bonus = Math.round(100 * a.remaining / (G.total*1000));
-      addPts(tid, 100 + bonus);
+      const avatarBonus = P.world===1 && G.teams[tid].avatarId==="mose" ? claimAvatarBonus(tid,"mose-w1") : P.world===2 && G.teams[tid].avatarId==="hiob" ? claimAvatarBonus(tid,"hiob-w2") : P.world===3 && G.teams[tid].avatarId==="marx" ? claimAvatarBonus(tid,"marx-w3") : 0;
+      addPts(tid, 100 + bonus + avatarBonus);
       if(!fastBest || a.remaining > fastBest.remaining) fastBest = {tid, remaining:a.remaining};
       if(!G.awards.fastest || a.remaining > G.awards.fastest.remaining) G.awards.fastest = {tid, remaining:a.remaining};
     }
@@ -772,7 +832,8 @@ function handleClueAnswer(tid, pi, choice){
     G.sub.answered[tid] = choice;
     if(choice === P.correct){
       G.sub.winner = tid;
-      addPts(tid, CLUE_PTS[Math.min(G.sub.step, 2)]);
+      const avatarBonus = P.title==="Der erste Angeklagte" && G.teams[tid].avatarId==="feuerbach" ? claimAvatarBonus(tid,"feuerbach-tribunal") : P.title==="Der zweite Angeklagte" && G.teams[tid].avatarId==="nietzsche" ? claimAvatarBonus(tid,"nietzsche-tribunal") : 0;
+      addPts(tid, CLUE_PTS[Math.min(G.sub.step, 2)] + avatarBonus);
       G.sub.stage = "res"; G.deadline = 0; stopTimerUI();
       sfx.correct();
     } else {
@@ -836,7 +897,10 @@ function resolveSort(){
   stopTimerUI();
   const P = PHASES[G.phaseIdx];
   const rankPts = [300,200,150,120,100,100];
-  G.sub.finished.forEach((tid,i)=>addPts(tid, rankPts[Math.min(i,rankPts.length-1)]));
+  G.sub.finished.forEach((tid,i)=>{
+    const avatarBonus=i===0 && G.teams[tid].avatarId==="petrus" ? claimAvatarBonus(tid,"petrus-sort") : 0;
+    addPts(tid, rankPts[Math.min(i,rankPts.length-1)] + avatarBonus);
+  });
   teamsArr().forEach(t=>{
     if(!G.sub.finished.includes(t.tid)){
       const pr = G.sub.prog[t.tid];
@@ -871,7 +935,10 @@ function resolveVote(){
   stopTimerUI();
   const results = {};
   Object.values(G.sub.votes).forEach(key=>{ results[key] = (results[key]||0)+1; });
-  Object.entries(results).forEach(([key,n])=>addPts(key, n*100));
+  Object.entries(results).forEach(([key,n])=>{
+    const avatarBonus=G.teams[key]?.avatarId==="epikur" && n>0 ? claimAvatarBonus(key,"epikur-vote") : 0;
+    addPts(key, n*100 + avatarBonus);
+  });
   let best=null; Object.entries(results).forEach(([key,n])=>{ if(!best || n>best.n) best={key,n}; });
   if(best) G.awards.poet = best.key;
   G.sub.results = results; G.sub.stage = "res"; G.deadline = 0;
@@ -958,7 +1025,7 @@ function hostbarRender(extra=""){
 function boardAnswersHtml(q, sub, showResult){
   const cnt = sub && sub.counts && sub.counts.length ? sub.counts : null;
   return `<div class="board-answers">` + q.a.map((a,i)=>`
-    <div class="board-ans a${(sub&&sub.answerColors?sub.answerColors[i]:i%4)} ${showResult ? (i===q.correct?"correct":"dim") : ""}" style="background:${ANSWER_COLORS[(sub&&sub.answerColors?sub.answerColors[i]:i%4)]}">
+    <div class="board-ans a${answerColorIndex(i,sub)} ${showResult ? (i===q.correct?"correct":"dim") : ""}" style="background:${ANSWER_COLORS[answerColorIndex(i,sub)]}">
       ${esc(a)} ${showResult && cnt ? `<span class="cnt">${cnt[i]||0}×</span>`:""}
     </div>`).join("") + `</div>`;
 }
@@ -1024,7 +1091,7 @@ function hostRender(){
     }
     let bottom = "";
     if(G.sub.stage==="ask"){
-      bottom = `<div class="board-answers">${P.options.map((o,i)=>`<div class="board-ans a${G.sub.answerColors?.[i]??i%4}" style="background:${ANSWER_COLORS[G.sub.answerColors?.[i]??i%4]}">${["🟥","🟦","🟧","🟩"][G.sub.answerColors?.[i]??i%4]} ${esc(o)}</div>`).join("")}</div>
+      bottom = `<div class="board-answers">${P.options.map((o,i)=>`<div class="board-ans a${answerColorIndex(i,G.sub)}" style="background:${ANSWER_COLORS[answerColorIndex(i,G.sub)]}">${["🟥","🟦","🟧","🟩"][answerColorIndex(i,G.sub)]} ${esc(o)}</div>`).join("")}</div>
         ${answeredChipsHtml(G.sub.answered)}
         <p class="center" style="color:var(--muted); margin-top:10px;">Früh antworten bringt ${CLUE_PTS[Math.min(G.sub.step,2)]} Punkte – falsch kostet 50 und sperrt!</p>`;
       barExtra = `<button class="btn small secondary" onclick="nextClue()">${isRev?"Mehr aufdecken":"Nächstes Indiz"} 🔎</button>`;
@@ -1212,30 +1279,31 @@ function renderJoin(){
       <h2 style="color:var(--gold); letter-spacing:.2em;">MITSPIELEN</h2>
       <input class="text code" id="jCode" maxlength="4" placeholder="CODE" autocomplete="off" value="${saved?esc(saved.code||""):""}">
       <input class="text" id="jName" maxlength="18" placeholder="Teamname" autocomplete="off" value="${saved?esc(saved.name||""):""}">
-      <div class="emblem-pick" id="jEmb">${EMBLEMS.map(e=>`<button data-e="${e}">${e}</button>`).join("")}</div>
+      <div class="avatar-pick" id="jAvatar">${AVATARS.map(a=>`<button class="avatar-option" data-a="${a.id}"><img src="img/avatar-${a.id}.png" alt="${esc(a.name)}"><span>${esc(a.name)}</span><small class="avatar-ability">${esc(a.ability)}</small></button>`).join("")}</div>
       <button class="btn big" id="jGo">Beitreten ➜</button>
       <button class="btn small secondary" onclick="renderStart()">← zurück</button>
     </div>`;
-  let emblem = saved ? saved.emblem : null;
-  document.querySelectorAll("#jEmb button").forEach(b=>{
-    if(b.dataset.e===emblem) b.classList.add("sel");
-    b.onclick = ()=>{ document.querySelectorAll("#jEmb button").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); emblem=b.dataset.e; };
+  let avatarId = saved ? saved.avatarId : null;
+  document.querySelectorAll("#jAvatar button").forEach(b=>{
+    if(b.dataset.a===avatarId) b.classList.add("sel");
+    b.onclick = ()=>{ document.querySelectorAll("#jAvatar button").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); avatarId=b.dataset.a; };
   });
   $("#jGo").onclick = ()=>{
     const code = $("#jCode").value.trim().toUpperCase();
     const name = $("#jName").value.trim();
     if(code.length!==4){ alert("Bitte den 4-stelligen Raumcode von der Tafel eingeben."); return; }
     if(!name){ alert("Bitte einen Teamnamen eingeben."); return; }
-    if(!emblem) emblem = EMBLEMS[Math.floor(Math.random()*EMBLEMS.length)];
-    startTeam(code, name, emblem);
+    if(!avatarId){ alert("Bitte wählt eine biblische Figur oder einen Philosophen aus."); return; }
+    startTeam(code, name, avatarId);
   };
 }
 
-function startTeam(code, name, emblem){
+function startTeam(code, name, avatarId){
   role = "team";
+  document.body.classList.add("is-team");
   const saved = JSON.parse(localStorage.getItem("lumen-team")||"null");
   const tid = (saved && saved.code===code) ? saved.tid : ("t"+Math.random().toString(36).slice(2,9));
-  T = {tid, name, emblem, code};
+  T = {tid, name, avatarId, emblem:EMBLEMS[0], code};
   localStorage.setItem("lumen-team", JSON.stringify(T));
   teamFlash("wait", "⏳", "Verbinde mit Raum " + code + " …");
   connect(code, onTeamMsg, ()=>{
@@ -1243,11 +1311,17 @@ function startTeam(code, name, emblem){
     helloTimer = setInterval(()=>{ if(!lastState) sayHello(); else { clearInterval(helloTimer); helloTimer=null; } }, 1500);
   });
 }
-function sayHello(){ send({t:"hello", tid:T.tid, name:T.name, emblem:T.emblem}); }
+function sayHello(){ send({t:"hello", tid:T.tid, name:T.name, avatarId:T.avatarId, emblem:T.emblem}); }
 
 let _lastSig = null;
 function onTeamMsg(m){
-  if(!m || m.t!=="state") return;
+  if(!m) return;
+  if(m.t==="assign" && m.tid===T?.tid){
+    T.avatarId=m.avatarId; T.emblem=m.emblem; localStorage.setItem("lumen-team", JSON.stringify(T));
+    if(lastState) teamRender();
+    return;
+  }
+  if(m.t!=="state") return;
   const isNewPhase = !lastState || lastState.pi !== m.pi;
   const sig = JSON.stringify([m.pi, m.sub, m.teams]);
   lastState = m;
@@ -1270,15 +1344,18 @@ function teamHeader(){
   const P = lastState && PHASES[lastState.pi];
   const canHelp = P && ["quiz","reveal","tribunal","finale"].includes(P.type) && (lastState.sub.stage==="ask" || (P.type==="finale" && ["play","retry"].includes(lastState.sub.stage)));
   const helpUsed = lastState?.sub?.helpUsed?.[T.tid];
+  const figur=avatarMeta(T.avatarId), helpCost=figur.id==="freud"?50:HELP_COST;
+  const delta=me?.lastDelta||0;
+  const deltaHtml=delta ? `<span class="points-change ${delta>0?"plus":"minus"}">${delta>0?"+":""}${delta} Punkte</span>` : "";
   return `${phaseImg(P)}<div class="row" style="justify-content:space-between; margin-bottom:14px;">
-    <span class="team-chip"><span class="emblem">${T.emblem}</span>${esc(T.name)}</span>
-    <span class="row" style="gap:8px;"><span class="team-chip">⭐ ${me?me.pts:0}</span>${canHelp?`<button class="btn small secondary" onclick="buyHelp()" ${helpUsed||!me||me.pts<HELP_COST?"disabled":""}>💡 Hilfe −${HELP_COST}</button>`:""}</span></div>`;
+    <span class="team-guide"><img src="img/avatar-${figur.id}.png" alt="${esc(figur.name)}"><span class="team-guide-copy"><span class="guide-label">Eure Figur</span><span class="team-chip">${esc(figur.name)} · ${esc(T.name)}</span><span class="avatar-ability">${esc(figur.ability)}</span></span></span>
+    <span class="row" style="gap:8px; align-items:flex-end;"><span class="team-chip">⭐ ${me?me.pts:0}</span>${deltaHtml}${canHelp?`<button class="btn small secondary" onclick="buyHelp()" ${helpUsed||!me||me.pts<helpCost?"disabled":""}>💡 Hilfe −${helpCost}</button>`:""}</span></div>`;
 }
 function buyHelp(){ if(T && lastState) send({t:"help", tid:T.tid, pi:lastState.pi}); }
 function answerButtons(q, keyPrefix, disabled, eliminated=[]){
   const chosen = myAnswers[keyPrefix];
   return `<div class="answers ${q.a.length<=2?"one-col":""}">` + q.a.map((a,i)=>`
-    <button class="ans-btn a${(lastState?.sub?.answerColors||[0,1,2,3])[i]??i%4} ${chosen===i?"chosen":""} ${eliminated.includes(i)?"dim eliminated":""} ${disabled&&chosen!==i?"dim":""}" data-i="${i}" ${disabled||eliminated.includes(i)?"disabled":""}>${esc(a)}${eliminated.includes(i)?"<br><small>ausgeschlossen</small>":""}</button>`).join("") + `</div>`;
+    <button class="ans-btn a${answerColorIndex(i,lastState?.sub)} ${chosen===i?"chosen":""} ${eliminated.includes(i)?"dim eliminated":""} ${disabled&&chosen!==i?"dim":""}" style="background:${ANSWER_COLORS[answerColorIndex(i,lastState?.sub)]}" data-i="${i}" ${disabled||eliminated.includes(i)?"disabled":""}>${esc(a)}${eliminated.includes(i)?"<br><small>ausgeschlossen</small>":""}</button>`).join("") + `</div>`;
 }
 function bindAnswers(handler){
   document.querySelectorAll(".ans-btn").forEach(b=> b.onclick = ()=>handler(parseInt(b.dataset.i,10)) );
