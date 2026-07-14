@@ -77,6 +77,8 @@ h2{font-size:clamp(1.3rem,3.5vw,2.4rem); text-align:center; font-weight:normal;}
 .finale-image{padding:10px; border-radius:22px; background:linear-gradient(135deg, #ffe29a, #5b8def 45%, #9b6fd4 72%, #5fbf77); box-shadow:0 0 55px rgba(244,201,93,.65), 0 18px 50px rgba(0,0,0,.45);}
 .finale-image .ai-img{border-color:#fff1bd; box-shadow:0 0 30px rgba(255,255,255,.35);}
 .ai-img img{width:100%; height:100%; object-fit:cover; display:block;}
+.phase-image{margin:10px auto 16px;}
+.phase-image .ai-img{max-height:260px;}
 .ai-placeholder{
   width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;
   gap:12px; padding:18px; text-align:center;
@@ -162,12 +164,17 @@ input.code{letter-spacing:.4em; text-transform:uppercase; font-size:1.6rem;}
 #hostbar{position:fixed; bottom:0; left:0; right:0; background:rgba(10,12,24,.92); backdrop-filter:blur(6px); border-top:1px solid #333a6e; padding:10px 14px; display:flex; gap:10px; align-items:center; z-index:50;}
 #hostbar .info{color:var(--muted); font-size:.9rem;}
 body.is-host #app{padding-bottom:90px;}
+#version-badge{position:fixed; right:12px; bottom:10px; z-index:55; padding:4px 9px; border:1px solid rgba(244,201,93,.45); border-radius:999px; background:rgba(10,12,24,.78); color:var(--muted); font:12px/1.2 Georgia,'Times New Roman',serif; letter-spacing:.04em; pointer-events:none;}
+body.is-host #version-badge{bottom:76px;}
 
 /* ===== Welt-Header ===== */
 .world-banner{display:flex; align-items:center; gap:16px; justify-content:center; margin-bottom:14px;}
 .world-banner .icon{font-size:2.2rem;}
 .world-banner .wname{font-size:clamp(1.2rem,3vw,2rem); letter-spacing:.12em;}
 .world-tag{font-size:.75rem; letter-spacing:.25em; text-transform:uppercase; color:var(--muted); text-align:center; margin-bottom:4px;}
+.clue-list{display:flex; flex-direction:column; gap:10px; margin:14px auto; max-width:720px;}
+.clue-item{background:var(--panel2); border:1px solid #5665a0; border-radius:12px; padding:13px 16px; line-height:1.45;}
+.clue-item.current{border-color:var(--gold); box-shadow:0 0 16px rgba(244,201,93,.18);}
 
 /* ===== Feedback-Overlays (Team) ===== */
 .flash{position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; z-index:40; font-size:1.6rem; text-align:center; padding:20px;}
@@ -199,6 +206,7 @@ body.is-host #app{padding-bottom:90px;}
 <div id="app"></div>
 <canvas id="confetti"></canvas>
 <div id="hostbar" class="hidden"></div>
+<div id="version-badge">Version 1.0</div>
 <script>
 /* ============================================================
    LUMEN – Das große Q1-Finale (Ev. Religionslehre)
@@ -236,6 +244,12 @@ const AI_IMAGES = {
   "welt2-sturm":       {emoji:"🌪️", desc:"Eine kleine einsame Gestalt (Hiob) unter einem gewaltigen Sturmwirbel aus blauem Glas"},
   "welt3-tribunal":    {emoji:"⚖️", desc:"Vier Scherenschnitt-Porträts auf einer Richterbank: Denker mit Schnurrbart, mit Brille und Zigarre, mit Vollbart, mit Backenbart"},
   "welt4-weg":         {emoji:"🌴", desc:"Staubige Straße mit Palmzweigen Richtung Stadtsilhouette Jerusalems im Abendlicht"},
+  "quiz-dornbusch":    {emoji:"🔥", desc:"Leuchtender brennender Dornbusch in einer nächtlichen Wüste mit abgestreiften Sandalen"},
+  "quiz-sturm":        {emoji:"🌪️", desc:"Gewaltiger blauer Sturm über dem Meer, eine kleine Gestalt steht im warmen Licht"},
+  "epikur-werkstatt":  {emoji:"⚖️", desc:"Leuchtende Waage mit Flamme und dunklem Stein, umgeben von vier Denkwegen"},
+  "tribunal-quiz":     {emoji:"⚖️", desc:"Stained-Glass-Tribunal mit leerem Richterstuhl, Waage und vier Denker-Silhouetten"},
+  "passions-puzzle":   {emoji:"✝️", desc:"Goldener Weg durch die Passionsgeschichte mit Palmzweigen, Abendmahl, Kreuz und Morgenlicht"},
+  "kurs-voting":       {emoji:"✨", desc:"Viele farbige Team-Symbole zeigen auf einen leuchtenden Stern"},
   "senfkorn-baum":     {emoji:"🌳", desc:"Winziges Senfkorn neben riesigem Baum voller Vögel, Kontrast klein/groß in Glasmalerei"},
   "finale-fenster":    {emoji:"✨", desc:"Dasselbe Kirchenfenster wie am Anfang, jetzt in voller Farbe leuchtend, Lichtstrahlen fluten den Raum"},
 };
@@ -249,6 +263,9 @@ const WORLDS = [
 ];
 
 const EMBLEMS = ["🕊️","🐟","🦁","🐑","🌱","🕯️"];
+const HELP_COST = 100;
+const ANSWER_COLORS = ["var(--glass-red)","var(--glass-blue)","var(--w1)","var(--glass-green)"];
+function randomAnswerColors(count=4){ return shuffle([0,1,2,3]).slice(0,count); }
 
 /* Phasentypen: lobby, world-intro, quiz, reveal, sort, creative, vote,
    world-done, finale-intro, finale, ceremony */
@@ -384,6 +401,7 @@ let soundOn = true;
 
 /* ---------- Sound (WebAudio, ohne Dateien) ---------- */
 let AC = null;
+let musicTimer = null, musicGain = null;
 function ac(){ if(!AC) AC = new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==="suspended") AC.resume(); return AC; }
 function tone(freq, dur, type="sine", vol=0.18, when=0){
   if(!soundOn) return;
@@ -405,6 +423,24 @@ const sfx = {
   fanfare(){ [523,659,784,1047].forEach((f,i)=>tone(f,.4,"triangle",.22,i*.18)); tone(1319,.9,"triangle",.25,.75); },
   whoosh(){ tone(220,.25,"sawtooth",.06); tone(330,.25,"sawtooth",.06,.08); },
 };
+function playMusicNote(freq, duration=2.4){
+  if(!soundOn) return;
+  try{
+    const ctx=ac(), o=ctx.createOscillator(), g=ctx.createGain(), now=ctx.currentTime;
+    o.type="sine"; o.frequency.value=freq;
+    g.gain.setValueAtTime(0.0001,now); g.gain.linearRampToValueAtTime(0.035,now+0.35);
+    g.gain.setValueAtTime(0.035,now+duration-0.45); g.gain.exponentialRampToValueAtTime(0.0001,now+duration);
+    o.connect(g); g.connect(musicGain||ctx.destination); o.start(now); o.stop(now+duration+0.05);
+  }catch(e){}
+}
+function startMusic(){
+  if(musicTimer || !soundOn) return;
+  const ctx=ac(); musicGain=ctx.createGain(); musicGain.gain.value=0.55; musicGain.connect(ctx.destination);
+  const notes=[196,246.94,293.66,246.94,220,261.63,329.63,261.63]; let i=0;
+  playMusicNote(notes[i++]); musicTimer=setInterval(()=>playMusicNote(notes[i++%notes.length]),2300);
+}
+function stopMusic(){ if(musicTimer){ clearInterval(musicTimer); musicTimer=null; } if(musicGain){ musicGain.gain.setTargetAtTime(0.0001,ac().currentTime,0.12); setTimeout(()=>{try{musicGain.disconnect();}catch(e){} musicGain=null;},500); } }
+function toggleSound(){ soundOn=!soundOn; if(soundOn){ if(role==="host") startMusic(); } else stopMusic(); hostRender(); }
 
 /* ---------- Konfetti ---------- */
 const confettiCv = $("#confetti"), cfx = confettiCv.getContext("2d");
@@ -440,6 +476,17 @@ function aiImg(id, aspect="16/9", maxW="640px"){
     </div>
   </div>`;
 }
+function phaseImageId(P){
+  if(!P) return null;
+  if(P.type==="quiz") return ({1:"quiz-dornbusch",2:"quiz-sturm",3:"tribunal-quiz",4:"passions-puzzle"})[P.world] || "titel-fenster";
+  if(P.type==="creative") return "epikur-werkstatt";
+  if(P.type==="vote") return "kurs-voting";
+  if(P.type==="sort") return "passions-puzzle";
+  if(P.type==="finale"||P.type==="finale-intro"||P.type==="ceremony") return "finale-fenster";
+  if(P.type==="world-done") return ({1:"brennender-dornbusch",2:"welt2-sturm",3:"welt3-tribunal",4:"welt4-weg"})[P.world];
+  return null;
+}
+function phaseImg(P){ const id=phaseImageId(P); return id ? `<div class="center phase-image">${aiImg(id,"16/9","720px")}</div>` : ""; }
 
 /* ---------- Netzwerk ---------- */
 function makeCode(){ const A="ABCDEFGHKLMNPRSTUWXYZ"; let c=""; for(let i=0;i<4;i++) c+=A[Math.floor(Math.random()*A.length)]; return c; }
@@ -507,7 +554,7 @@ function renderStart(){
         <button class="btn big secondary" id="btnJoin" ${ONLINE?"":"disabled"}>📱 Mitspielen</button>
       </div>
     </div>`;
-  $("#btnHost").onclick = ()=>{ ac(); startHost(); };
+  $("#btnHost").onclick = ()=>{ ac(); startHost(); startMusic(); };
   const j = $("#btnJoin"); if(j && ONLINE) j.onclick = ()=>{ ac(); renderJoin(); };
 }
 </script>
@@ -549,6 +596,44 @@ function addPts(tid, delta){
   const t = G.teams[tid]; if(!t) return;
   t.pts = Math.max(0, t.pts + delta); t.lastDelta = delta;
 }
+function resetHelpState(){ G.sub.helpUsed = {}; G.sub.eliminated = {}; }
+function handleHelpPurchase(tid, pi){
+  if(pi!==G.phaseIdx || !G.sub || G.sub.helpUsed?.[tid]) return;
+  const P = PHASES[G.phaseIdx], allowed = ["quiz","reveal","tribunal","finale"].includes(P.type);
+  if(!allowed || G.sub.stage!=="ask" && !(P.type==="finale" && ["play","retry"].includes(G.sub.stage))) return;
+  const team = G.teams[tid]; if(!team || team.pts < HELP_COST) return;
+  const q = P.type==="quiz" ? currentQ() : P.type==="finale" ? P.questions[G.sub.assigned[tid]] : {a:P.options};
+  const correct = q.correct;
+  const wrong = q.a.map((_,i)=>i).filter(i=>i!==correct && !(G.sub.eliminated?.[tid]||[]).includes(i));
+  if(!wrong.length) return;
+  addPts(tid, -HELP_COST);
+  const remove = shuffle(wrong)[0];
+  G.sub.helpUsed[tid] = true;
+  G.sub.eliminated[tid] = [...(G.sub.eliminated[tid]||[]), remove];
+  hostRender(); broadcastState();
+}
+const BONUS_QUESTIONS = {
+  1:{q:"Das Bilderverbot warnt davor, dass …", a:["ein menschengemachtes Bild Gott ersetzt","Gold im Gottesdienst verboten ist","Menschen keine Symbole verwenden dürfen","nur Mose Bilder sehen durfte"], correct:0},
+  2:{q:"Welche Frage steht im Zentrum der Theodizee?", a:["Wie kann ein guter und allmächtiger Gott Leid zulassen?","Wie viele Psalmen gibt es?","Wer schrieb die Evangelien?","Wann wurde Jerusalem gegründet?"], correct:0},
+  3:{q:"Wer prägte die These, Religion sei eine Projektion menschlicher Wünsche?", a:["Ludwig Feuerbach","Karl Marx","Sigmund Freud","Friedrich Nietzsche"], correct:0},
+  4:{q:"Was feiern Christinnen und Christen an Ostern?", a:["Die Auferstehung Jesu","Den Einzug in Jerusalem","Die Taufe Jesu","Die Tempelreinigung"], correct:0}
+};
+function startBonus(){
+  const P=PHASES[G.phaseIdx]; if(P.type!=="world-done" || G.sub.bonus) return;
+  const q=BONUS_QUESTIONS[P.world]; if(!q) return;
+  G.sub.bonus={stage:"ask", q, answers:{}, winner:null}; G.sub.answerColors=randomAnswerColors(q.a.length);
+  hostRender(); broadcastState();
+}
+function handleBonusAnswer(tid, pi, choice){
+  if(pi!==G.phaseIdx || G.sub.bonus?.stage!=="ask" || G.sub.bonus.answers[tid]!==undefined) return;
+  const b=G.sub.bonus; b.answers[tid]=choice;
+  if(choice===b.q.correct && !b.winner){
+    b.winner=tid; addPts(tid,150); G.awards.bonus.push(tid); b.stage="res"; sfx.fanfare();
+  } else if(Object.keys(b.answers).length>=teamCount()){
+    b.stage="res"; sfx.reveal();
+  }
+  hostRender(); broadcastState();
+}
 
 function onHostMsg(m){
   if(!m || !m.t) return;
@@ -563,7 +648,11 @@ function onHostMsg(m){
   }
   if(!G.teams[m.tid]) return;
 
-  if(m.t==="ans" && (P.type==="quiz"||P.type==="finale") ){
+  if(m.t==="help"){
+    handleHelpPurchase(m.tid, m.pi); return;
+  } else if(m.t==="bonus" && P.type==="world-done"){
+    handleBonusAnswer(m.tid, m.pi, m.choice); return;
+  } else if(m.t==="ans" && (P.type==="quiz"||P.type==="finale") ){
     handleAnswer(m.tid, m.pi, m.qi, m.choice);
   } else if(m.t==="ans" && (P.type==="reveal"||P.type==="tribunal")){
     handleClueAnswer(m.tid, m.pi, m.choice);
@@ -587,7 +676,7 @@ function enterPhase(idx){
   if(P.type==="quiz"){ G.sub = {qi:0, stage:"ask", counts:[], answers:{}}; startQuestion(); return; }
   if(P.type==="reveal"||P.type==="tribunal"){
     G.sub = {step:0, stage:"ask", locked:[], answered:{}, winner:null, fCounts:[], fAnswers:{}};
-    setDeadline(P.time); hostRender(); broadcastState(); return;
+    G.sub.answerColors = randomAnswerColors(P.options.length); resetHelpState(); setDeadline(P.time); hostRender(); broadcastState(); return;
   }
   if(P.type==="sort"){
     G.sub = {stage:"work", prog:{}, finished:[]};
@@ -610,7 +699,8 @@ function enterPhase(idx){
   if(P.type==="finale"){
     const assigned = {};
     teamsArr().forEach((t,i)=>assigned[t.tid] = i % P.questions.length);
-    G.sub = {stage:"play", assigned, results:{}, round:1};
+    G.sub = {stage:"play", assigned, results:{}, round:1, answerColors:randomAnswerColors(P.questions[0].a.length)};
+    resetHelpState();
     setDeadline(P.time); hostRender(); broadcastState(); return;
   }
   G.sub = {};
@@ -626,7 +716,7 @@ function extendTime(sec){ if(G.deadline){ G.deadline += sec*1000; hostRender(); 
 function currentQ(){ const P=PHASES[G.phaseIdx]; return P.questions[G.sub.qi]; }
 function startQuestion(){
   const P = PHASES[G.phaseIdx];
-  G.sub.stage = "ask"; G.sub.answers = {}; G.sub.counts = [];
+  G.sub.stage = "ask"; G.sub.answers = {}; G.sub.counts = []; G.sub.answerColors = randomAnswerColors(P.questions[G.sub.qi].a.length); resetHelpState();
   teamsArr().forEach(t=>t.lastDelta=0);
   setDeadline(P.time);
   sfx.whoosh();
@@ -703,14 +793,14 @@ function handleClueAnswer(tid, pi, choice){
 function nextClue(){
   const P = PHASES[G.phaseIdx];
   if(G.sub.step < 2){
-    G.sub.step++; setDeadline(P.time); sfx.whoosh();
+    G.sub.step++; G.sub.answerColors = randomAnswerColors(P.options.length); resetHelpState(); setDeadline(P.time); sfx.whoosh();
   } else { G.sub.stage = "res"; G.deadline = 0; stopTimerUI(); }
   hostRender(); broadcastState();
 }
 function startFollow(){
   const P = PHASES[G.phaseIdx];
   if(!P.follow){ hostAdvancePhase(); return; }
-  G.sub.stage = "follow"; G.sub.fAnswers = {};
+  G.sub.stage = "follow"; G.sub.fAnswers = {}; G.sub.answerColors = randomAnswerColors(P.follow.a.length); resetHelpState();
   setDeadline(P.follow.time || 25);
   hostRender(); broadcastState();
 }
@@ -841,6 +931,10 @@ function hostNext(){
     if(G.sub.stage==="play"||G.sub.stage==="retry"){ finaleRetry(); return; }
     hostAdvancePhase(); return;
   }
+  if(P.type==="world-done"){
+    if(G.sub.bonus?.stage==="ask"){ hostRender(); return; }
+    hostAdvancePhase(); return;
+  }
   hostAdvancePhase();
 }
 
@@ -857,14 +951,14 @@ function hostbarRender(extra=""){
     <span class="info">Raum <b style="color:var(--gold)">${G.code}</b> · Phase ${G.phaseIdx+1}/${PHASES.length} · ${teamCount()} Teams ${ONLINE?"":"· NOTFALLMODUS"}</span>
     <span class="spacer"></span> ${extra}
     ${G.deadline ? `<button class="btn small secondary" onclick="extendTime(30)">+30 s</button>` : ""}
-    <button class="btn small secondary" onclick="soundOn=!soundOn; hostRender();">${soundOn?"🔊":"🔇"}</button>
+    <button class="btn small secondary" onclick="toggleSound()">${soundOn?"🔊":"🔇"}</button>
     ${G.phaseIdx < PHASES.length-1 ? `<button class="btn small secondary" onclick="if(confirm('Diese Phase wirklich überspringen?')) hostAdvancePhase();">⏭</button>` : ""}
     <button class="btn small" onclick="hostNext()">Weiter ▶</button>`;
 }
 function boardAnswersHtml(q, sub, showResult){
   const cnt = sub && sub.counts && sub.counts.length ? sub.counts : null;
   return `<div class="board-answers">` + q.a.map((a,i)=>`
-    <div class="board-ans a${i} ${showResult ? (i===q.correct?"correct":"dim") : ""}" style="background:${["var(--glass-red)","var(--glass-blue)","var(--w1)","var(--glass-green)"][i%4]}">
+    <div class="board-ans a${(sub&&sub.answerColors?sub.answerColors[i]:i%4)} ${showResult ? (i===q.correct?"correct":"dim") : ""}" style="background:${ANSWER_COLORS[(sub&&sub.answerColors?sub.answerColors[i]:i%4)]}">
       ${esc(a)} ${showResult && cnt ? `<span class="cnt">${cnt[i]||0}×</span>`:""}
     </div>`).join("") + `</div>`;
 }
@@ -930,7 +1024,7 @@ function hostRender(){
     }
     let bottom = "";
     if(G.sub.stage==="ask"){
-      bottom = `<div class="board-answers">${P.options.map((o,i)=>`<div class="board-ans" style="background:var(--panel2)">${["🟥","🟦","🟧","🟩"][i]} ${esc(o)}</div>`).join("")}</div>
+      bottom = `<div class="board-answers">${P.options.map((o,i)=>`<div class="board-ans a${G.sub.answerColors?.[i]??i%4}" style="background:${ANSWER_COLORS[G.sub.answerColors?.[i]??i%4]}">${["🟥","🟦","🟧","🟩"][G.sub.answerColors?.[i]??i%4]} ${esc(o)}</div>`).join("")}</div>
         ${answeredChipsHtml(G.sub.answered)}
         <p class="center" style="color:var(--muted); margin-top:10px;">Früh antworten bringt ${CLUE_PTS[Math.min(G.sub.step,2)]} Punkte – falsch kostet 50 und sperrt!</p>`;
       barExtra = `<button class="btn small secondary" onclick="nextClue()">${isRev?"Mehr aufdecken":"Nächstes Indiz"} 🔎</button>`;
@@ -1003,11 +1097,14 @@ function hostRender(){
 
   else if(P.type==="world-done"){
     const lit = [...litWorldsUpTo(), P.world];
+    const b = G.sub.bonus;
     html = `${worldBanner(P.world)}
       <h2 style="color:var(--gold); margin-bottom:14px;">✨ Ein Fenster beginnt zu leuchten! ✨</h2>
       ${windowHtml(lit)}
+      ${b ? `<div class="panel center" style="max-width:760px; margin:20px auto; border-color:var(--gold);"><h2>🎁 Bonusfrage · +150 Punkte</h2><p style="margin-top:10px;">${esc(b.q.q)}</p>${b.stage==="res" ? `<p style="margin-top:12px; color:var(--gold);">${b.winner ? `${G.teams[b.winner].emblem} ${esc(G.teams[b.winner].name)} gewinnt den Bonus!` : "Niemand hat die Bonusfrage richtig beantwortet."}</p>` : ""}</div>` : ""}
       ${scoreboardHtml(teamsArr())}`;
     sfx.fanfare();
+    if(!b) barExtra = `<button class="btn small secondary" onclick="startBonus()">🎁 Bonusfrage starten</button>`;
   }
 
   else if(P.type==="finale-intro"){
@@ -1058,12 +1155,13 @@ function hostRender(){
         <h2 style="margin-bottom:10px;">🏆 Sonder-Awards</h2>
         ${fast?`<p style="margin:8px 0;">⚡ <b>Blitzmerker:</b> ${fast.emblem} ${esc(fast.name)} – schnellste richtige Antwort</p>`:""}
         ${poet?`<p style="margin:8px 0;">🖋️ <b>Poeten-Award:</b> ${poet.emblem} ${esc(poet.name)} – beliebteste Epikur-Antwort</p>`:""}
-        <p style="margin:8px 0;">👁️ <b>Bilderverbot-Bonus:</b> Welchem Team ist aufgefallen, dass Gott im ganzen Spiel <i>nie</i> abgebildet wurde? (+150)</p>
+        <p style="margin:8px 0;">🎁 <b>Tablet-Bonusfragen:</b> Die Bonuspunkte wurden in den Weltpausen auf den Tablets erspielt.</p>
         ${G.awards.bonus.map(tid=>{const t=G.teams[tid]; return t?`<p style="margin:4px 0; color:var(--gold);">→ ${t.emblem} ${esc(t.name)} +150</p>`:"";}).join("")}
       </div>`;
-    barExtra = `<button class="btn small secondary" onclick="giveBonus()">👁️ Bonus vergeben</button>
-      <button class="btn small secondary" onclick="confettiBurst(200); sfx.fanfare();">🎉 Konfetti</button>`;
+    barExtra = `<button class="btn small secondary" onclick="confettiBurst(200); sfx.fanfare();">🎉 Konfetti</button>`;
   }
+
+  if(!["lobby","world-intro","reveal","tribunal","world-done"].includes(P.type)) html = phaseImg(P) + html;
 
   app.innerHTML = html;
   hostbarRender(barExtra);
@@ -1169,14 +1267,18 @@ function myTeamState(){ return lastState.teams.find(t=>t.tid===T.tid); }
 
 function teamHeader(){
   const me = myTeamState();
-  return `<div class="row" style="justify-content:space-between; margin-bottom:14px;">
+  const P = lastState && PHASES[lastState.pi];
+  const canHelp = P && ["quiz","reveal","tribunal","finale"].includes(P.type) && (lastState.sub.stage==="ask" || (P.type==="finale" && ["play","retry"].includes(lastState.sub.stage)));
+  const helpUsed = lastState?.sub?.helpUsed?.[T.tid];
+  return `${phaseImg(P)}<div class="row" style="justify-content:space-between; margin-bottom:14px;">
     <span class="team-chip"><span class="emblem">${T.emblem}</span>${esc(T.name)}</span>
-    <span class="team-chip">⭐ ${me?me.pts:0}</span></div>`;
+    <span class="row" style="gap:8px;"><span class="team-chip">⭐ ${me?me.pts:0}</span>${canHelp?`<button class="btn small secondary" onclick="buyHelp()" ${helpUsed||!me||me.pts<HELP_COST?"disabled":""}>💡 Hilfe −${HELP_COST}</button>`:""}</span></div>`;
 }
-function answerButtons(q, keyPrefix, disabled){
+function buyHelp(){ if(T && lastState) send({t:"help", tid:T.tid, pi:lastState.pi}); }
+function answerButtons(q, keyPrefix, disabled, eliminated=[]){
   const chosen = myAnswers[keyPrefix];
   return `<div class="answers ${q.a.length<=2?"one-col":""}">` + q.a.map((a,i)=>`
-    <button class="ans-btn a${i} ${chosen===i?"chosen":""} ${disabled&&chosen!==i?"dim":""}" data-i="${i}" ${disabled?"disabled":""}>${esc(a)}</button>`).join("") + `</div>`;
+    <button class="ans-btn a${(lastState?.sub?.answerColors||[0,1,2,3])[i]??i%4} ${chosen===i?"chosen":""} ${eliminated.includes(i)?"dim eliminated":""} ${disabled&&chosen!==i?"dim":""}" data-i="${i}" ${disabled||eliminated.includes(i)?"disabled":""}>${esc(a)}${eliminated.includes(i)?"<br><small>ausgeschlossen</small>":""}</button>`).join("") + `</div>`;
 }
 function bindAnswers(handler){
   document.querySelectorAll(".ans-btn").forEach(b=> b.onclick = ()=>handler(parseInt(b.dataset.i,10)) );
@@ -1215,7 +1317,7 @@ function teamRender(){
       app.innerHTML = `${teamHeader()}
         ${withTimer?timerHtml():""}
         <div class="panel"><p style="font-size:1.15rem; ${P.emoji&&q.q.length<40?"font-size:2.2rem; text-align:center;":""}">${esc(q.q)}</p></div>
-        ${answerButtons(q, key, answered)}
+        ${answerButtons(q, key, answered, sub.eliminated?.[T.tid]||[])}
         ${answered?`<p class="center" style="margin-top:14px; color:var(--muted);">Antwort gesendet – warten auf die anderen …</p>`:""}`;
       if(withTimer) runTimerUI(lastState.deadline, lastState.total, null);
       if(!answered) bindAnswers(i=>{
@@ -1241,12 +1343,14 @@ function teamRender(){
       const locked = (sub.locked||[]).includes(T.tid);
       const answered = sub.answered && sub.answered[T.tid]!==undefined;
       const q = {a:P.options};
+      const clues = P.clues ? `<div class="clue-list"><div class="world-tag">Indizien für euer Team</div>${P.clues.slice(0,sub.step+1).map((clue,i)=>`<div class="clue-item ${i===sub.step?"current":""}">🔎 ${esc(clue)}</div>`).join("")}</div>` : "";
       app.innerHTML = `${teamHeader()}
         ${withTimer?timerHtml():""}
+        ${clues}
         <div class="panel center"><p style="font-size:1.1rem;">${P.type==="reveal"?"Was zeigt das Bild an der Tafel?":"Wer ist die gesuchte Person?"}</p>
         <p style="color:var(--gold); margin-top:6px;">Stufe ${sub.step+1}: ${CLUE_PTS[Math.min(sub.step,2)]} Punkte · Falsch = −50 & gesperrt</p></div>
         ${locked?`<div class="flash bad" style="position:static; border-radius:18px; margin-top:14px;"><div class="big-ico">🔒</div><div>Gesperrt für diese Runde</div></div>`
-          : answerButtons(q, key, answered) }
+          : answerButtons(q, key, answered, sub.eliminated?.[T.tid]||[]) }
         ${answered&&!locked?`<p class="center" style="margin-top:14px; color:var(--muted);">Gesendet …</p>`:""}`;
       if(withTimer) runTimerUI(lastState.deadline, lastState.total, null);
       if(!locked && !answered) bindAnswers(i=>{
@@ -1266,7 +1370,7 @@ function teamRender(){
       app.innerHTML = `${teamHeader()}
         ${withTimer?timerHtml():""}
         <div class="panel"><p style="font-size:1.15rem;">${esc(P.follow.q)}</p></div>
-        ${answerButtons(P.follow, fkey, answered)}
+        ${answerButtons(P.follow, fkey, answered, sub.eliminated?.[T.tid]||[])}
         ${answered?`<p class="center" style="margin-top:14px; color:var(--muted);">Gesendet …</p>`:""}`;
       if(withTimer) runTimerUI(lastState.deadline, lastState.total, null);
       if(!answered) bindAnswers(i=>{
@@ -1376,10 +1480,21 @@ function teamRender(){
 
   if(P.type==="world-done"){
     const meIdx = [...lastState.teams].sort((a,b)=>b.pts-a.pts).findIndex(t=>t.tid===T.tid);
-    app.innerHTML = `${teamHeader()}${worldBanner(P.world)}
-      <div class="panel center"><h2 style="color:var(--gold);">✨ Fenster ${P.world} leuchtet! ✨</h2>
-      <p style="margin-top:10px;">Ihr seid gerade auf <b>Platz ${meIdx+1}</b>.</p></div>
-      ${scoreboardHtml(lastState.teams, true)}`;
+    const b=sub.bonus;
+    if(b?.stage==="ask"){
+      const key="bonus:"+pi, answered=b.answers[T.tid]!==undefined;
+      app.innerHTML = `${teamHeader()}${worldBanner(P.world)}
+        <div class="panel center"><h2 style="color:var(--gold);">🎁 Bonusfrage · +150 Punkte</h2>
+        <p style="margin-top:12px; font-size:1.15rem;">${esc(b.q.q)}</p></div>
+        ${answerButtons(b.q,key,answered,[])}`;
+      if(!answered) bindAnswers(i=>{ myAnswers[key]=i; send({t:"bonus",tid:T.tid,pi,choice:i}); sfx.whoosh(); teamRender(); });
+    } else {
+      app.innerHTML = `${teamHeader()}${worldBanner(P.world)}
+        <div class="panel center"><h2 style="color:var(--gold);">✨ Fenster ${P.world} leuchtet! ✨</h2>
+        <p style="margin-top:10px;">Ihr seid gerade auf <b>Platz ${meIdx+1}</b>.</p>
+        ${b?`<p style="margin-top:14px; color:var(--gold);">${b.winner===T.tid?"🏆 Ihr habt den Bonus gewonnen!":b.winner?"Der Bonus ging an ein anderes Team.":"Niemand hat die Bonusfrage richtig beantwortet."}</p>`:""}</div>
+        ${scoreboardHtml(lastState.teams, true)}`;
+    }
     return;
   }
 
@@ -1417,7 +1532,7 @@ function teamRender(){
       ${withTimer?timerHtml():""}
       <div class="panel center" style="border-color:var(--gold);"><p style="color:var(--gold); letter-spacing:.15em;">EURE FINALFRAGE</p>
         <p style="font-size:1.2rem; margin-top:10px;">${esc(q.q)}</p></div>
-      ${answerButtons(q, key, false)}`;
+      ${answerButtons(q, key, false, sub.eliminated?.[T.tid]||[])}`;
     if(withTimer) runTimerUI(lastState.deadline, lastState.total, null);
     bindAnswers(i=>{
       myAnswers[key]=i; send({t:"ans", tid:T.tid, pi, qi:myQi, choice:i}); sfx.whoosh();
