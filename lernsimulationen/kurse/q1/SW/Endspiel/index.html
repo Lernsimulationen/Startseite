@@ -6,6 +6,7 @@
 <title>Endspiel Q1 – Deutschlandreise (SoWi)</title>
 <!-- Supabase Realtime: offizielle Bibliothek für die Geräte-Synchronisation. -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
 <style>
 /* ==========================================================================
    ENDSPIEL Q1 – DEUTSCHLANDREISE
@@ -223,6 +224,12 @@ textarea{min-height:130px;resize:vertical;line-height:1.5;}
 @keyframes routeDash{to{stroke-dashoffset:-7;}}
 @media (prefers-reduced-motion:reduce){.map-route.active-route{animation:none;}.map-train animateMotion{display:none;}}
 .version-badge{position:fixed;right:14px;bottom:12px;z-index:60;padding:5px 9px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(8,14,28,.82);color:var(--muted);font-size:.72rem;font-weight:800;letter-spacing:.04em;backdrop-filter:blur(6px);pointer-events:none;}
+.qr-share{display:flex;align-items:center;gap:14px;margin-top:14px;padding:12px 14px;border:1px solid rgba(77,201,255,.24);border-radius:14px;background:rgba(77,201,255,.07);}
+.qr-box{width:104px;height:104px;flex:none;display:flex;align-items:center;justify-content:center;padding:7px;border-radius:10px;background:#fff;box-shadow:0 8px 22px rgba(0,0,0,.22);}
+.qr-box canvas{display:block;width:90px;height:90px;}
+.qr-copy{min-width:0;}
+.qr-copy strong{display:block;margin-bottom:4px;}
+.qr-copy p{margin:0;color:var(--muted);font-size:.84rem;line-height:1.4;}
 
 /* ---------- Aufgabenanzeige Tafel ---------- */
 .task-q{font-size:clamp(1.35rem,2.6vw,2rem);font-weight:800;margin:10px 0 18px;line-height:1.3;}
@@ -489,6 +496,9 @@ input[type=range]{width:100%;}
   .pod .pname{font-size:.82rem;overflow-wrap:anywhere;}
   .pod .pscore{font-size:.78rem;}
   .version-badge{right:8px;bottom:7px;font-size:.64rem;padding:4px 7px;}
+  .qr-share{align-items:flex-start;padding:10px;}
+  .qr-box{width:88px;height:88px;padding:6px;}
+  .qr-box canvas{width:76px;height:76px;}
 }
 
 @media (max-width:430px){
@@ -549,6 +559,10 @@ input[type=range]{width:100%;}
     </div>
   </div>
   <p class="sync-note" id="syncNote"></p>
+  <div class="qr-share">
+    <div class="qr-box" id="startQr" aria-label="QR-Code zum Öffnen der Spielseite"></div>
+    <div class="qr-copy"><strong>Mit dem Tablet einsteigen</strong><p>QR-Code scannen, Spielseite öffnen und anschließend „Als Team beitreten“ auswählen.</p></div>
+  </div>
 </div>
 
 <!-- ======================= TEAM-BEITRITT (TABLET) ======================= -->
@@ -1054,6 +1068,16 @@ function seededShuffle(arr, seed){
 function imgSlotHTML(src, em, label, style){
   return `<div class="img-slot" ${style ? `style="${style}"` : ""} data-img="${esc(src)}" data-em="${esc(em)}" data-ph="${esc(label)}"></div>`;
 }
+function renderQr(id, value){
+  const el = $(id);
+  if(!el || !window.QRCode) return;
+  el.innerHTML = "";
+  const canvas = document.createElement("canvas");
+  QRCode.toCanvas(canvas, value, {width:90, margin:0, errorCorrectionLevel:"M"}, err => {
+    if(err){ el.textContent = "QR nicht verfügbar"; return; }
+    el.appendChild(canvas);
+  });
+}
 function hydrateImgSlots(root){
   (root || document).querySelectorAll(".img-slot:not([data-done])").forEach(slot => {
     slot.dataset.done = "1";
@@ -1315,6 +1339,7 @@ function renderLobby(c){
         <p class="muted" style="margin:12px 0 4px;">Diese Seite am Tablet öffnen → „Als Team beitreten“ → Code eingeben:</p>
         <div class="joincode">${esc(board.code)}</div>
         <p class="muted" style="font-size:.85rem;word-break:break-all;">${esc(url)}</p>
+        <div class="qr-share" style="justify-content:center;"><div class="qr-box" id="joinQr" aria-label="QR-Code zum Öffnen der Spielseite"></div><div class="qr-copy" style="text-align:left;"><strong>Tablet-Kamera öffnen</strong><p>Scannen und danach den Spielcode <strong>${esc(board.code)}</strong> eingeben.</p></div></div>
         <p class="muted" style="font-size:.85rem;">⚠️ Teamnamen sind Fantasienamen – keine echten Namen!</p>
       </div>
       <div class="scene-frame"><div class="img-slot" data-img="assets/img/lobby-bahnhof.png" data-em="🚉" data-ph="Bild: Startbahnhof der Deutschlandreise"></div><div class="scene-caption">Alle Teams bitte einsteigen<small>Der Zug wartet auf eure Reise-Avatare.</small></div></div>
@@ -1323,6 +1348,7 @@ function renderLobby(c){
       <h3>Teams am Bahnsteig (${teamList().length}/8)</h3>
       <div class="lobby-teams" id="lobbyTeams"></div>
     </div>`;
+  renderQr("joinQr", url);
   renderLobbyTeams();
 }
 function renderLobbyTeams(){
@@ -1973,6 +1999,7 @@ function toggleHelp(show){ $("helpOverlay").classList.toggle("hidden", !show); }
     : "🟡 <strong>Lokaler Modus:</strong> Supabase ist noch nicht konfiguriert (siehe SUPABASE-SETUP.md). "
       + "Tafelbild und Teams funktionieren aktuell nur in Tabs desselben Browsers – ideal zum Testen über „Probelauf“.";
   hydrateImgSlots(document);
+  renderQr("startQr", location.href.split("#")[0].split("?")[0]);
 })();
 
 </script>
