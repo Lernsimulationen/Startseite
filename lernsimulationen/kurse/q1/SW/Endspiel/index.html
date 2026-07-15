@@ -225,8 +225,8 @@ textarea{min-height:130px;resize:vertical;line-height:1.5;}
 @media (prefers-reduced-motion:reduce){.map-route.active-route{animation:none;}.map-train animateMotion{display:none;}}
 .version-badge{position:fixed;right:14px;bottom:12px;z-index:60;padding:5px 9px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(8,14,28,.82);color:var(--muted);font-size:.72rem;font-weight:800;letter-spacing:.04em;backdrop-filter:blur(6px);pointer-events:none;}
 .qr-share{display:flex;align-items:center;gap:14px;margin-top:14px;padding:12px 14px;border:1px solid rgba(77,201,255,.24);border-radius:14px;background:rgba(77,201,255,.07);}
-.qr-box{width:104px;height:104px;flex:none;display:flex;align-items:center;justify-content:center;padding:7px;border-radius:10px;background:#fff;box-shadow:0 8px 22px rgba(0,0,0,.22);}
-.qr-box canvas{display:block;width:90px;height:90px;}
+.qr-box{width:156px;height:156px;flex:none;display:flex;align-items:center;justify-content:center;padding:9px;border-radius:12px;background:#fff;box-shadow:0 8px 22px rgba(0,0,0,.22);}
+.qr-box canvas{display:block;width:138px;height:138px;}
 .qr-copy{min-width:0;}
 .qr-copy strong{display:block;margin-bottom:4px;}
 .qr-copy p{margin:0;color:var(--muted);font-size:.84rem;line-height:1.4;}
@@ -497,8 +497,8 @@ input[type=range]{width:100%;}
   .pod .pscore{font-size:.78rem;}
   .version-badge{right:8px;bottom:7px;font-size:.64rem;padding:4px 7px;}
   .qr-share{align-items:flex-start;padding:10px;}
-  .qr-box{width:88px;height:88px;padding:6px;}
-  .qr-box canvas{width:76px;height:76px;}
+  .qr-box{width:126px;height:126px;padding:8px;}
+  .qr-box canvas{width:110px;height:110px;}
 }
 
 @media (max-width:430px){
@@ -661,6 +661,7 @@ input[type=range]{width:100%;}
    müssen die Werte gefüllt und die supabase.js eingebunden werden.       */
 const SUPABASE_URL = "https://vncppixrcmajosekowlv.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_gZUPazyvdw-WwF9umrj5Lw_RFHPDR7x";
+const GAME_URL = "https://lernsimulationen.github.io/Startseite/lernsimulationen/kurse/q1/SW/Endspiel/index.html";
 /* ====================================================================== */
 /* ============================ SPIELDATEN ============================ */
 /* Avatare: Bilddateien optional unter assets/avatars/, Emoji als Fallback */
@@ -1073,7 +1074,7 @@ function renderQr(id, value){
   if(!el || !window.QRCode) return;
   el.innerHTML = "";
   const canvas = document.createElement("canvas");
-  QRCode.toCanvas(canvas, value, {width:90, margin:0, errorCorrectionLevel:"M"}, err => {
+  QRCode.toCanvas(canvas, value, {width:140, margin:1, errorCorrectionLevel:"M"}, err => {
     if(err){ el.textContent = "QR nicht verfügbar"; return; }
     el.appendChild(canvas);
   });
@@ -1330,7 +1331,8 @@ function renderBoard(){
 }
 
 function renderLobby(c){
-  const url = location.href.split("#")[0].split("?")[0];
+  const url = GAME_URL;
+  const joinUrl = `${GAME_URL}?join=1&code=${encodeURIComponent(board.code)}`;
   c.innerHTML = `
     <div class="lobby-hero">
       <div class="card" style="text-align:center;">
@@ -1348,7 +1350,7 @@ function renderLobby(c){
       <h3>Teams am Bahnsteig (${teamList().length}/8)</h3>
       <div class="lobby-teams" id="lobbyTeams"></div>
     </div>`;
-  renderQr("joinQr", url);
+  renderQr("joinQr", joinUrl);
   renderLobbyTeams();
 }
 function renderLobbyTeams(){
@@ -1759,6 +1761,10 @@ function showJoin(){
   $("joinScreen").classList.remove("hidden");
   const saved = JSON.parse(sessionStorage.getItem("endspiel-team") || "null");
   if(saved){ $("joinCode").value = saved.code || ""; $("joinName").value = saved.name || ""; }
+  else {
+    const qrCode = new URLSearchParams(location.search).get("code");
+    if(qrCode) $("joinCode").value = qrCode.toUpperCase().slice(0, 4);
+  }
   const pick = $("avatarPick");
   pick.innerHTML = AVATARS.map(a =>
     `<div class="pick ${saved && saved.avatar === a.id ? "sel" : ""}" data-av="${a.id}" onclick="selectAvatar('${a.id}')">
@@ -1999,7 +2005,8 @@ function toggleHelp(show){ $("helpOverlay").classList.toggle("hidden", !show); }
     : "🟡 <strong>Lokaler Modus:</strong> Supabase ist noch nicht konfiguriert (siehe SUPABASE-SETUP.md). "
       + "Tafelbild und Teams funktionieren aktuell nur in Tabs desselben Browsers – ideal zum Testen über „Probelauf“.";
   hydrateImgSlots(document);
-  renderQr("startQr", location.href.split("#")[0].split("?")[0]);
+  renderQr("startQr", GAME_URL);
+  if(new URLSearchParams(location.search).get("join") === "1") showJoin();
 })();
 
 </script>
