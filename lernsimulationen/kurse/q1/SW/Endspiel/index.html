@@ -227,6 +227,7 @@ textarea{min-height:130px;resize:vertical;line-height:1.5;}
 .qr-share{display:flex;align-items:center;gap:14px;margin-top:14px;padding:12px 14px;border:1px solid rgba(77,201,255,.24);border-radius:14px;background:rgba(77,201,255,.07);}
 .qr-box{width:156px;height:156px;flex:none;display:flex;align-items:center;justify-content:center;padding:9px;border-radius:12px;background:#fff;box-shadow:0 8px 22px rgba(0,0,0,.22);}
 .qr-box canvas{display:block;width:138px;height:138px;}
+.qr-box img{display:block;width:100%;height:100%;object-fit:contain;}
 .qr-copy{min-width:0;}
 .qr-copy strong{display:block;margin-bottom:4px;}
 .qr-copy p{margin:0;color:var(--muted);font-size:.84rem;line-height:1.4;}
@@ -560,7 +561,7 @@ input[type=range]{width:100%;}
   </div>
   <p class="sync-note" id="syncNote"></p>
   <div class="qr-share">
-    <div class="qr-box" id="startQr" aria-label="QR-Code zum Öffnen der Spielseite"></div>
+    <div class="qr-box" id="startQr" aria-label="QR-Code zum Öffnen der Spielseite"><img src="assets/img/qr-spielseite.png" alt="QR-Code zur Spielseite"></div>
     <div class="qr-copy"><strong>Mit dem Tablet einsteigen</strong><p>QR-Code scannen, Spielseite öffnen und anschließend „Als Team beitreten“ auswählen.</p></div>
   </div>
 </div>
@@ -1071,7 +1072,7 @@ function imgSlotHTML(src, em, label, style){
 }
 function renderQr(id, value){
   const el = $(id);
-  if(!el || !window.QRCode) return;
+  if(!el || !window.QRCode) return; // Lokales PNG bleibt als CDN-unabhängiger Fallback sichtbar.
   el.innerHTML = "";
   const canvas = document.createElement("canvas");
   QRCode.toCanvas(canvas, value, {width:140, margin:1, errorCorrectionLevel:"M"}, err => {
@@ -1341,7 +1342,7 @@ function renderLobby(c){
         <p class="muted" style="margin:12px 0 4px;">Diese Seite am Tablet öffnen → „Als Team beitreten“ → Code eingeben:</p>
         <div class="joincode">${esc(board.code)}</div>
         <p class="muted" style="font-size:.85rem;word-break:break-all;">${esc(url)}</p>
-        <div class="qr-share" style="justify-content:center;"><div class="qr-box" id="joinQr" aria-label="QR-Code zum Öffnen der Spielseite"></div><div class="qr-copy" style="text-align:left;"><strong>Tablet-Kamera öffnen</strong><p>Scannen und danach den Spielcode <strong>${esc(board.code)}</strong> eingeben.</p></div></div>
+        <div class="qr-share" style="justify-content:center;"><div class="qr-box" id="joinQr" aria-label="QR-Code zum Öffnen der Spielseite"><img src="assets/img/qr-spielseite.png" alt="QR-Code zur Spielseite"></div><div class="qr-copy" style="text-align:left;"><strong>Tablet-Kamera öffnen</strong><p>Scannen und danach den Spielcode <strong>${esc(board.code)}</strong> eingeben.</p></div></div>
         <p class="muted" style="font-size:.85rem;">⚠️ Teamnamen sind Fantasienamen – keine echten Namen!</p>
       </div>
       <div class="scene-frame"><div class="img-slot" data-img="assets/img/lobby-bahnhof.png" data-em="🚉" data-ph="Bild: Startbahnhof der Deutschlandreise"></div><div class="scene-caption">Alle Teams bitte einsteigen<small>Der Zug wartet auf eure Reise-Avatare.</small></div></div>
