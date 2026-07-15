@@ -224,6 +224,11 @@ textarea{min-height:130px;resize:vertical;line-height:1.5;}
 @keyframes routeDash{to{stroke-dashoffset:-7;}}
 @media (prefers-reduced-motion:reduce){.map-route.active-route{animation:none;}.map-train animateMotion{display:none;}}
 .version-badge{position:fixed;right:14px;bottom:12px;z-index:60;padding:5px 9px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(8,14,28,.82);color:var(--muted);font-size:.72rem;font-weight:800;letter-spacing:.04em;backdrop-filter:blur(6px);pointer-events:none;}
+.music-control{display:flex;align-items:center;gap:6px;padding:4px 6px 4px 10px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.05);color:var(--text);}
+.music-control select{width:auto;max-width:170px;padding:6px 8px;border:0;background:transparent;color:var(--text);font-size:.82rem;font-weight:700;}
+.music-control select option{background:var(--bg2);color:var(--text);}
+.music-control input[type=range]{width:70px;accent-color:var(--accent2);}
+.music-control .btn{box-shadow:none;}
 .qr-share{display:flex;align-items:center;gap:14px;margin-top:14px;padding:12px 14px;border:1px solid rgba(77,201,255,.24);border-radius:14px;background:rgba(77,201,255,.07);}
 .qr-box{width:156px;height:156px;flex:none;display:flex;align-items:center;justify-content:center;padding:9px;border-radius:12px;background:#fff;box-shadow:0 8px 22px rgba(0,0,0,.22);}
 .qr-box canvas{display:block;width:138px;height:138px;}
@@ -323,6 +328,8 @@ textarea{min-height:130px;resize:vertical;line-height:1.5;}
   display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(255,255,255,.04);
 }
 .avatar-pick .pick.sel{border-color:var(--accent);background:rgba(255,207,77,.1);}
+.avatar-pick .pick.taken{opacity:.38;filter:grayscale(.7);cursor:not-allowed;border-style:dashed;}
+.avatar-pick .pick .taken-label{font-size:.68rem;font-weight:900;color:var(--bad);text-transform:uppercase;letter-spacing:.04em;}
 .avatar-pick .pick .nm{font-size:.78rem;font-weight:700;color:var(--muted);}
 .t-opts{display:grid;gap:12px;margin-top:16px;}
 .t-opt{
@@ -612,6 +619,7 @@ input[type=range]{width:100%;}
   </div>
   <div class="screen" style="padding-top:0;" id="bContent"></div>
   <div class="teachbar" id="teachbar"></div>
+  <audio id="musicPlayer" preload="none"></audio>
 </div>
 
 <!-- ======================= HILFE ======================= -->
@@ -663,6 +671,12 @@ input[type=range]{width:100%;}
 const SUPABASE_URL = "https://vncppixrcmajosekowlv.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_gZUPazyvdw-WwF9umrj5Lw_RFHPDR7x";
 const GAME_URL = "https://lernsimulationen.github.io/Startseite/lernsimulationen/kurse/q1/SW/Endspiel/index.html";
+const MUSIC_TRACKS = {
+  main:{label:"Hauptmotiv · Aufbruch", src:"assets/audio/tafelfahrt-main.mp3"},
+  calm:{label:"Ruhig · Denkpause", src:"assets/audio/tafelfahrt-calm.mp3"},
+  finale:{label:"Finale · Gipfelmoment", src:"assets/audio/tafelfahrt-finale.mp3"}
+};
+const music = {track:"main", player:null};
 /* ====================================================================== */
 /* ============================ SPIELDATEN ============================ */
 /* Avatare: Bilddateien optional unter assets/avatars/, Emoji als Fallback */
@@ -707,12 +721,12 @@ const STATIONS = [
             "weder deskriptiv noch normativ, sondern eine Meinung.",
             "normativ, weil Zahlen immer eine Wertung enthalten."],
       c:1, expl:"Deskriptiv = beschreiben, normativ = bewerten. Ob diese Ungleichheit auch ungerecht ist, wäre eine zusätzliche normative Frage – genau die Unterscheidung aus dem Unterricht."},
-    {t:"match", q:"Ordnet jeder Dimension sozialer Ungleichheit einen passenden Indikator zu.",
+    {t:"match", q:"Ordnet jeder Dimension sozialer Ungleichheit genau einen messbaren Indikator zu. Links steht WAS ungleich verteilt ist, rechts WIE wir es beobachten oder messen.",
       pairs:[["Einkommen","Gender Pay Gap (Verdienstabstand in %)"],
              ["Bildung","Anteil der Studierenden aus Nichtakademikerfamilien"],
              ["Prestige / Ansehen","Rangliste des Berufsansehens (z. B. Ärztin vs. ungelernte Tätigkeit)"],
              ["Macht","Frauenanteil in Vorständen großer Unternehmen"]],
-      expl:"Dimensionen (Was ist ungleich verteilt?) werden über Indikatoren (Woran messe ich das?) beobachtbar gemacht."},
+      expl:"Jedes linke Stichwort bezeichnet eine Dimension der Ungleichheit: Einkommen, Bildung, Prestige oder Macht. Der rechte Text nennt jeweils einen beobachtbaren Indikator – zum Beispiel Verdienstabstand, Bildungsherkunft, Berufsrangliste oder Führungspositionen."},
     {t:"mc", q:"Ein Haushalt: 2 Erwachsene, 2 Kinder unter 14 Jahren, 3.600 € Nettoeinkommen. Wie hoch ist das Nettoäquivalenzeinkommen (modifizierte OECD-Skala)?",
       opts:["900 € – das Einkommen wird durch 4 Personen geteilt.",
             "3.600 € – es zählt das Haushaltseinkommen.",
@@ -780,12 +794,12 @@ const STATIONS = [
             "Alle Jobs ohne Homeoffice-Möglichkeit.",
             "Beschäftigungen mit Tarifvertrag und Kündigungsschutz."],
       c:1, expl:"Genau die Definition aus dem Unterricht: Unsicherheit + Armutsrisiko + drohende soziale Ausgrenzung."},
-    {t:"match", q:"Ordnet jeder Form prekärer Beschäftigung ihr zentrales Risiko zu.",
+    {t:"match", q:"Ordnet jeder prekären Beschäftigungsform genau das Risiko zu, das für die betroffene Person im Vordergrund steht.",
       pairs:[["Befristete Beschäftigung","keine langfristige Sicherheit und Planbarkeit"],
              ["Leih-/Zeitarbeit","geringer Schutz vor Arbeitslosigkeit"],
              ["Minijob / geringfügige Beschäftigung","wenig Verdienst, kaum eigene soziale Absicherung"],
              ["Unfreiwillige Teilzeit","Einkommen reicht trotz Arbeit kaum zum Leben"]],
-      expl:"Prekarität heißt: Erwerbsarbeit schützt nicht mehr zuverlässig vor Armut – Stress, finanzielle Sorgen und Zukunftsunsicherheit sind die Folgen."},
+      expl:"Achtet auf den jeweils typischen Schwerpunkt: Befristung bedeutet fehlende Planbarkeit, Leiharbeit unsichere Beschäftigung, Minijobs geringe Absicherung und unfreiwillige Teilzeit ein zu niedriges Einkommen trotz Arbeit."},
     {t:"mc", q:"Der demografische Wandel in Deutschland wird als „doppelte Alterung“ beschrieben, weil …",
       opts:["die Menschen älter werden und gleichzeitig früher in Rente gehen.",
             "dauerhaft niedrige Geburtenzahlen und steigende Lebenserwartung zusammenwirken.",
@@ -866,8 +880,8 @@ const STATIONS = [
             "Nur noch das Einkommen entscheidet über den Lebenslauf."],
       c:1, expl:"Beck beschreibt die „Auflösung“ der Schichten als Erfahrungswelt – nicht das Ende der Ungleichheit. Freiheit und Risiko wachsen zugleich."},
     {t:"order", q:"Bringt die Modelle in die Reihenfolge ihrer Entstehung – vom ältesten zum neuesten.",
-      items:["Klassenmodell (Marx, 19. Jahrhundert)","Schichtmodell (Geiger, 1930er)","Hausmodell (Dahrendorf, 1960er)","Milieu-/Lebensstilmodelle (z. B. Sinus, ab den 1980ern)"],
-      expl:"Die Modellgeschichte spiegelt den Wandel: Je moderner die Gesellschaft, desto weniger reicht ein einzelnes Merkmal zur Beschreibung."},
+      items:["Klassenmodell (Marx)","Schichtmodell (Geiger)","Hausmodell (Dahrendorf)","Milieu-/Lebensstilmodelle (z. B. Sinus)"],
+      expl:"Die Reihenfolge folgt der Entwicklung von Klassen über Schichten und das Hausmodell hin zu Milieu- und Lebensstilmodellen. Je moderner die Gesellschaft, desto weniger reicht ein einzelnes Merkmal zur Beschreibung."},
     {t:"mc", q:"Pro-/Contra-Debatte „Ist Deutschland eine Klassengesellschaft?“: Welches Argument stützt die CONTRA-Position?",
       opts:["Die Mehrheit arbeitet lohnabhängig, eine Minderheit verfügt über Kapital.",
             "Bildungs- und Lebenschancen hängen stark von der sozialen Herkunft ab.",
@@ -972,7 +986,7 @@ const STATIONS = [
             "Weil die Ziele geheim gehalten werden.",
             "Weil es sich jedes Jahr ändert."],
       c:1, expl:"Beispiel: Ein kräftiger Boom senkt die Arbeitslosigkeit, treibt aber die Inflation – Preisstabilität und Vollbeschäftigung geraten in Konflikt."},
-    {t:"order", q:"Bringt die Phasen des Konjunkturzyklus in die richtige Reihenfolge – beginnend mit dem Aufschwung.",
+    {t:"order", q:"Bringt die Phasen des Konjunkturzyklus in die richtige Reihenfolge – beginnend mit dem Aufschwung.", img:"assets/img/konjunkturzyklus.png",
       items:["Aufschwung (Expansion)","Hochkonjunktur (Boom)","Abschwung (Rezession)","Tiefphase (Depression)"],
       expl:"Danach beginnt der Zyklus von vorn. Beobachtet wird er v. a. am realen BIP, an Auftragslage, Beschäftigung und Preisen."},
     {t:"mc", q:"Von einer Rezession spricht man üblicherweise, wenn …",
@@ -1044,7 +1058,13 @@ const FINALE = {
             "Angebotsorientiert; Risiko: Die gesamtwirtschaftliche Nachfrage sinkt kurzfristig weiter, soziale Härten verschärfen die Krise.",
             "Antizyklische Fiskalpolitik nach Keynes; Risiko: Staatsverschuldung.",
             "Magisches Viereck; Risiko: keines, alle Ziele werden erreicht."],
-      c:1, expl:"Steuersenkung für Unternehmen + Ausgabenkürzung = klassisch angebotsorientiert. Keynesianer warnen: In der Krise kann das die Nachfragelücke vergrößern."}
+      c:1, expl:"Steuersenkung für Unternehmen + Ausgabenkürzung = klassisch angebotsorientiert. Keynesianer warnen: In der Krise kann das die Nachfragelücke vergrößern."},
+    {t:"mc", q:"FINALE – Welche Aussage verbindet die Themen der Deutschlandreise am treffendsten?",
+      opts:["Soziale Ungleichheit verschwindet automatisch, wenn die Wirtschaft wächst.",
+            "Eine stabile Gesellschaft braucht wirtschaftliche Dynamik, aber auch einen Sozialstaat, der Risiken abfedert und Teilhabe ermöglicht.",
+            "Konjunkturpolitik kann soziale Ungleichheit grundsätzlich nicht beeinflussen.",
+            "Nur individuelle Leistung entscheidet über Bildung, Einkommen und soziale Lage."],
+      c:1, expl:"Wachstum allein löst soziale Ungleichheit nicht. Nachhaltige Politik verbindet wirtschaftliche Stabilität mit sozialer Absicherung, fairen Chancen und gesellschaftlicher Teilhabe."}
   ]
 };
 /* ============================ HILFSFUNKTIONEN ============================ */
@@ -1065,6 +1085,9 @@ function seededShuffle(arr, seed){
     const j = s % (i + 1); [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+function shuffledOptions(task, key, seed){
+  return seededShuffle(task.opts.map((text, originalIndex) => ({text, originalIndex})), `${seed || ""}-${key}-options`);
 }
 /* Bild-Platzhalter: zeigt KI-Bild, wenn Datei existiert – sonst gestalteten Platzhalter */
 function imgSlotHTML(src, em, label, style){
@@ -1114,7 +1137,8 @@ function publicTask(task, seed){
   if(task.t === "mc")    p.opts = task.opts;
   if(task.t === "match"){
     p.left  = task.pairs.map(x => x[0]);
-    p.right = seededShuffle(task.pairs.map(x => x[1]), seed + "r");
+    p.rightIndex = seededShuffle(task.pairs.map((_, i) => i), seed + "r");
+    p.right = p.rightIndex.map(i => task.pairs[i][1]);
   }
   if(task.t === "order") p.items = seededShuffle(task.items.map((it, i) => ({i, txt:it})), seed + "o");
   if(task.t === "est"){ p.unit = task.unit; p.step = task.step || 1; }
@@ -1213,6 +1237,11 @@ function onBoardMsg(msg){
     const t = msg.team || {};
     if(!t.id || !t.name) return;
     const known = board.teams[t.id];
+    const avatarTaken = teamList().some(existing => existing.id !== t.id && existing.avatar === t.avatar);
+    if(avatarTaken){
+      board.backend?.send({kind:"joinDenied", teamId:t.id, reason:"avatar"});
+      return;
+    }
     board.teams[t.id] = {id:t.id, name:String(t.name).slice(0, 22), avatar:t.avatar, score:known ? known.score : 0};
     if(!known && teamList().length > 8){ delete board.teams[t.id]; return; }
     saveBoard(); broadcastState();
@@ -1227,12 +1256,19 @@ function onBoardMsg(msg){
     if(bucket[msg.teamId]) return;                       // erste Antwort zählt
     bucket[msg.teamId] = {payload:msg.payload, at:Date.now()};
     saveBoard(); renderAnswerStatus(); broadcastState();
+    if(msg.taskKey === taskKey() && allTeamsAnswered(msg.taskKey)) revealTask();
   }
   if(msg.kind === "wager" && board.screen === "wager"){
     const max = Math.floor((board.teams[msg.teamId].score || 0) / 2);
     board.wagers[msg.teamId] = Math.max(0, Math.min(max, Math.round(msg.amount || 0)));
     saveBoard(); renderBoard(); broadcastState();
   }
+}
+
+function allTeamsAnswered(key){
+  const teams = teamList();
+  const answers = board.answers[key] || {};
+  return teams.length > 0 && teams.every(t => !!answers[t.id]);
 }
 
 /* ---- Zustand an die Tablets senden (ohne Lösungen) ---- */
@@ -1392,8 +1428,9 @@ function renderTask(c){
   const ptsInfo = {mc:`${PTS.mc} P. + Tempobonus`, match:`${PTS.matchPair} P. je Paar`, order:`${PTS.orderFull} P.`, est:`${PTS.est[0]}/${PTS.est[1]}/${PTS.est[2]} P.`, open:`bis ${PTS.openMax} P.`}[task.t];
   let body = "";
   if(task.t === "mc"){
-    body = `<div class="opts">` + task.opts.map((o, i) =>
-      `<div class="opt ${board.phase === "revealed" ? (i === task.c ? "correct" : "wrong") : ""}"><span class="key">${KEYS[i]}</span><span>${esc(o)}</span></div>`).join("") + `</div>`;
+    const options = shuffledOptions(task, key, board.code);
+    body = `<div class="opts">` + options.map((o, i) =>
+      `<div class="opt ${board.phase === "revealed" ? (o.originalIndex === task.c ? "correct" : "wrong") : ""}"><span class="key">${KEYS[i]}</span><span>${esc(o.text)}</span></div>`).join("") + `</div>`;
   } else if(task.t === "match"){
     const right = seededShuffle(task.pairs.map(x => x[1]), board.code + key + "r");
     body = board.phase === "revealed"
@@ -1420,6 +1457,9 @@ function renderTask(c){
   const expl = board.phase === "revealed" && task.t !== "open"
     ? `<div class="reveal-box" style="margin-top:14px;"><h3>Erklärung</h3><p style="margin:0;">${esc(task.expl || "")}</p></div>` : "";
   const stationArt = isFinale ? FINALE : curStation();
+  const taskArt = task.img || stationArt.img;
+  const taskArtLabel = task.img ? "Konjunkturzyklus" : stationArt.city;
+  const taskArtTitle = task.img ? "Expansion · Boom · Rezession · Depression" : stationArt.title;
   c.innerHTML = `
     <div class="journey-strip"><span class="stop">${esc(stationArt.em)} ${esc(stationArt.city)}</span><span class="line"></span><span class="stop">${isFinale ? "Finale" : "Aufgabe " + (board.taskIdx + 1)}</span><span class="line"></span><span class="stop muted-stop">ICE unterwegs</span></div>
     <div class="row spread" style="margin-bottom:6px;">
@@ -1427,7 +1467,7 @@ function renderTask(c){
       <span class="badge blue">${isFinale ? "🏔️ FINALE" : `Aufgabe ${board.taskIdx + 1}/${total}${task.r ? " · Reserve" : ""}`}</span>
     </div>
     <div class="task-layout">
-      <div class="task-art"><div class="img-slot" data-img="${esc(stationArt.img)}" data-em="${esc(stationArt.em)}" data-ph="Bild: ${esc(stationArt.city)}"></div><div class="scene-caption">${esc(stationArt.city)}<small>${esc(stationArt.title)}</small></div></div>
+      <div class="task-art"><div class="img-slot" data-img="${esc(taskArt)}" data-em="${esc(stationArt.em)}" data-ph="Bild: ${esc(taskArtLabel)}"></div><div class="scene-caption">${esc(taskArtLabel)}<small>${esc(taskArtTitle)}</small></div></div>
       <div class="card task-card">
         <div class="task-q">${esc(task.q)}</div>
         ${body}${expl}
@@ -1570,9 +1610,49 @@ function confettiBurst(){
   })();
 }
 /* ---- Steuerleiste der Lehrkraft ---- */
+function ensureMusic(){
+  if(music.player) return music.player;
+  music.player = $("musicPlayer");
+  if(!music.player) return null;
+  music.player.volume = .28;
+  music.player.addEventListener("error", () => toast("Musikdatei fehlt noch – bitte die Suno-MP3 unter assets/audio/ ablegen."));
+  return music.player;
+}
+function loadMusicTrack(id, keepPlaying=false){
+  const player = ensureMusic();
+  if(!player || !MUSIC_TRACKS[id]) return;
+  music.track = id;
+  player.src = MUSIC_TRACKS[id].src;
+  player.load();
+  if(keepPlaying) player.play().catch(() => toast("Bitte zuerst einmal auf Musik ▶ tippen."));
+}
+function selectMusic(id){
+  const player = ensureMusic();
+  const wasPlaying = !!player && !player.paused;
+  loadMusicTrack(id, wasPlaying);
+  renderTeachbar();
+}
+function toggleMusic(){
+  const player = ensureMusic();
+  if(!player) return;
+  if(!player.src) loadMusicTrack(music.track);
+  if(player.paused) player.play().then(renderTeachbar).catch(() => toast("Bitte die Suno-MP3s unter assets/audio/ ablegen."));
+  else { player.pause(); renderTeachbar(); }
+}
+function setMusicVolume(value){
+  const player = ensureMusic();
+  if(player) player.volume = Math.max(0, Math.min(1, +value));
+}
 function renderTeachbar(){
   const bar = $("teachbar");
   const b = (label, fn, cls) => `<button class="btn ${cls || ""}" onclick="${fn}">${label}</button>`;
+  const player = ensureMusic();
+  const musicUi = `<div class="music-control" aria-label="Musiksteuerung">
+    <span aria-hidden="true">🎵</span>
+    <select aria-label="Musikstück auswählen" onchange="selectMusic(this.value)">${Object.entries(MUSIC_TRACKS).map(([id,t]) => `<option value="${id}" ${id === music.track ? "selected" : ""}>${t.label}</option>`).join("")}</select>
+    <input aria-label="Musiklautstärke" type="range" min="0" max="1" step=".01" value="${player ? player.volume : .28}" oninput="setMusicVolume(this.value)">
+    <button class="btn ghost small" onclick="toggleMusic()">${player && !player.paused ? "❚❚" : "▶"}</button>
+  </div>`;
   let html = "";
   if(board.screen === "lobby"){
     html = b("Reise starten →", "gotoIntro(0)") + (board.demo ? b("Demo: 2 Teams sind bereit", "toast('Demo-Teams warten – einfach starten!')", "ghost small") : "");
@@ -1599,7 +1679,7 @@ function renderTeachbar(){
   } else if(board.screen === "podium"){
     html = b("🎉 Konfetti!", "confettiBurst()", "ghost") + b("Spiel beenden & zurücksetzen", "resetGame()", "danger small");
   }
-  bar.innerHTML = html;
+  bar.innerHTML = musicUi + html;
 }
 
 /* ---- Ablaufsteuerung ---- */
@@ -1667,7 +1747,10 @@ function computeResults(task, answers){
   if(task.t === "match"){
     Object.entries(answers).forEach(([tid, a]) => {
       let n = 0;
-      (a.payload || []).forEach((rightTxt, li) => { if(task.pairs[li] && task.pairs[li][1] === rightTxt) n++; });
+      (a.payload || []).forEach((rightValue, li) => {
+        const rightTxt = Number.isInteger(rightValue) ? (task.pairs[rightValue] && task.pairs[rightValue][1]) : rightValue;
+        if(task.pairs[li] && task.pairs[li][1] === rightTxt) n++;
+      });
       res[tid] = {pts:n * PTS.matchPair, detail:`${n}/${task.pairs.length} Paare richtig`, correct:n === task.pairs.length};
     });
   }
@@ -1740,7 +1823,7 @@ function demoAnswers(){
     if((board.answers[key] || {})[tid]) return;
     let payload;
     if(task.t === "mc") payload = Math.random() < .6 ? task.c : Math.floor(Math.random() * task.opts.length);
-    if(task.t === "match") payload = seededShuffle(task.pairs.map(p => p[1]), tid + Math.random());
+    if(task.t === "match") payload = seededShuffle(task.pairs.map((_, i) => i), tid + Math.random());
     if(task.t === "order") payload = seededShuffle(task.items.map((_, i) => i), tid + Math.random());
     if(task.t === "est") payload = +(task.ans * (0.6 + Math.random() * 0.9)).toFixed(2);
     if(task.t === "open") payload = "— simulierte Teamantwort (Demo " + (k + 1) + ") —";
@@ -1767,13 +1850,16 @@ function showJoin(){
     if(qrCode) $("joinCode").value = qrCode.toUpperCase().slice(0, 4);
   }
   const pick = $("avatarPick");
+  const claimed = new Set((team.state?.teams || []).filter(t => t.id !== team.id).map(t => t.avatar));
   pick.innerHTML = AVATARS.map(a =>
-    `<div class="pick ${saved && saved.avatar === a.id ? "sel" : ""}" data-av="${a.id}" onclick="selectAvatar('${a.id}')">
-       ${avatarHTML(a.id, "big")}<span class="nm">${esc(a.name)}</span></div>`).join("");
+    `<div class="pick ${saved && saved.avatar === a.id ? "sel" : ""} ${claimed.has(a.id) ? "taken" : ""}" data-av="${a.id}" ${claimed.has(a.id) ? 'aria-disabled="true"' : `onclick="selectAvatar('${a.id}')"`}>
+       ${avatarHTML(a.id, "big")}<span class="nm">${esc(a.name)}</span>${claimed.has(a.id) ? '<span class="taken-label">vergeben</span>' : ""}</div>`).join("");
   hydrateAvatars(pick);
   team.avatar = saved?.avatar || null;
 }
 function selectAvatar(id){
+  const claimed = new Set((team.state?.teams || []).filter(t => t.id !== team.id).map(t => t.avatar));
+  if(claimed.has(id)) return;
   team.avatar = id;
   document.querySelectorAll("#avatarPick .pick").forEach(el => el.classList.toggle("sel", el.dataset.av === id));
 }
@@ -1804,7 +1890,18 @@ function joinGame(){
 }
 
 function onTeamMsg(msg){
-  if(!msg || msg.kind !== "state") return;
+  if(!msg) return;
+  if(msg.kind === "joinDenied" && msg.teamId === team.id){
+    const saved = JSON.parse(sessionStorage.getItem("endspiel-team") || "null");
+    if(saved){ delete saved.avatar; sessionStorage.setItem("endspiel-team", JSON.stringify(saved)); }
+    team.avatar = null;
+    $("teamScreen").classList.add("hidden");
+    $("joinScreen").classList.remove("hidden");
+    showJoin();
+    $("joinError").textContent = "Dieser Avatar ist bereits vergeben. Bitte einen anderen Avatar auswählen.";
+    return;
+  }
+  if(msg.kind !== "state") return;
   const st = msg.state;
   if(!st) return;
   team.clockOffset = (st.now || Date.now()) - Date.now();
@@ -1868,8 +1965,9 @@ function renderTeamTask(c, st){
   const timer = `<div class="timer" id="tTimer" style="margin:0 auto 4px;width:fit-content;">–</div>`;
   let ui = "";
   if(task.t === "mc"){
-    ui = `<div class="t-opts">` + task.opts.map((o, i) =>
-      `<button class="t-opt" onclick="sendAnswer(${i})"><span class="key">${KEYS[i]}</span><span>${esc(o)}</span></button>`).join("") + `</div>`;
+    const options = shuffledOptions(task, key, team.code);
+    ui = `<div class="t-opts">` + options.map((o, i) =>
+      `<button class="t-opt" onclick="sendAnswer(${o.originalIndex})"><span class="key">${KEYS[i]}</span><span>${esc(o.text)}</span></button>`).join("") + `</div>`;
   } else if(task.t === "match"){
     team.picks[key] = team.picks[key] || {sel:null, map:{}};
     ui = renderMatchUI(task, key) ;
@@ -1898,7 +1996,8 @@ function renderMatchUI(task, key){
       ${esc(l)}${paired ? `<span class="pairtag" style="background:${col};">${i + 1}</span>` : ""}</button>`;
   }).join("");
   const rightHtml = task.right.map((r, j) => {
-    const li = Object.keys(p.map).find(k => p.map[k] === r);
+    const rightIndex = task.rightIndex ? task.rightIndex[j] : j;
+    const li = Object.keys(p.map).find(k => p.map[k] === rightIndex);
     const col = li !== undefined ? colors[li % 4] : null;
     return `<button class="match-item" style="border-style:dashed;${col ? `border-color:${col};` : ""}" onclick="matchSelRight('${key}',${j})">
       ${esc(r)}${col ? `<span class="pairtag" style="background:${col};">${+li + 1}</span>` : ""}</button>`;
@@ -1916,10 +2015,10 @@ function matchSelLeft(key, i){
 }
 function matchSelRight(key, j){
   const p = team.picks[key];
-  const r = team.state.task.right[j];
-  const usedBy = Object.keys(p.map).find(k => p.map[k] === r);
+  const rightIndex = team.state.task.rightIndex ? team.state.task.rightIndex[j] : j;
+  const usedBy = Object.keys(p.map).find(k => p.map[k] === rightIndex);
   if(usedBy !== undefined){ delete p.map[usedBy]; }
-  else if(p.sel !== null){ p.map[p.sel] = r; p.sel = null; }
+  else if(p.sel !== null){ p.map[p.sel] = rightIndex; p.sel = null; }
   team.state._sig = ""; renderTeam();
 }
 function sendMatch(key){
