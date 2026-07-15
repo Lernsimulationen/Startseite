@@ -1,0 +1,1980 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Endspiel Q1 – Deutschlandreise (SoWi)</title>
+<!-- Supabase Realtime: offizielle Bibliothek für die Geräte-Synchronisation. -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+/* ==========================================================================
+   ENDSPIEL Q1 – DEUTSCHLANDREISE
+   Abschlussspiel Sozialwissenschaften Leistungskurs Q1
+   Zwei Ansichten in einer Datei: Tafelbild (Beamer) + Team-Tablet
+   ========================================================================== */
+:root{
+  --bg:#0e1a2f;
+  --bg2:#16274a;
+  --surface:#1d3157;
+  --surface2:#24406f;
+  --line:rgba(255,255,255,.14);
+  --text:#f2f6ff;
+  --muted:#9fb2d4;
+  --accent:#ffcf4d;      /* Signalgelb – Reise/DB-Anmutung */
+  --accent2:#4dc9ff;     /* Himmelblau */
+  --good:#43d17c;
+  --bad:#ff6b6b;
+  --radius:18px;
+  --shadow:0 18px 44px rgba(0,0,0,.35);
+  font-size:16px;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;}
+html{overflow-x:hidden;}
+body{
+  min-height:100vh;
+  overflow-x:hidden;
+  font-family:"Segoe UI","Trebuchet MS",Arial,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(1200px 600px at 85% -10%, rgba(77,201,255,.16), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(255,207,77,.10), transparent 60%),
+    linear-gradient(160deg,var(--bg),var(--bg2));
+  background-attachment:fixed;
+}
+button{font-family:inherit;}
+h1,h2,h3{margin:0; line-height:1.12; letter-spacing:-.02em;}
+p{line-height:1.55;}
+.hidden{display:none !important;}
+
+/* ---------- Allgemeine Bausteine ---------- */
+.screen{max-width:1180px;margin:0 auto;padding:26px 22px 60px;}
+.card{
+  background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.02));
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:22px;
+}
+.badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,207,77,.14);color:var(--accent);
+  font-weight:800;font-size:.82rem;letter-spacing:.05em;text-transform:uppercase;
+  border:1px solid rgba(255,207,77,.35);
+}
+.badge.blue{background:rgba(77,201,255,.13);color:var(--accent2);border-color:rgba(77,201,255,.35);}
+.btn{
+  appearance:none;border:0;cursor:pointer;
+  border-radius:14px;padding:13px 22px;
+  font-size:1.02rem;font-weight:800;color:#132038;
+  background:linear-gradient(180deg,#ffe08a,var(--accent));
+  box-shadow:0 10px 24px rgba(255,207,77,.25);
+  transition:transform .1s ease, filter .15s ease;
+}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.05);}
+.btn:active{transform:translateY(1px);}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+.btn.ghost{
+  background:transparent;color:var(--text);
+  border:1.5px solid var(--line);box-shadow:none;font-weight:700;
+}
+.btn.blue{background:linear-gradient(180deg,#8fdfff,var(--accent2));box-shadow:0 10px 24px rgba(77,201,255,.22);}
+.btn.small{padding:8px 14px;font-size:.9rem;border-radius:10px;}
+.btn.danger{background:linear-gradient(180deg,#ff9a9a,#ff6b6b);box-shadow:none;}
+input[type=text],input[type=number],textarea,select{
+  width:100%;padding:13px 14px;border-radius:12px;
+  border:1.5px solid var(--line);
+  background:rgba(10,20,40,.55);color:var(--text);
+  font-size:1.05rem;font-family:inherit;
+}
+input:focus,textarea:focus{outline:2px solid var(--accent2);border-color:transparent;}
+textarea{min-height:130px;resize:vertical;line-height:1.5;}
+.muted{color:var(--muted);}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+.spread{justify-content:space-between;}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;}
+
+/* ---------- Bild-Platzhalter (KI-Bilder, siehe BILD-PROMPTS.md) ---------- */
+.img-slot{
+  position:relative;border-radius:14px;overflow:hidden;
+  background:linear-gradient(145deg,var(--surface),var(--surface2));
+  border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;
+}
+.img-slot img{width:100%;height:100%;object-fit:cover;display:block;}
+.img-slot .ph{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:14px;text-align:center;color:var(--muted);font-size:.8rem;
+}
+.img-slot .ph .em{font-size:2.6rem;line-height:1;}
+.img-slot::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,transparent 45%,rgba(5,12,27,.62));}
+.img-slot img{position:relative;z-index:0;}
+.scene-caption{position:absolute;z-index:2;left:18px;right:18px;bottom:15px;color:var(--text);font-weight:900;letter-spacing:.01em;text-shadow:0 2px 12px rgba(0,0,0,.65);}
+.scene-caption small{display:block;margin-top:3px;color:#cbd8ef;font-weight:600;font-size:.78rem;}
+.scene-frame{position:relative;border-radius:var(--radius);overflow:hidden;min-height:220px;border:1px solid var(--line);box-shadow:var(--shadow);}
+.scene-frame .img-slot{height:100%;min-height:inherit;border:0;border-radius:0;}
+.scene-frame .img-slot img{height:100%;}
+.task-layout{display:grid;grid-template-columns:minmax(220px,.62fr) minmax(0,1.38fr);gap:14px;align-items:stretch;}
+.task-art{position:relative;min-height:330px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);}
+.task-art .img-slot{height:100%;min-height:330px;border:0;border-radius:0;}
+.task-art .scene-caption{font-size:1rem;}
+.task-card{min-width:0;}
+.journey-strip{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:10px 14px;border:1px solid rgba(77,201,255,.25);border-radius:14px;background:linear-gradient(90deg,rgba(77,201,255,.1),rgba(255,207,77,.07));}
+.journey-strip .line{height:2px;flex:1;background:linear-gradient(90deg,var(--accent2),var(--accent));box-shadow:0 0 10px rgba(77,201,255,.35);}
+.journey-strip .stop{font-size:.82rem;font-weight:900;white-space:nowrap;}
+.journey-strip .stop.muted-stop{color:var(--muted);}
+.lobby-hero,.finale-hero,.podium-hero{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch;}
+.lobby-hero .card,.finale-hero .card{display:flex;flex-direction:column;justify-content:center;}
+.finale-hero .scene-frame{min-height:280px;}
+.podium-hero{max-width:900px;margin:0 auto 16px;}
+.podium-hero .scene-frame{min-height:220px;}
+.podium-hero .podium-copy{display:flex;flex-direction:column;justify-content:center;text-align:center;}
+.podium-hero .podium-copy h2{font-size:clamp(1.8rem,4vw,2.8rem);margin:12px 0;}
+
+/* ---------- Startbildschirm ---------- */
+#modeSelect .hero{
+  display:grid;grid-template-columns:1.15fr .85fr;gap:22px;align-items:stretch;margin-top:18px;
+}
+#modeSelect .hero .img-slot{min-height:360px;}
+#modeSelect .hero > .img-slot{box-shadow:0 24px 60px rgba(0,0,0,.4);}
+.mode-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px;}
+.mode-card{
+  text-align:left;cursor:pointer;border:1.5px solid var(--line);border-radius:var(--radius);
+  padding:20px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));
+  color:var(--text);transition:transform .12s ease,border-color .12s ease;
+}
+.mode-card:hover{transform:translateY(-2px);border-color:var(--accent);}
+.mode-card .em{font-size:2rem;}
+.mode-card h3{margin:8px 0 6px;font-size:1.2rem;}
+.mode-card p{margin:0;color:var(--muted);font-size:.95rem;}
+.sync-note{margin-top:16px;font-size:.85rem;color:var(--muted);}
+
+/* ---------- Tafelbild: Lobby ---------- */
+.joincode{
+  font-size:clamp(3rem,8vw,5.2rem);font-weight:900;letter-spacing:.18em;
+  color:var(--accent);text-align:center;
+  text-shadow:0 6px 30px rgba(255,207,77,.35);
+}
+.lobby-teams{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:14px;}
+.team-chip{
+  display:flex;align-items:center;gap:10px;padding:9px 16px 9px 9px;border-radius:999px;
+  background:rgba(255,255,255,.07);border:1px solid var(--line);font-weight:700;
+}
+.avatar{
+  width:44px;height:44px;border-radius:50%;overflow:hidden;flex:none;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(145deg,var(--surface),var(--surface2));
+  border:2px solid var(--line);font-size:1.4rem;
+}
+.avatar img{width:100%;height:100%;object-fit:cover;}
+.avatar.big{width:74px;height:74px;font-size:2.2rem;}
+
+/* ---------- Tafelbild: Kopfleiste ---------- */
+.boardbar{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  padding:10px 16px;margin:-10px -6px 18px;
+  position:sticky;top:0;z-index:40;
+  background:rgba(10,18,36,.9);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.boardbar .title{font-weight:900;letter-spacing:.02em;}
+.boardbar .row{min-width:0;}
+.boardbar .title{max-width:min(58vw,720px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.timer{
+  min-width:96px;text-align:center;font-variant-numeric:tabular-nums;
+  font-size:1.7rem;font-weight:900;padding:4px 14px;border-radius:12px;
+  background:rgba(255,255,255,.07);border:1px solid var(--line);
+}
+.timer.warn{color:var(--accent);}
+.timer.crit{color:var(--bad);animation:pulse 1s infinite;}
+@keyframes pulse{50%{opacity:.55;}}
+
+/* ---------- Reisekarte (SVG) ---------- */
+.map-wrap{
+  position:relative;overflow:hidden;min-height:360px;display:flex;align-items:center;justify-content:center;
+  background:
+    radial-gradient(circle at 50% 45%,rgba(77,201,255,.12),transparent 52%),
+    linear-gradient(145deg,rgba(13,29,58,.96),rgba(29,49,87,.78));
+}
+.map-wrap::before,.map-wrap::after{content:"";position:absolute;pointer-events:none;border-radius:50%;filter:blur(2px);}
+.map-wrap::before{width:240px;height:240px;right:-100px;top:-110px;background:rgba(77,201,255,.12);}
+.map-wrap::after{width:180px;height:180px;left:-90px;bottom:-100px;background:rgba(255,207,77,.08);}
+.travel-map{position:relative;z-index:1;width:100%;height:100%;max-height:none;display:block;}
+.map-station{cursor:default;}
+.map-station .halo{fill:rgba(77,201,255,.14);stroke:rgba(77,201,255,.32);stroke-width:.55;}
+.map-station circle.dot{fill:var(--surface2);stroke:rgba(242,246,255,.85);stroke-width:.9;}
+.map-station.done circle.dot{fill:var(--good);stroke:#eafff2;}
+.map-station.active circle.dot{fill:var(--accent);stroke:#fff;stroke-width:1.2;}
+.map-station text{fill:var(--text);font-size:2.75px;font-weight:900;paint-order:stroke;stroke:rgba(14,26,47,.98);stroke-width:1.15px;stroke-linejoin:round;}
+.map-station .station-sub{fill:var(--muted);font-size:1.7px;font-weight:800;stroke-width:.7px;letter-spacing:.02em;}
+.map-route{fill:none;stroke:rgba(159,178,212,.48);stroke-width:1.15;stroke-dasharray:1.2 2.4;stroke-linecap:round;vector-effect:non-scaling-stroke;}
+.map-route.done{stroke:var(--accent);stroke-width:1.65;stroke-dasharray:none;filter:drop-shadow(0 0 3px rgba(255,207,77,.5));}
+.map-route.active-route{stroke:var(--accent2);stroke-width:1.8;stroke-dasharray:2 2.5;animation:routeDash 1.1s linear infinite;filter:drop-shadow(0 0 4px rgba(77,201,255,.65));}
+.map-de{fill:rgba(77,201,255,.055);stroke:rgba(159,178,212,.5);stroke-width:1.35;stroke-linejoin:round;vector-effect:non-scaling-stroke;}
+.map-de-inner{fill:none;stroke:rgba(77,201,255,.13);stroke-width:1;stroke-dasharray:1 4;vector-effect:non-scaling-stroke;}
+.map-image{opacity:.92;filter:saturate(.9) contrast(1.04);}
+.map-train{filter:drop-shadow(0 0 3px rgba(255,207,77,.75));}
+.map-train-image{filter:drop-shadow(0 0 2px rgba(255,207,77,.85));}
+.map-train .body{fill:#f2f6ff;stroke:#132038;stroke-width:.8;}
+.map-train .nose{fill:var(--accent);stroke:#132038;stroke-width:.8;}
+.map-train .window{fill:#24406f;stroke:#4dc9ff;stroke-width:.45;}
+.map-train .light{fill:#fff4b8;}
+@keyframes routeDash{to{stroke-dashoffset:-7;}}
+@media (prefers-reduced-motion:reduce){.map-route.active-route{animation:none;}.map-train animateMotion{display:none;}}
+.version-badge{position:fixed;right:14px;bottom:12px;z-index:60;padding:5px 9px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(8,14,28,.82);color:var(--muted);font-size:.72rem;font-weight:800;letter-spacing:.04em;backdrop-filter:blur(6px);pointer-events:none;}
+
+/* ---------- Aufgabenanzeige Tafel ---------- */
+.task-q{font-size:clamp(1.35rem,2.6vw,2rem);font-weight:800;margin:10px 0 18px;line-height:1.3;}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.opt{
+  padding:16px 18px;border-radius:14px;border:1.5px solid var(--line);
+  background:rgba(255,255,255,.045);font-size:1.12rem;font-weight:600;
+  display:flex;gap:12px;align-items:flex-start;
+}
+.opt .key{
+  flex:none;width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.1);font-weight:900;color:var(--accent2);
+}
+.opt.correct{border-color:var(--good);background:rgba(67,209,124,.14);}
+.opt.correct .key{background:var(--good);color:#08301a;}
+.opt.wrong{opacity:.5;}
+.answer-status{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;}
+.as-chip{
+  display:flex;align-items:center;gap:8px;padding:6px 13px 6px 6px;border-radius:999px;
+  border:1px solid var(--line);background:rgba(255,255,255,.05);font-weight:700;font-size:.92rem;
+  opacity:.45;transition:opacity .2s ease, border-color .2s ease;
+}
+.as-chip.in{opacity:1;border-color:var(--accent2);}
+.as-chip .avatar{width:30px;height:30px;font-size:1rem;border-width:1.5px;}
+.reveal-box{margin-top:18px;padding:16px 18px;border-radius:14px;background:rgba(67,209,124,.1);border:1px solid rgba(67,209,124,.4);}
+.reveal-box h3{color:var(--good);margin-bottom:6px;}
+
+/* Ergebnistabellen einer Aufgabe */
+.result-rows{display:grid;gap:8px;margin-top:14px;}
+.result-row{
+  display:flex;align-items:center;gap:12px;padding:9px 14px;border-radius:12px;
+  background:rgba(255,255,255,.05);border:1px solid var(--line);
+}
+.result-row .pts{margin-left:auto;font-weight:900;font-variant-numeric:tabular-nums;}
+.result-row .pts.plus{color:var(--good);}
+.result-row .pts.zero{color:var(--muted);}
+.result-row .pts.minus{color:var(--bad);}
+.result-row .detail{color:var(--muted);font-size:.9rem;}
+
+/* Offene Aufgabe: Bewertungspanel */
+.grade-card{padding:14px 16px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--line);margin-bottom:10px;}
+.grade-card .txt{white-space:pre-wrap;margin:8px 0 10px;line-height:1.5;background:rgba(0,0,0,.22);padding:12px;border-radius:10px;}
+.grade-btns{display:flex;gap:8px;flex-wrap:wrap;}
+.grade-btns button{
+  border:1.5px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);
+  border-radius:10px;padding:8px 13px;font-weight:800;cursor:pointer;
+}
+.grade-btns button.sel{background:var(--accent);color:#132038;border-color:var(--accent);}
+
+/* ---------- Punktestand ---------- */
+.standings{display:grid;gap:10px;margin-top:16px;}
+.stand-row{
+  display:flex;align-items:center;gap:14px;padding:12px 18px;border-radius:14px;
+  background:rgba(255,255,255,.05);border:1px solid var(--line);
+}
+.stand-row .rank{font-size:1.35rem;font-weight:900;width:2.2rem;color:var(--accent);}
+.stand-row .name{font-weight:800;font-size:1.15rem;}
+.stand-row .score{margin-left:auto;font-size:1.35rem;font-weight:900;font-variant-numeric:tabular-nums;}
+.stand-row.top1{border-color:var(--accent);background:rgba(255,207,77,.1);}
+
+/* ---------- Podium / Siegerehrung ---------- */
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:18px;margin:30px 0 10px;min-height:340px;}
+.pod{
+  display:flex;flex-direction:column;align-items:center;gap:10px;width:200px;
+}
+.pod .sockel{
+  width:100%;border-radius:14px 14px 0 0;display:flex;align-items:flex-start;justify-content:center;
+  padding-top:10px;font-size:2rem;font-weight:900;color:#132038;
+  background:linear-gradient(180deg,#ffe08a,var(--accent));
+}
+.pod.p1 .sockel{height:170px;}
+.pod.p2 .sockel{height:120px;background:linear-gradient(180deg,#e8eef7,#b9c6d9);}
+.pod.p3 .sockel{height:88px;background:linear-gradient(180deg,#ffbf8f,#e0925a);}
+.pod .pname{font-weight:900;font-size:1.15rem;text-align:center;}
+.pod .pscore{color:var(--muted);font-weight:700;}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:60;}
+
+/* ---------- Tablet-Ansicht ---------- */
+.tablet{max-width:660px;margin:0 auto;padding:18px 16px 90px;}
+.tablet-head{
+  display:flex;align-items:center;gap:12px;padding:10px 2px 14px;
+  position:sticky;top:0;z-index:30;background:linear-gradient(180deg,rgba(10,18,36,.96),rgba(10,18,36,.88));
+  backdrop-filter:blur(6px);
+}
+.tablet-head .tname{font-weight:900;font-size:1.05rem;}
+.tablet-head .tscore{margin-left:auto;font-weight:900;color:var(--accent);font-size:1.15rem;font-variant-numeric:tabular-nums;}
+.avatar-pick{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0;}
+.avatar-pick .pick{
+  cursor:pointer;border-radius:16px;border:2px solid var(--line);padding:10px;
+  display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(255,255,255,.04);
+}
+.avatar-pick .pick.sel{border-color:var(--accent);background:rgba(255,207,77,.1);}
+.avatar-pick .pick .nm{font-size:.78rem;font-weight:700;color:var(--muted);}
+.t-opts{display:grid;gap:12px;margin-top:16px;}
+.t-opt{
+  text-align:left;padding:16px;border-radius:14px;border:2px solid var(--line);cursor:pointer;
+  background:rgba(255,255,255,.05);color:var(--text);font-size:1.05rem;font-weight:700;
+  display:flex;gap:12px;align-items:flex-start;
+}
+.t-opt .key{flex:none;width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--accent2);}
+.t-opt.sel{border-color:var(--accent);background:rgba(255,207,77,.12);}
+.t-opt:disabled{cursor:default;opacity:.75;}
+.lockmsg{margin-top:18px;text-align:center;color:var(--muted);font-weight:700;}
+.bigfeedback{
+  margin-top:22px;padding:22px;border-radius:18px;text-align:center;font-size:1.3rem;font-weight:900;
+}
+.bigfeedback.ok{background:rgba(67,209,124,.15);border:1.5px solid var(--good);color:var(--good);}
+.bigfeedback.no{background:rgba(255,107,107,.13);border:1.5px solid var(--bad);color:var(--bad);}
+.bigfeedback.wait{background:rgba(77,201,255,.1);border:1.5px solid var(--accent2);color:var(--accent2);}
+.bigfeedback .sub{display:block;font-size:.95rem;font-weight:600;color:var(--text);margin-top:8px;}
+
+/* Zuordnen (Tablet) */
+.match-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+.match-item{
+  padding:12px;border-radius:12px;border:2px solid var(--line);cursor:pointer;
+  background:rgba(255,255,255,.05);font-size:.95rem;font-weight:600;color:var(--text);text-align:left;
+  position:relative;
+}
+.match-item.sel{border-color:var(--accent2);}
+.match-item.paired{border-style:solid;}
+.match-item .pairtag{
+  position:absolute;top:-9px;right:-6px;width:24px;height:24px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:900;color:#132038;
+}
+/* Reihenfolge (Tablet) */
+.order-list{display:grid;gap:10px;margin-top:14px;}
+.order-item{
+  padding:13px;border-radius:12px;border:2px solid var(--line);cursor:pointer;
+  background:rgba(255,255,255,.05);font-weight:600;color:var(--text);text-align:left;display:flex;gap:10px;align-items:center;
+}
+.order-item .num{
+  flex:none;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.08);
+  display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--muted);
+}
+.order-item.picked{border-color:var(--accent);}
+.order-item.picked .num{background:var(--accent);color:#132038;}
+
+/* Einsatz (Finale) */
+.wager-wrap{margin-top:18px;}
+.wager-val{font-size:2.6rem;font-weight:900;color:var(--accent);text-align:center;margin:8px 0;}
+input[type=range]{width:100%;}
+
+/* ---------- Lehrkraft-Steuerleiste unten ---------- */
+.teachbar{
+  position:fixed;left:0;right:0;bottom:0;z-index:50;
+  display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;
+  padding:12px 14px;background:rgba(8,14,28,.94);border-top:1px solid var(--line);
+  backdrop-filter:blur(8px);
+}
+/* ---------- Hilfe-Overlay ---------- */
+.overlay{
+  position:fixed;inset:0;z-index:70;background:rgba(5,10,22,.82);backdrop-filter:blur(4px);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+}
+.overlay .inner{max-width:860px;max-height:86vh;overflow:auto;}
+.overlay h3{margin-top:18px;}
+.overlay table{width:100%;border-collapse:collapse;font-size:.95rem;}
+.overlay td,.overlay th{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left;}
+
+/* Toast */
+#toast{
+  position:fixed;left:50%;bottom:86px;transform:translateX(-50%);z-index:80;
+  background:var(--surface2);border:1px solid var(--line);color:var(--text);
+  padding:12px 20px;border-radius:12px;font-weight:700;box-shadow:var(--shadow);
+  opacity:0;transition:opacity .25s ease;pointer-events:none;
+}
+#toast.show{opacity:1;}
+
+@media (max-width:760px){
+  .opts{grid-template-columns:1fr;}
+  #modeSelect .hero{grid-template-columns:1fr;}
+  .task-layout,.lobby-hero,.finale-hero,.podium-hero{grid-template-columns:1fr;}
+  .task-art{min-height:190px;}
+  .task-art .img-slot{min-height:190px;}
+  .mode-cards{grid-template-columns:1fr;}
+  .avatar-pick{grid-template-columns:repeat(3,1fr);}
+}
+
+/* iPad / kleinere Laptop-Höhen: möglichst alles ohne Seitenscrollen zeigen. */
+@media (min-width:700px) and (max-height:1050px){
+  .screen{padding:14px 18px 26px;}
+  #boardScreen .screen{padding-bottom:72px;}
+  .boardbar{padding:7px 12px;margin:-5px -4px 10px;}
+  .boardbar .badge{padding:4px 8px;font-size:.72rem;}
+  .grid2{gap:10px;}
+  .card{padding:16px;}
+  .map-wrap{min-height:285px;}
+  .travel-map{height:100%;max-height:none;}
+  .scene-frame{min-height:185px;}
+  #modeSelect .hero .img-slot{min-height:270px;}
+  .task-layout{grid-template-columns:minmax(190px,.5fr) minmax(0,1.5fr);gap:10px;}
+  .task-art,.task-art .img-slot{min-height:235px;}
+  .task-q{font-size:clamp(1.15rem,2.1vw,1.65rem);margin:5px 0 12px;}
+  .opts{gap:8px;}
+  .opt{padding:11px 13px;font-size:1rem;}
+  .journey-strip{margin-bottom:10px;padding:7px 11px;}
+  .finale-hero .scene-frame,.podium-hero .scene-frame{min-height:205px;}
+  .podium{min-height:230px;margin:18px 0 8px;gap:12px;}
+  .pod{width:165px;gap:7px;}
+  .pod.p1 .sockel{height:120px;}
+  .pod.p2 .sockel{height:88px;}
+  .pod.p3 .sockel{height:64px;}
+  .pod .pname{font-size:1rem;}
+  .pod .pscore{font-size:.9rem;}
+  .standings{gap:7px;margin-top:10px;}
+  .stand-row{padding:8px 12px;gap:10px;}
+  .stand-row .name{font-size:1rem;}
+  .stand-row .score{font-size:1.15rem;}
+}
+
+/* Flexible Zwischenstufe: Tablet und schmale Desktopfenster. */
+@media (max-width:980px){
+  .screen{padding-left:16px;padding-right:16px;}
+  #modeSelect .hero{grid-template-columns:1fr 1fr;gap:14px;}
+  #modeSelect .hero .img-slot{min-height:300px;}
+  .mode-cards{gap:10px;}
+  .mode-card{padding:15px;}
+  .mode-card h3{font-size:1.05rem;}
+  .mode-card p{font-size:.88rem;}
+  .boardbar{gap:8px;padding-left:10px;padding-right:10px;}
+  .boardbar > .row:last-child{margin-left:auto;}
+  .task-layout{grid-template-columns:minmax(170px,.45fr) minmax(0,1.55fr);}
+  .task-art,.task-art .img-slot{min-height:260px;}
+  .task-q{font-size:clamp(1.15rem,2.5vw,1.7rem);}
+  .opt{font-size:1rem;padding:12px 14px;}
+  .pod{width:170px;}
+}
+
+/* Smartphones und schmale Hochkantansichten. */
+@media (max-width:760px){
+  .screen{padding:14px 12px 76px;}
+  #boardScreen .screen{padding-left:12px;padding-right:12px;}
+  .boardbar{align-items:flex-start;padding:8px 10px;margin:0 0 8px;}
+  .boardbar > .row:first-child{width:100%;}
+  .boardbar > .row:last-child{width:100%;margin-left:0;justify-content:flex-end;}
+  .boardbar .title{max-width:calc(100vw - 185px);font-size:.9rem;}
+  .boardbar .badge{font-size:.68rem;padding:4px 7px;}
+  .boardbar .btn.small{padding:7px 10px;}
+  #modeSelect .hero{grid-template-columns:1fr;}
+  #modeSelect .hero .img-slot{min-height:220px;}
+  #modeSelect h1{font-size:clamp(1.8rem,9vw,2.7rem) !important;}
+  #modeSelect > p{font-size:.95rem;}
+  .mode-cards{grid-template-columns:1fr 1fr;gap:8px;}
+  .mode-card{padding:13px 11px;}
+  .mode-card .em{font-size:1.6rem;}
+  .mode-card h3{font-size:1rem;}
+  .mode-card p{font-size:.82rem;line-height:1.4;}
+  .lobby-hero,.finale-hero,.podium-hero,.task-layout{grid-template-columns:1fr;}
+  .scene-frame,.task-art,.task-art .img-slot{min-height:185px;}
+  .journey-strip{gap:6px;padding:7px 9px;overflow:hidden;}
+  .journey-strip .stop{font-size:.68rem;}
+  .map-wrap{min-height:270px;}
+  .travel-map{height:auto;max-height:330px;}
+  .task-q{font-size:1.18rem;line-height:1.28;}
+  .opts{grid-template-columns:1fr;}
+  .opt{font-size:.98rem;padding:12px;}
+  .match-cols{grid-template-columns:1fr 1fr;gap:7px;}
+  .match-item,.order-item{font-size:.9rem;padding:10px;}
+  .teachbar{padding:8px 10px;gap:7px;}
+  .teachbar .btn{padding:9px 11px;font-size:.86rem;}
+  .podium{gap:7px;min-height:220px;margin-top:18px;}
+  .pod{width:31%;}
+  .pod .avatar.big{width:58px;height:58px;font-size:1.6rem;}
+  .pod .pname{font-size:.82rem;overflow-wrap:anywhere;}
+  .pod .pscore{font-size:.78rem;}
+  .version-badge{right:8px;bottom:7px;font-size:.64rem;padding:4px 7px;}
+}
+
+@media (max-width:430px){
+  .mode-cards{grid-template-columns:1fr;}
+  .mode-card{display:grid;grid-template-columns:auto 1fr;column-gap:10px;align-items:center;text-align:left;}
+  .mode-card .em{grid-row:span 2;}
+  .mode-card h3{margin:0 0 3px;}
+  .mode-card p{margin:0;}
+  .boardbar .title{max-width:calc(100vw - 150px);}
+  .boardbar > .row:last-child{gap:6px !important;}
+  .boardbar .badge.blue{max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .card{padding:14px;}
+  .stand-row{padding:8px 10px;gap:8px;}
+  .stand-row .avatar{width:34px;height:34px;}
+  .stand-row .rank{font-size:1rem;width:1.6rem;}
+  .stand-row .name{font-size:.9rem;}
+  .stand-row .score{font-size:1rem;}
+}
+</style>
+</head>
+<body>
+<div class="version-badge" aria-label="Versionsnummer">v1.1.0</div>
+
+<!-- ======================= MODUS-AUSWAHL ======================= -->
+<div id="modeSelect" class="screen">
+  <span class="badge">Q1 · Sozialwissenschaften LK · Abschlussspiel</span>
+  <h1 style="font-size:clamp(2.1rem,4.5vw,3.4rem);margin-top:14px;">Endspiel: Deutschlandreise</h1>
+  <p class="muted" style="max-width:70ch;">Eine Zugfahrt durch Deutschland – an jeder Station wartet ein Thema des Halbjahres:
+  soziale Ungleichheit, Modelle &amp; Theorien, sozialer Wandel, Sozialstaat und ein Wirtschafts-Bonus in Frankfurt.
+  Gespielt wird in Teams: Aufgaben erscheinen am Tafelbild, geantwortet wird am Tablet.</p>
+
+  <div class="hero">
+    <div class="mode-cards" style="margin-top:0;">
+      <button class="mode-card" onclick="startBoard()">
+        <span class="em">📺</span>
+        <h3>Tafelbild starten</h3>
+        <p>Beamer-Ansicht für die Lehrkraft: Aufgaben, Punkte, Steuerung, Siegerehrung.</p>
+      </button>
+      <button class="mode-card" onclick="showJoin()">
+        <span class="em">📱</span>
+        <h3>Als Team beitreten</h3>
+        <p>Tablet-Ansicht: Spielcode eingeben, Avatar wählen, losreisen.</p>
+      </button>
+      <button class="mode-card" onclick="startDemo()">
+        <span class="em">🧪</span>
+        <h3>Probelauf (1 Gerät)</h3>
+        <p>Tafelbild mit zwei simulierten Teams – zum Testen ohne Tablets.</p>
+      </button>
+      <button class="mode-card" onclick="toggleHelp(true)">
+        <span class="em">🗺️</span>
+        <h3>Ablauf &amp; Regeln</h3>
+        <p>Zeitplan (ca. 90–100 Min.), Punktesystem und Hinweise für die Lehrkraft.</p>
+      </button>
+    </div>
+    <div class="scene-frame">
+      <div class="img-slot" data-img="assets/img/hero-zugreise.png" data-em="🚆" data-ph="Titelbild: Reiseteam am Bahnsteig"></div>
+      <div class="scene-caption">Die Deutschlandreise beginnt<small>Gemeinsam einsteigen · gemeinsam denken · gemeinsam punkten</small></div>
+    </div>
+  </div>
+  <p class="sync-note" id="syncNote"></p>
+</div>
+
+<!-- ======================= TEAM-BEITRITT (TABLET) ======================= -->
+<div id="joinScreen" class="screen tablet hidden">
+  <span class="badge blue">Team-Anmeldung</span>
+  <h2 style="margin:12px 0 4px;">Steigt ein!</h2>
+  <p class="muted">Gebt den Spielcode vom Tafelbild ein und wählt euren Reise-Avatar.<br>
+  <strong>Wichtig:</strong> Als Teamname bitte einen Fantasienamen wählen – keine echten Namen von Personen.</p>
+  <div class="card" style="margin-top:14px;">
+    <label class="muted" style="font-weight:700;font-size:.9rem;">Spielcode</label>
+    <input type="text" id="joinCode" maxlength="4" placeholder="z. B. ZUG7" autocomplete="off"
+           style="text-transform:uppercase;letter-spacing:.35em;font-weight:900;font-size:1.6rem;text-align:center;">
+    <label class="muted" style="font-weight:700;font-size:.9rem;display:block;margin-top:14px;">Teamname (Fantasiename)</label>
+    <input type="text" id="joinName" maxlength="22" placeholder="z. B. Die Milieu-Millionäre" autocomplete="off">
+    <div id="avatarPick" class="avatar-pick"></div>
+    <button class="btn" style="width:100%;" onclick="joinGame()">Einsteigen 🚆</button>
+    <p class="muted" id="joinError" style="color:var(--bad);font-weight:700;min-height:1.2em;margin:10px 0 0;"></p>
+  </div>
+</div>
+
+<!-- ======================= TABLET: SPIEL ======================= -->
+<div id="teamScreen" class="screen tablet hidden">
+  <div class="tablet-head">
+    <div class="avatar" id="tAvatar"></div>
+    <div>
+      <div class="tname" id="tName">Team</div>
+      <div class="muted" style="font-size:.8rem;" id="tStation">Bahnhof</div>
+    </div>
+    <div class="tscore" id="tScore">0 P.</div>
+  </div>
+  <div id="tContent"></div>
+</div>
+
+<!-- ======================= TAFELBILD ======================= -->
+<div id="boardScreen" class="hidden">
+  <div class="boardbar">
+    <div class="row" style="gap:10px;">
+      <span class="badge">Endspiel Q1</span>
+      <span class="title" id="bStationTitle">Deutschlandreise</span>
+    </div>
+    <div class="row" style="gap:10px;">
+      <span class="badge blue" id="bCodeBadge" title="Spielcode">Code: –</span>
+      <div class="timer hidden" id="bTimer">–</div>
+      <button class="btn ghost small" onclick="toggleHelp(true)">Hilfe</button>
+    </div>
+  </div>
+  <div class="screen" style="padding-top:0;" id="bContent"></div>
+  <div class="teachbar" id="teachbar"></div>
+</div>
+
+<!-- ======================= HILFE ======================= -->
+<div id="helpOverlay" class="overlay hidden" onclick="if(event.target===this)toggleHelp(false)">
+  <div class="card inner">
+    <div class="row spread">
+      <h2>Ablauf &amp; Regeln</h2>
+      <button class="btn ghost small" onclick="toggleHelp(false)">Schließen ✕</button>
+    </div>
+    <h3>⏱️ Zeitplan (ca. 90–100 Minuten)</h3>
+    <table>
+      <tr><th>Phase</th><th>Dauer</th></tr>
+      <tr><td>Begrüßung, Teams bilden, Tablets verbinden</td><td>ca. 10 Min.</td></tr>
+      <tr><td>5 Stationen (Hamburg, Essen, Heidelberg, Berlin, Frankfurt) à ca. 14 Min.</td><td>ca. 70 Min.</td></tr>
+      <tr><td>Finale auf der Zugspitze (Risiko-Einsatz)</td><td>ca. 8 Min.</td></tr>
+      <tr><td>Siegerehrung</td><td>ca. 5 Min.</td></tr>
+    </table>
+    <p class="muted">Tipp: Jede Station lässt sich abkürzen – mit „Aufgabe überspringen“ bleibt der Zeitplan flexibel.
+    Wer schneller ist, nutzt die Reserveaufgaben (werden automatisch angehängt).</p>
+    <h3>🏅 Punktesystem</h3>
+    <table>
+      <tr><th>Aufgabentyp</th><th>Punkte</th></tr>
+      <tr><td>Quizfrage (Multiple Choice)</td><td>100 + Schnelligkeitsbonus bis 50</td></tr>
+      <tr><td>Zuordnung</td><td>30 je richtiges Paar</td></tr>
+      <tr><td>Reihenfolge</td><td>120 (komplett richtig) / 60 (halb richtig)</td></tr>
+      <tr><td>Schätzfrage</td><td>100 / 70 / 40 nach Nähe zur Lösung</td></tr>
+      <tr><td>Offene Aufgabe (Lehrkraft bewertet)</td><td>0–150</td></tr>
+      <tr><td>Finale</td><td>Einsatz bis 50 % des Punktestands: richtig = +Einsatz, falsch = −Einsatz</td></tr>
+    </table>
+    <h3>🔒 Datenschutz</h3>
+    <p class="muted">Teams melden sich nur mit Fantasienamen an – keine Klarnamen, keine personenbezogenen Daten.
+    Ohne Supabase-Konfiguration bleiben alle Daten auf den Geräten (lokaler Modus).</p>
+    <h3>🖼️ Bilder</h3>
+    <p class="muted">Alle Bildflächen sind Platzhalter und funktionieren auch ohne Dateien.
+    Die fertigen KI-Bilder einfach unter <code>assets/…</code> ablegen (Details: BILD-PROMPTS.md).</p>
+  </div>
+</div>
+
+<div id="toast"></div>
+<canvas id="confetti" class="hidden"></canvas>
+
+<script>
+/* ============================ KONFIGURATION ============================ */
+/* SUPABASE – WIRD GANZ AM SCHLUSS EINGERICHTET (siehe SUPABASE-SETUP.md).
+   Solange die beiden Werte leer sind, läuft das Spiel im lokalen Modus
+   (BroadcastChannel): Tafelbild + Tablets funktionieren dann nur im selben
+   Browser auf einem Gerät (Probelauf). Für den echten Einsatz mit Tablets
+   müssen die Werte gefüllt und die supabase.js eingebunden werden.       */
+const SUPABASE_URL = "https://vncppixrcmajosekowlv.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_gZUPazyvdw-WwF9umrj5Lw_RFHPDR7x";
+/* ====================================================================== */
+/* ============================ SPIELDATEN ============================ */
+/* Avatare: Bilddateien optional unter assets/avatars/, Emoji als Fallback */
+const AVATARS = [
+  {id:"moewe",   name:"Möwe Mia",       em:"🕊️", img:"assets/avatars/avatar-moewe.png"},
+  {id:"baer",    name:"Bär Bruno",      em:"🐻", img:"assets/avatars/avatar-baer.png"},
+  {id:"steinbock",name:"Steinbock Sepp",em:"🐐", img:"assets/avatars/avatar-steinbock.png"},
+  {id:"fuchs",   name:"Füchsin Frida",  em:"🦊", img:"assets/avatars/avatar-fuchs.png"},
+  {id:"igel",    name:"Igel Ingo",      em:"🦔", img:"assets/avatars/avatar-igel.png"},
+  {id:"hoernchen",name:"Hörnchen Hazel",em:"🐿️", img:"assets/avatars/avatar-hoernchen.png"},
+  {id:"taube",   name:"Taube Toni",     em:"🐦", img:"assets/avatars/avatar-taube.png"},
+  {id:"dackel",  name:"Dackel Waldi",   em:"🐕", img:"assets/avatars/avatar-dackel.png"},
+];
+
+/* Zeitvorgaben je Aufgabentyp (Sekunden) – Lehrkraft kann verlängern/pausieren */
+const TIMERS = {mc:60, match:120, order:90, est:45, open:300, finale:90};
+const PTS = {mc:100, mcBonus:50, matchPair:30, orderFull:120, orderHalf:60, est:[100,70,40], openMax:150};
+
+/* Aufgabentypen:
+   mc    – Multiple Choice: q, opts[4], c (Index), expl
+   match – Zuordnung: q, pairs[[links,rechts],...], expl
+   order – Reihenfolge: q, items[in korrekter Reihenfolge], expl
+   est   – Schätzfrage: q, ans (Zahl), unit, step, expl
+   open  – offene Aufgabe: q, focus (Erwartungshorizont), expl optional
+   r:true = Reserveaufgabe (wird ans Stationsende gehängt, bei Zeitnot überspringen) */
+
+const STATIONS = [
+{
+  id:"hamburg", city:"Hamburg", title:"Erscheinungsformen sozialer Ungleichheit",
+  em:"⚓", img:"assets/img/station-hamburg.png", mx:46, my:16,
+  intro:"Zwischen Elbphilharmonie und Veddel liegen nur wenige S-Bahn-Minuten – und Welten. Hier geht es um Dimensionen, Indikatoren und Messung sozialer Ungleichheit.",
+  tasks:[
+    {t:"mc", q:"Soziale Ungleichheit liegt im soziologischen Sinn vor, wenn …",
+      opts:["Menschen sich in Aussehen, Talenten oder Interessen unterscheiden.",
+            "wertvolle Güter einer Gesellschaft (z. B. Einkommen, Bildung, Macht, Prestige) dauerhaft ungleich verteilt sind und dadurch bessere oder schlechtere Lebenschancen entstehen.",
+            "der Staat unterschiedliche Steuersätze erhebt.",
+            "es in einer Gesellschaft überhaupt Regeln und Hierarchien gibt."],
+      c:1, expl:"Entscheidend ist die dauerhafte, strukturelle Ungleichverteilung wertvoller Güter, die Lebens- und Verwirklichungschancen prägt – nicht jede individuelle Verschiedenheit."},
+    {t:"mc", q:"„Das oberste Zehntel besitzt mehr als die Hälfte des Gesamtvermögens.“ – Diese Aussage ist …",
+      opts:["normativ, denn sie bewertet die Verteilung als ungerecht.",
+            "deskriptiv, denn sie beschreibt die Verteilung, ohne sie zu bewerten.",
+            "weder deskriptiv noch normativ, sondern eine Meinung.",
+            "normativ, weil Zahlen immer eine Wertung enthalten."],
+      c:1, expl:"Deskriptiv = beschreiben, normativ = bewerten. Ob diese Ungleichheit auch ungerecht ist, wäre eine zusätzliche normative Frage – genau die Unterscheidung aus dem Unterricht."},
+    {t:"match", q:"Ordnet jeder Dimension sozialer Ungleichheit einen passenden Indikator zu.",
+      pairs:[["Einkommen","Gender Pay Gap (Verdienstabstand in %)"],
+             ["Bildung","Anteil der Studierenden aus Nichtakademikerfamilien"],
+             ["Prestige / Ansehen","Rangliste des Berufsansehens (z. B. Ärztin vs. ungelernte Tätigkeit)"],
+             ["Macht","Frauenanteil in Vorständen großer Unternehmen"]],
+      expl:"Dimensionen (Was ist ungleich verteilt?) werden über Indikatoren (Woran messe ich das?) beobachtbar gemacht."},
+    {t:"mc", q:"Ein Haushalt: 2 Erwachsene, 2 Kinder unter 14 Jahren, 3.600 € Nettoeinkommen. Wie hoch ist das Nettoäquivalenzeinkommen (modifizierte OECD-Skala)?",
+      opts:["900 € – das Einkommen wird durch 4 Personen geteilt.",
+            "3.600 € – es zählt das Haushaltseinkommen.",
+            "ca. 1.714 € – das Einkommen wird durch das Gesamtgewicht 2,1 geteilt.",
+            "ca. 2.400 € – Kinder zählen gar nicht."],
+      c:2, expl:"Gewichte: 1,0 + 0,5 + 0,3 + 0,3 = 2,1 → 3.600 € ÷ 2,1 ≈ 1.714 €. Die Skala berücksichtigt, dass Haushalte gemeinsame Kosten teilen."},
+    {t:"mc", q:"Welches Gewicht erhält nach der modifizierten OECD-Skala jede weitere Person ab 14 Jahren im Haushalt?",
+      opts:["1,0","0,5","0,3","0,7"],
+      c:1, expl:"Erste erwachsene Person 1,0 – jede weitere Person ab 14 Jahren 0,5 – jedes Kind unter 14 Jahren 0,3."},
+    {t:"mc", q:"Was misst der bereinigte Gender Pay Gap – im Unterschied zum unbereinigten?",
+      opts:["Den Verdienstabstand zwischen allen Männern und Frauen insgesamt.",
+            "Den Verdienstabstand bei vergleichbarer Tätigkeit, Qualifikation und Erwerbsbiografie.",
+            "Den Unterschied bei den Renten von Männern und Frauen.",
+            "Den Anteil der Frauen, die in Teilzeit arbeiten."],
+      c:1, expl:"Der bereinigte Gap rechnet strukturelle Unterschiede (Branche, Teilzeit, Berufswahl …) heraus – es bleibt der Abstand „bei gleicher Arbeit“. Der unbereinigte Gap zeigt die gesamte Lücke."},
+    {t:"est", q:"Schätzt: Wie hoch war 2025 der Frauenanteil in den Führungsetagen großer deutscher Börsenunternehmen (in Prozent)?",
+      ans:29, unit:"%", step:1,
+      expl:"Rund 29 % (EU-Durchschnitt: ca. 34 %). 2014 lag der Anteil in deutschen Vorständen noch bei 4,9 % – ein Wandel, aber keine Parität."},
+    {t:"mc", q:"Als armutsgefährdet gilt in der EU-Statistik, wer …",
+      opts:["weniger als 60 % des mittleren Nettoäquivalenzeinkommens (Median) zur Verfügung hat.",
+            "weniger als 1.000 € im Monat verdient.",
+            "staatliche Leistungen wie Bürgergeld bezieht.",
+            "weniger als die Hälfte des Durchschnittslohns brutto verdient."],
+      c:0, expl:"Relative Armut wird am Median des Nettoäquivalenzeinkommens gemessen (60-%-Schwelle) – sie misst Teilhabe, nicht das bloße Überleben (absolute Armut)."},
+    {t:"open", q:"Aus dem Unterricht: „Eine Schülerin mit Lese-Rechtschreib-Schwäche bekommt 20 Minuten mehr Zeit in der Klassenarbeit.“ – Ordnet begründet ein: Liegt Gleichheit oder Ungleichheit vor? Ist das gerecht oder ungerecht? Nutzt die Begriffe deskriptiv und normativ.",
+      focus:"Erwartung: Deskriptiv liegt Ungleichbehandlung vor; normativ lässt sie sich als gerecht bewerten (Nachteilsausgleich → Chancengleichheit). Volle Punktzahl bei sauberer Begriffsverwendung + Begründung.",
+      expl:"Gleichbehandlung ist nicht automatisch gerecht – gerechte Ungleichbehandlung kann Chancengleichheit erst herstellen."},
+    {t:"mc", r:true, q:"Warum haben Kinder aus Akademikerfamilien im Bildungssystem statistisch Vorteile?",
+      opts:["Sie sind von Natur aus begabter.",
+            "Die Familien verfügen über mehr ökonomische, kulturelle und soziale Ressourcen – etwa Erfahrungswissen über Schule und Studium, Förderung und Netzwerke.",
+            "Lehrkräfte bevorzugen sie grundsätzlich absichtlich.",
+            "Es gibt keine messbaren Unterschiede nach Herkunft."],
+      c:1, expl:"Herkunft wirkt über Ressourcen: Förderung, Vorbilder, finanzielle Sicherheit, Vertrautheit mit dem Bildungssystem – so vererben sich Bildungschancen."},
+    {t:"mc", r:true, q:"Welcher davon ist KEIN gängiger Indikator für geschlechtsbezogene Ungleichheit auf dem Arbeitsmarkt?",
+      opts:["Teilzeitquote","Frauenanteil in Führungspositionen","Bereinigter Gender Pay Gap","Durchschnittliche Körpergröße"],
+      c:3, expl:"Teilzeitquote, Führungsquote und (bereinigter) Gender Pay Gap waren unsere Indikatoren – die Körpergröße sagt nichts über soziale Ungleichheit aus."},
+  ]
+},
+{
+  id:"essen", city:"Essen (Ruhrgebiet)", title:"Sozialer Wandel",
+  em:"⛏️", img:"assets/img/station-essen.png", mx:22, my:42,
+  intro:"Von der Zeche Zollverein zum Dienstleistungsstandort: Kaum eine Region zeigt den Strukturwandel so deutlich wie das Ruhrgebiet. Hier geht es um Wandel in Arbeit, Werten und Lebensformen.",
+  tasks:[
+    {t:"mc", q:"Was versteht man unter sozialem Wandel?",
+      opts:["Jede kurzfristige Veränderung, z. B. neue Moden oder Trends.",
+            "Die dauerhafte, grundlegende Veränderung der Sozialstruktur, der Institutionen und der Wertemuster einer Gesellschaft.",
+            "Den Wechsel der Regierung nach einer Bundestagswahl.",
+            "Die persönliche Entwicklung eines Menschen im Lebenslauf."],
+      c:1, expl:"Sozialer Wandel meint tiefgreifende, dauerhafte Veränderungen der Gesellschaft – z. B. Strukturwandel der Arbeit, Wertewandel, demografischer Wandel."},
+    {t:"match", q:"Ordnet die Begriffe der Drei-Sektoren-Hypothese richtig zu.",
+      pairs:[["Primärer Sektor","Landwirtschaft, Fischerei, Rohstoffgewinnung (z. B. Bergbau)"],
+             ["Sekundärer Sektor","Industrie und verarbeitendes Gewerbe"],
+             ["Tertiärer Sektor","Dienstleistungen (Handel, Pflege, Bildung, IT …)"],
+             ["Sektoraler Strukturwandel","Verschiebung der Beschäftigten zwischen den Sektoren"]],
+      expl:"Nach der Drei-Sektoren-Hypothese (Fourastié) wandern Beschäftigung und Wertschöpfung langfristig vom primären über den sekundären in den tertiären Sektor."},
+    {t:"mc", q:"Im Ruhrgebiet schlossen die Zechen, heute arbeiten die meisten Menschen dort in Logistik, Handel, Verwaltung oder Gesundheit. Das ist ein Beispiel für …",
+      opts:["Deindustrialisierung ohne Ersatz – die Region hat keine Arbeitsplätze mehr.",
+            "Tertiarisierung: den Übergang von der Industrie- zur Dienstleistungsgesellschaft.",
+            "den Übergang vom sekundären in den primären Sektor.",
+            "reinen technischen Fortschritt ohne gesellschaftliche Folgen."],
+      c:1, expl:"Der sozioökonomische Strukturwandel verschiebt Beschäftigung in den tertiären Sektor – mit Folgen für Qualifikationen, Städte und soziale Sicherheit."},
+    {t:"mc", q:"Was kennzeichnet prekäre Beschäftigungsverhältnisse?",
+      opts:["Jede Arbeit, die körperlich anstrengend ist.",
+            "Arbeitsverhältnisse, die für Arbeitnehmer unsicher sind und bei denen die Gefahr besteht, in Armut und soziale Ausgrenzung abzurutschen.",
+            "Alle Jobs ohne Homeoffice-Möglichkeit.",
+            "Beschäftigungen mit Tarifvertrag und Kündigungsschutz."],
+      c:1, expl:"Genau die Definition aus dem Unterricht: Unsicherheit + Armutsrisiko + drohende soziale Ausgrenzung."},
+    {t:"match", q:"Ordnet jeder Form prekärer Beschäftigung ihr zentrales Risiko zu.",
+      pairs:[["Befristete Beschäftigung","keine langfristige Sicherheit und Planbarkeit"],
+             ["Leih-/Zeitarbeit","geringer Schutz vor Arbeitslosigkeit"],
+             ["Minijob / geringfügige Beschäftigung","wenig Verdienst, kaum eigene soziale Absicherung"],
+             ["Unfreiwillige Teilzeit","Einkommen reicht trotz Arbeit kaum zum Leben"]],
+      expl:"Prekarität heißt: Erwerbsarbeit schützt nicht mehr zuverlässig vor Armut – Stress, finanzielle Sorgen und Zukunftsunsicherheit sind die Folgen."},
+    {t:"mc", q:"Der demografische Wandel in Deutschland wird als „doppelte Alterung“ beschrieben, weil …",
+      opts:["die Menschen älter werden und gleichzeitig früher in Rente gehen.",
+            "dauerhaft niedrige Geburtenzahlen und steigende Lebenserwartung zusammenwirken.",
+            "es immer mehr Pflegeheime und Krankenhäuser gibt.",
+            "junge Menschen doppelt so schnell altern wie früher."],
+      c:1, expl:"Von unten (wenige Geburten) und von oben (längeres Leben) verschiebt sich der Altersaufbau – der Altenquotient steigt."},
+    {t:"est", q:"Schätzt: Wie viele Kinder bekam eine Frau in Deutschland 2023 im Durchschnitt (zusammengefasste Geburtenziffer)?",
+      ans:1.35, unit:"Kinder je Frau", step:0.01,
+      expl:"2023 lag die zusammengefasste Geburtenziffer bei etwa 1,35 – deutlich unter dem „Bestandserhaltungsniveau“ von ca. 2,1."},
+    {t:"match", q:"Wandel der Werte: Ordnet den Theoretikern ihre Kernaussage zu.",
+      pairs:[["Ulrich Beck","Individualisierung: Menschen werden aus traditionellen Bindungen freigesetzt und müssen ihr Leben selbst gestalten"],
+             ["Ronald Inglehart","Wertewandel von materialistischen zu postmaterialistischen Werten"],
+             ["Helmut Klages","Wertesynthese: Verbindung von Pflicht- und Akzeptanzwerten mit Selbstentfaltungswerten"],
+             ["Bildungsexpansion","mehr höhere Abschlüsse verändern Rollenbilder und Lebensläufe"]],
+      expl:"Beck, Inglehart und Klages erklären denselben Wandel unterschiedlich – ihr habt sie in Gruppen erarbeitet und verglichen."},
+    {t:"mc", q:"Wodurch entsteht der Wertewandel nach Inglehart vor allem?",
+      opts:["Durch strengere Gesetze und staatliche Erziehung.",
+            "Durch wirtschaftlichen Wohlstand und soziale Sicherheit der Nachkriegsjahrzehnte – Knappheit prägt Werte, Sicherheit verschiebt sie.",
+            "Durch die sozialen Medien allein.",
+            "Durch Zuwanderung aus anderen Kulturen."],
+      c:1, expl:"Ingleharts Mangel- und Sozialisationshypothese: Wer in Sicherheit aufwächst, entwickelt eher postmaterialistische Werte (Mitbestimmung, Umwelt, Lebensqualität)."},
+    {t:"open", q:"„Früher war alles besser!“ – Nehmt zu dieser These fachlich Stellung: Nennt eine Chance UND ein Problem des sozialen Wandels und begründet mit einer Theorie (Beck, Inglehart oder Klages).",
+      focus:"Erwartung: z. B. Beck – Chance: mehr Freiheit, Selbstverwirklichung, individuelle Lebensplanung; Problem: Unsicherheit, Entscheidungsdruck, Verlust fester Orientierung. Theoriebezug + Beispiel = volle Punktzahl.",
+      expl:"Sozialer Wandel ist ambivalent: Er schafft Freiheiten und neue Unsicherheiten zugleich – genau das prüfen die Theorien."},
+    {t:"mc", r:true, q:"Was meint Klages mit „Wertesynthese“?",
+      opts:["Alte Werte verschwinden vollständig und werden ersetzt.",
+            "Traditionelle Pflicht- und Akzeptanzwerte verbinden sich mit modernen Selbstentfaltungswerten – etwa bei den „aktiven Realisten“.",
+            "Alle Menschen einigen sich auf dieselben Werte.",
+            "Werte spielen in modernen Gesellschaften keine Rolle mehr."],
+      c:1, expl:"Klages widerspricht einem reinen „Werteverfall“: Menschen kombinieren Disziplin und Engagement mit Selbstverwirklichung."},
+    {t:"mc", r:true, q:"„Pluralisierung der Lebensformen“ bedeutet …",
+      opts:["dass die klassische Kernfamilie gesetzlich abgeschafft wurde.",
+            "dass neben der Kernfamilie viele weitere Lebensformen (Alleinerziehende, Patchwork, Singles, gleichgeschlechtliche Paare, WGs) normal geworden sind.",
+            "dass Menschen heute seltener zusammenleben wollen.",
+            "dass alle Lebensformen rechtlich völlig gleichgestellt sind."],
+      c:1, expl:"Der Wandel der Lebensformen zeigt Individualisierung im Alltag: mehr Wahlmöglichkeiten, weniger Standardbiografie."},
+  ]
+},
+{
+  id:"heidelberg", city:"Heidelberg", title:"Modelle und Theorien sozialer Ungleichheit",
+  em:"🎓", img:"assets/img/station-heidelberg.png", mx:38, my:66,
+  intro:"Alte Universitätsstadt, große Theorien: Von Marx über Geiger bis zu Milieus und Individualisierung – wie lässt sich Gesellschaft überhaupt modellieren?",
+  tasks:[
+    {t:"mc", q:"Nach Karl Marx ist die Gesellschaft gespalten in …",
+      opts:["Ober-, Mittel- und Unterschicht.",
+            "Bourgeoisie (Besitz an Produktionsmitteln) und Proletariat (lohnabhängige Arbeit) – zwischen ihnen besteht ein Klassenkonflikt.",
+            "verschiedene Milieus mit unterschiedlichen Lebensstilen.",
+            "Eliten, Experten und Laien."],
+      c:1, expl:"Marx' Klassenmodell ist monofaktoriell: Allein der Besitz an Produktionsmitteln entscheidet – daraus folgt der Grundkonflikt zwischen den Klassen."},
+    {t:"mc", q:"Was unterscheidet Geigers Schichtmodell von Marx' Klassenmodell?",
+      opts:["Geiger verzichtet ganz auf die Einteilung in Gruppen.",
+            "Geiger schichtet multifaktoriell (u. a. Einkommen, Bildung, Beruf) und ergänzt die mittlere Lage – statt nur nach Besitz und Konflikt zu fragen.",
+            "Geiger sieht einen noch schärferen Klassenkampf als Marx.",
+            "Geiger untersucht nur die Oberschicht."],
+      c:1, expl:"Genau der Vergleich aus dem Unterricht: Besitz & Konflikt (Marx) vs. mehrere Kriterien & mittlere Lage (Geiger); Monofaktorität vs. Multifaktorität."},
+    {t:"match", q:"Ordnet jedem Modell seine Kernidee zu.",
+      pairs:[["Klassenmodell (Marx)","zwei Klassen, Konflikt um Besitz an Produktionsmitteln"],
+             ["Schichtmodell (Geiger)","Schichtung der Gesellschaft nach mehreren Merkmalen wie Einkommen, Bildung, Beruf"],
+             ["Hausmodell (Dahrendorf)","differenziertes Bild: von Eliten über Mittelschichten bis zur Unterschicht „unter einem Dach“"],
+             ["Sinus-Milieus","Gruppierung nach sozialer Lage UND Werten/Lebensstil"]],
+      expl:"Die Modelle wurden immer feiner: von zwei Klassen über Schichten bis zu Milieus, die auch Mentalitäten erfassen."},
+    {t:"mc", q:"Wozu brauchen Sozialwissenschaften überhaupt Modelle sozialer Ungleichheit?",
+      opts:["Um jede einzelne Person exakt zu beschreiben.",
+            "Sie reduzieren die Komplexität der Gesellschaft und machen Ungleichheit beschreibbar und vergleichbar – bleiben dabei aber immer vereinfachend.",
+            "Um zu beweisen, dass Ungleichheit gerecht ist.",
+            "Modelle sind veraltet und werden nicht mehr genutzt."],
+      c:1, expl:"Modelle sind Werkzeuge: Sie ordnen die Wirklichkeit, haben aber Grenzen – jedes Modell betont anderes und blendet anderes aus."},
+    {t:"mc", q:"Was besagt Rawls' „Schleier des Nichtwissens“?",
+      opts:["Menschen sollen Regeln für die Gesellschaft festlegen, ohne zu wissen, welche Position sie selbst darin einnehmen werden – so entstehen faire Regeln.",
+            "Bürger sollen möglichst wenig über Politik wissen.",
+            "Der Staat darf Informationen über Ungleichheit geheim halten.",
+            "Niemand kann Gerechtigkeit objektiv definieren, also ist alles erlaubt."],
+      c:0, expl:"Wer nicht weiß, ob er arm oder reich sein wird, wählt Regeln, die auch die Schwächsten absichern – euer Einstieg in die Reihe."},
+    {t:"mc", q:"Individualisierungsthese (Beck): Was bedeutet „jenseits von Klasse und Schicht“?",
+      opts:["Ungleichheit ist vollständig verschwunden.",
+            "Klassische Großgruppen verlieren an Prägekraft: Lebensläufe werden zunehmend zur eigenen Entscheidungs- und Gestaltungsaufgabe – Ungleichheit bleibt aber bestehen.",
+            "Alle Menschen gehören heute zur Mittelschicht.",
+            "Nur noch das Einkommen entscheidet über den Lebenslauf."],
+      c:1, expl:"Beck beschreibt die „Auflösung“ der Schichten als Erfahrungswelt – nicht das Ende der Ungleichheit. Freiheit und Risiko wachsen zugleich."},
+    {t:"order", q:"Bringt die Modelle in die Reihenfolge ihrer Entstehung – vom ältesten zum neuesten.",
+      items:["Klassenmodell (Marx, 19. Jahrhundert)","Schichtmodell (Geiger, 1930er)","Hausmodell (Dahrendorf, 1960er)","Milieu-/Lebensstilmodelle (z. B. Sinus, ab den 1980ern)"],
+      expl:"Die Modellgeschichte spiegelt den Wandel: Je moderner die Gesellschaft, desto weniger reicht ein einzelnes Merkmal zur Beschreibung."},
+    {t:"mc", q:"Pro-/Contra-Debatte „Ist Deutschland eine Klassengesellschaft?“: Welches Argument stützt die CONTRA-Position?",
+      opts:["Die Mehrheit arbeitet lohnabhängig, eine Minderheit verfügt über Kapital.",
+            "Bildungs- und Lebenschancen hängen stark von der sozialen Herkunft ab.",
+            "Sozialer Aufstieg ist möglich und heute eher die Regel; die politische Führung stammt überwiegend aus bürgerlichen Berufen.",
+            "Prekäre Arbeit, Leiharbeit und Niedriglohn nehmen zu."],
+      c:2, expl:"Contra (Material 7): Durchlässigkeit, gestiegener Wohlstand, Macht und Reichtum fallen nicht automatisch zusammen. Die anderen drei waren Pro-Argumente (Material 6)."},
+    {t:"open", q:"„Ist Deutschland eine Klassengesellschaft?“ – Formuliert EIN Argument (Position frei wählbar) streng nach dem Schema: These – Begründung – Beleg/Beispiel.",
+      focus:"Erwartung: klar erkennbare These, logische Begründung, konkreter Beleg (z. B. Lohnabhängigkeit/Herkunftseffekte für Pro; Aufstiegsmobilität/Wohlstandsanstieg für Contra). Schema eingehalten = Grundpunkte, Fachbegriffe = volle Punktzahl.",
+      expl:"These – Begründung – Beleg war euer Handwerkszeug der Pro-/Contra-Diskussion."},
+    {t:"mc", r:true, q:"Was unterscheidet Milieumodelle (z. B. Sinus) von klassischen Schichtmodellen?",
+      opts:["Sie ordnen Menschen nur nach ihrem Einkommen.",
+            "Sie berücksichtigen neben der sozialen Lage auch Werte, Einstellungen und Lebensstile.",
+            "Sie teilen die Gesellschaft in genau zwei Gruppen.",
+            "Sie gelten nur für andere Länder, nicht für Deutschland."],
+      c:1, expl:"Milieus verbinden die vertikale Dimension (Lage) mit der horizontalen (Grundorientierung) – gleiche Schicht, ganz verschiedene Lebenswelten."},
+    {t:"mc", r:true, q:"Warum gilt das Klassenmodell von Marx heute vielen als „unterkomplex“ – obwohl es weiterhin Besitzende und Nichtbesitzende gibt?",
+      opts:["Weil es keine Ungleichheit mehr gibt.",
+            "Weil moderne Gesellschaften durch Bildung, Beruf, Milieus und Lebensstile differenzierter sind, als es zwei Klassen abbilden können.",
+            "Weil Besitz heute keine Rolle mehr spielt.",
+            "Weil Marx nie Daten benutzt hat."],
+      c:1, expl:"Eure Bilanz aus dem Unterricht: Das Klassenmodell ist für moderne Gesellschaften zu grob, Geigers multifaktorieller Ansatz realistischer – wenn auch ebenfalls begrenzt."},
+  ]
+},
+{
+  id:"berlin", city:"Berlin", title:"Der Sozialstaat",
+  em:"🏛️", img:"assets/img/station-berlin.png", mx:74, my:24,
+  intro:"Regierungsviertel, Bundestag, Sozialgesetzbücher: Hier wird über Rente, Pflege und Bürgergeld entschieden. Wie funktioniert der deutsche Sozialstaat – und wie bleibt er zukunftsfest?",
+  tasks:[
+    {t:"match", q:"Ordnet den Prinzipien des Sozialstaats das passende Beispiel bzw. Merkmal zu.",
+      pairs:[["Versicherungsprinzip","Leistungen nach gezahlten Beiträgen, z. B. gesetzliche Rente"],
+             ["Versorgungsprinzip","steuerfinanzierte Leistungen für besondere Gruppen, z. B. Beamtenpensionen"],
+             ["Fürsorgeprinzip","Hilfe bei Bedürftigkeit nach Prüfung, z. B. Sozialhilfe/Bürgergeld"],
+             ["Subsidiaritätsprinzip","kleinere Einheiten (Familie, Träger) haben Vorrang, der Staat hilft nachrangig"]],
+      expl:"Die drei Leistungsprinzipien + Subsidiarität sind das Grundgerüst der sozialen Sicherung in Deutschland."},
+    {t:"mc", q:"Welche gehört NICHT zu den fünf Säulen der Sozialversicherung?",
+      opts:["Krankenversicherung","Rentenversicherung","Hausratversicherung","Arbeitslosenversicherung"],
+      c:2, expl:"Die fünf Säulen: Kranken-, Pflege-, Renten-, Unfall- und Arbeitslosenversicherung. Hausrat ist eine private Sachversicherung."},
+    {t:"mc", q:"Umlageverfahren und Generationenvertrag bedeuten:",
+      opts:["Jeder spart auf einem eigenen Konto für die eigene Rente an.",
+            "Die heutigen Beitragszahler finanzieren die heutigen Renten – im Vertrauen darauf, dass die nächste Generation dasselbe tut.",
+            "Der Staat zahlt alle Renten aus Steuern.",
+            "Renten werden aus den Gewinnen der Unternehmen bezahlt."],
+      c:1, expl:"Genau deshalb trifft der demografische Wandel die Rente so hart: weniger Einzahlende stehen mehr und länger lebenden Rentnern gegenüber."},
+    {t:"match", q:"Wohlfahrtsstaats-Typen im Vergleich – ordnet zu.",
+      pairs:[["Liberaler Typ (z. B. USA)","geringe staatliche Leistungen, Markt und Eigenverantwortung im Zentrum"],
+             ["Konservativer Typ (z. B. Deutschland)","Sicherung über beitragsfinanzierte Sozialversicherungen, statusorientiert"],
+             ["Sozialdemokratischer Typ (z. B. Schweden)","universelle, überwiegend steuerfinanzierte Leistungen für alle"],
+             ["Sozialstaatsgebot","Art. 20 GG: Deutschland ist ein „sozialer Bundesstaat“"]],
+      expl:"Die Typologie (nach Esping-Andersen) zeigt: Sozialstaat ist nicht gleich Sozialstaat – Umfang und Logik unterscheiden sich stark."},
+    {t:"match", q:"Warum gibt es soziale Sicherungssysteme? Ordnet den Theorien ihre Kernaussage zu.",
+      pairs:[["Funktionalistische Theorie","Antwort auf neue Risiken durch Industrialisierung und Modernisierung"],
+             ["Konflikttheorie","Ergebnis gesellschaftlicher Machtkämpfe, v. a. des Drucks der Arbeiterbewegung"],
+             ["Institutionelle Theorie","staatliche Institutionen handeln eigenständig und treiben soziale Sicherung voran"],
+             ["Theorie der Pfadabhängigkeit","einmal eingeschlagene Wege prägen die weitere Entwicklung der Systeme"]],
+      expl:"Eure Vergleichstabelle: vier Erklärungen für Entstehung und Beständigkeit des Sozialstaats – mit je eigenen Stärken und Grenzen."},
+    {t:"mc", q:"Die Alterssicherungskommission schlägt ein „Gesamtpaket“ vor. Welche Maßnahme gehört NICHT dazu?",
+      opts:["Schrittweise Anhebung des Renteneintrittsalters entsprechend der Lebenserwartung",
+            "Stärkere Einbeziehung von Selbstständigen in die gesetzliche Rentenversicherung",
+            "Einführung einer gesetzlichen kapitalgedeckten Zusatzrente",
+            "Abschaffung der gesetzlichen Rente zugunsten rein privater Vorsorge"],
+      c:3, expl:"Die Kommission will die gesetzliche Rente stabilisieren, nicht abschaffen – ergänzt um Kapitaldeckung, breitere Finanzierungsbasis und Maßnahmen gegen Altersarmut."},
+    {t:"est", q:"Schätzt: Wie viel Prozent seiner Wirtschaftsleistung (BIP) gibt Deutschland pro Jahr für Sozialleistungen aus (Sozialleistungsquote)?",
+      ans:30, unit:"% des BIP", step:1,
+      expl:"Rund 30 % – das Sozialbudget umfasst weit über eine Billion Euro pro Jahr und ist der größte Ausgabenblock des Staates."},
+    {t:"mc", q:"Welcher Zielkonflikt steckt im Kern der Rentenreform?",
+      opts:["Umweltschutz vs. Wirtschaftswachstum",
+            "Angemessene, stabile Renten vs. bezahlbare Beiträge und Steuerzuschüsse – also Verteilung der Lasten zwischen den Generationen",
+            "Mehr Urlaub vs. mehr Gehalt",
+            "Zentralstaat vs. Föderalismus"],
+      c:1, expl:"Die Kommission sucht den „Mittelweg“: Rentenniveau möglichst stabil halten, ohne Beiträge und Bundeszuschüsse unbegrenzt steigen zu lassen."},
+    {t:"open", q:"Bewertet den Vorschlag „Das Renteneintrittsalter steigt künftig mit der Lebenserwartung“: je EIN überzeugendes Pro- und Contra-Argument plus kurzes Fazit.",
+      focus:"Erwartung: Pro z. B. Finanzierbarkeit/längere Lebensarbeitszeit bei längerem Leben; Contra z. B. Belastung körperlich harter Berufe, ungleiche Lebenserwartung nach sozialer Lage. Begründetes Fazit = volle Punktzahl.",
+      expl:"Klassische Urteilsaufgabe: Kriterien nennen, abwägen, begründet entscheiden."},
+    {t:"mc", r:true, q:"Das Solidarprinzip der gesetzlichen Krankenversicherung bedeutet:",
+      opts:["Wer mehr zahlt, wird schneller behandelt.",
+            "Beiträge richten sich nach dem Einkommen, Leistungen nach dem medizinischen Bedarf.",
+            "Jeder zahlt denselben Betrag.",
+            "Nur Kranke müssen Beiträge zahlen."],
+      c:1, expl:"Starke Schultern tragen mehr als schwache – behandelt wird aber jeder nach Bedarf. Gegenprinzip: Äquivalenz in der Privatversicherung."},
+    {t:"mc", r:true, q:"Welche Entwicklung setzt den Sozialstaat aktuell am stärksten unter Druck?",
+      opts:["Sinkende Lebenserwartung",
+            "Der demografische Wandel: weniger Beitragszahler müssen mehr Leistungsempfänger finanzieren",
+            "Zu wenige Gesetze im Sozialbereich",
+            "Die Abschaffung der Sozialversicherungspflicht"],
+      c:1, expl:"Dazu kommen Kostendruck im Gesundheitswesen, Wandel der Arbeitswelt und die Finanzierung über den Bundeshaushalt."},
+  ]
+},
+{
+  id:"frankfurt", city:"Frankfurt a. M.", title:"Bonus: Wirtschaftspolitik",
+  em:"📈", img:"assets/img/station-frankfurt.png", mx:33, my:56,
+  intro:"Skyline, Börse, EZB: In der Bonus-Station geht es um wirtschaftspolitische Konzeptionen, das magische Viereck und den Konjunkturzyklus.",
+  tasks:[
+    {t:"match", q:"Das magische Viereck: Ordnet jedem Ziel den passenden Indikator zu.",
+      pairs:[["Preisniveaustabilität","Inflationsrate um ca. 2 %"],
+             ["Hoher Beschäftigungsstand","niedrige Arbeitslosenquote"],
+             ["Außenwirtschaftliches Gleichgewicht","ausgewogenes Verhältnis von Exporten und Importen"],
+             ["Stetiges und angemessenes Wirtschaftswachstum","Wachstum des realen BIP"]],
+      expl:"Die vier Ziele stehen seit 1967 im Stabilitätsgesetz – gemessen werden sie über genau diese Indikatoren."},
+    {t:"mc", q:"Warum heißt das magische Viereck „magisch“?",
+      opts:["Weil es von einem Zauberkünstler erfunden wurde.",
+            "Weil alle vier Ziele gleichzeitig kaum vollständig erreichbar sind – zwischen ihnen bestehen Zielkonflikte.",
+            "Weil die Ziele geheim gehalten werden.",
+            "Weil es sich jedes Jahr ändert."],
+      c:1, expl:"Beispiel: Ein kräftiger Boom senkt die Arbeitslosigkeit, treibt aber die Inflation – Preisstabilität und Vollbeschäftigung geraten in Konflikt."},
+    {t:"order", q:"Bringt die Phasen des Konjunkturzyklus in die richtige Reihenfolge – beginnend mit dem Aufschwung.",
+      items:["Aufschwung (Expansion)","Hochkonjunktur (Boom)","Abschwung (Rezession)","Tiefphase (Depression)"],
+      expl:"Danach beginnt der Zyklus von vorn. Beobachtet wird er v. a. am realen BIP, an Auftragslage, Beschäftigung und Preisen."},
+    {t:"mc", q:"Von einer Rezession spricht man üblicherweise, wenn …",
+      opts:["die Inflation über 2 % steigt.",
+            "das reale BIP in zwei aufeinanderfolgenden Quartalen schrumpft.",
+            "die Börsenkurse an einem Tag stark fallen.",
+            "der Staat neue Schulden aufnimmt."],
+      c:1, expl:"Die „technische“ Definition: zwei Quartale negatives Wachstum in Folge."},
+    {t:"mc", q:"Kern der nachfrageorientierten Wirtschaftspolitik (nach Keynes) ist:",
+      opts:["Der Staat hält sich aus der Wirtschaft vollständig heraus.",
+            "In der Krise stützt der Staat die gesamtwirtschaftliche Nachfrage – antizyklisch, notfalls über Kredite (deficit spending).",
+            "Die Zentralbank druckt dauerhaft Geld für alle Bürger.",
+            "Unternehmen werden verstaatlicht."],
+      c:1, expl:"Logik: Krisen entstehen aus Nachfragemangel. Staatliche Ausgabenprogramme springen ein, bis private Nachfrage wieder trägt – im Boom wird gespart."},
+    {t:"mc", q:"Kern der angebotsorientierten Wirtschaftspolitik ist:",
+      opts:["Der Staat erhöht in der Krise sofort das Kindergeld.",
+            "Bessere Produktions- und Investitionsbedingungen für Unternehmen – z. B. Steuern senken, Bürokratie abbauen, Lohnzusatzkosten begrenzen – stärken mittelfristig Wachstum und Beschäftigung.",
+            "Löhne werden staatlich festgelegt.",
+            "Importe werden verboten, um das Angebot zu schützen."],
+      c:1, expl:"Logik: Wer investiert, schafft Arbeitsplätze. Der Staat setzt Rahmenbedingungen und vertraut auf die Selbstheilung der Märkte."},
+    {t:"match", q:"Ordnet die Maßnahmen der jeweiligen Konzeption zu.",
+      pairs:[["Konjunkturpaket: Staat erhöht Ausgaben in der Krise","nachfrageorientiert"],
+             ["Senkung der Unternehmenssteuern","angebotsorientiert"],
+             ["Abbau von Bürokratie und Regulierung","angebotsorientiert"],
+             ["Öffentliche Investitionsprogramme zur Belebung der Konjunktur","nachfrageorientiert"]],
+      expl:"Merkhilfe: Nachfrageorientierung setzt kurzfristig beim Konsum an, Angebotsorientierung mittelfristig bei den Produktionsbedingungen."},
+    {t:"est", q:"Schätzt: Wie hoch war die Arbeitslosenquote in Deutschland im Jahresdurchschnitt 2024 (in Prozent)?",
+      ans:6.0, unit:"%", step:0.1,
+      expl:"Rund 6,0 % (Bundesagentur für Arbeit) – gemessen als Anteil der registrierten Arbeitslosen an den zivilen Erwerbspersonen."},
+    {t:"open", q:"Krisenstab! Deutschland steckt in einer Rezession, die Arbeitslosigkeit steigt. Euer Team berät die Bundesregierung: Entscheidet euch für eine Konzeption (angebots- ODER nachfrageorientiert), nennt zwei konkrete Maßnahmen und begründet mit Blick auf das magische Viereck.",
+      focus:"Erwartung: Konzeption klar benannt, zwei passende Maßnahmen (z. B. Konjunkturpaket + Kurzarbeitergeld ODER Steuersenkung + Bürokratieabbau), Begründung über Ziele/Zielkonflikte des magischen Vierecks.",
+      expl:"In der Realität kombinieren Regierungen oft beide Ansätze – entscheidend ist die schlüssige Begründung."},
+    {t:"mc", r:true, q:"Antizyklische Fiskalpolitik bedeutet:",
+      opts:["Der Staat spart in der Krise und gibt im Boom mehr aus.",
+            "Der Staat gibt in der Krise mehr aus bzw. senkt Steuern – und spart im Boom, um Rücklagen zu bilden.",
+            "Die Steuern bleiben immer gleich.",
+            "Die Zentralbank legt den Staatshaushalt fest."],
+      c:1, expl:"„Gegen den Zyklus“ steuern: Nachfragelücken füllen, Überhitzung bremsen. Praktisches Problem: Im Boom zu sparen ist politisch unbeliebt."},
+    {t:"mc", r:true, q:"Im Boom steigen die Preise deutlich. Die Regierung bremst die Konjunktur. Welche Ziele des magischen Vierecks geraten dabei typischerweise in Konflikt?",
+      opts:["Preisniveaustabilität und hoher Beschäftigungsstand",
+            "Außenwirtschaftliches Gleichgewicht und Umweltschutz",
+            "Wachstum und Digitalisierung",
+            "Es gibt keine Konflikte zwischen den Zielen."],
+      c:0, expl:"Wer die Inflation bekämpft, riskiert kurzfristig Wachstum und Jobs – der klassische Zielkonflikt im magischen Viereck."},
+  ]
+}
+];
+
+/* ---------- Finale (Zugspitze): Risiko-Einsatz + Finalfrage ---------- */
+const FINALE = {
+  id:"zugspitze", city:"Zugspitze", title:"Das Finale", em:"🏔️",
+  img:"assets/img/station-zugspitze.png", mx:56, my:88,
+  intro:"2.962 Meter über dem Alltag: Setzt bis zu 50 % eurer Punkte auf die Finalfrage. Richtig = Einsatz dazu, falsch = Einsatz weg!",
+  questions:[
+    {t:"mc", q:"FINALE – Warum trifft die „doppelte Alterung“ das Umlageverfahren der Rentenversicherung besonders hart?",
+      opts:["Weil ältere Menschen höhere Beiträge zahlen müssen.",
+            "Weil gleichzeitig die Zahl der Beitragszahler sinkt UND Rentnerinnen und Rentner länger Rente beziehen – das Verhältnis verschiebt sich von zwei Seiten.",
+            "Weil das Umlageverfahren nur bei wachsender Bevölkerung verboten ist.",
+            "Weil Kapitalerträge im Alter steigen."],
+      c:1, expl:"Weniger Geburten = weniger Einzahler; höhere Lebenserwartung = längere Rentenbezugsdauer. Genau hier setzen die Reformvorschläge der Alterssicherungskommission an."},
+    {t:"mc", q:"FINALE – Beck beschreibt den „Fahrstuhleffekt“. Was ist damit gemeint?",
+      opts:["Wer hart arbeitet, fährt im Fahrstuhl nach oben – sozialer Aufstieg ist garantiert.",
+            "Die ganze Gesellschaft fährt „eine Etage höher“ (mehr Wohlstand, Bildung, Freizeit) – die Abstände zwischen den sozialen Lagen bleiben aber bestehen.",
+            "Arme fahren nach unten, Reiche nach oben – die Schere öffnet sich zwingend.",
+            "Der Aufstieg ist nur mit akademischer Bildung möglich."],
+      c:1, expl:"Gestiegener Lebensstandard für (fast) alle – aber relative Ungleichheit bleibt. Deshalb fühlt sich Ungleichheit trotz Wohlstands nicht erledigt an."},
+    {t:"mc", q:"FINALE – Eine Regierung senkt in der Rezession die Unternehmenssteuern und kürzt zugleich Sozialausgaben. Wie ist das einzuordnen – und welches Risiko besteht?",
+      opts:["Nachfrageorientiert; Risiko: Inflation durch zu viel Kaufkraft.",
+            "Angebotsorientiert; Risiko: Die gesamtwirtschaftliche Nachfrage sinkt kurzfristig weiter, soziale Härten verschärfen die Krise.",
+            "Antizyklische Fiskalpolitik nach Keynes; Risiko: Staatsverschuldung.",
+            "Magisches Viereck; Risiko: keines, alle Ziele werden erreicht."],
+      c:1, expl:"Steuersenkung für Unternehmen + Ausgabenkürzung = klassisch angebotsorientiert. Keynesianer warnen: In der Krise kann das die Nachfragelücke vergrößern."}
+  ]
+};
+/* ============================ HILFSFUNKTIONEN ============================ */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+const KEYS = ["A","B","C","D","E","F"];
+
+function toast(msg){
+  const t = $("toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2600);
+}
+/* Deterministisches Mischen: alle Geräte sehen dieselbe Reihenfolge */
+function seededShuffle(arr, seed){
+  const a = arr.slice();
+  let s = 0; for(const ch of String(seed)) s = (s * 31 + ch.charCodeAt(0)) % 2147483647;
+  for(let i = a.length - 1; i > 0; i--){
+    s = (s * 48271) % 2147483647;
+    const j = s % (i + 1); [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+/* Bild-Platzhalter: zeigt KI-Bild, wenn Datei existiert – sonst gestalteten Platzhalter */
+function imgSlotHTML(src, em, label, style){
+  return `<div class="img-slot" ${style ? `style="${style}"` : ""} data-img="${esc(src)}" data-em="${esc(em)}" data-ph="${esc(label)}"></div>`;
+}
+function hydrateImgSlots(root){
+  (root || document).querySelectorAll(".img-slot:not([data-done])").forEach(slot => {
+    slot.dataset.done = "1";
+    const src = slot.dataset.img, em = slot.dataset.em || "🖼️", ph = slot.dataset.ph || "";
+    const img = new Image();
+    img.onload = () => { slot.innerHTML = ""; slot.appendChild(img); };
+    img.onerror = () => { slot.innerHTML = `<div class="ph"><span class="em">${esc(em)}</span><span>${esc(ph)}</span></div>`; };
+    img.src = src;
+  });
+}
+function avatarHTML(avatarId, cls){
+  const av = AVATARS.find(a => a.id === avatarId) || AVATARS[0];
+  return `<span class="avatar ${cls || ""}" data-avimg="${esc(av.img)}" data-avem="${esc(av.em)}">${esc(av.em)}</span>`;
+}
+function hydrateAvatars(root){
+  (root || document).querySelectorAll("[data-avimg]:not([data-done])").forEach(el => {
+    el.dataset.done = "1";
+    const img = new Image();
+    img.onload = () => { el.innerHTML = ""; el.appendChild(img); };
+    img.src = el.dataset.avimg; /* bei Fehler bleibt das Emoji stehen */
+  });
+}
+function randomCode(){
+  const C = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let out = ""; for(let i = 0; i < 4; i++) out += C[Math.floor(Math.random() * C.length)];
+  return out;
+}
+/* Öffentliche Aufgaben-Variante für Tablets: ohne Lösungen */
+function publicTask(task, seed){
+  if(!task) return null;
+  const p = {t:task.t, q:task.q};
+  if(task.t === "mc")    p.opts = task.opts;
+  if(task.t === "match"){
+    p.left  = task.pairs.map(x => x[0]);
+    p.right = seededShuffle(task.pairs.map(x => x[1]), seed + "r");
+  }
+  if(task.t === "order") p.items = seededShuffle(task.items.map((it, i) => ({i, txt:it})), seed + "o");
+  if(task.t === "est"){ p.unit = task.unit; p.step = task.step || 1; }
+  if(task.t === "open") p.hint = "Kurz und präzise antworten – die Lehrkraft bewertet eure Antwort am Tafelbild.";
+  return p;
+}
+
+/* ============================ SYNC-SCHICHT ============================
+   Board = einzige Wahrheitsquelle. Nachrichten:
+   Team → Board:  {kind:"join"|"answer"|"wager", ...}
+   Board → Teams: {kind:"state", state:{...}}  (ohne Lösungen)
+   LOKALER MODUS  : BroadcastChannel – nur Tabs desselben Browsers (Probelauf).
+   SUPABASE MODUS : Realtime-Broadcast über einen Channel je Spielcode.
+                    Es werden KEINE Daten in Tabellen gespeichert (Datenschutz!).
+                    Aktivierung: SUPABASE_URL/KEY oben füllen + supabase.js einbinden
+                    (Anleitung: SUPABASE-SETUP.md).                             */
+class LocalBackend{
+  constructor(code, onMsg){
+    this.bc = new BroadcastChannel("endspiel-" + code);
+    this.bc.onmessage = e => onMsg(e.data);
+    this.ready = Promise.resolve();
+  }
+  send(msg){ this.bc.postMessage(msg); }
+  close(){ this.bc.close(); }
+}
+class SupabaseBackend{
+  constructor(code, onMsg){
+    const client = window.__sb || (window.__sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY));
+    this.ch = client.channel("endspiel-" + code, {config:{broadcast:{self:false}}});
+    this.ch.on("broadcast", {event:"msg"}, p => onMsg(p.payload));
+    this.ready = new Promise(res => this.ch.subscribe(s => { if(s === "SUBSCRIBED") res(); }));
+  }
+  send(msg){ this.ch.send({type:"broadcast", event:"msg", payload:msg}); }
+  close(){ this.ch.unsubscribe(); }
+}
+function supabaseActive(){
+  return !!(SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase);
+}
+function makeBackend(code, onMsg){
+  if(supabaseActive()) return new SupabaseBackend(code, onMsg);
+  return new LocalBackend(code, onMsg);
+}
+/* ============================ TAFELBILD (BOARD) ============================ */
+const board = {
+  active:false, code:null, backend:null, demo:false,
+  teams:{},            // id -> {id, name, avatar, score}
+  screen:"lobby",      // lobby | intro | task | standings | wager | finale | podium
+  stationIdx:0, taskIdx:0,
+  phase:"answering",   // answering | revealed
+  answers:{},          // taskKey -> { teamId: {payload, at} }
+  results:{},          // taskKey -> { teamId: {pts, detail} }
+  wagers:{},           // teamId -> Zahl
+  finaleQ:0,
+  deadline:null, paused:null, timerH:null, heartbeatH:null,
+};
+const taskKey = () => board.screen === "finale" ? "finale" : `${board.stationIdx}-${board.taskIdx}`;
+const curStation = () => STATIONS[board.stationIdx];
+const curTask = () => board.screen === "finale" ? FINALE.questions[board.finaleQ] : curStation()?.tasks[board.taskIdx];
+const teamList = () => Object.values(board.teams).sort((a, b) => b.score - a.score);
+
+function startBoard(demo){
+  const saved = localStorage.getItem("endspiel-board");
+  if(saved && !demo){
+    try{
+      const s = JSON.parse(saved);
+      if(s.code && confirm(`Gespeichertes Spiel ${s.code} gefunden (${Object.keys(s.teams||{}).length} Teams). Fortsetzen?\n\n„Abbrechen“ startet ein neues Spiel.`)){
+        Object.assign(board, s);
+      } else localStorage.removeItem("endspiel-board");
+    }catch(e){ localStorage.removeItem("endspiel-board"); }
+  }
+  board.active = true;
+  board.demo = !!demo;
+  if(!board.code) board.code = randomCode();
+  board.backend = makeBackend(board.code, onBoardMsg);
+  if(demo){
+    board.teams["demo1"] = {id:"demo1", name:"Team Bahnsteig 9¾", avatar:"fuchs", score:0};
+    board.teams["demo2"] = {id:"demo2", name:"Die Pendler", avatar:"baer", score:0};
+  }
+  $("modeSelect").classList.add("hidden");
+  $("boardScreen").classList.remove("hidden");
+  clearInterval(board.heartbeatH);
+  board.heartbeatH = setInterval(broadcastState, 4000);
+  renderBoard();
+}
+function startDemo(){ startBoard(true); }
+
+function saveBoard(){
+  const {backend, timerH, heartbeatH, ...rest} = board;
+  try{ localStorage.setItem("endspiel-board", JSON.stringify(rest)); }catch(e){}
+}
+
+/* ---- Nachrichten der Teams ---- */
+function onBoardMsg(msg){
+  if(!board.active || !msg || !msg.kind) return;
+  if(msg.kind === "join"){
+    const t = msg.team || {};
+    if(!t.id || !t.name) return;
+    const known = board.teams[t.id];
+    board.teams[t.id] = {id:t.id, name:String(t.name).slice(0, 22), avatar:t.avatar, score:known ? known.score : 0};
+    if(!known && teamList().length > 8){ delete board.teams[t.id]; return; }
+    saveBoard(); broadcastState();
+    if(board.screen === "lobby") renderBoard(); else renderAnswerStatus();
+    return;
+  }
+  if(!board.teams[msg.teamId]) return;
+  if(msg.kind === "answer"){
+    if(board.phase !== "answering") return;
+    if(msg.taskKey !== taskKey()) return;
+    const bucket = board.answers[msg.taskKey] || (board.answers[msg.taskKey] = {});
+    if(bucket[msg.teamId]) return;                       // erste Antwort zählt
+    bucket[msg.teamId] = {payload:msg.payload, at:Date.now()};
+    saveBoard(); renderAnswerStatus(); broadcastState();
+  }
+  if(msg.kind === "wager" && board.screen === "wager"){
+    const max = Math.floor((board.teams[msg.teamId].score || 0) / 2);
+    board.wagers[msg.teamId] = Math.max(0, Math.min(max, Math.round(msg.amount || 0)));
+    saveBoard(); renderBoard(); broadcastState();
+  }
+}
+
+/* ---- Zustand an die Tablets senden (ohne Lösungen) ---- */
+function broadcastState(){
+  if(!board.backend) return;
+  const key = taskKey();
+  const st = {
+    code:board.code, screen:board.screen, stationIdx:board.stationIdx,
+    phase:board.phase, taskKey:key, now:Date.now(),
+    deadline:board.deadline, paused:!!board.paused,
+    station:{city:(board.screen === "finale" || board.screen === "wager") ? FINALE.city : curStation()?.city, em:(board.screen === "finale" || board.screen === "wager") ? FINALE.em : curStation()?.em},
+    teams:teamList().map(t => ({id:t.id, name:t.name, avatar:t.avatar, score:t.score})),
+    answered:Object.keys(board.answers[key] || {}),
+    wagers:board.wagers,
+  };
+  if(board.screen === "task" || board.screen === "finale"){
+    st.task = publicTask(curTask(), board.code + key);
+    if(board.phase === "revealed"){
+      st.results = board.results[key] || {};
+      st.solution = solutionText(curTask());
+    }
+  }
+  board.backend.send({kind:"state", state:st});
+}
+function solutionText(task){
+  if(!task) return "";
+  if(task.t === "mc")    return task.opts[task.c] + (task.expl ? "\n\n" + task.expl : "");
+  if(task.t === "match") return task.pairs.map(p => `${p[0]} → ${p[1]}`).join("\n") + (task.expl ? "\n\n" + task.expl : "");
+  if(task.t === "order") return task.items.map((it, i) => `${i + 1}. ${it}`).join("\n") + (task.expl ? "\n\n" + task.expl : "");
+  if(task.t === "est")   return `Lösung: ${task.ans} ${task.unit}` + (task.expl ? "\n\n" + task.expl : "");
+  if(task.t === "open")  return task.expl || "";
+  return "";
+}
+
+/* ---- Reisekarte (SVG) ---- */
+function mapSVG(){
+  const pts = [...STATIONS.map((s, i) => ({...s, idx:i})), {...FINALE, idx:STATIONS.length}];
+  const doneUpto = board.screen === "podium" ? STATIONS.length + 1
+    : (board.screen === "wager" || board.screen === "finale") ? STATIONS.length
+    : board.stationIdx;
+  const activeIdx = Math.min(doneUpto, pts.length - 1);
+  const shortCity = city => city.replace(" (Ruhrgebiet)", "").replace(" a. M.", "");
+  let routes = "";
+  for(let i = 0; i < pts.length - 1; i++){
+    const a = pts[i], b = pts[i + 1];
+    const routeClass = i < doneUpto ? "done" : (i === activeIdx - 1 ? "active-route" : "");
+    routes += `<path class="map-route ${routeClass}" d="M${a.mx},${a.my} Q${(a.mx + b.mx) / 2 + 6},${(a.my + b.my) / 2 - 6} ${b.mx},${b.my}"/>`;
+  }
+  let stations = "";
+  pts.forEach(s => {
+    const cls = s.idx < doneUpto ? "done" : (s.idx === doneUpto ? "active" : "");
+    stations += `<g class="map-station ${cls}">
+      <circle class="halo" cx="${s.mx}" cy="${s.my}" r="${s.idx === doneUpto ? 3.8 : 3.15}"/>
+      <circle class="dot" cx="${s.mx}" cy="${s.my}" r="2.25"/>
+      <text x="${s.mx}" y="${s.my - 5.5}" text-anchor="middle">${esc(s.em)} ${esc(shortCity(s.city))}</text>
+      <text class="station-sub" x="${s.mx}" y="${s.my + 6.8}" text-anchor="middle">${s.idx === doneUpto ? "AKTUELLER HALT" : s.idx < doneUpto ? "ERLEDIGT" : "NÄCHSTER HALT"}</text>
+    </g>`;
+  });
+  const train = pts[activeIdx];
+  const previous = pts[Math.max(0, activeIdx - 1)];
+  const trainPath = activeIdx > 0
+    ? `M${previous.mx},${previous.my} Q${(previous.mx + train.mx) / 2 + 6},${(previous.my + train.my) / 2 - 6} ${train.mx},${train.my}`
+    : `M${train.mx},${train.my} L${train.mx},${train.my}`;
+  return `<svg class="travel-map" viewBox="0 0 100 110" role="img" aria-label="Reisekarte mit ICE-Route durch Deutschland">
+    <defs><linearGradient id="mapShine" x1="0" x2="1"><stop offset="0" stop-color="#4dc9ff"/><stop offset="1" stop-color="#ffcf4d"/></linearGradient></defs>
+    <image class="map-image" href="assets/img/reisekarte-deutschland.png" x="0" y="0" width="100" height="110" preserveAspectRatio="xMidYMid slice"/>
+    <rect x="0" y="0" width="100" height="110" fill="#0e1a2f" fill-opacity=".16"/>
+    ${routes}${stations}
+    <g class="map-train" aria-hidden="true">
+      <!-- Der KI-ICE bleibt bewusst aufrecht; die Route darf ihn nicht auf den Kopf drehen. -->
+      <animateMotion dur="2.6s" begin="0s" fill="freeze" rotate="0" path="${trainPath}"/>
+      <image class="map-train-image" href="assets/img/ice-reise.png" x="-8" y="-4.1" width="16" height="8.2" preserveAspectRatio="xMidYMid meet"/>
+    </g>
+  </svg>`;
+}
+/* ---- Rendering Tafelbild ---- */
+function renderBoard(){
+  const c = $("bContent");
+  const s = curStation();
+  $("bCodeBadge").textContent = "Code: " + board.code + (supabaseActive() ? "" : " · lokal");
+  $("bStationTitle").textContent =
+    board.screen === "lobby" ? "Deutschlandreise – Abfahrt" :
+    board.screen === "wager" || board.screen === "finale" ? `${FINALE.em} ${FINALE.city}: ${FINALE.title}` :
+    board.screen === "podium" ? "🏆 Siegerehrung" :
+    s ? `Station ${board.stationIdx + 1}/5 · ${s.em} ${s.city}: ${s.title}` : "";
+
+  if(board.screen === "lobby") renderLobby(c);
+  else if(board.screen === "intro") renderIntro(c);
+  else if(board.screen === "task") renderTask(c);
+  else if(board.screen === "standings") renderStandings(c);
+  else if(board.screen === "wager") renderWager(c);
+  else if(board.screen === "finale") renderTask(c);
+  else if(board.screen === "podium") renderPodium(c);
+  renderTeachbar();
+  hydrateImgSlots(c); hydrateAvatars(c);
+  saveBoard(); broadcastState();
+}
+
+function renderLobby(c){
+  const url = location.href.split("#")[0].split("?")[0];
+  c.innerHTML = `
+    <div class="lobby-hero">
+      <div class="card" style="text-align:center;">
+        <span class="badge blue">So steigt ihr ein</span>
+        <h2 style="margin:12px 0 0;">Abfahrt am Hauptbahnhof</h2>
+        <p class="muted" style="margin:12px 0 4px;">Diese Seite am Tablet öffnen → „Als Team beitreten“ → Code eingeben:</p>
+        <div class="joincode">${esc(board.code)}</div>
+        <p class="muted" style="font-size:.85rem;word-break:break-all;">${esc(url)}</p>
+        <p class="muted" style="font-size:.85rem;">⚠️ Teamnamen sind Fantasienamen – keine echten Namen!</p>
+      </div>
+      <div class="scene-frame"><div class="img-slot" data-img="assets/img/lobby-bahnhof.png" data-em="🚉" data-ph="Bild: Startbahnhof der Deutschlandreise"></div><div class="scene-caption">Alle Teams bitte einsteigen<small>Der Zug wartet auf eure Reise-Avatare.</small></div></div>
+    </div>
+    <div class="card" style="margin-top:14px;">
+      <h3>Teams am Bahnsteig (${teamList().length}/8)</h3>
+      <div class="lobby-teams" id="lobbyTeams"></div>
+    </div>`;
+  renderLobbyTeams();
+}
+function renderLobbyTeams(){
+  const el = $("lobbyTeams"); if(!el) return;
+  el.innerHTML = teamList().map(t =>
+    `<span class="team-chip" title="Klick: Team entfernen" onclick="removeTeam('${t.id}')">${avatarHTML(t.avatar)} ${esc(t.name)}</span>`
+  ).join("") || `<span class="muted">Noch niemand da – die Tablets können jetzt beitreten.</span>`;
+  hydrateAvatars(el);
+}
+function removeTeam(id){
+  if(board.screen !== "lobby") return;
+  if(confirm(`Team „${board.teams[id]?.name}“ entfernen?`)){ delete board.teams[id]; renderBoard(); }
+}
+
+function renderIntro(c){
+  const s = curStation();
+  c.innerHTML = `
+    <div class="journey-strip"><span class="stop">🚆 Start</span><span class="line"></span><span class="stop">${esc(s.em)} ${esc(s.city)}</span><span class="line"></span><span class="stop muted-stop">Nächster Halt</span></div>
+    <div class="grid2">
+      <div class="card map-wrap">${mapSVG()}</div>
+      <div style="display:grid;gap:14px;">
+        <div class="scene-frame"><div class="img-slot" data-img="${esc(s.img)}" data-em="${esc(s.em)}" data-ph="Bild: ${esc(s.city)}"></div><div class="scene-caption">${esc(s.city)}<small>${esc(s.title)}</small></div></div>
+        <div class="card">
+          <span class="badge">${esc(s.em)} Station ${board.stationIdx + 1} von 5 · ${esc(s.city)}</span>
+          <h2 style="margin:10px 0 8px;">${esc(s.title)}</h2>
+          <p class="muted" style="margin:0;">${esc(s.intro)}</p>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderTask(c){
+  const task = curTask();
+  const key = taskKey();
+  const isFinale = board.screen === "finale";
+  const total = isFinale ? 1 : curStation().tasks.length;
+  const typeName = {mc:"Quizfrage", match:"Zuordnung", order:"Reihenfolge", est:"Schätzfrage", open:"Offene Aufgabe"}[task.t];
+  const ptsInfo = {mc:`${PTS.mc} P. + Tempobonus`, match:`${PTS.matchPair} P. je Paar`, order:`${PTS.orderFull} P.`, est:`${PTS.est[0]}/${PTS.est[1]}/${PTS.est[2]} P.`, open:`bis ${PTS.openMax} P.`}[task.t];
+  let body = "";
+  if(task.t === "mc"){
+    body = `<div class="opts">` + task.opts.map((o, i) =>
+      `<div class="opt ${board.phase === "revealed" ? (i === task.c ? "correct" : "wrong") : ""}"><span class="key">${KEYS[i]}</span><span>${esc(o)}</span></div>`).join("") + `</div>`;
+  } else if(task.t === "match"){
+    const right = seededShuffle(task.pairs.map(x => x[1]), board.code + key + "r");
+    body = board.phase === "revealed"
+      ? `<div class="result-rows">` + task.pairs.map(p => `<div class="result-row"><span>✅ <strong>${esc(p[0])}</strong> → ${esc(p[1])}</span></div>`).join("") + `</div>`
+      : `<div class="match-cols">` + task.pairs.map(p => `<div class="match-item">${esc(p[0])}</div>`).join("")
+        + right.map(r => `<div class="match-item" style="border-style:dashed;">${esc(r)}</div>`).join("") + `</div>
+        <p class="muted" style="margin-top:10px;">Die Teams verbinden die Paare an ihren Tablets.</p>`;
+  } else if(task.t === "order"){
+    const shuffled = seededShuffle(task.items.map((it, i) => ({i, txt:it})), board.code + key + "o");
+    body = board.phase === "revealed"
+      ? `<div class="result-rows">` + task.items.map((it, i) => `<div class="result-row"><span><strong>${i + 1}.</strong> ${esc(it)}</span></div>`).join("") + `</div>`
+      : `<div class="order-list">` + shuffled.map(o => `<div class="order-item"><span class="num">?</span>${esc(o.txt)}</div>`).join("") + `</div>
+        <p class="muted" style="margin-top:10px;">Die Teams tippen die Elemente in der richtigen Reihenfolge an.</p>`;
+  } else if(task.t === "est"){
+    body = board.phase === "revealed"
+      ? `<div class="reveal-box"><h3>Lösung: ${esc(String(task.ans))} ${esc(task.unit)}</h3></div>`
+      : `<p class="muted">Die Teams geben ihre Schätzung am Tablet ein. Am nächsten dran gewinnt!</p>`;
+  } else if(task.t === "open"){
+    body = board.phase === "revealed"
+      ? `<div id="gradePanel"></div>`
+      : `<p class="muted">Die Teams schreiben ihre Antwort am Tablet (Team-Antwort, kurz und präzise).</p>
+         <div class="card" style="margin-top:12px;background:rgba(77,201,255,.06);"><strong>🔎 Bewertungsfokus (nur Lehrkraft):</strong><br><span class="muted">${esc(task.focus || "")}</span></div>`;
+  }
+  const expl = board.phase === "revealed" && task.t !== "open"
+    ? `<div class="reveal-box" style="margin-top:14px;"><h3>Erklärung</h3><p style="margin:0;">${esc(task.expl || "")}</p></div>` : "";
+  const stationArt = isFinale ? FINALE : curStation();
+  c.innerHTML = `
+    <div class="journey-strip"><span class="stop">${esc(stationArt.em)} ${esc(stationArt.city)}</span><span class="line"></span><span class="stop">${isFinale ? "Finale" : "Aufgabe " + (board.taskIdx + 1)}</span><span class="line"></span><span class="stop muted-stop">ICE unterwegs</span></div>
+    <div class="row spread" style="margin-bottom:6px;">
+      <span class="badge">${esc(typeName)} · ${esc(ptsInfo)}</span>
+      <span class="badge blue">${isFinale ? "🏔️ FINALE" : `Aufgabe ${board.taskIdx + 1}/${total}${task.r ? " · Reserve" : ""}`}</span>
+    </div>
+    <div class="task-layout">
+      <div class="task-art"><div class="img-slot" data-img="${esc(stationArt.img)}" data-em="${esc(stationArt.em)}" data-ph="Bild: ${esc(stationArt.city)}"></div><div class="scene-caption">${esc(stationArt.city)}<small>${esc(stationArt.title)}</small></div></div>
+      <div class="card task-card">
+        <div class="task-q">${esc(task.q)}</div>
+        ${body}${expl}
+        <div class="answer-status" id="answerStatus"></div>
+      </div>
+    </div>`;
+  renderAnswerStatus();
+  if(board.phase === "revealed" && task.t === "open") renderGradePanel();
+  if(board.phase === "revealed" && task.t !== "open") renderTaskResults(c);
+}
+function renderAnswerStatus(){
+  const el = $("answerStatus"); if(!el) return;
+  const got = board.answers[taskKey()] || {};
+  el.innerHTML = teamList().map(t =>
+    `<span class="as-chip ${got[t.id] ? "in" : ""}">${avatarHTML(t.avatar)} ${esc(t.name)} ${got[t.id] ? "✓" : "…"}</span>`).join("");
+  hydrateAvatars(el);
+}
+function renderTaskResults(c){
+  const res = board.results[taskKey()] || {};
+  const rows = teamList().map(t => {
+    const r = res[t.id];
+    const pts = r ? r.pts : 0;
+    return `<div class="result-row">${avatarHTML(t.avatar)}<strong>${esc(t.name)}</strong>
+      <span class="detail">${esc(r?.detail || "keine Antwort")}</span>
+      <span class="pts ${pts > 0 ? "plus" : pts < 0 ? "minus" : "zero"}">${pts > 0 ? "+" : ""}${pts} P.</span></div>`;
+  }).join("");
+  c.querySelector(".card").insertAdjacentHTML("beforeend", `<div class="result-rows">${rows}</div>`);
+  hydrateAvatars(c);
+}
+/* Bewertungspanel für offene Aufgaben */
+function renderGradePanel(){
+  const el = $("gradePanel"); if(!el) return;
+  const key = taskKey();
+  const answers = board.answers[key] || {};
+  const res = board.results[key] || (board.results[key] = {});
+  const task = curTask();
+  el.innerHTML = `<div class="card" style="background:rgba(77,201,255,.06);margin-bottom:12px;">
+      <strong>🔎 Bewertungsfokus:</strong> <span class="muted">${esc(task.focus || "")}</span></div>` +
+    teamList().map(t => {
+      const a = answers[t.id];
+      const given = res[t.id]?.pts;
+      const btns = [0, 30, 60, 90, 120, 150].map(p =>
+        `<button class="${given === p ? "sel" : ""}" onclick="gradeOpen('${t.id}',${p})">${p}</button>`).join("");
+      return `<div class="grade-card">
+        <div class="row">${avatarHTML(t.avatar)}<strong>${esc(t.name)}</strong>
+          <span class="pts muted" style="margin-left:auto;">${given !== undefined ? given + " P. vergeben" : "noch nicht bewertet"}</span></div>
+        <div class="txt">${a ? esc(a.payload) : "— keine Antwort abgegeben —"}</div>
+        <div class="grade-btns">${btns}</div>
+      </div>`;
+    }).join("");
+  hydrateAvatars(el);
+}
+function gradeOpen(teamId, pts){
+  const key = taskKey();
+  const res = board.results[key] || (board.results[key] = {});
+  const old = res[teamId]?.pts || 0;
+  res[teamId] = {pts, detail:"Lehrkraft-Bewertung"};
+  board.teams[teamId].score += pts - old;
+  renderGradePanel(); saveBoard(); broadcastState();
+}
+
+function renderStandings(c){
+  const list = teamList();
+  c.innerHTML = `
+    <div class="journey-strip"><span class="stop">✅ Station geschafft</span><span class="line"></span><span class="stop">${esc(curStation().city)}</span><span class="line"></span><span class="stop muted-stop">Weiterfahren</span></div>
+    <div class="grid2">
+      <div class="card map-wrap">${mapSVG()}</div>
+      <div class="card">
+        <span class="badge">Zwischenstand nach Station ${board.stationIdx + 1}</span>
+        <div class="standings">` +
+    list.map((t, i) => `<div class="stand-row ${i === 0 ? "top1" : ""}">
+        <span class="rank">${i + 1}.</span>${avatarHTML(t.avatar)}
+        <span class="name">${esc(t.name)}</span><span class="score">${t.score} P.</span></div>`).join("") +
+    `</div></div></div>`;
+}
+
+function renderWager(c){
+  const list = teamList();
+  c.innerHTML = `
+    <div class="finale-hero">
+      <div class="scene-frame"><div class="img-slot" data-img="${esc(FINALE.img)}" data-em="${esc(FINALE.em)}" data-ph="Bild: Zugspitze – Finale"></div><div class="scene-caption">Die letzte Etappe<small>Jetzt entscheidet sich, wie viel Risiko ihr eingeht.</small></div></div>
+      <div class="card">
+        <span class="badge">🏔️ Finale – Risiko-Einsatz</span>
+        <h2 style="margin:10px 0 8px;">Wie viel setzt ihr?</h2>
+        <p class="muted">${esc(FINALE.intro)}<br><strong>Keine Antwort zählt wie eine falsche Antwort.</strong></p>
+        <div class="standings">` +
+    list.map(t => {
+      const w = board.wagers[t.id];
+      return `<div class="stand-row"><span class="rank">${avatarHTML(t.avatar)}</span>
+        <span class="name">${esc(t.name)} <span class="muted" style="font-size:.85rem;">(${t.score} P.)</span></span>
+        <span class="score">${w !== undefined ? "Einsatz: " + w : "…überlegt"}</span></div>`;
+    }).join("") + `</div></div></div>`;
+}
+
+/* ---- Podium / Siegerehrung ---- */
+function renderPodium(c){
+  const list = teamList();
+  const pod = (t, cls, medal) => t ? `<div class="pod ${cls}">
+      ${avatarHTML(t.avatar, "big")}
+      <div class="pname">${medal} ${esc(t.name)}</div>
+      <div class="pscore">${t.score} Punkte</div>
+      <div class="sockel">${cls === "p1" ? "1" : cls === "p2" ? "2" : "3"}</div>
+    </div>` : "";
+  const rest = list.slice(3).map((t, i) => `<div class="stand-row">
+      <span class="rank">${i + 4}.</span>${avatarHTML(t.avatar)}
+      <span class="name">${esc(t.name)}</span><span class="score">${t.score} P.</span></div>`).join("");
+  c.innerHTML = `
+    <div class="podium-hero">
+      <div class="podium-copy"><span class="badge">🎉 Ziel erreicht – Siegerehrung</span><h2>Herzlichen Glückwunsch!</h2><p class="muted">Die Deutschlandreise ist geschafft.</p></div>
+      <div class="scene-frame"><div class="img-slot" data-img="assets/img/siegerehrung.png" data-em="🏆" data-ph="Bild: Siegerehrung am Gipfelkreuz"></div><div class="scene-caption">Ankunft auf dem Gipfel<small>Teamgeist, Wissen und eine gute Portion Tempo.</small></div></div>
+    </div>
+    <div class="podium">${pod(list[1], "p2", "🥈")}${pod(list[0], "p1", "🥇")}${pod(list[2], "p3", "🥉")}</div>
+    ${rest ? `<div class="card" style="max-width:640px;margin:0 auto;"><div class="standings">${rest}</div></div>` : ""}`;
+  confettiBurst();
+}
+
+/* ---- Konfetti ---- */
+function confettiBurst(){
+  const cv = $("confetti"); cv.classList.remove("hidden");
+  cv.width = innerWidth; cv.height = innerHeight;
+  const ctx = cv.getContext("2d");
+  const cols = ["#ffcf4d", "#4dc9ff", "#43d17c", "#ff6b6b", "#ffffff", "#c792ff"];
+  const parts = Array.from({length:220}, () => ({
+    x:Math.random() * cv.width, y:-20 - Math.random() * cv.height * .5,
+    vy:2 + Math.random() * 3.5, vx:-1.5 + Math.random() * 3,
+    s:5 + Math.random() * 7, r:Math.random() * Math.PI, vr:-.1 + Math.random() * .2,
+    c:cols[Math.floor(Math.random() * cols.length)]
+  }));
+  let frames = 0;
+  cancelAnimationFrame(cv._raf);
+  (function tick(){
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    parts.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.r += p.vr;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r);
+      ctx.fillStyle = p.c; ctx.fillRect(-p.s / 2, -p.s / 2, p.s, p.s * .6); ctx.restore();
+    });
+    if(++frames < 420) cv._raf = requestAnimationFrame(tick);
+    else { ctx.clearRect(0, 0, cv.width, cv.height); cv.classList.add("hidden"); }
+  })();
+}
+/* ---- Steuerleiste der Lehrkraft ---- */
+function renderTeachbar(){
+  const bar = $("teachbar");
+  const b = (label, fn, cls) => `<button class="btn ${cls || ""}" onclick="${fn}">${label}</button>`;
+  let html = "";
+  if(board.screen === "lobby"){
+    html = b("Reise starten →", "gotoIntro(0)") + (board.demo ? b("Demo: 2 Teams sind bereit", "toast('Demo-Teams warten – einfach starten!')", "ghost small") : "");
+  } else if(board.screen === "intro"){
+    html = b("Erste Aufgabe →", "gotoTask(0)");
+  } else if(board.screen === "task" || board.screen === "finale"){
+    if(board.phase === "answering"){
+      html = b("⏸︎ Timer", "pauseTimer()", "ghost small") + b("+30 s", "extendTimer(30)", "ghost small")
+        + (board.demo ? b("🧪 Demo-Antworten", "demoAnswers()", "ghost small") : "")
+        + b("Auflösen ✓", "revealTask()")
+        + (board.screen === "task" ? b("Überspringen ›", "nextTask(true)", "ghost small") : "");
+    } else {
+      html = board.screen === "finale"
+        ? b("Zur Siegerehrung 🏆", "gotoPodium()")
+        : b("Weiter →", "nextTask(false)");
+    }
+  } else if(board.screen === "standings"){
+    html = board.stationIdx < STATIONS.length - 1
+      ? b("Weiter nach " + STATIONS[board.stationIdx + 1].city + " →", "gotoIntro(" + (board.stationIdx + 1) + ")")
+      : b("Zum Finale auf die Zugspitze 🏔️", "gotoWager()");
+  } else if(board.screen === "wager"){
+    const sel = FINALE.questions.map((q, i) => `<option value="${i}" ${i === board.finaleQ ? "selected" : ""}>Finalfrage ${i + 1}</option>`).join("");
+    html = `<select style="width:auto;padding:9px 12px;" onchange="board.finaleQ=+this.value">${sel}</select>` + b("Finalfrage stellen →", "gotoFinale()");
+  } else if(board.screen === "podium"){
+    html = b("🎉 Konfetti!", "confettiBurst()", "ghost") + b("Spiel beenden & zurücksetzen", "resetGame()", "danger small");
+  }
+  bar.innerHTML = html;
+}
+
+/* ---- Ablaufsteuerung ---- */
+function gotoIntro(i){ board.stationIdx = i; board.screen = "intro"; stopTimer(); renderBoard(); }
+function gotoTask(j){
+  board.taskIdx = j; board.screen = "task"; board.phase = "answering";
+  startTimer(TIMERS[curTask().t] || 60);
+  renderBoard();
+}
+function nextTask(skip){
+  if(!skip && board.phase === "answering"){ revealTask(); return; }
+  stopTimer();
+  if(board.taskIdx < curStation().tasks.length - 1) gotoTask(board.taskIdx + 1);
+  else { board.screen = "standings"; renderBoard(); }
+}
+function gotoWager(){ board.screen = "wager"; board.wagers = {}; stopTimer(); renderBoard(); }
+function gotoFinale(){
+  board.screen = "finale"; board.phase = "answering";
+  teamList().forEach(t => { if(board.wagers[t.id] === undefined) board.wagers[t.id] = 0; });
+  startTimer(TIMERS.finale);
+  renderBoard();
+}
+function gotoPodium(){ board.screen = "podium"; stopTimer(); renderBoard(); }
+function resetGame(){
+  if(!confirm("Spielstand wirklich löschen? (Für ein neues Spiel mit neuem Code)")) return;
+  localStorage.removeItem("endspiel-board"); location.reload();
+}
+
+/* ---- Auflösen & Punkte ---- */
+function revealTask(){
+  if(board.phase !== "answering") return;
+  const task = curTask(), key = taskKey();
+  board.phase = "revealed"; stopTimer();
+  if(!board.results[key]) board.results[key] = {};
+  if(task.t !== "open"){
+    const res = computeResults(task, board.answers[key] || {});
+    board.results[key] = res;
+    Object.entries(res).forEach(([tid, r]) => { if(board.teams[tid]) board.teams[tid].score += r.pts; });
+  }
+  renderBoard();
+}
+function computeResults(task, answers){
+  const res = {};
+  if(board.screen === "finale"){
+    teamList().forEach(t => {
+      const w = board.wagers[t.id] || 0;
+      const a = answers[t.id];
+      const ok = a && a.payload === task.c;
+      res[t.id] = {pts: ok ? w : -w, detail: a ? "Antwort " + KEYS[a.payload] + (ok ? " – richtig!" : " – leider falsch") : "keine Antwort", correct:!!ok};
+    });
+    return res;
+  }
+  if(task.t === "mc"){
+    const total = (TIMERS.mc || 60) * 1000;
+    Object.entries(answers).forEach(([tid, a]) => {
+      const ok = a.payload === task.c;
+      let bonus = 0;
+      if(ok && board._taskStart && board._deadlineAbs){
+        const remain = Math.max(0, board._deadlineAbs - a.at);
+        bonus = Math.round(PTS.mcBonus * Math.min(1, remain / total));
+      }
+      res[tid] = {pts: ok ? PTS.mc + bonus : 0, detail: "Antwort " + KEYS[a.payload] + (ok ? ` (+${bonus} Tempobonus)` : " – falsch"), correct:ok};
+    });
+  }
+  if(task.t === "match"){
+    Object.entries(answers).forEach(([tid, a]) => {
+      let n = 0;
+      (a.payload || []).forEach((rightTxt, li) => { if(task.pairs[li] && task.pairs[li][1] === rightTxt) n++; });
+      res[tid] = {pts:n * PTS.matchPair, detail:`${n}/${task.pairs.length} Paare richtig`, correct:n === task.pairs.length};
+    });
+  }
+  if(task.t === "order"){
+    Object.entries(answers).forEach(([tid, a]) => {
+      const seq = a.payload || [];
+      let n = 0; seq.forEach((orig, pos) => { if(orig === pos) n++; });
+      const full = n === task.items.length;
+      const pts = full ? PTS.orderFull : (n >= task.items.length / 2 ? PTS.orderHalf : 0);
+      res[tid] = {pts, detail:`${n}/${task.items.length} Positionen richtig`, correct:full};
+    });
+  }
+  if(task.t === "est"){
+    const entries = Object.entries(answers).map(([tid, a]) => ({tid, val:parseFloat(a.payload), diff:Math.abs(parseFloat(a.payload) - task.ans)}))
+      .filter(e => !isNaN(e.val)).sort((x, y) => x.diff - y.diff);
+    let lastDiff = null, rank = -1;
+    entries.forEach(e => {
+      if(e.diff !== lastDiff){ rank++; lastDiff = e.diff; }
+      const pts = rank < PTS.est.length ? PTS.est[rank] : 20;
+      res[e.tid] = {pts, detail:`Schätzung: ${e.val} ${task.unit}`, correct:rank === 0};
+    });
+  }
+  return res;
+}
+
+/* ---- Timer ---- */
+function startTimer(sec){
+  stopTimer();
+  board.deadline = sec; board.paused = null;
+  board._taskStart = Date.now();
+  board._deadlineAbs = Date.now() + sec * 1000;
+  const el = $("bTimer"); el.classList.remove("hidden");
+  board.timerH = setInterval(tickTimer, 250);
+  tickTimer();
+}
+function tickTimer(){
+  const el = $("bTimer"); if(!el) return;
+  if(board.paused){ el.textContent = "⏸ " + fmtSec(board.paused); return; }
+  const remain = Math.max(0, Math.ceil((board._deadlineAbs - Date.now()) / 1000));
+  el.textContent = fmtSec(remain);
+  el.className = "timer" + (remain <= 10 ? " crit" : remain <= 25 ? " warn" : "");
+  if(remain <= 0 && board.phase === "answering"){ el.textContent = "0:00 ⏰"; }
+}
+function fmtSec(s){ return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); }
+function pauseTimer(){
+  if(board.paused){ board._deadlineAbs = Date.now() + board.paused * 1000; board.paused = null; }
+  else { board.paused = Math.max(0, Math.ceil((board._deadlineAbs - Date.now()) / 1000)); }
+  broadcastState();
+}
+function extendTimer(sec){
+  if(board.paused) board.paused += sec;
+  else board._deadlineAbs = Math.max(board._deadlineAbs, Date.now()) + sec * 1000;
+  broadcastState(); tickTimer();
+}
+function stopTimer(){ clearInterval(board.timerH); board.timerH = null; $("bTimer")?.classList.add("hidden"); }
+
+/* Für die Tablets: Restzeit mitsenden */
+const _origBroadcast = broadcastState;
+broadcastState = function(){
+  if(board.backend && (board.screen === "task" || board.screen === "finale") && board.phase === "answering"){
+    board.deadline = board.paused ? null : board._deadlineAbs;
+  } else board.deadline = null;
+  _origBroadcast();
+};
+
+/* ---- Demo: simulierte Antworten (Probelauf) ---- */
+function demoAnswers(){
+  const task = curTask(), key = taskKey();
+  ["demo1", "demo2"].forEach((tid, k) => {
+    if((board.answers[key] || {})[tid]) return;
+    let payload;
+    if(task.t === "mc") payload = Math.random() < .6 ? task.c : Math.floor(Math.random() * task.opts.length);
+    if(task.t === "match") payload = seededShuffle(task.pairs.map(p => p[1]), tid + Math.random());
+    if(task.t === "order") payload = seededShuffle(task.items.map((_, i) => i), tid + Math.random());
+    if(task.t === "est") payload = +(task.ans * (0.6 + Math.random() * 0.9)).toFixed(2);
+    if(task.t === "open") payload = "— simulierte Teamantwort (Demo " + (k + 1) + ") —";
+    onBoardMsg({kind:"answer", teamId:tid, taskKey:key, payload});
+  });
+  toast("Demo-Antworten eingetroffen");
+}
+/* ============================ TABLET (TEAM) ============================ */
+const team = {
+  id:null, name:null, avatar:null, code:null, backend:null,
+  state:null,          // letzter Zustand vom Tafelbild
+  sent:{},             // taskKey -> true (Antwort abgeschickt)
+  picks:{},            // Zwischenstände (Zuordnung/Reihenfolge)
+  clockOffset:0, timerH:null,
+};
+
+function showJoin(){
+  $("modeSelect").classList.add("hidden");
+  $("joinScreen").classList.remove("hidden");
+  const saved = JSON.parse(sessionStorage.getItem("endspiel-team") || "null");
+  if(saved){ $("joinCode").value = saved.code || ""; $("joinName").value = saved.name || ""; }
+  const pick = $("avatarPick");
+  pick.innerHTML = AVATARS.map(a =>
+    `<div class="pick ${saved && saved.avatar === a.id ? "sel" : ""}" data-av="${a.id}" onclick="selectAvatar('${a.id}')">
+       ${avatarHTML(a.id, "big")}<span class="nm">${esc(a.name)}</span></div>`).join("");
+  hydrateAvatars(pick);
+  team.avatar = saved?.avatar || null;
+}
+function selectAvatar(id){
+  team.avatar = id;
+  document.querySelectorAll("#avatarPick .pick").forEach(el => el.classList.toggle("sel", el.dataset.av === id));
+}
+function joinGame(){
+  const code = $("joinCode").value.trim().toUpperCase();
+  const name = $("joinName").value.trim();
+  const err = $("joinError");
+  if(code.length !== 4){ err.textContent = "Bitte den 4-stelligen Spielcode vom Tafelbild eingeben."; return; }
+  if(name.length < 2){ err.textContent = "Bitte einen Teamnamen eingeben (Fantasiename!)."; return; }
+  if(!team.avatar){ err.textContent = "Bitte einen Avatar auswählen."; return; }
+  err.textContent = "";
+  const saved = JSON.parse(sessionStorage.getItem("endspiel-team") || "null");
+  team.id = (saved && saved.code === code) ? saved.id : "t" + Math.random().toString(36).slice(2, 10);
+  team.name = name; team.code = code;
+  sessionStorage.setItem("endspiel-team", JSON.stringify({id:team.id, name, avatar:team.avatar, code}));
+  team.backend = makeBackend(code, onTeamMsg);
+  team.backend.ready.then(() => {
+    team.backend.send({kind:"join", team:{id:team.id, name, avatar:team.avatar}});
+  });
+  $("joinScreen").classList.add("hidden");
+  $("teamScreen").classList.remove("hidden");
+  $("tName").textContent = name;
+  $("tAvatar").outerHTML = `<span class="avatar" id="tAvatar" data-avimg="${esc((AVATARS.find(a=>a.id===team.avatar)||AVATARS[0]).img)}" data-avem="x">${esc((AVATARS.find(a=>a.id===team.avatar)||AVATARS[0]).em)}</span>`;
+  hydrateAvatars($("teamScreen"));
+  $("tContent").innerHTML = `<div class="bigfeedback wait">Verbinde mit dem Tafelbild …<span class="sub">Code ${esc(code)}${supabaseActive() ? "" : " · lokaler Modus (gleicher Browser)"}</span></div>`;
+  clearInterval(team.timerH);
+  team.timerH = setInterval(renderTeamTimer, 500);
+}
+
+function onTeamMsg(msg){
+  if(!msg || msg.kind !== "state") return;
+  const st = msg.state;
+  if(!st) return;
+  team.clockOffset = (st.now || Date.now()) - Date.now();
+  const prev = team.state;
+  team.state = st;
+  const me = st.teams.find(t => t.id === team.id);
+  if(me){ $("tScore").textContent = me.score + " P."; }
+  $("tStation").textContent = st.station?.city ? `${st.station.em || ""} ${st.station.city}` : "Deutschlandreise";
+  /* Nur neu rendern, wenn sich Wesentliches ändert (Tippen nicht unterbrechen) */
+  const sig = [st.screen, st.taskKey, st.phase, st.paused, !!st.deadline].join("|");
+  if(prev && prev._sig === sig && (st.screen === "task" || st.screen === "finale") && st.phase === "answering") { st._sig = sig; return; }
+  st._sig = sig;
+  renderTeam();
+}
+
+function renderTeam(){
+  const st = team.state, c = $("tContent");
+  if(!st){ return; }
+  const me = st.teams.find(t => t.id === team.id);
+  if(!me){
+    c.innerHTML = `<div class="bigfeedback no">Ihr seid (noch) nicht im Spiel.<span class="sub">Vielleicht ist das Spiel voll (max. 8 Teams) oder wurde neu gestartet – ladet die Seite neu und tretet erneut bei.</span></div>`;
+    return;
+  }
+  if(st.screen === "lobby"){
+    c.innerHTML = `<div class="bigfeedback wait">🚉 Ihr seid an Bord!<span class="sub">Wartet, bis die Lehrkraft die Reise startet. Besprecht schon mal eure Taktik …</span></div>`;
+  } else if(st.screen === "intro"){
+    c.innerHTML = `<div class="bigfeedback wait">${esc(st.station.em)} Nächster Halt: ${esc(st.station.city)}<span class="sub">Gleich kommt die erste Aufgabe – Augen zum Tafelbild!</span></div>`;
+  } else if(st.screen === "task" || st.screen === "finale"){
+    renderTeamTask(c, st);
+  } else if(st.screen === "standings"){
+    const rank = st.teams.findIndex(t => t.id === team.id) + 1;
+    c.innerHTML = `<div class="bigfeedback wait">Zwischenstand: Platz ${rank} von ${st.teams.length}<span class="sub">${me.score} Punkte – weiter geht die Fahrt!</span></div>`;
+  } else if(st.screen === "wager"){
+    renderTeamWager(c, st, me);
+  } else if(st.screen === "podium"){
+    const rank = st.teams.findIndex(t => t.id === team.id) + 1;
+    const medal = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : "🎖️";
+    c.innerHTML = `<div class="bigfeedback ok">${medal} Platz ${rank}!<span class="sub">${me.score} Punkte – danke fürs Mitreisen durch die Q1!</span></div>`;
+  }
+  hydrateAvatars(c);
+}
+
+function renderTeamTask(c, st){
+  const key = st.taskKey, task = st.task;
+  if(!task) return;
+  if(st.phase === "revealed"){
+    const r = (st.results || {})[team.id];
+    const cls = r ? (r.pts > 0 ? "ok" : (r.correct ? "ok" : "no")) : "no";
+    c.innerHTML = `
+      <div class="bigfeedback ${task.t === "open" && !r ? "wait" : cls}">
+        ${task.t === "open" && !r ? "Bewertung läuft …" : r ? (r.pts >= 0 ? "+" : "") + r.pts + " Punkte" : "Keine Antwort abgegeben"}
+        <span class="sub">${esc(r?.detail || "")}</span></div>
+      ${st.solution ? `<div class="card" style="margin-top:14px;"><strong>Lösung / Erklärung</strong><p style="white-space:pre-wrap;margin:8px 0 0;" class="muted">${esc(st.solution)}</p></div>` : ""}`;
+    return;
+  }
+  const answered = team.sent[key] || (st.answered || []).includes(team.id);
+  if(answered){
+    c.innerHTML = `<div class="bigfeedback wait">Antwort abgeschickt ✓<span class="sub">Wartet auf die Auflösung am Tafelbild.</span></div>`;
+    return;
+  }
+  const timer = `<div class="timer" id="tTimer" style="margin:0 auto 4px;width:fit-content;">–</div>`;
+  let ui = "";
+  if(task.t === "mc"){
+    ui = `<div class="t-opts">` + task.opts.map((o, i) =>
+      `<button class="t-opt" onclick="sendAnswer(${i})"><span class="key">${KEYS[i]}</span><span>${esc(o)}</span></button>`).join("") + `</div>`;
+  } else if(task.t === "match"){
+    team.picks[key] = team.picks[key] || {sel:null, map:{}};
+    ui = renderMatchUI(task, key) ;
+  } else if(task.t === "order"){
+    team.picks[key] = team.picks[key] || {seq:[]};
+    ui = renderOrderUI(task, key);
+  } else if(task.t === "est"){
+    ui = `<div class="card" style="margin-top:14px;">
+      <input type="number" inputmode="decimal" step="${task.step}" id="estInput" placeholder="Eure Schätzung (${esc(task.unit)})">
+      <button class="btn" style="width:100%;margin-top:12px;" onclick="sendEstimate()">Schätzung abschicken</button></div>`;
+  } else if(task.t === "open"){
+    ui = `<div class="card" style="margin-top:14px;">
+      <textarea id="openInput" maxlength="800" placeholder="Eure Team-Antwort … (kurz und präzise, Fachbegriffe nutzen!)"></textarea>
+      <button class="btn" style="width:100%;margin-top:12px;" onclick="sendOpen()">Antwort abschicken</button></div>`;
+  }
+  c.innerHTML = `${timer}<div class="card"><div class="task-q" style="font-size:1.15rem;">${esc(task.q)}</div></div>${ui}`;
+  renderTeamTimer();
+}
+function renderMatchUI(task, key){
+  const p = team.picks[key];
+  const colors = ["#ffcf4d", "#4dc9ff", "#43d17c", "#c792ff"];
+  const leftHtml = task.left.map((l, i) => {
+    const paired = p.map[i] !== undefined;
+    const col = paired ? colors[i % 4] : null;
+    return `<button class="match-item ${p.sel === i ? "sel" : ""}" style="${col ? `border-color:${col};` : ""}" onclick="matchSelLeft('${key}',${i})">
+      ${esc(l)}${paired ? `<span class="pairtag" style="background:${col};">${i + 1}</span>` : ""}</button>`;
+  }).join("");
+  const rightHtml = task.right.map((r, j) => {
+    const li = Object.keys(p.map).find(k => p.map[k] === r);
+    const col = li !== undefined ? colors[li % 4] : null;
+    return `<button class="match-item" style="border-style:dashed;${col ? `border-color:${col};` : ""}" onclick="matchSelRight('${key}',${j})">
+      ${esc(r)}${col ? `<span class="pairtag" style="background:${col};">${+li + 1}</span>` : ""}</button>`;
+  }).join("");
+  const done = Object.keys(p.map).length === task.left.length;
+  return `<p class="muted" style="margin:14px 0 4px;">Links antippen, dann rechts das passende Gegenstück – Paar antippen löst es wieder.</p>
+    <div class="match-cols">${leftHtml}${rightHtml}</div>
+    <button class="btn" style="width:100%;margin-top:14px;" ${done ? "" : "disabled"} onclick="sendMatch('${key}')">Zuordnung abschicken</button>`;
+}
+function matchSelLeft(key, i){
+  const p = team.picks[key];
+  if(p.map[i] !== undefined){ delete p.map[i]; p.sel = null; }
+  else p.sel = (p.sel === i ? null : i);
+  team.state._sig = ""; renderTeam();
+}
+function matchSelRight(key, j){
+  const p = team.picks[key];
+  const r = team.state.task.right[j];
+  const usedBy = Object.keys(p.map).find(k => p.map[k] === r);
+  if(usedBy !== undefined){ delete p.map[usedBy]; }
+  else if(p.sel !== null){ p.map[p.sel] = r; p.sel = null; }
+  team.state._sig = ""; renderTeam();
+}
+function sendMatch(key){
+  const p = team.picks[key];
+  const payload = team.state.task.left.map((_, i) => p.map[i]);
+  sendPayload(payload);
+}
+function renderOrderUI(task, key){
+  const p = team.picks[key];
+  const items = task.items;   /* [{i:originalIndex, txt}] – bereits gemischt */
+  const html = items.map(o => {
+    const pos = p.seq.indexOf(o.i);
+    return `<button class="order-item ${pos >= 0 ? "picked" : ""}" onclick="orderPick('${key}',${o.i})">
+      <span class="num">${pos >= 0 ? pos + 1 : "·"}</span>${esc(o.txt)}</button>`;
+  }).join("");
+  const done = p.seq.length === items.length;
+  return `<p class="muted" style="margin:14px 0 4px;">Tippt die Elemente in der richtigen Reihenfolge an (1., 2., 3. …). Nochmal tippen = zurücknehmen.</p>
+    <div class="order-list">${html}</div>
+    <div class="row" style="margin-top:14px;">
+      <button class="btn ghost small" onclick="team.picks['${key}'].seq=[];team.state._sig='';renderTeam();">Zurücksetzen</button>
+      <button class="btn" style="flex:1;" ${done ? "" : "disabled"} onclick="sendPayload(team.picks['${key}'].seq)">Reihenfolge abschicken</button></div>`;
+}
+function orderPick(key, origIdx){
+  const p = team.picks[key];
+  const at = p.seq.indexOf(origIdx);
+  if(at >= 0) p.seq.splice(at);          /* ab dieser Position zurücknehmen */
+  else p.seq.push(origIdx);
+  team.state._sig = ""; renderTeam();
+}
+function sendEstimate(){
+  const v = parseFloat($("estInput").value.replace(",", "."));
+  if(isNaN(v)){ toast("Bitte eine Zahl eingeben."); return; }
+  sendPayload(v);
+}
+function sendOpen(){
+  const txt = $("openInput").value.trim();
+  if(txt.length < 3){ toast("Bitte erst eine Antwort schreiben."); return; }
+  sendPayload(txt);
+}
+function sendAnswer(i){ sendPayload(i); }
+function sendPayload(payload){
+  const key = team.state.taskKey;
+  if(team.sent[key]) return;
+  team.sent[key] = true;
+  team.backend.send({kind:"answer", teamId:team.id, taskKey:key, payload});
+  team.state._sig = ""; renderTeam();
+}
+function renderTeamWager(c, st, me){
+  const max = Math.floor(me.score / 2);
+  const sentW = st.wagers && st.wagers[team.id] !== undefined;
+  if(sentW){
+    c.innerHTML = `<div class="bigfeedback wait">Einsatz gesetzt: ${st.wagers[team.id]} Punkte<span class="sub">Gleich kommt die Finalfrage – volle Konzentration!</span></div>`;
+    return;
+  }
+  c.innerHTML = `<div class="card wager-wrap">
+    <span class="badge">🏔️ Finale – Risiko</span>
+    <p class="muted">Ihr habt <strong>${me.score} Punkte</strong>. Setzt bis zu 50 % davon:
+    richtig = Einsatz dazu, falsch oder keine Antwort = Einsatz weg.</p>
+    <div class="wager-val" id="wagerVal">${Math.floor(max / 2)}</div>
+    <input type="range" id="wagerRange" min="0" max="${max}" value="${Math.floor(max / 2)}"
+      oninput="$('wagerVal').textContent=this.value">
+    <button class="btn" style="width:100%;margin-top:14px;" onclick="sendWager()">Einsatz festmachen 🔒</button>
+  </div>`;
+}
+function sendWager(){
+  team.backend.send({kind:"wager", teamId:team.id, amount:+$("wagerRange").value});
+  $("tContent").innerHTML = `<div class="bigfeedback wait">Einsatz übermittelt …</div>`;
+}
+function renderTeamTimer(){
+  const el = $("tTimer"); if(!el || !team.state) return;
+  const st = team.state;
+  if(st.paused){ el.textContent = "⏸ Pause"; el.className = "timer"; return; }
+  if(!st.deadline){ el.textContent = "–"; return; }
+  const remain = Math.max(0, Math.ceil((st.deadline - (Date.now() + team.clockOffset)) / 1000));
+  el.textContent = fmtSec(remain);
+  el.className = "timer" + (remain <= 10 ? " crit" : remain <= 25 ? " warn" : "");
+}
+
+/* ============================ START ============================ */
+function toggleHelp(show){ $("helpOverlay").classList.toggle("hidden", !show); }
+(function init(){
+  $("syncNote").innerHTML = supabaseActive()
+    ? "🟢 Supabase verbunden – Tablets können über das Internet beitreten."
+    : "🟡 <strong>Lokaler Modus:</strong> Supabase ist noch nicht konfiguriert (siehe SUPABASE-SETUP.md). "
+      + "Tafelbild und Teams funktionieren aktuell nur in Tabs desselben Browsers – ideal zum Testen über „Probelauf“.";
+  hydrateImgSlots(document);
+})();
+
+</script>
+</body>
+</html>
